@@ -1,0 +1,288 @@
+﻿@model List<Deneme_proje.Models.CrmEntities.Firsat>
+
+@{
+    ViewData["Title"] = "CRM Fırsatlar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+
+<style>
+    .modal-content {
+        background-color: #fefefe;
+        margin: 50% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 100%;
+        height: 25%;
+    }
+
+    .modal-body {
+        padding: 20px;
+        max-height: 500px;
+        overflow-y: auto;
+        width: 100%;
+    }
+
+    .dataTables_wrapper {
+        position: relative;
+        clear: none;
+    }
+
+    table.dataTable tbody td {
+        font-size: 12px;
+        word-wrap: break-word;
+        white-space: normal;
+    }
+</style>
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="#">CRM</a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">Fırsatlar</h5>
+                    </div>
+
+                    <div class="card-block accordion-block">
+                        <div class="mb-3">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addOpportunityModal">Yeni Fırsat</button>
+                            <button class="btn btn-secondary">Fırsatları İçe Aktar</button>
+                           @*  <button class="btn btn-outline-secondary">Kanban Görünümüne Geç</button> *@
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <select class="form-select">
+                                        <option selected>Atanan</option>
+                                        <option>Hüseyin Karadenizli</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select">
+                                        <option selected>Durum</option>
+                                        <option>MIKRO</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select">
+                                        <option selected>Kaynak</option>
+                                        <option>Google</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select">
+                                        <option selected>Ek Filtreler</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="example_wrapper" class="dataTables_wrapper tablo">
+                                <table id="example" class="display dataTable table-striped" style="width:100%">
+                                    <thead>
+                                        <tr class="tablo-icerik-yazi">
+                                            <th>#</th>
+                                            <th>Adı</th>
+                                            <th>Firma</th>
+                                            <th>E-posta Adresi</th>
+                                            <th>Telefonu</th>
+                                            <th>Tutar</th>
+                                            <th>Etiketler</th>
+                                            <th>Atanan</th>
+                                            <th>Durum</th>
+                                            <th>Kaynak</th>
+                                            <th>Son İletişim</th>
+                                            <th>Oluşturuldu</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var firsat in Model)
+                                        {
+                                            <tr>
+                                                <td>@firsat.Firsat_Guid</td>
+                                                <td>@firsat.Firsat_Adi</td>
+                                                <td>@firsat.Firma_Adi</td>
+                                                <td>@firsat.Email</td>
+                                                <td>@firsat.Telefon</td>
+                                                <td>@firsat.Tutar</td>
+                                                <td>@firsat.Etiketler</td>
+                                                <td>@firsat.Atanan_Kisi</td>
+                                                <td><span class="badge bg-info">@firsat.Durum</span></td>
+                                                <td>@firsat.Kaynak</td>
+                                                <td>@(firsat.Son_Iletisim_Tarihi?.ToString("dd.MM.yyyy"))</td>
+                                                <td>@firsat.Olusturulma_Tarihi.ToString("dd.MM.yyyy")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Yeni Fırsat Modal -->
+                        <div class="modal fade" id="addOpportunityModal" tabindex="-1" aria-labelledby="addOpportunityLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="addOpportunityLabel">Yeni Fırsat Ekle</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form asp-action="FirsatEkle" method="post">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-2">
+                                                    <label class="form-label">Fırsat Durumu</label>
+                                                    <select name="Durum" class="form-select">
+                                                        <option>Seçim yapılmadı</option>
+                                                        <option>MIKRO</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6 mb-2">
+                                                    <label class="form-label">Kaynağı</label>
+                                                    <select name="Kaynak" class="form-select">
+                                                        <option>Seçim yapılmadı</option>
+                                                        <option>Google</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6 mb-2">
+                                                    <label class="form-label">Atanan Kişi</label>
+                                                    <select name="Atanan_Kisi" class="form-select">
+                                                        <option>Seçim yapılmadı</option>
+                                                        <option>Hüseyin Karadenizli</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Etiketler</label>
+                                                    <select name="Etiketler" multiple class="form-select">
+                                                        <option value="Etiket 1">Etiket 1</option>
+                                                        <option value="Etiket 2">Etiket 2</option>
+                                                        <option value="Etiket 3">Etiket 3</option>
+                                                        <option value="Etiket 4">Etiket 4</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Adı</label>
+                                                    <input type="text" name="Firsat_Adi" class="form-control">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Adres</label>
+                                                    <input type="text" name="Adres" class="form-control">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Pozisyon</label>
+                                                    <input type="text" name="Pozisyon" class="form-control">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Şehir</label>
+                                                    <input type="text" name="Sehir" class="form-control">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">E-posta Adresi</label>
+                                                    <input type="email" name="Email" class="form-control">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">İlçe</label>
+                                                    <input type="text" name="Ilce" class="form-control">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Website</label>
+                                                    <input type="text" name="Website" class="form-control">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Ülke</label>
+                                                    <select name="Ulke" class="form-select">
+                                                        <option>Seçim yapılmadı</option>
+                                                        <option>Türkiye</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Telefonu</label>
+                                                    <input type="text" name="Telefon" class="form-control">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Posta Kodu</label>
+                                                    <input type="text" name="Posta_Kodu" class="form-control">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Tutar</label>
+                                                    <input type="number" name="Tutar" class="form-control">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Varsayılan Dil</label>
+                                                    <select name="Varsayilan_Dil" class="form-select">
+                                                        <option>Seçim yapılmadı</option>
+                                                        <option>Türkçe</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Firma</label>
+                                                    <input type="text" name="Firma_Adi" class="form-control">
+                                                </div>
+                                                <div class="col-md-12 mb-6">
+                                                    <label class="form-label">Açıklama</label>
+                                                    <textarea name="Aciklama" class="form-control" rows="3"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex">
+                                                <div class="form-check mb-2 me-3">
+                                                    <input class="form-check-input" type="checkbox" name="BugunIletisimKuruldu" id="contactedToday">
+                                                    <label class="form-check-label" for="contactedToday">Bugün İletişim Kuruldu</label>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                                                <button type="submit" class="btn btn-primary">Kaydet</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
+    <script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#example').DataTable({
+                "dom": '<"row"<"col-sm-12"B>>' +
+                    '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+                    't' +
+                    '<"row"<"col-sm-6"i><"col-sm-6"p>>',
+                "language": {
+                    "url": "/Content/DataTables/turkish.json"
+                },
+                "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'],
+                "columnDefs": [
+                    { "targets": "_all" }
+                ]
+            });
+        });
+    </script>
+}

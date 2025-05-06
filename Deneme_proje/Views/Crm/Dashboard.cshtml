@@ -1,0 +1,650 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Mali Durum Özeti</title>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<style>
+		body {
+			background-color: #f5f5f5;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		}
+
+		.container-fluid {
+			padding: 20px;
+		}
+
+		.card {
+			border-radius: 4px;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+			margin-bottom: 20px;
+			border: none;
+			transition: transform 0.3s, box-shadow 0.3s;
+		}
+
+			.card:hover {
+				transform: translateY(-3px);
+				box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+			}
+
+		.card-header {
+			font-weight: bold;
+			text-align: center;
+			padding: 12px;
+		}
+
+		.table th, .table td {
+			vertical-align: middle;
+			padding: 0.5rem 0.75rem;
+		}
+
+		.table-bordered {
+			border: 1px solid #dee2e6;
+		}
+
+			.table-bordered th, .table-bordered td {
+				border: 1px solid #dee2e6;
+			}
+
+		.text-danger {
+			color: #E53935 !important;
+		}
+
+		.bg-danger {
+			background-color: #1E3559 !important;
+			color: #fff !important;
+		}
+
+		.text-success {
+			color: #52B5AF !important;
+		}
+
+		.bg-success {
+			background-color: #296299 !important;
+			color: #fff !important;
+		}
+
+		.text-primary {
+			color: #4CA7E1 !important;
+		}
+
+		.bg-primary {
+			background-color: #3B86A1 !important;
+			color: #fff !important;
+		}
+
+		.table-danger {
+			background-color: rgba(30, 53, 89, 0.08);
+		}
+
+		.table-success {
+			background-color: rgba(82, 181, 175, 0.08);
+		}
+
+		.red-row {
+			color: #E53935;
+			font-weight: bold;
+		}
+
+		tfoot {
+			font-weight: bold;
+		}
+
+			tfoot tr {
+				background: linear-gradient(to right, #1E3559, #4CA7E1) !important;
+				color: white !important;
+			}
+
+			tfoot th.text-danger {
+				color: #FFFFFF !important;
+			}
+
+		.badge-info {
+			display: inline-block;
+			padding: 0.25em 0.4em;
+			font-size: 75%;
+			font-weight: 700;
+			line-height: 1;
+			text-align: center;
+			white-space: nowrap;
+			vertical-align: baseline;
+			border-radius: 0.25rem;
+			background-color: #4CA7E1;
+			color: #fff;
+		}
+
+		/* Yan yana tablolar */
+		.balance-columns {
+			display: flex;
+			gap: 20px;
+			width: 100%;
+		}
+
+		.balance-column {
+			flex: 1;
+		}
+
+		/* Responsive */
+		@@media (max-width: 768px) {
+			.balance-columns
+
+		{
+			flex-direction: column;
+		}
+
+		}
+
+		.btn-block {
+			display: block;
+			width: 100%;
+		}
+
+		.btn-primary {
+			background: linear-gradient(45deg, #1E3559, #194181);
+			border-color: #1E3559;
+			box-shadow: 0 2px 4px rgba(30, 53, 89, 0.4);
+			transition: all 0.3s;
+		}
+
+			.btn-primary:hover {
+				background: linear-gradient(45deg, #194181, #296299);
+				border-color: #194181;
+				box-shadow: 0 4px 8px rgba(30, 53, 89, 0.6);
+				transform: translateY(-2px);
+			}
+
+		.form-control:focus {
+			border-color: #4CA7E1;
+			box-shadow: 0 0 0 0.2rem rgba(76, 167, 225, 0.25);
+		}
+
+		/* Animasyonlu border */
+		.animated-border {
+			position: relative;
+			overflow: hidden;
+		}
+
+			.animated-border::before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: -100%;
+				width: 100%;
+				height: 2px;
+				background: linear-gradient(to right, transparent, #4CA7E1, transparent);
+				animation: border-flow 3s infinite linear;
+			}
+
+		@@keyframes border-flow {
+			0%
+
+		{
+			left: -100%;
+		}
+
+		100% {
+			left: 100%;
+		}
+
+		}
+
+		/* Card stilleri */
+		.metric-card {
+			border-radius: 8px;
+			transition: all 0.3s;
+			overflow: hidden;
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+		}
+
+			.metric-card:hover {
+				transform: translateY(-5px);
+				box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+			}
+
+		.metric-title {
+			font-size: 14px;
+			font-weight: 600;
+			margin-bottom: 5px;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			color: rgba(255, 255, 255, 0.9);
+		}
+
+		.metric-value {
+			font-size: 24px;
+			font-weight: 700;
+			margin-bottom: 0;
+		}
+
+		/* Gradientli kartlar */
+		.gradient-blue {
+			background: linear-gradient(135deg, #1E3559, #296299);
+		}
+
+		.gradient-teal {
+			background: linear-gradient(135deg, #296299, #52B5AF);
+		}
+
+		.gradient-purple {
+			background: linear-gradient(135deg, #4CA7E1, #3B86A1);
+		}
+
+		.gradient-orange {
+			background: linear-gradient(135deg, #52B5AF, #4CA7E1);
+		}
+
+		/* Tablo başlıkları için gradientler */
+		.header-gradient-blue {
+			background: linear-gradient(to right, #1E3559, #296299);
+			color: white;
+			border: none;
+		}
+
+		.header-gradient-teal {
+			background: linear-gradient(to right, #296299, #4CA7E1);
+			color: white;
+			border: none;
+		}
+	</style>
+</head>
+<body>
+	<div class="main-content mt-5">
+		<div class="px-lg-5 px-3">
+			<div class="row mb-4">
+				<div class="col-md-2">
+					<div class="form-group">
+						<label for="startDate">Başlangıç Tarihi</label>
+						<input type="date" id="startDate" class="form-control" value="2025-03-13">
+					</div>
+				</div>
+				<div class="col-md-2">
+					<div class="form-group">
+						<label for="endDate">Bitiş Tarihi</label>
+						<input type="date" id="endDate" class="form-control" value="2025-04-30">
+					</div>
+				</div>
+				<div class="col-md-2 d-flex align-items-end">
+					<button id="filterButton" class="btn btn-primary btn-block">Filtrele</button>
+				</div>
+			</div>
+
+			<!-- Ana İçerik -->
+			<div class="row">
+				<div class="col-sm-12">
+					<div class="card animated-border">
+						<div class="card-header" style="background: radial-gradient(circle, rgba(76, 167, 225, 1) 0%, rgba(30, 53, 89, 1) 63%); padding: 15px 20px;">
+							<h5 class="card-header-text text-white m-0">Kasa Raporu</h5>
+						</div>
+						<!-- Yan Yana Tablolar -->
+						<div class="balance-columns pt-4 px-4">
+							<!-- Sol Tablo (Toplam Bakiye) -->
+							<div class="balance-column">
+								<div class="card">
+									<div class="card-header header-gradient-blue">
+										<h5 class="mb-0">TOPLAM BAKİYE</h5>
+									</div>
+									<div class="card-body p-0">
+										<div class="table-responsive">
+											<table class="table table-bordered mb-0">
+												<thead>
+													<tr style="background-color: rgba(30, 53, 89, 0.1)">
+														<th class="text-center" width="50%">HESAP ADI</th>
+														<th class="text-center" width="50%">BAKİYE</th>
+													</tr>
+												</thead>
+												<tbody id="accountsTable">
+													<tr>
+														<td class="text-center">NAKİT KASASI</td>
+														<td class="text-right">₺25.872,35</td>
+													</tr>
+													<tr class="table-danger">
+														<td class="text-center">İŞ BANKASI</td>
+														<td class="text-right">-₺1.732.456,82</td>
+													</tr>
+													<tr>
+														<td class="text-center">İŞ BANKASI DBS HS</td>
+														<td class="text-right">₺87.921,64</td>
+													</tr>
+													<tr class="table-danger">
+														<td class="text-center">FİNANSBANK-MAAŞ HESABI</td>
+														<td class="text-right">-₺675.000,00</td>
+													</tr>
+													<tr>
+														<td class="text-center">FİNANSBANK-POS HESABI</td>
+														<td class="text-right">₺15.250,32</td>
+													</tr>
+													<tr>
+														<td class="text-center">FİNANSBANK VADELİ</td>
+														<td class="text-right">₺150.000,00</td>
+													</tr>
+													<tr>
+														<td class="text-center">GARANTİ BANKASI-VADELİ</td>
+														<td class="text-right">₺75.000,00</td>
+													</tr>
+													<tr class="table-danger">
+														<td class="text-center">GARANTİ</td>
+														<td class="text-right">-₺1.125.630,45</td>
+													</tr>
+													<tr>
+														<td class="text-center">AKBANK (ÇEK HESABI)</td>
+														<td class="text-right">₺42.318,75</td>
+													</tr>
+													<tr class="table-danger">
+														<td class="text-center">AKBANK (POS HESABI)</td>
+														<td class="text-right">-₺545.218,72</td>
+													</tr>
+													<tr>
+														<td class="text-center">AKBANK FON HES.</td>
+														<td class="text-right">₺18.500,00</td>
+													</tr>
+													<tr class="table-danger">
+														<td class="text-center">TEB BANKASI</td>
+														<td class="text-right">-₺78.452,25</td>
+													</tr>
+													<tr>
+														<td class="text-center">YAPI KREDİ BANKASI</td>
+														<td class="text-right">₺1.254,63</td>
+													</tr>
+													<tr>
+														<td class="text-center">DENİZBANK</td>
+														<td class="text-right">₺785,42</td>
+													</tr>
+													<tr class="table-danger">
+														<td class="text-center">ING BANK</td>
+														<td class="text-right">-₺3.528,90</td>
+													</tr>
+												</tbody>
+												<tfoot>
+													<tr>
+														<th class="text-center">KASADAKİ TOPLAM PARA</th>
+														<th class="text-right text-danger">-₺3.743.384,03</th>
+													</tr>
+												</tfoot>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Sağ Tablo (Ödeme Listesi) -->
+							<div class="balance-column">
+								<div class="card">
+									<div class="card-header header-gradient-teal">
+										<h5 class="mb-0" id="paymentListTitle">MART - NİSAN ÖDEME LİSTESİ</h5>
+									</div>
+									<div class="card-body p-0">
+										<div class="table-responsive">
+											<table class="table table-bordered mb-0">
+												<thead>
+													<tr style="background-color: rgba(41, 98, 153, 0.1)">
+														<th class="text-center" width="25%">TARİH</th>
+														<th class="text-center" width="50%">AÇIKLAMA</th>
+														<th class="text-center" width="25%">TUTAR</th>
+													</tr>
+												</thead>
+												<tbody id="paymentsTable">
+													<!-- 15 Mart Ödemeleri -->
+													<tr>
+														<td class="text-center">15 Mart 2025 Cumartesi</td>
+														<td>ARC YAPI HAKEDİŞ ÖDEMESİ</td>
+														<td class="text-right">₺285.000,00</td>
+													</tr>
+													<tr>
+														<td colspan="2" class="text-right font-weight-bold"></td>
+														<td class="text-right text-danger font-weight-bold">-₺3.458.384,03</td>
+													</tr>
+
+													<!-- 20 Mart Ödemeleri -->
+													<tr>
+														<td class="text-center">20 Mart 2025 Perşembe</td>
+														<td>ELEKTRİK VE SU ÖDEMELERİ</td>
+														<td class="text-right">₺37.452,18</td>
+													</tr>
+													<tr>
+														<td class="text-center"></td>
+														<td>AVRASYA İNŞAAT HAKEDİŞİ</td>
+														<td class="text-right">₺178.250,00</td>
+													</tr>
+													<tr>
+														<td colspan="2" class="text-right font-weight-bold"></td>
+														<td class="text-right text-danger font-weight-bold">-₺3.674.086,21</td>
+													</tr>
+
+													<!-- 26 Mart Ödemeleri -->
+													<tr>
+														<td class="text-center">26 Mart 2025 Çarşamba</td>
+														<td>KDV VE MUHTASAR</td>
+														<td class="text-right">₺145.832,75</td>
+													</tr>
+													<tr>
+														<td colspan="2" class="text-right font-weight-bold"></td>
+														<td class="text-right text-danger font-weight-bold">-₺3.819.918,96</td>
+													</tr>
+
+													<!-- 31 Mart Ödemeleri -->
+													<tr class="red-row">
+														<td class="text-center">31 Mart 2025 Pazartesi</td>
+														<td>İŞ BANKASI KREDİSİ</td>
+														<td class="text-right">₺95.000,00</td>
+													</tr>
+													<tr>
+														<td class="text-center"></td>
+														<td>SGK ÖDEMESİ</td>
+														<td class="text-right">₺345.782,50</td>
+													</tr>
+													<tr>
+														<td class="text-center"></td>
+														<td>ONUR ARICAN YAYLA ARSA 7 TAKSİT(TOPLAM 8 TAKSİT)</td>
+														<td class="text-right">₺50.000,00</td>
+													</tr>
+													<tr>
+														<td class="text-center"></td>
+														<td>SGK YAPILANDIRMA ÖDEMESİ</td>
+														<td class="text-right">₺8.342,25</td>
+													</tr>
+													<tr>
+														<td colspan="2" class="text-right font-weight-bold"></td>
+														<td class="text-right text-danger font-weight-bold">-₺4.319.043,71</td>
+													</tr>
+
+													<!-- 5 Nisan Ödemeleri -->
+													<tr class="red-row">
+														<td class="text-center">5 Nisan 2025 Cumartesi</td>
+														<td>YÖNETİM KREDİ (İNCİ ARICAN+ONUR ARICAN)</td>
+														<td class="text-right">₺118.265,70</td>
+													</tr>
+													<tr>
+														<td class="text-center"></td>
+														<td>AYI MAAŞ ÖDEMESİ+MESAİ</td>
+														<td class="text-right">₺645.000,00</td>
+													</tr>
+													<tr>
+														<td class="text-center"></td>
+														<td>İŞBANKASI F.K.K</td>
+														<td class="text-right">₺312.458,65</td>
+													</tr>
+													<tr>
+														<td colspan="2" class="text-right font-weight-bold"></td>
+														<td class="text-right text-danger font-weight-bold">-₺5.394.768,06</td>
+													</tr>
+
+													<!-- 12 Nisan Ödemeleri -->
+													<tr>
+														<td class="text-center">12 Nisan 2025 Cumartesi</td>
+														<td>YURTDIŞI MALZEME ALIMI</td>
+														<td class="text-right">₺185.430,25</td>
+													</tr>
+													<tr>
+														<td class="text-center"></td>
+														<td>TEMEL ETÜT İŞLERİ</td>
+														<td class="text-right">₺76.850,00</td>
+													</tr>
+													<tr>
+														<td colspan="2" class="text-right font-weight-bold"></td>
+														<td class="text-right text-danger font-weight-bold">-₺5.657.048,31</td>
+													</tr>
+
+													<!-- 18 Nisan Ödemeleri -->
+													<tr>
+														<td class="text-center">18 Nisan 2025 Cuma</td>
+														<td>YENİ PROJE HAZIRLIKLARI</td>
+														<td class="text-right">₺128.750,00</td>
+													</tr>
+													<tr>
+														<td class="text-center"></td>
+														<td>GARANTİ BANKASI KREDİ TAKSİTİ</td>
+														<td class="text-right">₺87.325,45</td>
+													</tr>
+													<tr>
+														<td colspan="2" class="text-right font-weight-bold"></td>
+														<td class="text-right text-danger font-weight-bold">-₺5.873.123,76</td>
+													</tr>
+
+													<!-- 25 Nisan Ödemeleri -->
+													<tr>
+														<td class="text-center">25 Nisan 2025 Cuma</td>
+														<td>KDV ÖDEMESİ</td>
+														<td class="text-right">₺132.456,80</td>
+													</tr>
+													<tr>
+														<td class="text-center"></td>
+														<td>AKBANK KREDİ TAKSİTİ</td>
+														<td class="text-right">₺95.428,42</td>
+													</tr>
+													<tr>
+														<td colspan="2" class="text-right font-weight-bold"></td>
+														<td class="text-right text-danger font-weight-bold">-₺6.101.008,98</td>
+													</tr>
+
+													<!-- 30 Nisan Ödemeleri -->
+													<tr class="red-row">
+														<td class="text-center">30 Nisan 2025 Çarşamba</td>
+														<td>SGK ÖDEMESİ</td>
+														<td class="text-right">₺347.625,85</td>
+													</tr>
+													<tr>
+														<td class="text-center"></td>
+														<td>PERSONEL İKRAMİYE ÖDEMELERİ</td>
+														<td class="text-right">₺185.000,00</td>
+													</tr>
+													<tr>
+														<td class="text-center"></td>
+														<td>TEDARİKÇİ ÖDEME 1. TAKSİT</td>
+														<td class="text-right">₺158.435,20</td>
+													</tr>
+													<tr>
+														<td colspan="2" class="text-right font-weight-bold"></td>
+														<td class="text-right text-danger font-weight-bold">-₺6.792.070,03</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Diğer İçerik (İsteğe Bağlı) -->
+			<div class="row mt-4">
+				<div class="col-12">
+					<div class="card animated-border">
+						<div class="card-header header-gradient-blue">
+							<h5 class="mb-0">ÖZET BİLGİLER</h5>
+						</div>
+						<div class="card-body py-4">
+							<div class="row">
+								<div class="col-md-3 mb-3">
+									<div class="card metric-card gradient-blue">
+										<div class="card-body p-3 text-center">
+											<div class="metric-title">Toplam Gelir</div>
+											<div class="metric-value">₺3.048.686,00</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3 mb-3">
+									<div class="card metric-card gradient-teal">
+										<div class="card-body p-3 text-center">
+											<div class="metric-title">Toplam Gider</div>
+											<div class="metric-value">₺6.792.070,03</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3 mb-3">
+									<div class="card metric-card gradient-purple">
+										<div class="card-body p-3 text-center">
+											<div class="metric-title">Toplam Bakiye</div>
+											<div class="metric-value">-₺3.743.384,03</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3 mb-3">
+									<div class="card metric-card gradient-orange">
+										<div class="card-body p-3 text-center">
+											<div class="metric-title">Toplam Çek Teminatı</div>
+											<div class="metric-value">₺750.000,00</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		$(document).ready(function() {
+			// Tarih filtresi için olay dinleyicisi
+			$("#filterButton").click(function() {
+				const startDate = new Date($("#startDate").val());
+				const endDate = new Date($("#endDate").val());
+
+				if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+					alert("Lütfen geçerli tarih aralığı seçin!");
+					return;
+				}
+
+				// Başlığı güncelle
+				updatePaymentListTitle(startDate, endDate);
+
+				// Örnek veriyle çalıştığımız için sadece başlığı güncelliyoruz
+				// Gerçek uygulamada burada AJAX çağrısı yapılacaktır
+
+				alert("Seçilen tarih aralığı: " +
+					  formatDate(startDate) + " - " +
+					  formatDate(endDate) +
+					  "\n\nGerçek uygulamada burada veritabanından filtrelenmiş veriler getirilecektir.");
+			});
+
+			// Sayfa başlığını güncelleme fonksiyonu
+			function updatePaymentListTitle(startDate, endDate) {
+				const months = ["OCAK", "ŞUBAT", "MART", "NİSAN", "MAYIS", "HAZİRAN",
+							   "TEMMUZ", "AĞUSTOS", "EYLÜL", "EKİM", "KASIM", "ARALIK"];
+
+				const startMonth = months[startDate.getMonth()];
+				const endMonth = months[endDate.getMonth()];
+
+				let title = "";
+				if (startMonth === endMonth && startDate.getFullYear() === endDate.getFullYear()) {
+					title = startMonth + " AYI ÖDEME LİSTESİ";
+				} else {
+					title = startMonth + " - " + endMonth + " ÖDEME LİSTESİ";
+				}
+
+				$("#paymentListTitle").text(title);
+			}
+
+			// Tarih formatlama yardımcı fonksiyonu
+			function formatDate(date) {
+				return date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear();
+			}
+		});
+	</script>
+</body>
+</html>

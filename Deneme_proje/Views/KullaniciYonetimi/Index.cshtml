@@ -1,0 +1,197 @@
+﻿@model List<Deneme_proje.Models.YonetimEntities.KullaniciListViewModel>
+
+@{
+    ViewData["Title"] = "Kullanıcı Yönetimi";
+}
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">Kullanıcı Yönetimi</h5>
+                    </div>
+                    <div class="card-block px-0 py-0">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Kullanıcı No</th>
+                                    <th>Kullanıcı Adı</th>
+                                    <th>Ad Soyad</th>
+                                    <th>E-posta</th>
+                                    <th>Giriş Yetkisi</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var kullanici in Model)
+                                {
+                                    <tr>
+                                        <td>@kullanici.UserNo</td>
+                                        <td>@kullanici.UserName</td>
+                                        <td>@kullanici.LongName</td>
+                                        <td>@kullanici.Email</td>
+                                        <td>
+                                            <span class="badge @(kullanici.GirisYetkisi ? "bg-success" : "bg-danger")">
+                                                @(kullanici.GirisYetkisi ? "Aktif" : "Pasif")
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button type="button"
+                                                    class="btn btn-sm @(kullanici.GirisYetkisi ? "btn-danger" : "btn-success")"
+                                                    data-user-no="@kullanici.UserNo"
+                                                    data-yetki="@(!kullanici.GirisYetkisi)"
+                                                    onclick="updateYetki(this)">
+                                                @(kullanici.GirisYetkisi ? "Pasif Yap" : "Aktif Yap")
+                                            </button>
+                                            <a href="/MenuYonetimi/Index?userNo=@kullanici.UserNo"
+                                               class="btn btn-sm btn-info">
+                                                Düzenle
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: #1D3A67 #f0f0f0;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+
+        .table::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .table::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .table::-webkit-scrollbar-thumb {
+            background: #1D3A67;
+            border-radius: 4px;
+        }
+
+    @@media screen and (max-width: 768px) {
+        .table {
+            position: relative !important;
+            display: block !important;
+            width: 100% !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+
+        .table-mobile-container {
+            overflow-x: auto !important;
+            max-width: 100% !important;
+            position: relative !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+
+        .table thead th {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 10 !important;
+            background-color: #f8f9fa !important;
+            white-space: nowrap !important;
+            min-width: 120px !important;
+            padding: 10px !important;
+            font-size: 14px !important;
+            box-shadow: inset 0 1px 0 #dee2e6, inset 0 -1px 0 #dee2e6 !important;
+        }
+
+        .table tbody td {
+            white-space: nowrap !important;
+            min-width: 120px !important;
+            padding: 10px !important;
+            font-size: 14px !important;
+            vertical-align: middle !important;
+        }
+
+        .card {
+            margin: 0 -15px !important;
+            border-radius: 0 !important;
+        }
+
+        .px-lg-5 {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+    }
+
+    .table-mobile-container::-webkit-scrollbar {
+        width: 8px !important;
+        height: 8px !important;
+    }
+
+    .table-mobile-container::-webkit-scrollbar-track {
+        background: #f0f0f0 !important;
+        border-radius: 4px !important;
+    }
+
+    .table-mobile-container::-webkit-scrollbar-thumb {
+        background: #1D3A67 !important;
+        border-radius: 4px !important;
+    }
+</style>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function updateYetki(button) {
+            var userNo = $(button).data('user-no');
+            var girisYetkisi = $(button).data('yetki') === 'True';
+
+            console.log('UserNo:', userNo);
+            console.log('GirisYetkisi:', girisYetkisi);
+
+            $.ajax({
+                url: '/KullaniciYonetimi/UpdateYetki',
+                type: 'POST',
+                data: {
+                    userNo: userNo,
+                    girisYetkisi: girisYetkisi
+                },
+                success: function(response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert('İşlem sırasında bir hata oluştu: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('İşlem sırasında bir hata oluştu.');
+                }
+            });
+        }
+    </script>
+}

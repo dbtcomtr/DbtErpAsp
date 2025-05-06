@@ -1,0 +1,186 @@
+﻿@model Dictionary<string, Dictionary<string, List<Deneme_proje.Models.Entities.KrediDetayi>>>
+
+@{
+    DateTime? maxVadeTarihi = null;
+    var filteredModel = new Dictionary<string, Dictionary<string, List<Deneme_proje.Models.Entities.KrediDetayi>>>();
+
+    // Verisi olan sözleşmeleri filtrele
+    foreach (var contractData in Model)
+    {
+        // Sözleşmedeki her ayın verisini kontrol et
+        bool hasData = contractData.Value.Values.Any(monthData => monthData.Any());
+
+        // Eğer sözleşme herhangi bir ay için veri içeriyorsa tabloya dahil et
+        if (hasData)
+        {
+            filteredModel[contractData.Key] = contractData.Value;
+
+            // En ileri vade tarihini bulmak
+            foreach (var monthData in contractData.Value.Values)
+            {
+                foreach (var krediDetayi in monthData)
+                {
+                    if (!maxVadeTarihi.HasValue || krediDetayi.krsoztaksit_vade > maxVadeTarihi.Value)
+                    {
+                        maxVadeTarihi = krediDetayi.krsoztaksit_vade;
+                    }
+                }
+            }
+        }
+    }
+
+    var validContracts = filteredModel
+        .Where(contractData => contractData.Value.Values.Any(monthData => monthData.Any())) // İçerisinde en az bir veri olan sözleşmeler
+        .ToDictionary(k => k.Key, v => v.Value);
+
+    // Aylar listesini oluşturma
+    var currentYear = DateTime.Now.Year;
+    var currentMonth = DateTime.Now.Month;
+    var months = new List<string>();
+
+    if (maxVadeTarihi.HasValue)
+    {
+        var maxYear = maxVadeTarihi.Value.Year;
+        var maxMonth = maxVadeTarihi.Value.Month;
+
+        for (var year = currentYear; year <= maxYear; year++)
+        {
+            for (var month = 1; month <= 12; month++)
+            {
+                if (year == currentYear && month < currentMonth)
+                    continue;
+                if (year == maxYear && month > maxMonth)
+                    break;
+
+                var monthName = new DateTime(year, month, 1).ToString("MMMM yyyy", new System.Globalization.CultureInfo("tr-TR"));
+                months.Add(monthName);
+            }
+        }
+    }
+}
+
+<div class="table-container">
+    <div class="table-scroll">
+        <!-- Tablonun kaydırılabilir alanını tanımlar -->
+        <table class="table-detay" id="creditDetailsTable">
+
+            <thead>
+                <tr>
+                    <th class="sticky-column" rowspan="2">Aylar</th>
+                    @foreach (var contractData in filteredModel)
+                    {
+                        // Eğer bu kontrat kodu herhangi bir ayda veri içeriyorsa başlığı render et
+                        if (contractData.Value.Values.Any(monthData => monthData.Any()))
+                        {
+                            <th colspan="4">@contractData.Key</th>
+                        }
+                    }
+                    <th rowspan="2">Aylık Toplam Tutar</th>
+                </tr>
+                <tr>
+                    @foreach (var contractData in filteredModel)
+                    {
+                        if (contractData.Value.Values.Any(monthData => monthData.Any()))
+                        {
+                            <th>Vade Tarihi</th>
+                            <th>Anapara</th>
+                            <th>Faiz</th>
+                            <th>BSMV</th>
+                        }
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var month in months)
+                {
+                    decimal monthlyTotal = 0;
+
+                    <tr>
+                        <td class="month-header sticky-column">@month</td>
+                        @foreach (var contractData in filteredModel)
+                        {
+                            // Eğer bu kontrat kodu herhangi bir ayda veri içeriyorsa sütunlarını render et
+                            if (contractData.Value.Values.Any(monthData => monthData.Any()))
+                            {
+                                var monthKey = month.Split(' ')[0];
+                                var currentMonthData = contractData.Value.ContainsKey(monthKey)
+                                ? contractData.Value[monthKey]
+                                .Where(d => d.krsoztaksit_vade.ToString("MMMM yyyy", new System.Globalization.CultureInfo("tr-TR")) == month)
+                                .ToList()
+                                : new List<Deneme_proje.Models.Entities.KrediDetayi>();
+
+                                if (currentMonthData.Any())
+                                {
+                                    var detay = currentMonthData.First();
+                                    var total = detay.krsoztaksit_anapara + detay.krsoztaksit_faiz + detay.krsoztaksit_bsmv;
+                                    monthlyTotal += total;
+
+                                    <td>@detay.krsoztaksit_vade.ToString("dd/MM/yyyy")</td>
+                                    <td>@detay.krsoztaksit_anapara.ToString("C")</td>
+                                    <td>@detay.krsoztaksit_faiz.ToString("C")</td>
+                                    <td>@detay.krsoztaksit_bsmv.ToString("C")</td>
+                                }
+                                else
+                                {
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                }
+                            }
+                        }
+                        <td class="total-row">@monthlyTotal.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+
+
+<style>
+    .table-container {
+        position: relative;
+        border: 1px solid #ddd;
+        max-height: 50vh; /* Kapsayıcı yüksekliği sınırlandırır */
+        overflow: hidden; /* Görsel taşmaları engeller */
+    }
+
+    .table-scroll {
+        overflow-x: auto; /* Yatay kaydırma */
+        overflow-y: auto; /* Dikey kaydırma */
+        max-height: 50vh; /* Scroll için gerekli yüksekliği belirler */
+    }
+
+    .table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #eceeef;
+            position: sticky;
+            top: 0;
+            background-color: #001f3f;
+            color: white;
+            z-index: 2;
+        }
+
+        .table tbody td:first-child {
+            position: sticky;
+            left: 0;
+            background-color: #efefef;
+            z-index: 1;
+            color: black;
+            font-weight: bold;
+        }
+
+    .table-detay td, .table-detay th {
+        text-align: center;
+        padding: 8px;
+    }
+</style>
+

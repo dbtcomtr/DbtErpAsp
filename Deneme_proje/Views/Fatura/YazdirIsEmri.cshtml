@@ -1,0 +1,285 @@
+﻿@model Deneme_proje.Models.Entities.IsEmriYazdirViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <title>Bahçepınar Ürün Etiketi</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            width: 13cm;
+            height: 10cm;
+            overflow: hidden;
+        }
+
+        .etiket-container {
+            width: 13cm;
+            height: 10cm;
+            border: 1px solid #888;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 10px;
+            border-bottom: 1px solid #888;
+            background-color: #fff;
+            height: 15%;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            height: 35px;
+            margin-right: 8px;
+        }
+
+        .header-text {
+            font-size: 10px;
+            color: #555;
+            line-height: 1.3;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            font-size: 9px;
+            color: #555;
+        }
+
+        .location-info {
+            display: flex;
+            font-size: 9px;
+            color: #555;
+        }
+
+        .location-block {
+            margin-left: 12px;
+            padding-left: 12px;
+            border-left: 1px solid #aaa;
+            line-height: 1.2;
+        }
+
+        .urun-baslik {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #888;
+            padding: 5px 15px;
+            height: 30%;
+        }
+
+        .urun-adi {
+            font-size: 35px;
+            font-weight: bold;
+            color: #666;
+            text-transform: uppercase;
+            padding-right: 10px;
+            border-right: 2px solid #888; /* <<< BURAYA EKLİYORUZ */
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .urun-fiyat {
+            font-size: 35px;
+            font-weight: bold;
+            color: #666;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .urun-detaylar {
+            display: grid;
+            grid-template-columns: 1fr 3fr 1fr 1fr;
+            border-bottom: 1px solid #888;
+            height: 45%;
+        }
+
+        .detay-baslik {
+            padding: 4px 8px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #666;
+            border-right: 1px solid #888;
+            border-bottom: 1px solid #888;
+            text-transform: uppercase;
+        }
+
+        .detay-deger {
+            padding: 4px 8px;
+            font-size: 12px;
+            border-right: 1px solid #888;
+            border-bottom: 1px solid #888;
+        }
+
+        .etiket-footer {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 15px;
+            flex-grow: 1;
+            height: 20%;
+        }
+
+        .barcode-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .barcode-text {
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 3px;
+            color: #666;
+        }
+
+        .qr-code {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 80px;
+            width: 80px;
+        }
+
+        @@page {
+            size: 13cm 10cm;
+            margin: 0;
+            padding: 0;
+        }
+
+        @@media print {
+            html, body {
+                width: 13cm;
+                height: 10cm;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+
+            .etiket-container {
+                border: none;
+                width: 13cm;
+                height: 10cm;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="etiket-container">
+        <div class="header">
+			<div class="header-left">
+		
+                <img class="logo-img" src="~/bahcelogo.png" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22100%22%20height%3D%2240%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Ctext%20x%3D%220%22%20y%3D%2225%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%3EBah%C3%A7ep%C4%B1nar%3C/text%3E%3C/svg%3E';">
+                <div class="contact-info">
+                    <div>0324 327 75 75 - 0324 327 75 60</div>
+                    <div>bahcepinar@bahcepinar.com.tr</div>
+                    <div>www.bahcepinar.com.tr</div>
+                </div>
+            </div>
+            <div class="location-info">
+                <div class="location-block">
+                    <div><strong>Merkez</strong></div>
+                    <div>Dumlupinar Mh.1506 Sok. No:8</div>
+                    <div>Yenişehir /MERSİN</div>
+                </div>
+                <div class="location-block">
+                    <div><strong>Fabrika</strong></div>
+                    <div>Yeşilyurt Mh. Şehit Mehmet Çelik Cd. No:58</div>
+                    <div>Osmaniye/TÜRKİYE</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="urun-baslik">
+            <div class="urun-adi">@Model.KisaIsim</div>
+            <div class="urun-fiyat">@Model.YabanciIsim</div>
+        </div>
+
+        <div class="urun-detaylar">
+            <div class="detay-baslik">ÜRÜN KODU</div>
+            <div class="detay-deger">@Model.UrunKodu</div>
+            <div class="detay-baslik">PLT. KOLİ MİK.</div>
+            <div class="detay-deger">@(Model.Birim2Katsayi.HasValue ? ((-1) * Model.Birim2Katsayi.Value).ToString("N0") : "")</div>
+
+            <div class="detay-baslik">ÜRÜN CİNSİ</div>
+            <div class="detay-deger">@(string.IsNullOrEmpty(Model.UrunAciklamasi) ? Model.UrunAdi : Model.UrunAciklamasi)</div>
+            <div class="detay-baslik">ÜRET. SAATİ</div>
+            <div class="detay-deger">@DateTime.Now.ToString("HH.mm")</div>
+
+            <div class="detay-baslik">ÜRET. TARİHİ</div>
+            <div class="detay-deger">@DateTime.Now.ToString("dd.MM.yyyy")</div>
+            <div class="detay-baslik">BARKOD NO</div>
+            <div class="detay-deger">@Model.IsEmriKodu</div> <!-- Bu artık gerçek barkod değeri olacak -->
+
+            <div class="detay-baslik">ÜRETİM YERİ</div>
+            <div class="detay-deger">BAHÇE OSMANİYE</div>
+            <div class="detay-baslik"></div>
+            <div class="detay-deger"></div>
+        </div>
+
+        <div class="etiket-footer">
+            <div class="barcode-area">
+                <svg id="barcode"></svg>
+                <!-- Barkod metni - Bu artık gerçek barkod değeri olacak -->
+                <div class="barcode-text">@Model.IsEmriKodu</div>
+            </div>
+            <div id="qrcode" class="qr-code"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <script>
+        window.onload = function () {
+            // Barkod oluşturma - Bu artık gerçek barkod değeri kullanacak
+            JsBarcode("#barcode", "@Model.IsEmriKodu", {
+                format: "CODE128",
+                lineColor: "#000",
+                width: 1.5,
+                height: 40,
+                displayValue: false,
+                margin: 0
+            });
+
+            // QR kod oluşturma - Bu artık gerçek barkod değeri kullanacak
+            var qr = qrcode(0, 'L');
+            qr.addData('@Model.IsEmriKodu');
+            qr.make();
+            document.getElementById('qrcode').innerHTML = qr.createImgTag(3);
+
+            setTimeout(function () {
+                window.print();
+            }, 500);
+
+            window.onafterprint = function () {
+                window.close();
+            };
+        };
+    </script>
+</body>
+</html>

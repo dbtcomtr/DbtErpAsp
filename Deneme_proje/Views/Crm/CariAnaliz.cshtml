@@ -1,0 +1,1081 @@
+﻿@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+<style>
+	.modal-content {
+		width: 100%;
+	}
+
+	.modal-body {
+		overflow-y: hidden;
+	}
+
+	.main-header {
+		margin-bottom: 20px;
+	}
+
+	.card-header {
+		background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%);
+		padding: 10px 20px;
+	}
+
+	.card-header-text {
+		color: white;
+		margin-bottom: 0;
+	}
+
+	.custom-table {
+		width: 100%;
+	}
+
+		.custom-table th {
+			background-color: #f8f9fa;
+			color: #6c757d;
+			font-weight: 600;
+			border: 1px solid #e1e5eb;
+			padding: 12px;
+			text-align: center;
+		}
+
+		.custom-table td {
+			border: 1px solid #e1e5eb;
+			padding: 10px;
+			text-align: center;
+			vertical-align: middle;
+		}
+
+			.custom-table td:first-child {
+				text-align: left;
+				font-weight: 500;
+			}
+
+	.btn-group .btn {
+		padding: 4px 8px;
+		font-size: 0.75rem;
+	}
+
+	.analysis-section {
+		background-color: #ffffff;
+		border: 1px solid #e1e5eb;
+		padding: 15px;
+		text-align: center;
+		font-weight: 600;
+		color: #6c757d;
+	}
+
+	.cari-select {
+		margin-bottom: 20px;
+	}
+
+	.favorite-list {
+		padding: 0;
+		list-style: none;
+	}
+
+		.favorite-list li {
+			padding: 10px 15px;
+			border-bottom: 1px solid #e1e5eb;
+			cursor: pointer;
+			transition: background-color 0.2s;
+		}
+
+			.favorite-list li:hover {
+				background-color: #f8f9fa;
+			}
+
+			.favorite-list li.active {
+				background-color: #e9f0f7;
+				font-weight: 600;
+			}
+
+	.favorite-cari-card {
+		height: 100%;
+	}
+
+	.customer-info {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 15px;
+		background-color: #f8f9fa;
+		padding: 10px;
+		border-radius: 5px;
+	}
+
+	.customer-info-item {
+		text-align: center;
+	}
+
+	.customer-info-label {
+		font-size: 0.8rem;
+		color: #6c757d;
+	}
+
+	.customer-info-value {
+		font-weight: 600;
+		font-size: 1rem;
+	}
+</style>
+
+<div class="main-content mt-5">
+	<div class="px-lg-5 px-3">
+		<div class="row">
+			<div class="col-sm-12 p-0">
+				<div class="main-header">
+					<h4>Cari Analiz Kartı</h4>
+					<ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+						<li class="breadcrumb-item">
+							<a href="/Home/Index">
+								<i class="icofont icofont-home"></i>
+							</a>
+						</li>
+						<li class="breadcrumb-item">
+							<a href="/Rapor/">Rapor</a>
+						</li>
+						<li class="breadcrumb-item">
+							<a href="/Rapor/CariAnaliz">Cari Analiz Kartı</a>
+						</li>
+					</ol>
+				</div>
+			</div>
+		</div>
+
+		<div class="row ">
+			<div class="col-sm-12">
+				<div class="card">
+					<div class="card-header">
+						<h5 class="card-header-text">Cari Analiz Kartı</h5>
+					</div>
+					<!-- Detay Modal -->
+					<div class="modal fade" id="detailModal" tabindex="-1">
+						<div class="modal-dialog modal-lg">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="modalTitle">Detay</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body" id="modalContent">
+									<!-- Dinamik içerik buraya gelecek -->
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" id="monthlyViewBtn">Aylık Detay</button>
+									<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Kapat</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+
+
+					<!-- Cari Seçim Alanı -->
+					<div class="row mb-4 pt-5 px-5">
+						<div class="col-lg-6">
+							<div class="form-group cari-select">
+								<label for="cariSelect" class="form-label fw-bold">Cari Seçimi:</label>
+								<select class="form-select" id="cariSelect">
+									<option value="" selected disabled>Cari Seçiniz</option>
+									<option value="cari1">ABC Tekstil Ltd. Şti.</option>
+									<option value="cari2">XYZ Mobilya San. A.Ş.</option>
+									<option value="cari3">123 Otomotiv Yedek Parça</option>
+									<option value="cari4">İstanbul Gıda Pazarlama</option>
+									<option value="cari5">Teknik Elektronik Ltd. Şti.</option>
+								</select>
+							</div>
+						</div>
+					</div>
+
+					<!-- Müşteri Bilgi Özeti -->
+					<div class="row px-5" id="customerInfoSection" style="display: none;">
+						<div class="col-12">
+							<div class="customer-info">
+								<div class="customer-info-item">
+									<div class="customer-info-label">Toplam Borç</div>
+									<div class="customer-info-value" id="totalDebt">0,00 TL</div>
+								</div>
+								<div class="customer-info-item">
+									<div class="customer-info-label">Gecikmiş Borç</div>
+									<div class="customer-info-value" id="overdueDebt">0,00 TL</div>
+								</div>
+								<div class="customer-info-item">
+									<div class="customer-info-label">Vade Ortalaması</div>
+									<div class="customer-info-value" id="dueAverage">0 Gün</div>
+								</div>
+								<div class="customer-info-item">
+									<div class="customer-info-label">Risk Durumu</div>
+									<div class="customer-info-value" id="riskStatus"><span class="badge bg-success">Normal</span></div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="row px-5">
+						<!-- Ana Cari Analiz Kartı -->
+						<div class="col-lg-8 col-md-12 mb-4">
+							<div class="card">
+								<div class="card-header">
+									<h5 class="card-header-text">Cari Analiz Kartı</h5>
+								</div>
+
+								<div class="card-block">
+									<div class="table-responsive">
+										<table class="table custom-table">
+											<thead>
+												<tr>
+													<th></th>
+													<th>UPB</th>
+													<th>TL</th>
+													<th>USD</th>
+													<th>EUR</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td>Geciken Bakiye</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="gecikenBakiye-UPB">100.500,50</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="gecikenBakiye" data-currency="UPB">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="gecikenBakiye" data-currency="UPB">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="gecikenBakiye-TL">100.500,50</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="gecikenBakiye" data-currency="TL">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="gecikenBakiye" data-currency="TL">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="gecikenBakiye-USD">00.00</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="gecikenBakiye" data-currency="USD">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="gecikenBakiye" data-currency="USD">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="gecikenBakiye-EUR">00.00</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="gecikenBakiye" data-currency="EUR">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="gecikenBakiye" data-currency="EUR">Ay</button>
+															</div>
+														</div>
+													</td>
+												</tr>
+												<tr>
+													<td>Bakiye</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="bakiye-UPB">100.500,50</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="bakiye" data-currency="UPB">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="bakiye" data-currency="UPB">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="bakiye-TL">100.500,50</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="bakiye" data-currency="TL">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="bakiye" data-currency="TL">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="bakiye-USD">00.00</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="bakiye" data-currency="USD">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="bakiye" data-currency="USD">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="bakiye-EUR">00.00</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="bakiye" data-currency="EUR">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="bakiye" data-currency="EUR">Ay</button>
+															</div>
+														</div>
+													</td>
+												</tr>
+												<tr>
+													<td colspan="5" class="text-center">
+														<strong>A. Ortalama Vade:</strong> <span id="ortalamaVade">10.06.2024</span>
+													</td>
+												</tr>
+												<tr>
+													<td colspan="2" class="text-center">Müşteri</td>
+													<td colspan="3" class="text-center">Satıcı</td>
+												</tr>
+												<tr>
+													<td>İrsaliye</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="irsaliye-UPB">100.500,50</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="irsaliye" data-currency="UPB">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="irsaliye" data-currency="UPB">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="irsaliye-TL">100.500,50</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="irsaliye" data-currency="TL">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="irsaliye" data-currency="TL">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="irsaliye-USD">100.500,50</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="irsaliye" data-currency="USD">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="irsaliye" data-currency="USD">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="irsaliye-EUR">00.00</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="irsaliye" data-currency="EUR">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="irsaliye" data-currency="EUR">Ay</button>
+															</div>
+														</div>
+													</td>
+												</tr>
+												<tr>
+													<td>Sipariş</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="siparis-UPB">100.500,50</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="siparis" data-currency="UPB">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="siparis" data-currency="UPB">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="siparis-TL">100.500,50</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="siparis" data-currency="TL">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="siparis" data-currency="TL">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="siparis-USD">00.00</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="siparis" data-currency="USD">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="siparis" data-currency="USD">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="siparis-EUR">00.00</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="siparis" data-currency="EUR">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="siparis" data-currency="EUR">Ay</button>
+															</div>
+														</div>
+													</td>
+												</tr>
+												<tr>
+													<td>Konsinye</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="konsinye-UPB">100.500,50</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="konsinye" data-currency="UPB">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="konsinye" data-currency="UPB">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="konsinye-TL">100.500,50</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="konsinye" data-currency="TL">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="konsinye" data-currency="TL">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="konsinye-USD">00.00</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="konsinye" data-currency="USD">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="konsinye" data-currency="USD">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="konsinye-EUR">00.00</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="konsinye" data-currency="EUR">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="konsinye" data-currency="EUR">Ay</button>
+															</div>
+														</div>
+													</td>
+												</tr>
+												<tr>
+													<td>Çek</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="cek-UPB">100.500,50</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="cek" data-currency="UPB">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="cek" data-currency="UPB">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="cek-TL">100.500,50</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="cek" data-currency="TL">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="cek" data-currency="TL">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="cek-USD">00.00</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="cek" data-currency="USD">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="cek" data-currency="USD">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="cek-EUR">00.00</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="cek" data-currency="EUR">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="cek" data-currency="EUR">Ay</button>
+															</div>
+														</div>
+													</td>
+												</tr>
+												<tr>
+													<td>Senet</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="senet-UPB">100.500,50</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="senet" data-currency="UPB">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="senet" data-currency="UPB">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="senet-TL">100.500,50</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="senet" data-currency="TL">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="senet" data-currency="TL">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="senet-USD">00.00</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="senet" data-currency="USD">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="senet" data-currency="USD">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="senet-EUR">00.00</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="senet" data-currency="EUR">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="senet" data-currency="EUR">Ay</button>
+															</div>
+														</div>
+													</td>
+												</tr>
+												<tr>
+													<td>Diğer</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="diger-UPB">100.500,50</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="diger" data-currency="UPB">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="diger" data-currency="UPB">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="diger-TL">100.500,50</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="diger" data-currency="TL">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="diger" data-currency="TL">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="diger-USD">00.00</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="diger" data-currency="USD">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="diger" data-currency="USD">Ay</button>
+															</div>
+														</div>
+													</td>
+													<td>
+														<div class="d-flex justify-content-between align-items-center">
+															<span id="diger-EUR">00.00</span>
+															<div class="btn-group btn-group-sm">
+																<button class="btn btn-info detail-btn" data-type="diger" data-currency="EUR">i</button>
+																<button class="btn btn-secondary monthly-btn" data-type="diger" data-currency="EUR">Ay</button>
+															</div>
+														</div>
+													</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+									<div class="row mt-3">
+										<div class="col-6 analysis-section">Stok Hareket Analizi (Miktarsal)</div>
+										<div class="col-6 analysis-section">Stok Hareket Analizi (Finansal)</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Sık Kullanılan Cariler Kartı -->
+						<div class="col-lg-4 col-md-12 mb-4">
+							<div class="card favorite-cari-card">
+								<div class="card-header">
+									<h5 class="card-header-text">Sık Kullanılan Cariler</h5>
+								</div>
+								<div class="card-block">
+									<ul class="favorite-list" id="favoriteList">
+										<li class="d-flex justify-content-between align-items-center" data-id="cari1">
+											<span>ABC Tekstil Ltd. Şti.</span>
+											<span class="badge bg-primary rounded-pill">Müşteri</span>
+										</li>
+										<li class="d-flex justify-content-between align-items-center" data-id="cari2">
+											<span>XYZ Mobilya San. A.Ş.</span>
+											<span class="badge bg-primary rounded-pill">Müşteri</span>
+										</li>
+										<li class="d-flex justify-content-between align-items-center" data-id="cari3">
+											<span>123 Otomotiv Yedek Parça</span>
+											<span class="badge bg-success rounded-pill">Tedarikçi</span>
+										</li>
+										<li class="d-flex justify-content-between align-items-center" data-id="cari4">
+											<span>İstanbul Gıda Pazarlama</span>
+											<span class="badge bg-primary rounded-pill">Müşteri</span>
+										</li>
+										<li class="d-flex justify-content-between align-items-center" data-id="cari5">
+											<span>Teknik Elektronik Ltd. Şti.</span>
+											<span class="badge bg-success rounded-pill">Tedarikçi</span>
+										</li>
+									</ul>
+
+									<div class="mt-4">
+										<h6 class="mb-2">Cari Kartı Özeti</h6>
+										<div id="selectedCariInfo" class="p-3 bg-light" style="display: none;">
+											<p class="mb-1"><strong>Cari Adı:</strong> <span id="selectedCariName">-</span></p>
+											<p class="mb-1"><strong>Tipi:</strong> <span id="selectedCariType">-</span></p>
+											<p class="mb-1"><strong>Yetkili:</strong> <span id="selectedCariContact">-</span></p>
+											<p class="mb-1"><strong>Son İşlem:</strong> <span id="selectedCariLastTransaction">-</span></p>
+											<p class="mb-0"><strong>Toplam Bakiye:</strong> <span id="selectedCariTotalBalance">-</span></p>
+										</div>
+										<div id="noCariSelectedInfo" class="p-3 bg-light text-center">
+											<p class="mb-0">Bilgileri görüntülemek için cari seçiniz</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
+	<script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+
+	<script>
+		// Cari verileri
+		const cariData = {
+			cari1: {
+				name: "ABC Tekstil Ltd. Şti.",
+				type: "Müşteri",
+				contact: "Ahmet Yılmaz",
+				lastTransaction: "15.02.2025",
+				totalBalance: "245.750,25 TL",
+				totalDebt: "245.750,25 TL",
+				overdueDebt: "75.000,00 TL",
+				dueAverage: "45 Gün",
+				riskStatus: "Normal",
+				values: {
+					gecikenBakiye: {
+						UPB: "75.000,00",
+						TL: "75.000,00",
+						USD: "2.350,00",
+						EUR: "0,00"
+					},
+					bakiye: {
+						UPB: "245.750,25",
+						TL: "245.750,25",
+						USD: "7.653,00",
+						EUR: "0,00"
+					},
+					irsaliye: {
+						UPB: "156.250,50",
+						TL: "156.250,50",
+						USD: "4.875,00",
+						EUR: "0,00"
+					},
+					siparis: {
+						UPB: "98.500,00",
+						TL: "98.500,00",
+						USD: "0,00",
+						EUR: "0,00"
+					}
+				},
+				ortalamaVade: "25.04.2025"
+			},
+			cari2: {
+				name: "XYZ Mobilya San. A.Ş.",
+				type: "Müşteri",
+				contact: "Zeynep Kaya",
+				lastTransaction: "20.01.2025",
+				totalBalance: "468.950,75 TL",
+				totalDebt: "468.950,75 TL",
+				overdueDebt: "120.500,00 TL",
+				dueAverage: "60 Gün",
+				riskStatus: "Yüksek",
+				values: {
+					gecikenBakiye: {
+						UPB: "120.500,00",
+						TL: "120.500,00",
+						USD: "3.765,00",
+						EUR: "0,00"
+					},
+					bakiye: {
+						UPB: "468.950,75",
+						TL: "468.950,75",
+						USD: "14.650,00",
+						EUR: "0,00"
+					},
+					irsaliye: {
+						UPB: "282.570,25",
+						TL: "282.570,25",
+						USD: "8.830,00",
+						EUR: "0,00"
+					},
+					siparis: {
+						UPB: "175.300,00",
+						TL: "175.300,00",
+						USD: "5.470,00",
+						EUR: "0,00"
+					}
+				},
+				ortalamaVade: "15.05.2025"
+			},
+			cari3: {
+				name: "123 Otomotiv Yedek Parça",
+				type: "Tedarikçi",
+				contact: "Mehmet Özkan",
+				lastTransaction: "05.02.2025",
+				totalBalance: "198.750,00 TL",
+				totalDebt: "198.750,00 TL",
+				overdueDebt: "0,00 TL",
+				dueAverage: "30 Gün",
+				riskStatus: "Düşük",
+				values: {
+					gecikenBakiye: {
+						UPB: "0,00",
+						TL: "0,00",
+						USD: "0,00",
+						EUR: "0,00"
+					},
+					bakiye: {
+						UPB: "198.750,00",
+						TL: "198.750,00",
+						USD: "6.200,00",
+						EUR: "1.850,00"
+					},
+					irsaliye: {
+						UPB: "135.000,00",
+						TL: "135.000,00",
+						USD: "4.215,00",
+						EUR: "1.255,00"
+					},
+					siparis: {
+						UPB: "63.750,00",
+						TL: "63.750,00",
+						USD: "1.985,00",
+						EUR: "595,00"
+					}
+				},
+				ortalamaVade: "10.03.2025"
+			},
+			cari4: {
+				name: "İstanbul Gıda Pazarlama",
+				type: "Müşteri",
+				contact: "Ayşe Demir",
+				lastTransaction: "10.02.2025",
+				totalBalance: "87.500,00 TL",
+				totalDebt: "87.500,00 TL",
+				overdueDebt: "25.000,00 TL",
+				dueAverage: "15 Gün",
+				riskStatus: "Normal",
+				values: {
+					gecikenBakiye: {
+						UPB: "25.000,00",
+						TL: "25.000,00",
+						USD: "780,00",
+						EUR: "0,00"
+					},
+					bakiye: {
+						UPB: "87.500,00",
+						TL: "87.500,00",
+						USD: "2.730,00",
+						EUR: "0,00"
+					},
+					irsaliye: {
+						UPB: "60.000,00",
+						TL: "60.000,00",
+						USD: "1.870,00",
+						EUR: "0,00"
+					},
+					siparis: {
+						UPB: "27.500,00",
+						TL: "27.500,00",
+						USD: "860,00",
+						EUR: "0,00"
+					}
+				},
+				ortalamaVade: "01.03.2025"
+			},
+			cari5: {
+				name: "Teknik Elektronik Ltd. Şti.",
+				type: "Tedarikçi",
+				contact: "Can Güler",
+				lastTransaction: "18.02.2025",
+				totalBalance: "156.800,00 TL",
+				totalDebt: "156.800,00 TL",
+				overdueDebt: "0,00 TL",
+				dueAverage: "45 Gün",
+				riskStatus: "Düşük",
+				values: {
+					gecikenBakiye: {
+						UPB: "0,00",
+						TL: "0,00",
+						USD: "0,00",
+						EUR: "0,00"
+					},
+					bakiye: {
+						UPB: "156.800,00",
+						TL: "156.800,00",
+						USD: "4.900,00",
+						EUR: "2.350,00"
+					},
+					irsaliye: {
+						UPB: "98.500,00",
+						TL: "98.500,00",
+						USD: "3.075,00",
+						EUR: "1.475,00"
+					},
+					siparis: {
+						UPB: "58.300,00",
+						TL: "58.300,00",
+						USD: "1.825,00",
+						EUR: "875,00"
+					}
+				},
+				ortalamaVade: "05.04.2025"
+			}
+		};
+
+		// Detay verileri
+		const detailData = {
+			bakiye: {
+				UPB: {
+					total: '100.500,50 UPB',
+					monthly: [
+						{ ay: 'Ocak 2024', bakiye: '10.000,00 UPB' },
+						{ ay: 'Şubat 2024', bakiye: '35.000,25 UPB' },
+						{ ay: 'Mart 2024', bakiye: '45.000,75 UPB' },
+						{ ay: 'Nisan 2024', bakiye: '10.499,50 UPB' },
+						{ ay: 'Mayıs 2024', bakiye: '0,00 UPB' },
+						{ ay: 'Haziran 2024', bakiye: '0,00 UPB' },
+						{ ay: 'Temmuz 2024', bakiye: '0,00 UPB' },
+						{ ay: 'Ağustos 2024', bakiye: '0,00 UPB' },
+						{ ay: 'Eylül 2024', bakiye: '0,00 UPB' },
+						{ ay: 'Ekim 2024', bakiye: '0,00 UPB' },
+						{ ay: 'Kasım 2024',                         bakiye: '0,00 UPB' },
+						{ ay: 'Aralık 2024', bakiye: '0,00 UPB' }
+					],
+					items: [
+						{ faturaNo: 'FA-2024-001', tarih: '15.02.2024', vade: '15.03.2024', tutar: '35.000,25 UPB', aciklama: 'Şubat ayı mal alım faturası' },
+						{ faturaNo: 'FA-2024-002', tarih: '10.03.2024', vade: '10.04.2024', tutar: '45.000,75 UPB', aciklama: 'Mart ayı mal alım faturası' },
+						{ faturaNo: 'FA-2024-003', tarih: '05.04.2024', vade: '05.05.2024', tutar: '20.499,50 UPB', aciklama: 'Nisan ayı mal alım faturası' }
+					]
+				},
+				TL: {
+					total: '100.500,50 TL',
+					monthly: [
+						{ ay: 'Ocak 2024', bakiye: '10.000,00 TL' },
+						{ ay: 'Şubat 2024', bakiye: '35.000,25 TL' },
+						{ ay: 'Mart 2024', bakiye: '45.000,75 TL' },
+						{ ay: 'Nisan 2024', bakiye: '10.499,50 TL' },
+						{ ay: 'Mayıs 2024', bakiye: '0,00 TL' },
+						{ ay: 'Haziran 2024', bakiye: '0,00 TL' },
+						{ ay: 'Temmuz 2024', bakiye: '0,00 TL' },
+						{ ay: 'Ağustos 2024', bakiye: '0,00 TL' },
+						{ ay: 'Eylül 2024', bakiye: '0,00 TL' },
+						{ ay: 'Ekim 2024', bakiye: '0,00 TL' },
+						{ ay: 'Kasım 2024', bakiye: '0,00 TL' },
+						{ ay: 'Aralık 2024', bakiye: '0,00 TL' }
+					],
+					items: [
+						{ faturaNo: 'FA-2024-001', tarih: '15.02.2024', vade: '15.03.2024', tutar: '35.000,25 TL', aciklama: 'Şubat ayı mal alım faturası' },
+						{ faturaNo: 'FA-2024-002', tarih: '10.03.2024', vade: '10.04.2024', tutar: '45.000,75 TL', aciklama: 'Mart ayı mal alım faturası' },
+						{ faturaNo: 'FA-2024-003', tarih: '05.04.2024', vade: '05.05.2024', tutar: '20.499,50 TL', aciklama: 'Nisan ayı mal alım faturası' }
+					]
+				},
+				USD: {
+					total: '0,00 USD',
+					monthly: Array(12).fill().map((_, index) => ({
+						ay: `${['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'][index]} 2024`,
+						bakiye: '0,00 USD'
+					})),
+					items: []
+				},
+				EUR: {
+					total: '0,00 EUR',
+					monthly: Array(12).fill().map((_, index) => ({
+						ay: `${['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'][index]} 2024`,
+						bakiye: '0,00 EUR'
+					})),
+					items: []
+				}
+			},
+			konsinye: {
+				// Diğer kategoriler için bu yapı tekrarlanır
+				UPB: { total: '100.500,50 UPB', monthly: [], items: [] },
+				TL: { total: '100.500,50 TL', monthly: [], items: [] },
+				USD: { total: '0,00 USD', monthly: [], items: [] },
+				EUR: { total: '0,00 EUR', monthly: [], items: [] }
+			},
+			cek: {
+				UPB: { total: '100.500,50 UPB', monthly: [], items: [] },
+				TL: { total: '100.500,50 TL', monthly: [], items: [] },
+				USD: { total: '0,00 USD', monthly: [], items: [] },
+				EUR: { total: '0,00 EUR', monthly: [], items: [] }
+			},
+			senet: {
+				UPB: { total: '100.500,50 UPB', monthly: [], items: [] },
+				TL: { total: '100.500,50 TL', monthly: [], items: [] },
+				USD: { total: '0,00 USD', monthly: [], items: [] },
+				EUR: { total: '0,00 EUR', monthly: [], items: [] }
+			},
+			diger: {
+				UPB: { total: '100.500,50 UPB', monthly: [], items: [] },
+				TL: { total: '100.500,50 TL', monthly: [], items: [] },
+				USD: { total: '0,00 USD', monthly: [], items: [] },
+				EUR: { total: '0,00 EUR', monthly: [], items: [] }
+			}
+		};
+
+		$(document).ready(function() {
+			// Cari seçim event handler
+			$('#cariSelect').on('change', function() {
+				const cariId = $(this).val();
+				if (cariId) {
+					updateCariData(cariId);
+
+					// Cari seçildiğinde aktif et
+					$('#favoriteList li').removeClass('active');
+					$('#favoriteList li[data-id="' + cariId + '"]').addClass('active');
+
+					// Bilgi panelini göster
+					$('#customerInfoSection').show();
+				}
+			});
+
+			// Sık kullanılan cariler listesi tıklama event handler
+			$('#favoriteList li').on('click', function() {
+				const cariId = $(this).data('id');
+
+				// Select'i güncelle
+				$('#cariSelect').val(cariId);
+
+				// Cari verilerini güncelle
+				updateCariData(cariId);
+
+				// Aktif cariyi işaretle
+				$('#favoriteList li').removeClass('active');
+				$(this).addClass('active');
+
+				// Bilgi panelini göster
+				$('#customerInfoSection').show();
+			});
+
+			// Ortak modal gösterme fonksiyonu
+			function showModal(type, currency, isMonthly = false) {
+				// Modal başlığını ayarla
+				const title = `${type.charAt(0).toUpperCase() + type.slice(1)} Detayı (${currency})`;
+				$('#modalTitle').text(title);
+
+				// Veri setini seç
+				const data = detailData[type][currency];
+
+				// İçerik oluştur
+				let contentHtml;
+				if (isMonthly) {
+					// Aylık detay
+					contentHtml = `
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th>Ay</th>
+									<th>Bakiye</th>
+								</tr>
+							</thead>
+							<tbody>
+								${data.monthly.map(item => `
+									<tr>
+										<td>${item.ay}</td>
+										<td>${item.bakiye}</td>
+									</tr>
+								`).join('')}
+							</tbody>
+						</table>
+					`;
+				} else {
+					// Detay listesi
+					contentHtml = `
+						<div class="alert alert-info">
+							<strong>Toplam Bakiye:</strong> ${data.total}
+						</div>
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th>Fatura No</th>
+									<th>Tarih</th>
+									<th>Vade</th>
+									<th>Tutar</th>
+									<th>Açıklama</th>
+								</tr>
+							</thead>
+							<tbody>
+								${data.items && data.items.length > 0
+									? data.items.map(item => `
+										<tr>
+											<td>${item.faturaNo}</td>
+											<td>${item.tarih}</td>
+											<td>${item.vade}</td>
+											<td>${item.tutar}</td>
+											<td>${item.aciklama}</td>
+										</tr>
+									`).join('')
+									: '<tr><td colspan="5" class="text-center">Detay bulunamadı</td></tr>'
+								}
+							</tbody>
+						</table>
+					`;
+				}
+
+				$('#modalContent').html(contentHtml);
+				$('#detailModal').modal('show');
+			}
+
+			// Detay butonu tıklama eventi
+			$('.detail-btn').on('click', function() {
+				const type = $(this).data('type');
+				const currency = $(this).data('currency');
+				showModal(type, currency);
+			});
+
+			// Aylık detay butonu tıklama eventi
+			$('.monthly-btn').on('click', function() {
+				const type = $(this).data('type');
+				const currency = $(this).data('currency');
+				showModal(type, currency, true);
+			});
+
+			// Modal içindeki Aylık Detay butonu
+			$('#monthlyViewBtn').on('click', function() {
+				// Aktif modal başlığından türü ve para birimini çıkar
+				const title = $('#modalTitle').text();
+				const [type, currency] = title.match(/(.+) Detayı \((.+)\)/).slice(1);
+
+				// Aylık detayı göster
+				showModal(type.toLowerCase().includes('bakiye') ? 'bakiye' : type.toLowerCase(), currency, true);
+			});
+
+			// Cari verileriyle sayfayı güncelleme fonksiyonu
+			function updateCariData(cariId) {
+				const cari = cariData[cariId];
+				if (!cari) return;
+
+				// Müşteri bilgilerini güncelle
+				$('#totalDebt').text(cari.totalDebt);
+				$('#overdueDebt').text(cari.overdueDebt);
+				$('#dueAverage').text(cari.dueAverage);
+
+				// Risk durumu
+				let riskBadge;
+				if (cari.riskStatus === 'Yüksek') {
+					riskBadge = '<span class="badge bg-danger">Yüksek</span>';
+				} else if (cari.riskStatus === 'Normal') {
+					riskBadge = '<span class="badge bg-warning">Normal</span>';
+				} else {
+					riskBadge = '<span class="badge bg-success">Düşük</span>';
+				}
+				$('#riskStatus').html(riskBadge);
+
+				// Ortalama vade
+				$('#ortalamaVade').text(cari.ortalamaVade);
+
+				// Tablo değerlerini güncelle
+				for (const type in cari.values) {
+					for (const currency in cari.values[type]) {
+						$(`#${type}-${currency}`).text(cari.values[type][currency]);
+					}
+				}
+
+				// Cari detay bilgilerini güncelle
+				$('#selectedCariName').text(cari.name);
+				$('#selectedCariType').text(cari.type);
+				$('#selectedCariContact').text(cari.contact);
+				$('#selectedCariLastTransaction').text(cari.lastTransaction);
+				$('#selectedCariTotalBalance').text(cari.totalBalance);
+
+				// Bilgi panelini göster
+				$('#selectedCariInfo').show();
+				$('#noCariSelectedInfo').hide();
+			}
+		});
+	</script>
+}

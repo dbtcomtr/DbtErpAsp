@@ -1,0 +1,1909 @@
+﻿@model Deneme_proje.Models.Entities.CanliBilancoViewModel
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Canlı Bilanço Raporu</title>
+	<style>
+		:root {
+			--primary-color: #2563eb;
+			--primary-dark: #1e40af;
+			--primary-light: #3b82f6;
+			--secondary-color: #64748b;
+			--light-bg: #f8fafc;
+			--dark-text: #1e293b;
+			--light-text: #f1f5f9;
+			--border-color: #cbd5e1;
+			--hover-color: #dbeafe;
+			--card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		}
+
+		body {
+			background-color: var(--light-bg);
+			color: var(--dark-text);
+			line-height: 1.6;
+		}
+
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 20px;
+		}
+
+		.header {
+			margin-bottom: 20px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+			.header h1 {
+				color: var(--primary-dark);
+				font-weight: 600;
+				font-size: 1.8rem;
+			}
+
+		.breadcrumb {
+			display: flex;
+			list-style: none;
+			align-items: center;
+		}
+
+			.breadcrumb li {
+				display: flex;
+				align-items: center;
+			}
+
+				.breadcrumb li:not(:last-child)::after {
+					content: '>';
+					margin: 0 8px;
+					color: var(--secondary-color);
+				}
+
+			.breadcrumb a {
+				color: var(--primary-color);
+				text-decoration: none;
+			}
+
+				.breadcrumb a:hover {
+					text-decoration: underline;
+				}
+
+		.card {
+			background-color: white;
+			border-radius: 8px;
+			box-shadow: var(--card-shadow);
+			margin-bottom: 20px;
+			overflow: hidden;
+		}
+
+		.card-header {
+			background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+			color: white;
+			padding: 15px 20px;
+			font-weight: 500;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.card-body {
+			padding: 20px;
+		}
+
+		/* Side by side columns */
+		.balance-columns {
+			display: flex;
+			gap: 20px;
+			width: 100%;
+		}
+
+		.balance-column {
+			flex: 1;
+		}
+
+		/* Hierarchical list styling */
+		.balance-list {
+			width: 100%;
+			border-collapse: collapse;
+			margin-bottom: 20px;
+		}
+
+			.balance-list th {
+				background-color: var(--primary-color);
+				color: white;
+				padding: 10px 15px;
+				text-align: left;
+			}
+
+			.balance-list tr:hover {
+				background-color: var(--hover-color);
+			}
+
+			.balance-list td {
+				padding: 8px 15px;
+				border-bottom: 1px solid var(--border-color);
+			}
+
+		.level-1 {
+			font-weight: 600;
+			font-size: 1.1rem;
+			background-color: var(--primary-color);
+			color: white;
+		}
+
+		.level-2 {
+			font-weight: 600;
+			background-color: #e2e8f0;
+		}
+
+			.level-2 .item-name-A {
+				padding-left: 20px;
+			}
+
+		.level-3 {
+			background-color: #f1f5f9;
+		}
+
+			.level-3 .item-name-A {
+				padding-left: 40px;
+			}
+
+		.level-4 .item-name-A {
+			padding-left: 60px;
+			font-weight: bold;
+		}
+
+		.level-5 .item-name-A {
+			padding-left: 80px;
+		}
+
+		.level-6 .item-name-A {
+			padding-left: 100px;
+		}
+
+		.detail-row .item-name-A {
+			padding-left: 100px;
+			font-style: italic;
+			font-weight:bold;
+			color: var(--secondary-color);
+		}
+
+		.sub-detail-row .item-name-A {
+			padding-left: 120px;
+			font-style: italic;
+			color: var(--secondary-color);
+		}
+
+		.item-amount {
+			text-align: right;
+			font-family: 'Consolas', monospace;
+			font-weight: 500;
+			white-space: nowrap;
+		}
+
+		.positive {
+			color: #10b981;
+		}
+
+		.negative {
+			color: #ef4444;
+		}
+
+		/* Detail tables */
+		.detail-table-container {
+			padding: 0 0 10px 100px;
+		}
+
+		.detail-table {
+			width: calc(100% - 100px);
+			border-collapse: collapse;
+			margin-bottom: 15px;
+			box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+			border-radius: 4px;
+			overflow: hidden;
+		}
+
+			.detail-table th {
+				background-color: var(--primary-light);
+				color: white;
+				text-align: left;
+				padding: 8px 12px;
+				font-size: 0.9rem;
+			}
+
+			.detail-table td {
+				padding: 6px 12px;
+				border-bottom: 1px solid var(--border-color);
+				font-size: 0.9rem;
+			}
+
+			.detail-table tr:nth-child(even) {
+				background-color: var(--light-bg);
+			}
+
+			.detail-table tr:hover {
+				background-color: var(--hover-color);
+			}
+
+			.detail-table .currency {
+				text-align: right;
+				font-family: 'Consolas', monospace;
+			}
+
+		.detail-title {
+			margin: 10px 0 5px 100px;
+			color: var(--primary-dark);
+			font-size: 0.95rem;
+		}
+
+		/* Summary box */
+		.summary-box {
+			background-color: var(--primary-light);
+			color: white;
+			padding: 15px;
+			border-radius: 8px;
+			margin-bottom: 20px;
+			display: flex;
+			justify-content: space-between;
+		}
+
+		.summary-item {
+			text-align: center;
+		}
+
+		.summary-label {
+			font-size: 0.9rem;
+			opacity: 0.9;
+		}
+
+		.summary-value {
+			font-size: 1.2rem;
+			font-weight: 600;
+		}
+
+		.column-header {
+			background-color: var(--primary-dark);
+			color: white;
+			padding: 10px 15px;
+			border-radius: 8px 8px 0 0;
+			font-size: 1.2rem;
+			font-weight: 600;
+			margin-bottom: 10px;
+			text-align: center;
+		}
+
+		/* Responsive adjustments */
+		@@media (max-width: 768px) {
+			.header {
+				flex-direction: column;
+				align-items: flex-start;
+			}
+
+			.breadcrumb {
+				margin-top: 10px;
+			}
+
+			.summary-box {
+				flex-direction: column;
+				gap: 10px;
+			}
+
+			.summary-item {
+				text-align: left;
+			}
+
+			.detail-table-container {
+				padding-left: 20px;
+			}
+
+			.detail-table {
+				width: calc(100% - 20px);
+			}
+
+			.detail-title {
+				margin-left: 20px;
+			}
+
+			.level-2 .item-name-A {
+				padding-left: 10px;
+			}
+
+			.level-3 .item-name-A {
+				padding-left: 20px;
+			}
+
+			.level-4 .item-name-A {
+				padding-left: 30px;
+			}
+
+			.level-5 .item-name-A {
+				padding-left: 40px;
+			}
+
+			.detail-row .item-name-A {
+				padding-left: 50px;
+			}
+
+			.balance-columns {
+				flex-direction: column;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="main-content mt-5">
+		<div class="px-lg-5 px-3">
+			<div class="row">
+
+				<!-- Main Card -->
+				<div class="card">
+					<div class="card-header">
+						<h2>Bilanço Detayları</h2>
+						<div id="date-info">@DateTime.Now.ToString("dd MMMM yyyy")</div>
+					</div>
+
+					<div class="card-body">
+						<!-- Summary Box -->
+						<div class="summary-box">
+							<div class="summary-item">
+								<div class="summary-label">Toplam Aktif</div>
+								<div class="summary-value"></div>
+							</div>
+							<div class="summary-item">
+								<div class="summary-label">Toplam Pasif</div>
+								<div class="summary-value"></div>
+							</div>
+							<div class="summary-item">
+								<div class="summary-label">Dönen Varlıklar</div>
+								<div class="summary-value"></div>
+							</div>
+							<div class="summary-item">
+								<div class="summary-label">K.V. Yabancı Kaynaklar</div>
+								<div class="summary-value"></div>
+							</div>
+						</div>
+
+						<!-- Columns Layout -->
+						<div class="balance-columns">
+							<!-- AKTIF Column -->
+							<div class="balance-column">
+								<div class="column-header">AKTİF</div>
+
+								<!-- Hierarchical List Structure as Table -->
+
+								<table class="balance-list">
+									<thead>
+										<tr>
+											<th>Hesap</th>
+											<th>Tutar</th>
+										</tr>
+									</thead>
+									<tbody>
+
+										<!-- Aktif Toplamı Düzeltmesi - Sadece Level 3 -->
+										<tr class="level-1">
+											<td class="item-name-A">AKTİF (VARLIKLAR)</td>
+											<td class="item-amount">
+												@{
+													decimal toplamAktif = 0;
+
+													// Level 3: Kasa
+													if (Model.KasaBilgisi != null)
+													{
+														toplamAktif += Convert.ToDecimal(Model.KasaBilgisi.ToplamBakiye);
+													}
+
+													// Level 3: Hazır Değerler
+													if (Model.MusteriCekleri != null || Model.BankaHesaplari != null || Model.MusteriKrediKartlari != null)
+													{
+														decimal toplamHazirDegerlera = 0;
+														if (Model.MusteriCekleri != null && Model.MusteriCekleri.Any())
+														{
+															toplamHazirDegerlera += Model.MusteriCekleri.Sum(c => c.Kalan);
+														}
+														if (Model.BankaHesaplari != null && Model.BankaHesaplari.Any())
+														{
+															toplamHazirDegerlera += Convert.ToDecimal(Model.BankaHesaplari.Sum(b => b.Bakiye));
+														}
+														if (Model.MusteriKrediKartlari != null && Model.MusteriKrediKartlari.Any())
+														{
+															toplamHazirDegerlera += Model.MusteriKrediKartlari.Sum(k => k.Kalan);
+														}
+														toplamAktif += toplamHazirDegerlera;
+													}
+
+													// Level 3: Ticari Alacaklar
+													decimal toplamTicariAlacaklara = 0;
+													if (Model.ArtiBakiyeliMusteriler != null && Model.ArtiBakiyeliMusteriler.Any())
+													{
+														toplamTicariAlacaklara += Model.ArtiBakiyeliMusteriler.Sum(m => m.ToplamBorc);
+													}
+													if (Model.EksiBakiyeliMusteriler != null && Model.EksiBakiyeliMusteriler.Any())
+													{
+														toplamTicariAlacaklara -= Model.EksiBakiyeliMusteriler.Sum(m => m.ToplamAlacak);
+													}
+													if (Model.VerilenDepozitoVeTeminatBilgisi != null)
+													{
+														toplamTicariAlacaklara += Convert.ToDecimal(Model.VerilenDepozitoVeTeminatBilgisi.ToplamBakiye);
+													}
+													if (Model.SupheliTicariAlacaklar != null)
+													{
+														toplamTicariAlacaklara += Convert.ToDecimal(Model.SupheliTicariAlacaklar.ToplamBakiye);
+													}
+													toplamAktif += toplamTicariAlacaklara;
+
+													// Level 3: Diğer Çeşitli Alacaklar
+													decimal toplamDigerCesitliAlacaklara = 0;
+													if (Model.OrtaklardanAlacaklar != null)
+													{
+														toplamDigerCesitliAlacaklara += Convert.ToDecimal(Model.OrtaklardanAlacaklar.ToplamBakiye);
+													}
+													if (Model.PersoneldenAlacaklar != null)
+													{
+														toplamDigerCesitliAlacaklara += Convert.ToDecimal(Model.PersoneldenAlacaklar.ToplamBakiye);
+													}
+													if (Model.DigerCesitliAlacaklarBilgisi != null)
+													{
+														toplamDigerCesitliAlacaklara += Convert.ToDecimal(Model.DigerCesitliAlacaklarBilgisi.ToplamBakiye);
+													}
+													toplamAktif += toplamDigerCesitliAlacaklara;
+
+													// Level 3: Diğer Dönen Varlıklar
+													decimal toplamDigerDonenVarliklara = 0;
+													if (Model.IsAvanslariBilgisi != null)
+													{
+														toplamDigerDonenVarliklara += Convert.ToDecimal(Model.IsAvanslariBilgisi.ToplamBakiye);
+													}
+													if (Model.PesinOdenenVergiveFon != null)
+													{
+														toplamDigerDonenVarliklara += Convert.ToDecimal(Model.PesinOdenenVergiveFon.ToplamBakiye);
+													}
+													if (Model.PersonelAvanslari != null)
+													{
+														toplamDigerDonenVarliklara += Convert.ToDecimal(Model.PersonelAvanslari.ToplamBakiye);
+													}
+													if (Model.DevredenKdvBilgisi != null)
+													{
+														toplamDigerDonenVarliklara += Convert.ToDecimal(Model.DevredenKdvBilgisi.ToplamBakiye);
+													}
+													if (Model.SayimveTesellumNoksanlari != null)
+													{
+														toplamDigerDonenVarliklara += Convert.ToDecimal(Model.SayimveTesellumNoksanlari.ToplamBakiye);
+													}
+
+													// Diğer Dönen Varlıklar altına alınmış olanlar
+													if (Model.VerilenSiparisAvanslari != null)
+													{
+														toplamDigerDonenVarliklara += Convert.ToDecimal(Model.VerilenSiparisAvanslari.ToplamBakiye);
+													}
+													if (Model.GelecekGiderBilgisi != null)
+													{
+														toplamDigerDonenVarliklara += Convert.ToDecimal(Model.GelecekGiderBilgisi.ToplamBakiye);
+													}
+
+													toplamAktif += toplamDigerDonenVarliklara;
+												}
+												@toplamAktif.ToString("N2") ₺
+											</td>
+										</tr>
+
+
+										<!-- Level 2: 1. DÖNEN VARLIKLAR -->
+										<tr class="level-2">
+											<td class="item-name-A">1. DÖNEN VARLIKLAR</td>
+											<td class="item-amount"></td>
+										</tr>
+										<tr class="level-3">
+											<td>@Model.KasaBilgisi.HesapAdi</td>
+											<td class="text-end">@Model.KasaBilgisi.ToplamBakiye.ToString("N2") ₺</td>
+
+										</tr>
+										<!-- Level 3: Hazır Değerler -->
+										<tr class="level-3">
+											<td class="item-name-A">Hazır Değerler</td>
+											<td class="item-amount">
+												@{
+													decimal toplamHazirDegerler = 0;
+
+													// Alınan Çekler
+													if (Model.MusteriCekleri != null && Model.MusteriCekleri.Any())
+													{
+														toplamHazirDegerler += Model.MusteriCekleri.Sum(c => c.Kalan);
+													}
+
+													// Bankalar
+													if (Model.BankaHesaplari != null && Model.BankaHesaplari.Any())
+													{
+														toplamHazirDegerler += Convert.ToDecimal(Model.BankaHesaplari.Sum(b => b.Bakiye));
+													}
+
+													// Müşteri Kredi Kartları
+													if (Model.MusteriKrediKartlari != null && Model.MusteriKrediKartlari.Any())
+													{
+														toplamHazirDegerler += Model.MusteriKrediKartlari.Sum(k => k.Kalan);
+													}
+												}
+												@toplamHazirDegerler.ToString("N2") ₺
+											</td>
+										</tr>
+
+
+										<!-- Level 4: Alınan Çekler -->
+										<tr class="level-4">
+											<td class="item-name-A">Alınan Çekler</td>
+											<td class="item-amount">
+												@{
+													decimal toplamCekTutari = 0;
+													if (Model.MusteriCekleri != null && Model.MusteriCekleri.Any())
+													{
+														toplamCekTutari = Model.MusteriCekleri.Sum(c => c.Kalan);
+													}
+												}
+												@toplamCekTutari.ToString("N2") ₺
+											</td>
+										</tr>
+
+										@if (Model.MusteriCekleri != null && Model.MusteriCekleri.Any())
+										{
+											var cekGruplari = new[] { "Portföyde", "Tahsilde", "Teminatta" };
+
+											@foreach (var pozisyon in cekGruplari)
+											{
+												var pozisyonCekleri = Model.MusteriCekleri.Where(c => c.Pozisyonu == pozisyon && c.Kalan > 0).ToList();
+												if (pozisyonCekleri.Any())
+												{
+													<!-- Detail: Pozisyon (Portföyde, Teminatta, Tahsilde) -->
+													<tr class="detail-row">
+														<td class="item-name-A">@pozisyon</td>
+														<td class="item-amount">@pozisyonCekleri.Sum(c => c.Kalan).ToString("N2") ₺</td>
+													</tr>
+
+													@foreach (var cek in pozisyonCekleri.OrderBy(c => c.Vade))
+													{
+														<!-- Sub-Detail: Çek -->
+														<tr class="sub-detail-row">
+															<td class="item-name-A">@cek.SahipCariAdi Vade: @cek.Vade.ToString("dd.MM.yyyy") </td>
+															<td class="item-amount">@cek.Kalan.ToString("N2") ₺</td>
+														</tr>
+													}
+												}
+											}
+										}
+										<!-- Level 4: Bankalar -->
+										<tr class="level-4 can-toggle">
+											<td class="item-name-A">Bankalar</td>
+											<td class="item-amount">
+												@{
+													double toplamBankaBakiye = 0;
+													if (Model.BankaHesaplari != null && Model.BankaHesaplari.Any())
+													{
+														toplamBankaBakiye = Model.BankaHesaplari.Sum(b => b.Bakiye);
+													}
+												}
+												@toplamBankaBakiye.ToString("N2") ₺
+											</td>
+										</tr>
+
+										@if (Model.BankaHesaplari != null && Model.BankaHesaplari.Any())
+										{
+											var bankalar = Model.BankaHesaplari.GroupBy(b => b.BankaAdi).OrderByDescending(g => g.Sum(b => b.Bakiye));
+
+											@foreach (var bankaGrup in bankalar)
+											{
+												var bankaToplam = bankaGrup.Sum(b => b.Bakiye);
+
+												<!-- Detail: Banka Adı -->
+												<tr class="detail-row can-toggle">
+													<td class="item-name-A">@bankaGrup.Key</td>
+													<td class="item-amount">@bankaToplam.ToString("N2") ₺</td>
+												</tr>
+
+												@foreach (var hesap in bankaGrup)
+												{
+													<!-- Sub-Detail: Hesap Bilgileri -->
+													<tr class="sub-detail-row hidden-row">
+														<td class="item-name-A">
+															@hesap.Sube - @hesap.HesapNo (@hesap.DovizCinsi)
+														</td>
+														<td class="item-amount">@hesap.Bakiye.ToString("N2") ₺</td>
+													</tr>
+												}
+											}
+										}
+
+										<!-- Level 4: Diğer Hazır Değerler -->
+										<tr class="level-4">
+											<td class="item-name-A">Diğer Hazır Değerler</td>
+											<td class="item-amount"></td>
+										</tr>
+
+										<!-- Detail: POS Kredi Kartı -->
+										<tr class="level-4">
+											<td class="item-name-A">Müşteri Kredi Kartları</td>
+											<td class="item-amount">
+												@{
+													decimal toplamMusteriKrediKarti = 0;
+													if (Model.MusteriKrediKartlari != null && Model.MusteriKrediKartlari.Any())
+													{
+														toplamMusteriKrediKarti = Model.MusteriKrediKartlari.Sum(k => k.Kalan);
+													}
+												}
+												@toplamMusteriKrediKarti.ToString("N2") ₺
+											</td>
+										</tr>
+
+										@if (Model.MusteriKrediKartlari != null && Model.MusteriKrediKartlari.Any())
+										{
+											var grupluKartlar = Model.MusteriKrediKartlari
+											.GroupBy(k => k.Nerede)
+											.OrderByDescending(g => g.Sum(k => k.Kalan));
+
+											@foreach (var grup in grupluKartlar)
+											{
+												<!-- Detail: Banka/Kurum Adı -->
+												<tr class="detail-row">
+													<td class="item-name-A">@grup.Key</td>
+													<td class="item-amount">@grup.Sum(k => k.Kalan).ToString("N2") ₺</td>
+												</tr>
+
+												var siraliKartlar = grup.OrderByDescending(k => k.Kalan);
+												@foreach (var kart in siraliKartlar)
+												{
+													<!-- Sub-Detail: Kart Bilgisi -->
+													<tr class="sub-detail-row">
+														<td class="item-name-A">
+															@kart.Borçlu
+															@if (kart.VadeTarihi != DateTime.MinValue)
+															{
+																<span> - Vade: @kart.VadeTarihi.ToString("dd.MM.yyyy")</span>
+															}
+														</td>
+														<td class="item-amount">@kart.Kalan.ToString("N2") ₺</td>
+													</tr>
+												}
+
+											}
+										}
+
+										<!-- Level 3: TİCARİ ALACAKLAR -->
+										<tr class="level-3">
+											<td class="item-name-A">TİCARİ ALACAKLAR</td>
+											<td class="item-amount">
+												@{
+													decimal toplamTicariAlacaklar = 0;
+
+													if (Model.ArtiBakiyeliMusteriler != null && Model.ArtiBakiyeliMusteriler.Any())
+													{
+														toplamTicariAlacaklar += Model.ArtiBakiyeliMusteriler.Sum(m => m.ToplamBorc);
+													}
+
+													if (Model.EksiBakiyeliMusteriler != null && Model.EksiBakiyeliMusteriler.Any())
+													{
+														toplamTicariAlacaklar -= Model.EksiBakiyeliMusteriler.Sum(m => m.ToplamAlacak);
+													}
+
+													if (Model.VerilenDepozitoVeTeminatBilgisi != null)
+													{
+														toplamTicariAlacaklar += Convert.ToDecimal(Model.VerilenDepozitoVeTeminatBilgisi.ToplamBakiye);
+													}
+
+													if (Model.SupheliTicariAlacaklar != null)
+													{
+														toplamTicariAlacaklar += Convert.ToDecimal(Model.SupheliTicariAlacaklar.ToplamBakiye);
+													}
+												}
+												@toplamTicariAlacaklar.ToString("N2") ₺
+											</td>
+										</tr>
+
+
+
+										<!-- Level 4: ARTI BAKİYELİ TİCARİ ALACAKLAR -->
+										<tr class="level-4">
+											<td class="item-name-A">ARTI BAKİYELİ TİCARİ ALACAKLAR</td>
+											<td class="item-amount">
+												@{
+													decimal toplamArtiBakiye = 0;
+													if (Model.ArtiBakiyeliMusteriler != null && Model.ArtiBakiyeliMusteriler.Any())
+													{
+														toplamArtiBakiye = Model.ArtiBakiyeliMusteriler.Sum(m => m.ToplamBorc);
+													}
+												}
+												@toplamArtiBakiye.ToString("N2") ₺
+											</td>
+										</tr>
+										@if (Model.ArtiBakiyeliMusteriler != null && Model.ArtiBakiyeliMusteriler.Any())
+										{
+											@foreach (var musteri in Model.ArtiBakiyeliMusteriler.OrderByDescending(m => m.ToplamBorc))
+											{
+												<!-- Detail: Cari bilgisi -->
+												<tr class="detail-row">
+													<td class="item-name-A">@musteri.CariUnvani (@musteri.CariKodu)</td>
+													<td class="item-amount">@musteri.ToplamBorc.ToString("N2") ₺</td>
+												</tr>
+												<!-- Detay bilgileri kaldırıldı -->
+											}
+										}
+
+
+										<!-- Level 4: EKSİ BAKİYELİ TİCARİ ALACAKLAR -->
+										<tr class="level-4">
+											<td class="item-name-A">EKSİ BAKİYELİ TİCARİ ALACAKLAR</td>
+											<td class="item-amount negative">
+												@{
+													decimal toplamEksiBakiye = 0;
+													if (Model.EksiBakiyeliMusteriler != null && Model.EksiBakiyeliMusteriler.Any())
+													{
+														toplamEksiBakiye = Model.EksiBakiyeliMusteriler.Sum(m => m.ToplamAlacak);
+													}
+												}
+												-@toplamEksiBakiye.ToString("N2") ₺
+											</td>
+										</tr>
+
+										@if (Model.EksiBakiyeliMusteriler != null && Model.EksiBakiyeliMusteriler.Any())
+										{
+											@foreach (var musteri in Model.EksiBakiyeliMusteriler.OrderByDescending(m => m.ToplamAlacak))
+											{
+												<!-- Detail: Cari bilgisi -->
+												<tr class="detail-row">
+													<td class="item-name-A">@musteri.CariUnvani (@musteri.CariKodu)</td>
+													<td class="item-amount negative">-@musteri.ToplamAlacak.ToString("N2") ₺</td>
+												</tr>
+
+												<!-- Detaylı fatura bilgileri kaldırıldı -->
+											}
+										}
+
+
+										<!-- Level 4: Verilen Dep. ve Teminatlar -->
+										<tr class="level-4">
+											<td class="item-name-A">@Model.VerilenDepozitoVeTeminatBilgisi.HesapAdi</td>
+											<td class="item-amount">@Model.VerilenDepozitoVeTeminatBilgisi.ToplamBakiye.ToString("N0") ₺</td>
+										</tr>
+
+										@if (Model.VerilenDepozitoVeTeminatlarDetay != null && Model.VerilenDepozitoVeTeminatlarDetay.Any())
+										{
+											@foreach (var detay in Model.VerilenDepozitoVeTeminatlarDetay)
+											{
+												<!-- Detail: Firma detayları -->
+												<tr class="detail-row">
+													<td class="item-name-A">@detay.HesapAdi</td>
+													<td class="item-amount">@detay.ToplamBakiye.ToString("N0") ₺</td>
+												</tr>
+											}
+										}
+
+
+
+										<!-- Level 4: Şüpheli Ticari Alacaklar -->
+										<tr class="level-4">
+											<td>@Model.SupheliTicariAlacaklar.HesapAdi</td>
+											<td class="text-end">@Model.SupheliTicariAlacaklar.ToplamBakiye.ToString("N2") ₺</td>
+
+										</tr>
+
+
+										<!-- Level 3: DİĞER ÇEŞİTLİ ALACAKLAR -->
+										<tr class="level-3">
+											<td class="item-name-A">DİĞER ÇEŞİTLİ ALACAKLAR</td>
+											<td class="item-amount">
+												@{
+													decimal toplamDigerCesitliAlacaklar = 0;
+
+													if (Model.OrtaklardanAlacaklar != null)
+													{
+														toplamDigerCesitliAlacaklar += Convert.ToDecimal(Model.OrtaklardanAlacaklar.ToplamBakiye);
+													}
+
+													if (Model.PersoneldenAlacaklar != null)
+													{
+														toplamDigerCesitliAlacaklar += Convert.ToDecimal(Model.PersoneldenAlacaklar.ToplamBakiye);
+													}
+
+													if (Model.DigerCesitliAlacaklarBilgisi != null)
+													{
+														toplamDigerCesitliAlacaklar += Convert.ToDecimal(Model.DigerCesitliAlacaklarBilgisi.ToplamBakiye);
+													}
+												}
+												@toplamDigerCesitliAlacaklar.ToString("N2") ₺
+											</td>
+										</tr>
+
+
+										<!-- Level 4: Ortaklardan Alacaklar -->
+										<tr class="level-4">
+											<td class="item-name-A">@Model.OrtaklardanAlacaklar.HesapAdi</td>
+											<td class="item-amount">@Model.OrtaklardanAlacaklar.ToplamBakiye.ToString("N0") ₺</td>
+										</tr>
+
+										@if (Model.OrtaklardanAlacaklarDetay != null && Model.OrtaklardanAlacaklarDetay.Any())
+										{
+											@foreach (var detay in Model.OrtaklardanAlacaklarDetay)
+											{
+												<!-- Detail: Company names -->
+												<tr class="detail-row">
+													<td class="item-name-A">@detay.HesapAdi</td>
+													<td class="item-amount">@detay.ToplamBakiye.ToString("N0") ₺</td>
+												</tr>
+											}
+										}
+
+										<!-- Level 4: Personelden Alacaklar -->
+										<tr class="level-4">
+											<td>@Model.PersoneldenAlacaklar.HesapAdi</td>
+											<td class="text-end">@Model.PersoneldenAlacaklar.ToplamBakiye.ToString("N2") ₺</td>
+										</tr>
+
+										<!-- Level 4: Diğer Çeşitli Alacaklar -->
+										<tr class="level-4">
+											<td>@Model.DigerCesitliAlacaklarBilgisi.HesapAdi</td>
+											<td class="text-end">@Model.DigerCesitliAlacaklarBilgisi.ToplamBakiye.ToString("N2") ₺</td>
+										</tr>
+
+										<!-- Level 3: STOKLAR -->
+										<tr class="level-3">
+											<td class="item-name-A">STOKLAR</td>
+											<td class="item-amount"></td>
+										</tr>
+
+										<!-- Level 4: İlk Madde Malzeme -->
+										<tr class="level-4">
+											<td class="item-name-A">İlk Madde Malzeme</td>
+											<td class="item-amount"></td>
+										</tr>
+
+										@if (Model.StokDepoDagilimi != null && Model.StokDepoDagilimi.Any())
+										{
+											var ilkMaddeMalzemeler = Model.StokDepoDagilimi
+											.GroupBy(s => new { s.StokKodu, s.StokAdi })
+											.Select(g => new
+											{
+												g.Key.StokKodu,
+												g.Key.StokAdi,
+												ToplamMiktar = g.Sum(s => s.DepoMiktari),
+												BirimAdi = g.First().BirimAdi,
+												Depolar = g.Select(d => new { d.DepoNo, d.DepoAdi, d.DepoMiktari }).ToList()
+											})
+											.OrderByDescending(s => s.ToplamMiktar)
+											;  // İlk 5 stok
+
+											@foreach (var stok in ilkMaddeMalzemeler)
+											{
+												<!-- Detail: Stok bilgisi -->
+												<tr class="detail-row">
+													<td class="item-name-A">@stok.StokAdi (@stok.StokKodu)</td>
+													<td class="item-amount">@stok.ToplamMiktar.ToString("N2") @stok.BirimAdi</td>
+												</tr>
+
+												@foreach (var depo in stok.Depolar)
+												{
+													<!-- Sub-Detail: Depo bilgisi -->
+													<tr class="sub-detail-row">
+														<td class="item-name-A">@depo.DepoAdi (Depo: @depo.DepoNo)</td>
+														<td class="item-amount">@depo.DepoMiktari.ToString("N2") @stok.BirimAdi</td>
+													</tr>
+												}
+											}
+										}
+
+										<!-- Level 4: Diğer Stoklar -->
+										<tr class="level-4">
+											<td class="item-name-A">@Model.DigerStoklar.HesapAdi</td>
+											<td class="item-amount">@Model.DigerStoklar.ToplamBakiye.ToString("N0") ₺</td>
+										</tr>
+
+										@if (Model.StokDepoDagilimi != null && Model.StokDepoDagilimi.Any())
+										{
+											var digerStoklar = Model.StokDepoDagilimi
+											.GroupBy(s => new { s.StokKodu, s.StokAdi })
+											.Select(g => new
+											{
+												g.Key.StokKodu,
+												g.Key.StokAdi,
+												ToplamMiktar = g.Sum(s => s.DepoMiktari),
+												BirimAdi = g.First().BirimAdi,
+												Depolar = g.Select(d => new { d.DepoNo, d.DepoAdi, d.DepoMiktari }).ToList()
+											})
+											.OrderByDescending(s => s.ToplamMiktar)
+											.Skip(5)  // İlk 5'i atlayıp
+											; // Sonraki 5 stok
+
+											@foreach (var stok in digerStoklar)
+											{
+												<!-- Detail: Stok bilgisi -->
+												<tr class="detail-row">
+													<td class="item-name-A">@stok.StokAdi (@stok.StokKodu)</td>
+													<td class="item-amount">@stok.ToplamMiktar.ToString("N2") @stok.BirimAdi</td>
+												</tr>
+
+												@foreach (var depo in stok.Depolar)
+												{
+													<!-- Sub-Detail: Depo bilgisi -->
+													<tr class="sub-detail-row">
+														<td class="item-name-A">@depo.DepoAdi (Depo: @depo.DepoNo)</td>
+														<td class="item-amount">@depo.DepoMiktari.ToString("N2") @stok.BirimAdi</td>
+													</tr>
+												}
+											}
+										}
+
+										<!-- Level 4: Ticari Mallar -->
+										<tr class="level-4">
+											<td class="item-name-A">Ticari Mallar</td>
+											<td class="item-amount"></td>
+										</tr>
+
+										<!-- Level 4: Diğer Stoklar -->
+										<tr class="level-4">
+											<td class="item-name-A">@Model.DigerStoklar.HesapAdi</td>
+											<td class="item-amount">@Model.DigerStoklar.ToplamBakiye.ToString("N0") ₺</td>
+										</tr>
+
+										@if (Model.DigerStoklarDetay != null && Model.DigerStoklarDetay.Any())
+										{
+											@foreach (var detay in Model.DigerStoklarDetay)
+											{
+												<!-- Detail: Company names -->
+												<tr class="detail-row">
+													<td class="item-name-A">@detay.HesapAdi</td>
+													<td class="item-amount">@detay.ToplamBakiye.ToString("N0") ₺</td>
+												</tr>
+											}
+										}
+
+										<!-- Level 4: Verilen Sipariş Avansları -->
+										<!-- Level 3: GELECEK AYLARA AİT GİDER VE GELİR TAHAKKUKLARI -->
+										@* <tr class="level-3">
+											<td>@Model.GelecekAylaraAitGelirGiderTahmini.HesapAdi</td>
+											<td class="text-end">@Model.GelecekAylaraAitGelirGiderTahmini.ToplamBakiye.ToString("N2") ₺</td>
+
+										</tr> *@
+
+										<!-- Level 4: Gelecek Aylara Ait Giderler -->
+										<!-- Level 3: DİĞER DÖNEN VARLIKLAR -->
+										<tr class="level-3">
+											<td class="item-name-A">DİĞER DÖNEN VARLIKLAR</td>
+											<td class="item-amount">
+												@{
+													decimal toplamDigerDonenVarliklar = 0;
+
+													if (Model.IsAvanslariBilgisi != null)
+													{
+														toplamDigerDonenVarliklar += Convert.ToDecimal(Model.IsAvanslariBilgisi.ToplamBakiye);
+													}
+
+													if (Model.PesinOdenenVergiveFon != null)
+													{
+														toplamDigerDonenVarliklar += Convert.ToDecimal(Model.PesinOdenenVergiveFon.ToplamBakiye);
+													}
+
+													if (Model.PersonelAvanslari != null)
+													{
+														toplamDigerDonenVarliklar += Convert.ToDecimal(Model.PersonelAvanslari.ToplamBakiye);
+													}
+
+													if (Model.DevredenKdvBilgisi != null)
+													{
+														toplamDigerDonenVarliklar += Convert.ToDecimal(Model.DevredenKdvBilgisi.ToplamBakiye);
+													}
+
+													if (Model.SayimveTesellumNoksanlari != null)
+													{
+														toplamDigerDonenVarliklar += Convert.ToDecimal(Model.SayimveTesellumNoksanlari.ToplamBakiye);
+													}
+
+													if (Model.VerilenSiparisAvanslari != null)
+													{
+														toplamDigerDonenVarliklar += Convert.ToDecimal(Model.VerilenSiparisAvanslari.ToplamBakiye);
+													}
+
+													if (Model.GelecekGiderBilgisi != null)
+													{
+														toplamDigerDonenVarliklar += Convert.ToDecimal(Model.GelecekGiderBilgisi.ToplamBakiye);
+													}
+
+												}
+												@toplamDigerDonenVarliklar.ToString("N2") ₺
+											</td>
+										</tr>
+
+
+										<!-- Level 4: İş Avansları -->
+										<tr class="level-4">
+											<td>@Model.IsAvanslariBilgisi.HesapAdi</td>
+											<td class="text-end">@Model.IsAvanslariBilgisi.ToplamBakiye.ToString("N2") ₺</td>
+
+										</tr>
+
+										<!-- Level 4: Peşin Ödenen Vergiler -->
+										<tr class="level-4">
+											<td>@Model.PesinOdenenVergiveFon.HesapAdi</td>
+											<td class="text-end">@Model.PesinOdenenVergiveFon.ToplamBakiye.ToString("N2") ₺</td>
+
+										</tr>
+
+										<!-- Level 4: Personel Avansları -->
+										<tr class="level-4">
+											<td>@Model.PersonelAvanslari.HesapAdi</td>
+											<td class="text-end">@Model.PersonelAvanslari.ToplamBakiye.ToString("N2") ₺</td>
+
+										</tr>
+
+
+										<!-- Level 4: Devreden KDV -->
+										<tr class="level-4">
+											<td>@Model.DevredenKdvBilgisi.HesapAdi</td>
+											<td class="text-end">@Model.DevredenKdvBilgisi.ToplamBakiye.ToString("N2") ₺</td>
+
+										</tr>
+
+
+
+										<!-- Level 4: Sayım Tesellüm Noksanlıkları -->
+										<tr class="level-4">
+											<td>@Model.SayimveTesellumNoksanlari.HesapAdi</td>
+											<td class="text-end">@Model.SayimveTesellumNoksanlari.ToplamBakiye.ToString("N2") ₺</td>
+
+										</tr>
+
+										<tr class="level-4">
+											<td>@Model.GelecekGiderBilgisi.HesapAdi</td>
+											<td class="text-end">@Model.GelecekGiderBilgisi.ToplamBakiye.ToString("N2") ₺</td>
+
+										</tr>
+										<tr class="level-4">
+											<td class="item-name-A">@Model.VerilenSiparisAvanslari.HesapAdi</td>
+											<td class="item-amount">@Model.VerilenSiparisAvanslari.ToplamBakiye.ToString("N0") ₺</td>
+										</tr>
+
+										@if (Model.VerilenSiparisAvanslariDetay != null && Model.VerilenSiparisAvanslariDetay.Any())
+										{
+											@foreach (var detay in Model.VerilenSiparisAvanslariDetay)
+											{
+												<!-- Detail: Company names -->
+												<tr class="detail-row">
+													<td class="item-name-A">@detay.HesapAdi</td>
+													<td class="item-amount">@detay.ToplamBakiye.ToString("N0") ₺</td>
+												</tr>
+											}
+										}
+
+									</tbody>
+								</table>
+							</div>
+
+							<!-- PASIF Column -->
+							<div class="balance-column">
+								<div class="column-header">PASİF</div>
+
+								<!-- Hierarchical List Structure as Table -->
+								<table class="balance-list">
+									<thead>
+										<tr>
+											<th>Hesap</th>
+											<th>Tutar</th>
+										</tr>
+									</thead>
+									<tbody>
+										<!-- Level 1: PASİF (KAYNAKLAR) -->
+										<tr class="level-1">
+											<td class="item-name-A">PASİF (KAYNAKLAR)</td>
+											<td class="item-amount">
+												@{
+													decimal toplamPasif = 0;
+
+													// Mali Borçlar
+													if (Model.KrediDetaylari != null && Model.KrediDetaylari.Any())
+													{
+														foreach (var bankaGrubu in Model.KrediDetaylari)
+														{
+															foreach (var kredi in bankaGrubu)
+															{
+																toplamPasif += kredi.krsoztaksit_anapara;
+															}
+														}
+													}
+													if (Model.FinansalKiralamaBorcBilgisi != null)
+													{
+														toplamPasif += Convert.ToDecimal(Model.FinansalKiralamaBorcBilgisi.ToplamBakiye);
+													}
+													if (Model.ErtelenmisFinansalKiralamaBilgisi != null)
+													{
+														toplamPasif += Convert.ToDecimal(Model.ErtelenmisFinansalKiralamaBilgisi.ToplamBakiye);
+													}
+													if (Model.DigerMaliBorclarBilgisi != null)
+													{
+														toplamPasif += Convert.ToDecimal(Model.DigerMaliBorclarBilgisi.ToplamBakiye);
+													}
+													if (Model.FirmaKrediKartlari != null && Model.FirmaKrediKartlari.Any())
+													{
+														toplamPasif += Model.FirmaKrediKartlari.Sum(k => k.Kalan);
+													}
+
+													// Ticari Borçlar
+													if (Model.ArtiBakiyeliTedarikciler != null && Model.ArtiBakiyeliTedarikciler.Any())
+													{
+														toplamPasif += Model.ArtiBakiyeliTedarikciler.Sum(t => t.ToplamBorc);
+													}
+													if (Model.EksiBakiyeliTedarikciler != null && Model.EksiBakiyeliTedarikciler.Any())
+													{
+														toplamPasif += Model.EksiBakiyeliTedarikciler.Sum(t => (decimal)t.AnaDovizBakiyesi);
+													}
+													if (Model.FirmaCekleri != null && Model.FirmaCekleri.Any())
+													{
+														toplamPasif += Model.FirmaCekleri.Sum(c => c.Kalan);
+													}
+													if (Model.AlinanDepozitoVeTeminatBilgisi != null)
+													{
+														toplamPasif += Convert.ToDecimal(Model.AlinanDepozitoVeTeminatBilgisi.ToplamBakiye);
+													}
+
+													// Diğer Borçlar
+													if (Model.PersonelBorclariBilgisi != null)
+													{
+														toplamPasif += Convert.ToDecimal(Model.PersonelBorclariBilgisi.ToplamBakiye);
+													}
+													if (Model.DigerCesitliBorclar != null)
+													{
+														toplamPasif += Convert.ToDecimal(Model.DigerCesitliBorclar.ToplamBakiye);
+													}
+
+													// Ödenecek Yükümlülükler
+													if (Model.OdenecekVergiVeFonBilgisi != null)
+													{
+														toplamPasif += Convert.ToDecimal(Model.OdenecekVergiVeFonBilgisi.ToplamBakiye);
+													}
+													if (Model.OdenecekSosyalGuvenlikKesintileriBilgisi != null)
+													{
+														toplamPasif += Convert.ToDecimal(Model.OdenecekSosyalGuvenlikKesintileriBilgisi.ToplamBakiye);
+													}
+
+													// Uzun Vadeli Yabancı Kaynaklar
+													if (Model.OdenecekDigerYukumlulukler != null)
+													{
+														toplamPasif += Convert.ToDecimal(Model.OdenecekDigerYukumlulukler.ToplamBakiye);
+													}
+
+													// Ortaklara Borçlar
+													if (Model.OrtaklaraBorclar != null)
+													{
+														toplamPasif += Convert.ToDecimal(Model.OrtaklaraBorclar.ToplamBakiye);
+													}
+												}
+												@toplamPasif.ToString("N2") ₺
+											</td>
+										</tr>
+
+
+
+										<!-- Level 2: 3. KISA VADELİ YABANCI KAYNAKLAR -->
+										<tr class="level-2">
+											<td class="item-name-A">3. KISA VADELİ YABANCI KAYNAKLAR</td>
+											<td class="item-amount"></td>
+										</tr>
+
+										<!-- Level 3: MALİ BORÇLAR -->
+										<tr class="level-3">
+											<td class="item-name-A">MALİ BORÇLAR</td>
+											<td class="item-amount">
+												@{
+													decimal toplamMaliBorclar = 0;
+
+													if (Model.KrediDetaylari != null && Model.KrediDetaylari.Any())
+													{
+														foreach (var bankaGrubu in Model.KrediDetaylari)
+														{
+															foreach (var kredi in bankaGrubu)
+															{
+																toplamMaliBorclar += kredi.krsoztaksit_anapara;
+															}
+														}
+													}
+
+													if (Model.FinansalKiralamaBorcBilgisi != null)
+													{
+														toplamMaliBorclar += Convert.ToDecimal(Model.FinansalKiralamaBorcBilgisi.ToplamBakiye);
+													}
+
+													if (Model.ErtelenmisFinansalKiralamaBilgisi != null)
+													{
+														toplamMaliBorclar += Convert.ToDecimal(Model.ErtelenmisFinansalKiralamaBilgisi.ToplamBakiye);
+													}
+
+													if (Model.DigerMaliBorclarBilgisi != null)
+													{
+														toplamMaliBorclar += Convert.ToDecimal(Model.DigerMaliBorclarBilgisi.ToplamBakiye);
+													}
+
+													if (Model.FirmaKrediKartlari != null && Model.FirmaKrediKartlari.Any())
+													{
+														toplamMaliBorclar += Model.FirmaKrediKartlari.Sum(k => k.Kalan);
+													}
+												}
+												@toplamMaliBorclar.ToString("N2") ₺
+											</td>
+										</tr>
+										<!-- Level 4: Banka Kredileri -->
+										@* Bilançodaki Kredi bilgileri kısmını güncelleyelim *@
+										<!-- Level 4: Banka Kredileri -->
+										<!-- Level 4: Banka Kredileri -->
+										<tr class="level-4">
+											<td class="item-name-A">Banka Kredileri (Kalan Ana Para)</td>
+											<td class="item-amount">
+												@{
+													decimal toplamKrediAnaParaKalan = 0;
+													if (Model.KrediDetaylari != null && Model.KrediDetaylari.Any())
+													{
+														foreach (var bankaGrubu in Model.KrediDetaylari)
+														{
+															foreach (var kredi in bankaGrubu)
+															{
+																toplamKrediAnaParaKalan += kredi.krsoztaksit_anapara;
+															}
+														}
+													}
+												}
+												@toplamKrediAnaParaKalan.ToString("N2") ₺
+											</td>
+										</tr>
+
+										@if (Model.KrediDetaylari != null && Model.KrediDetaylari.Any())
+										{
+											foreach (var bankaGrubu in Model.KrediDetaylari)
+											{
+												decimal bankaToplam = bankaGrubu.Sum(k => k.krsoztaksit_anapara);
+
+												<!-- Level 5: Banka Adı -->
+												<tr class="level-5">
+													<td class="item-name-A">@bankaGrubu.Key</td>
+													<td class="item-amount">@bankaToplam.ToString("N2") ₺</td>
+												</tr>
+
+												@foreach (var krediGrubu in bankaGrubu.GroupBy(k => k.krsoztaksit_sozkodu))
+												{
+													string krediKodu = krediGrubu.Key;
+													decimal krediToplam = krediGrubu.Sum(k => k.krsoztaksit_anapara);
+													decimal faizOrani = krediGrubu.First().krsoztaksit_faizorani;
+
+													<!-- Detail: Kredi Sözleşme Kodu ve Toplam Ana Para -->
+													<tr class="detail-row can-toggle">
+														<td class="item-name-A">Sözleşme: @krediKodu (Faiz: %@faizOrani)</td>
+														<td class="item-amount">@krediToplam.ToString("N2") ₺</td>
+													</tr>
+
+													@foreach (var taksit in krediGrubu.OrderBy(t => t.krsoztaksit_vade))
+													{
+														<!-- Sub-Detail: Taksit detayları vadeye göre sıralı -->
+														<tr class="sub-detail-row hidden-row">
+															<td class="item-name-A">
+																Vade: @taksit.krsoztaksit_vade.ToString("dd.MM.yyyy")
+															</td>
+															<td class="item-amount">@taksit.krsoztaksit_anapara.ToString("N2") ₺</td>
+														</tr>
+													}
+												}
+											}
+										}
+
+										<!-- Level 4: Finansal Kiralama İşlem Borçlar -->
+										<tr class="level-4">
+											<td class="item-name-A">@Model.FinansalKiralamaBorcBilgisi.HesapAdi</td>
+											<td class="text-end">@Model.FinansalKiralamaBorcBilgisi.ToplamBakiye.ToString("N2") ₺</td>
+
+										</tr>
+
+										<!-- Level 4: Ertelenmiş Fin. Kir. Maliyeti(-) -->
+										<tr class="level-4">
+											<td class="item-name-A">@Model.ErtelenmisFinansalKiralamaBilgisi.HesapAdi</td>
+											<td class="text-end">@Model.ErtelenmisFinansalKiralamaBilgisi.ToplamBakiye.ToString("N2") ₺</td>
+
+										</tr>
+
+										<!-- Level 4: Diğer Mali Borçlar -->
+										@* 	<tr class="level-4">
+											<td>@Model.DigerMaliBorclarBilgisi.HesapAdi</td>
+											<td class="text-end">@Model.DigerMaliBorclarBilgisi.ToplamBakiye.ToString("N2") ₺</td>
+
+										</tr> *@
+										<tr class="level-4">
+											<td class="item-name-A">@Model.DigerMaliBorclarBilgisi.HesapAdi</td>
+											<td class="item-amount">@Model.DigerMaliBorclarBilgisi.ToplamBakiye.ToString("N0") ₺</td>
+										</tr>
+
+										@if (Model.DigerMaliBorclarDetay != null && Model.DigerMaliBorclarDetay.Any())
+										{
+											@foreach (var detay in Model.DigerMaliBorclarDetay)
+											{
+												<!-- Detail: Company names -->
+												<tr class="detail-row">
+													<td class="item-name-A">@detay.HesapAdi</td>
+													<td class="item-amount">@detay.ToplamBakiye.ToString("N0") ₺</td>
+												</tr>
+											}
+										}
+
+										<!-- Detail: Şirket Kredi Kartı -->
+										<!-- Detail: POS Kredi Kartı -->
+										<tr class="level-4">
+											<td class="item-name-A">Firma Kredi Kartları</td>
+											<td class="item-amount">
+												@{
+													decimal toplamFirmaKrediKarti = 0;
+													if (Model.FirmaKrediKartlari != null && Model.FirmaKrediKartlari.Any())
+													{
+														toplamFirmaKrediKarti = Model.FirmaKrediKartlari.Sum(k => k.Kalan);
+													}
+												}
+												@toplamMusteriKrediKarti.ToString("N2") ₺
+											</td>
+										</tr>
+
+										@if (Model.FirmaKrediKartlari != null && Model.FirmaKrediKartlari.Any())
+										{
+											var grupluKartlar = Model.FirmaKrediKartlari
+											.GroupBy(k => k.Nerede)
+											.OrderByDescending(g => g.Sum(k => k.Kalan));
+
+											@foreach (var grup in grupluKartlar)
+											{
+												<!-- Detail: Banka/Kurum Adı -->
+												<tr class="detail-row">
+													<td class="item-name-A">@grup.Key</td>
+													<td class="item-amount">@grup.Sum(k => k.Kalan).ToString("N2") ₺</td>
+												</tr>
+
+												var siraliKartlar = grup.OrderByDescending(k => k.Kalan);
+												@foreach (var kart in siraliKartlar)
+												{
+													<!-- Sub-Detail: Kart Bilgisi -->
+													<tr class="sub-detail-row">
+														<td class="item-name-A">
+															@kart.Borçlu
+															@if (kart.VadeTarihi != DateTime.MinValue)
+															{
+																<span> - Vade: @kart.VadeTarihi.ToString("dd.MM.yyyy")</span>
+															}
+														</td>
+														<td class="item-amount">@kart.Kalan.ToString("N2") ₺</td>
+													</tr>
+												}
+
+											}
+										}
+
+										<!-- Level 3: TİCARİ BORÇLAR -->
+										<tr class="level-3">
+											<td class="item-name-A">TİCARİ BORÇLAR</td>
+											<td class="item-amount">
+												@{
+													decimal toplamTicariBorclar = 0;
+
+													// Artı bakiyeli tedarikçi borçları
+													if (Model.ArtiBakiyeliTedarikciler != null)
+													{
+														toplamTicariBorclar += Model.ArtiBakiyeliTedarikciler.Sum(t => t.ToplamBorc);
+													}
+
+													// Eksi bakiyeli tedarikçi alacakları
+													if (Model.EksiBakiyeliTedarikciler != null)
+													{
+														toplamTicariBorclar += Model.EksiBakiyeliTedarikciler.Sum(m => (decimal)m.AnaDovizBakiyesi);
+													}
+
+													// Verilen firma çekleri
+													if (Model.FirmaCekleri != null)
+													{
+														toplamTicariBorclar += Model.FirmaCekleri.Sum(c => c.Kalan);
+													}
+
+													// Alınan depozito ve teminatlar
+													if (Model.AlinanDepozitoVeTeminatBilgisi != null)
+													{
+														toplamTicariBorclar += Convert.ToDecimal(Model.AlinanDepozitoVeTeminatBilgisi.ToplamBakiye);
+													}
+												}
+												@toplamTicariBorclar.ToString("N2") ₺
+											</td>
+										</tr>
+
+
+
+
+										<!-- Level 5: ARTI BAKİYELİ TİCARİ BORÇLAR -->
+										<tr class="level-4">
+											<td class="item-name-A">ARTI BAKİYELİ TEDARİKÇİ BORÇLARI</td>
+											<td class="item-amount">
+												@{
+													decimal toplamTedarikciBakiye = 0;
+													if (Model.ArtiBakiyeliTedarikciler != null && Model.ArtiBakiyeliTedarikciler.Any())
+													{
+														toplamTedarikciBakiye = Model.ArtiBakiyeliTedarikciler.Sum(t => t.ToplamBorc);
+													}
+												}
+												@toplamTedarikciBakiye.ToString("N2") ₺
+											</td>
+										</tr>
+
+										@if (Model.ArtiBakiyeliTedarikciler != null && Model.ArtiBakiyeliTedarikciler.Any())
+										{
+											@foreach (var tedarikci in Model.ArtiBakiyeliTedarikciler.OrderByDescending(t => t.ToplamBorc))
+											{
+												<!-- Detail: Tedarikçi bilgisi -->
+												<tr class="detail-row">
+													<td class="item-name-A">@tedarikci.CariUnvani (@tedarikci.CariKodu)</td>
+													<td class="item-amount">@tedarikci.ToplamBorc.ToString("N2") ₺</td>
+												</tr>
+
+												<!-- Detay bilgileri kaldırıldı -->
+											}
+										}
+
+
+										<!-- Level 5: EKSİ BAKİYELİ TİCARİ BORÇLAR -->
+										<tr class="level-4">
+											<td class="item-name-A">EKSİ BAKİYELİ TEDARİKÇİ ALACAKLAR</td>
+											<td class="item-amount negative">
+												@{
+													decimal toplamEksiBakiyeTedarikci = 0;
+													if (Model.EksiBakiyeliTedarikciler != null && Model.EksiBakiyeliTedarikciler.Any())
+													{
+														toplamEksiBakiyeTedarikci = Model.EksiBakiyeliTedarikciler.Sum(m => (decimal)m.AnaDovizBakiyesi);
+													}
+												}
+												@toplamEksiBakiyeTedarikci.ToString("N2") ₺
+											</td>
+										</tr>
+
+										@if (Model.EksiBakiyeliTedarikciler != null && Model.EksiBakiyeliTedarikciler.Any())
+										{
+											foreach (var musteri in Model.EksiBakiyeliTedarikciler.OrderBy(m => m.AnaDovizBakiyesi))
+											{
+												<tr class="detail-row">
+													<td class="item-name-A">@musteri.CariUnvani (@musteri.CariKodu)</td>
+													<td class="item-amount negative">@musteri.AnaDovizBakiyesi.ToString("N2") ₺</td>
+												</tr>
+											}
+										}
+
+
+										<!-- Level 4: VERİLEN FİRMA ÇEKLERİ -->
+										<tr class="level-4">
+											<td class="item-name-A">Verilen Firma Çekleri</td>
+											<td class="item-amount">
+												@{
+													decimal toplamFirmaCekTutari = 0;
+													if (Model.FirmaCekleri != null && Model.FirmaCekleri.Any())
+													{
+														toplamFirmaCekTutari = Model.FirmaCekleri.Sum(c => c.Kalan);
+													}
+												}
+												@toplamFirmaCekTutari.ToString("N2") ₺
+											</td>
+										</tr>
+
+										@if (Model.FirmaCekleri != null && Model.FirmaCekleri.Any())
+										{
+											var cekGruplari = new[] { "Portföy", "Ciro" }; // Pozisyonları buraya yaz
+											foreach (var pozisyon in cekGruplari)
+											{
+												var pozisyonCekleri = Model.FirmaCekleri
+												.Where(c => c.Pozisyonu == pozisyon && c.Kalan > 0)
+												.ToList();
+
+												if (pozisyonCekleri.Any())
+												{
+													<tr class="detail-row">
+														<td class="item-name-A">@pozisyon</td>
+														<td class="item-amount">@pozisyonCekleri.Sum(c => c.Kalan).ToString("N2") ₺</td>
+													</tr>
+
+													@foreach (var cek in pozisyonCekleri.OrderBy(c => c.Vade))
+													{
+														<tr class="sub-detail-row">
+															<td class="item-name-A">
+																@cek.SahipCariAdi
+																@if (!string.IsNullOrEmpty(cek.RefNo))
+																{
+																	<span> - Çek No: @cek.RefNo - Vade: @cek.Vade.ToString("dd.MM.yyyy")</span>
+																}
+																else
+																{
+																	<span> - Vade: @cek.Vade.ToString("dd.MM.yyyy")</span>
+																}
+															</td>
+															<td class="item-amount">@cek.Kalan.ToString("N2") ₺</td>
+														</tr>
+													}
+												}
+											}
+										}
+
+
+
+										<tr class="level-4">
+											<td>@Model.AlinanDepozitoVeTeminatBilgisi.HesapAdi</td>
+											<td class="text-end">@Model.AlinanDepozitoVeTeminatBilgisi.ToplamBakiye.ToString("N2") ₺</td>
+
+										</tr>
+										<!-- Level 3: DİĞER BORÇLAR -->
+										<tr class="level-3">
+											<td class="item-name-A">@Model.DigerBorclar.HesapAdi</td>
+											<td class="item-amount">
+												@{
+													decimal toplamDigerBorclar = 0;
+
+													if (Model.PersonelBorclariBilgisi != null)
+													{
+														toplamDigerBorclar += Convert.ToDecimal(Model.PersonelBorclariBilgisi.ToplamBakiye);
+													}
+
+													if (Model.DigerCesitliBorclar != null)
+													{
+														toplamDigerBorclar += Convert.ToDecimal(Model.DigerCesitliBorclar.ToplamBakiye);
+													}
+												}
+												@toplamDigerBorclar.ToString("N2") ₺
+											</td>
+										</tr>
+
+
+										<!-- Level 4: İştiraklere Borçlar -->
+										<tr class="level-4">
+											<td class="item-name-A">İştiraklere Borçlar</td>
+											<td class="item-amount"></td>
+										</tr>
+
+										<!-- Level 4: Personele Borçlar -->
+										<tr class="level-4">
+											<td>@Model.PersonelBorclariBilgisi.HesapAdi</td>
+											<td class="text-end">@Model.PersonelBorclariBilgisi.ToplamBakiye.ToString("N2") ₺</td>
+
+										</tr>
+
+										<!-- Level 4: Diğ. Çeşitli Borçlar -->
+										<tr class="level-4">
+											<td class="item-name-A">@Model.DigerCesitliBorclar.HesapAdi</td>
+											<td class="item-amount">>@Model.DigerCesitliBorclar.ToplamBakiye.ToString("N2") ₺</td>
+										</tr>
+
+
+
+										<!-- Level 3: ÖDENECEK VERGİ VE DİĞER YÜKÜMLÜLÜKLER -->
+										<tr class="level-3">
+											<td class="item-name-A">ÖDENECEK DİĞER YÜKÜMLÜLÜKLER</td>
+											<td class="item-amount">
+												@{
+													decimal toplamOdenecekYukumlulukler = 0;
+
+													if (Model.OdenecekVergiVeFonBilgisi != null)
+													{
+														toplamOdenecekYukumlulukler += Convert.ToDecimal(Model.OdenecekVergiVeFonBilgisi.ToplamBakiye);
+													}
+
+													if (Model.OdenecekSosyalGuvenlikKesintileriBilgisi != null)
+													{
+														toplamOdenecekYukumlulukler += Convert.ToDecimal(Model.OdenecekSosyalGuvenlikKesintileriBilgisi.ToplamBakiye);
+													}
+												}
+												@toplamOdenecekYukumlulukler.ToString("N2") ₺
+											</td>
+										</tr>
+
+
+										<!-- Level 4: Ödenecek Vergi ve Fonlar -->
+										<tr class="level-4">
+											<td>@Model.OdenecekVergiVeFonBilgisi.HesapAdi</td>
+											<td class="text-end">@Model.OdenecekVergiVeFonBilgisi.ToplamBakiye.ToString("N2") ₺</td>
+
+										</tr>
+
+										<!-- Level 4: Ödenecek Sos. Güv. Kesintileri -->
+										<tr class="level-4">
+											<td>@Model.OdenecekSosyalGuvenlikKesintileriBilgisi.HesapAdi</td>
+											<td class="text-end">@Model.OdenecekSosyalGuvenlikKesintileriBilgisi.ToplamBakiye.ToString("N2") ₺</td>
+
+										</tr>
+
+										<!-- Level 2: 4. UZUN VADELİ YABANCI KAYNAKLAR -->
+										<tr class="level-2">
+											<td>@Model.OdenecekDigerYukumlulukler.HesapAdi</td>
+											<td class="text-end">@Model.OdenecekDigerYukumlulukler.ToplamBakiye.ToString("N2") ₺</td>
+										</tr>
+
+
+
+										<!-- Level 3: Ortaklara Borçlar -->
+										<tr class="level-3">
+											<td>@Model.OrtaklaraBorclar.HesapAdi</td>
+											<td class="text-end">@Model.OrtaklaraBorclar.ToplamBakiye.ToString("N2") ₺</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<!-- Add this style section to your existing CSS -->
+	<style>
+		/* Clickable row indicator styles */
+		.balance-list tr.can-toggle td.item-name-A {
+			cursor: pointer;
+			position: relative;
+			
+		}
+
+			/* Plus/minus icon for clickable rows */
+			.balance-list tr.can-toggle td.item-name-A::before {
+				content: '+';
+				position: absolute;
+				left: 8px;
+				top: 50%;
+				transform: translateY(-50%);
+				width: 15px;
+				text-align: center;
+				color: var(--primary-color);
+				font-weight: bold;
+				transition: transform 0.3s ease;
+			}
+
+		/* Change to minus icon when expanded */
+		.balance-list tr.can-toggle.expanded td.item-name-A::before {
+			content: '-';
+		}
+
+		/* Add hover effect to indicate clickable rows */
+		.balance-list tr.can-toggle:hover {
+			background-color: var(--hover-color);
+		}
+
+		/* Transition for smooth opening/closing animation */
+		.balance-list tr {
+			transition: background-color 0.2s ease;
+		}
+
+		/* Hidden rows */
+		.hidden-row {
+			display: none !important;
+		}
+	</style>
+
+	<!-- Replace your existing script with this improved version -->
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			// Get all table rows
+			const rows = document.querySelectorAll('.balance-list tr');
+			const allRows = Array.from(rows);
+
+			// Mark rows with toggle functionality
+			allRows.forEach(function(row) {
+				// Skip table headers
+				if (row.querySelector('th')) return;
+
+				// Check row classes
+				const isLevel1 = row.classList.contains('level-1');
+				const isLevel2 = row.classList.contains('level-2');
+				const isLevel3 = row.classList.contains('level-3');
+				const isLevel4 = row.classList.contains('level-4');
+				const isLevel5 = row.classList.contains('level-5');
+				const isDetailRow = row.classList.contains('detail-row');
+				const isSubDetailRow = row.classList.contains('sub-detail-row');
+
+				// Make rows togglable
+				if (isLevel2 || isLevel3 || isLevel4) {
+					row.classList.add('can-toggle');
+				}
+
+				// Make special detail rows togglable too
+				const textContent = row.querySelector('td:first-child')?.textContent.trim();
+				if ((isDetailRow && ['Portföyde', 'Teminatta', 'Tahsilde', 'Ciro'].includes(textContent)) ||
+					(isDetailRow && row.nextElementSibling && row.nextElementSibling.classList.contains('sub-detail-row'))) {
+					row.classList.add('can-toggle');
+				}
+
+				// Default hidden rows
+				if (isLevel3 || isLevel4 || isLevel5 || isDetailRow || isSubDetailRow) {
+					row.classList.add('hidden-row');
+				}
+			});
+
+
+			// Add click handlers to all togglable rows
+			document.querySelectorAll('.can-toggle').forEach(function(toggleRow) {
+				toggleRow.addEventListener('click', function(e) {
+					e.stopPropagation(); // Prevent event bubbling
+
+					// Toggle expanded state
+					toggleRow.classList.toggle('expanded');
+					const isExpanded = toggleRow.classList.contains('expanded');
+
+					// Determine row level
+					let rowLevel = '';
+					if (toggleRow.classList.contains('level-2')) rowLevel = 'level-2';
+					else if (toggleRow.classList.contains('level-3')) rowLevel = 'level-3';
+					else if (toggleRow.classList.contains('level-4')) rowLevel = 'level-4';
+					else if (toggleRow.classList.contains('detail-row')) rowLevel = 'detail-row';
+
+					// Handle special cases for checks
+					const checkHeading = toggleRow.querySelector('td:first-child')?.textContent.trim();
+					if (checkHeading === 'Alınan Çekler' || checkHeading === 'Verilen Firma Çekleri') {
+						let nextRow = toggleRow.nextElementSibling;
+						while (nextRow && !isHigherOrSameLevel(nextRow, toggleRow)) {
+							if (isExpanded) {
+								if (nextRow.classList.contains('detail-row')) {
+									nextRow.classList.remove('hidden-row');
+								} else {
+									nextRow.classList.add('hidden-row');
+								}
+							} else {
+								nextRow.classList.add('hidden-row');
+							}
+							nextRow = nextRow.nextElementSibling;
+						}
+						return;
+					}
+
+					// Handle special detail rows (Portföyde, etc.)
+					if (toggleRow.classList.contains('detail-row') &&
+						['Portföyde', 'Teminatta', 'Tahsilde', 'Ciro'].includes(checkHeading)) {
+						let nextRow = toggleRow.nextElementSibling;
+						while (nextRow && nextRow.classList.contains('sub-detail-row')) {
+							if (isExpanded) {
+								nextRow.classList.remove('hidden-row');
+							} else {
+								nextRow.classList.add('hidden-row');
+							}
+							nextRow = nextRow.nextElementSibling;
+						}
+						return;
+					}
+
+					// Handle regular hierarchy
+					if (rowLevel) {
+						let nextRow = toggleRow.nextElementSibling;
+						while (nextRow && !isHigherOrSameLevel(nextRow, toggleRow)) {
+							if (isExpanded) {
+								// Show only direct children
+								if (isDirectNextLevel(nextRow, toggleRow)) {
+									nextRow.classList.remove('hidden-row');
+								} else {
+									// Show deeper levels only if their parent is expanded
+									const parentRow = findParentRow(nextRow, toggleRow);
+									if (parentRow && parentRow.classList.contains('expanded')) {
+										nextRow.classList.remove('hidden-row');
+									} else {
+										nextRow.classList.add('hidden-row');
+									}
+								}
+							} else {
+								// Hide all children when closing
+								nextRow.classList.add('hidden-row');
+								// Clear expanded state of children
+								if (nextRow.classList.contains('expanded')) {
+									nextRow.classList.remove('expanded');
+								}
+							}
+							nextRow = nextRow.nextElementSibling;
+						}
+					}
+				});
+			});
+
+			// Helper function: Is a row higher or same level as reference row
+			function isHigherOrSameLevel(rowToCheck, referenceRow) {
+				const levels = ['level-1', 'level-2', 'level-3', 'level-4', 'level-5', 'level-6'];
+
+				// Find reference row level
+				let refLevel = '';
+				for (let i = 0; i < levels.length; i++) {
+					if (referenceRow.classList.contains(levels[i])) {
+						refLevel = levels[i];
+						break;
+					}
+				}
+
+				// Handle detail rows
+				if (!refLevel && referenceRow.classList.contains('detail-row')) {
+					if (rowToCheck.classList.contains('detail-row') ||
+						levels.some(level => rowToCheck.classList.contains(level))) {
+						return true;
+					}
+					return false;
+				}
+
+				// Compare levels
+				const refIndex = levels.indexOf(refLevel);
+				for (let j = 0; j <= refIndex; j++) {
+					if (rowToCheck.classList.contains(levels[j])) {
+						return true;
+					}
+				}
+
+				return false;
+			}
+
+			// Helper function: Is a row a direct child of reference row
+			function isDirectNextLevel(rowToCheck, referenceRow) {
+				// Level hierarchy checks
+				if (referenceRow.classList.contains('level-2') && rowToCheck.classList.contains('level-3')) return true;
+				if (referenceRow.classList.contains('level-3') && rowToCheck.classList.contains('level-4')) return true;
+				if (referenceRow.classList.contains('level-4') && rowToCheck.classList.contains('level-5')) return true;
+
+				// Special cases
+				if (referenceRow.classList.contains('level-4') && rowToCheck.classList.contains('detail-row')) return true;
+				if (referenceRow.classList.contains('detail-row') && rowToCheck.classList.contains('sub-detail-row')) return true;
+
+				return false;
+			}
+
+			// Helper function: Find parent row
+			function findParentRow(row, topLevelRow) {
+				const levels = ['level-1', 'level-2', 'level-3', 'level-4', 'level-5', 'level-6'];
+				let rowLevel = '';
+
+				// Find row's level
+				for (let i = 0; i < levels.length; i++) {
+					if (row.classList.contains(levels[i])) {
+						rowLevel = levels[i];
+						break;
+					}
+				}
+
+				// Handle sub-detail rows
+				if (row.classList.contains('sub-detail-row')) {
+					const prevRow = row.previousElementSibling;
+					if (prevRow && prevRow.classList.contains('detail-row')) {
+						return prevRow;
+					}
+				}
+
+				// Handle detail rows
+				if (row.classList.contains('detail-row')) {
+					let prevRow = row.previousElementSibling;
+					while (prevRow && !prevRow.classList.contains('level-4')) {
+						prevRow = prevRow.previousElementSibling;
+					}
+					return prevRow;
+				}
+
+				// Handle regular hierarchy
+				if (rowLevel) {
+					const targetLevel = levels[levels.indexOf(rowLevel) - 1];
+					let prevRow = row.previousElementSibling;
+
+					while (prevRow && prevRow !== topLevelRow) {
+						if (prevRow.classList.contains(targetLevel)) {
+							return prevRow;
+						}
+						prevRow = prevRow.previousElementSibling;
+					}
+				}
+
+				return null;
+			}
+
+			// Open level-2 rows by default
+			document.querySelectorAll('.level-2.can-toggle').forEach(function(level2Row) {
+				level2Row.click();
+			});
+		});
+
+
+
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,811 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = null;
+}
+
+<head>
+    <title>DBT PARTNER</title>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="description" content="codedthemes">
+    <meta name="keywords"
+          content=", Responsive, Landing, Bootstrap, App, Template, Mobile, iOS, Android, apple, creative app">
+    <meta name="author" content="codedthemes">
+
+    <!-- Favicon icon -->
+    <link rel="shortcut icon" href="/Content/assets/images/favicon.png" type="image/x-icon">
+    <link rel="icon" href="~/favicon.ico" type="image/x-icon">
+
+    <!-- Google font-->
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu:400,500,700" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="~/Content/assets/css/font-awesome.min.css" rel="stylesheet" />
+
+    <!--ico Fonts-->
+    <link href="~/Content/assets/icon/icofont/css/icofont.css" rel="stylesheet" />
+
+    <!-- Required Fremwork -->
+    <link href="~/Content/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- waves css -->
+    <link href="~/Content/assets/plugins/Waves/waves.min.css" rel="stylesheet" />
+
+    <!-- Style.css -->
+    <link href="~/Content/assets/css/main.css" rel="stylesheet" />
+
+    <!-- Responsive.css-->
+    <link href="~/Content/assets/css/responsive.css" rel="stylesheet" />
+
+    <!--color css-->
+    <link href="~/Content/assets/css/color/color-1.min.css" rel="stylesheet" id="color" />
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.10/dist/sweetalert2.all.min.js"></script>
+    <style>
+        /* Background styling */
+        .login {
+            background: radial-gradient(circle, rgba(0, 149, 212, 1) 0%, rgba(23, 96, 150, 1) 63%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        /* Card styling */
+        .login-card {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            max-width: 420px;
+            width: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .login-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            }
+
+        /* Input wrapper with floating label */
+        .md-input-wrapper {
+            position: relative;
+            margin-bottom: 30px;
+            padding-top: 10px;
+        }
+
+            .md-input-wrapper input {
+                width: 100%;
+                padding: 14px 12px;
+                font-size: 16px;
+                border: 1px solid rgba(23, 96, 150, 0.4);
+                border-radius: 6px;
+                transition: border-color 0.3s, box-shadow 0.3s;
+                background-color: rgba(255, 255, 255, 0.9);
+                z-index: 1;
+                color: #707070;
+            }
+
+                .md-input-wrapper input:focus {
+                    border-color: rgba(0, 149, 212, 0.8);
+                    box-shadow: 0 0 8px rgba(0, 149, 212, 0.3);
+                    outline: none;
+                }
+
+            .md-input-wrapper label {
+                position: absolute;
+                top: 16px;
+                left: 14px;
+                font-size: 14px !important;
+                color: #176096 !important;
+                transition: all 0.3s ease;
+                pointer-events: none;
+                background-color: rgba(255, 255, 255, 0.9);
+                padding: 0 4px;
+                transform-origin: left;
+            }
+
+            .md-input-wrapper input:focus + label,
+            .md-input-wrapper input:not(:placeholder-shown) + label {
+                top: -10px;
+                left: 0;
+                font-size: 12px;
+                color: rgba(0, 149, 212, 0.9);
+                background: #ffffff;
+                padding: 0 5px;
+                border-radius: 4px;
+            }
+
+        /* Button styling */
+        .btn-primary {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            border: none;
+            padding: 12px;
+            font-size: 17px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            color: white;
+            width: auto;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+
+            .btn-primary:hover {
+                background: linear-gradient(45deg, #0056b3, #003b75);
+            }
+        /* Basit Checkbox Stili /*/
+                .rkmd-checkbox {
+                    display: flex;
+            align-items: center; /* Elemanların dikey olarak hizalanmasını sağlar */
+        margin-top: 10px;
+        }
+
+        .input-checkbox {
+            -webkit-appearance: none; /* Safari ve eski tarayıcılar için /*/
+                    -moz-appearance: none; /* Firefox için */
+                    appearance: none; /* Diğer tarayıcılar için */
+                    width: 20px !important;
+                    height: 20px !important;
+                    border: 2px solid rgba(23, 96, 150, 0.8);
+                    border-radius: 4px;
+                    margin-right: 10px; /* Checkbox ile yazı arasındaki boşluk */
+                    cursor: pointer;
+                    outline: none;
+                    background-color: transparent;
+                    position: relative !important;
+                    display: inline-block; /* Elemanların yatayda hizalanması */
+        }
+
+            .input-checkbox:checked {
+                background-color: rgba(0, 149, 212, 0.9);
+                border-color: rgba(0, 149, 212, 0.9);
+            }
+
+            .input-checkbox::after {
+                content: '';
+                position: absolute;
+                top: 2px; /* Tik işaretinin konumunu ayarlayın */
+                        left: 6px; /*Tik işaretinin konumunu ayarlayın*/
+                        width: 6px;
+                        height: 12px;
+                        border: solid white;
+                        border-width: 0 2px 2px 0;
+                        transform: rotate(45deg);
+                        display: none; /*Varsayılan olarak tik işaretini gizle */
+            }
+
+            .input-checkbox:checked::after {
+                display: block; /* Tik işaretini göster */
+            }
+
+        .captions {
+            font-size: 14px;
+            color: #333;
+            user-select: none;
+            cursor: pointer;
+            padding: 0 !important;
+        }
+
+        /* Image styling */
+        .text-center img {
+            width: 130px;
+            margin-bottom: 25px;
+            transition: transform 0.3s ease;
+        }
+
+            .text-center img:hover {
+                transform: scale(1.05);
+            }
+
+        /* Responsive adjustments */
+        @@media (max-width: 768px) {
+            .login-card {
+                padding: 30px 20px;
+            }
+
+            .btn-primary {
+                font-size: 15px;
+                padding: 10px;
+            }
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: -1;
+            background-color: #000;
+        }
+
+        .modal-backdrop {
+            z-index: 1040 !important; /* Backdrop için z-index */
+        }
+
+        .modal {
+            z-index: 1050 !important; /* Modalın diğer her şeyin üzerinde olduğundan emin olun */
+        }
+
+        .modal-dialog {
+            max-width: 100%;
+            width: 50%;
+            margin: auto;
+            top: 50%;
+            transform: translate(-50%, -50%) !important;
+            position: fixed;
+            left: 50%;
+        }
+
+        .modal-content {
+            border-radius: 10px;/*  Kenarları yuvarlat / */
+                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* / Hafif gölge ekle / */
+                    border: none; /* / Çerçeve kaldır / */
+                    background-color: #f8f9fa; /* / Modern açık arka plan rengi */ */
+        }
+
+        .modal-header {
+            background-color: rgba(22, 46, 84, 1); /* Başlık kısmına sayfanızın temasına uygun renk / */
+                    border-bottom: none; /* / Alt çizgiyi kaldır / */
+                    color: white; /* / Başlık metin rengini beyaz yap / */
+                    padding: 15px 20px; /* / İç boşluk düzenlemesi / */
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border-top-left-radius: 10px; /* / Üst kenarları yuvarla / */
+                    border-top-right-radius: 10px; /* / Üst kenarları yuvarla */
+        }
+
+        .modal-title {
+            font-size: 1.25rem; /* Başlık boyutunu büyüt / */
+                    font-weight: 500; /* / Başlık font kalınlığını düzenle */
+        }
+
+        .modal-body {
+            padding: 20px; /* İçerik için geniş padding / */
+                    max-height: 500px; /* / Maksimum yükseklik / */
+                    overflow-y: auto;/*  / İçeriğin taşması durumunda scroll */
+        }
+
+        .modal-footer {
+            border-top: none;/*  Üst çizgiyi kaldır / */
+                    padding: 15px 20px;/*  / İç boşluk düzenlemesi */
+            display: flex;
+            justify-content: flex-end;
+        }
+
+            .modal-footer .btn {
+                background-color: rgba(0, 118, 168, 1); /* Buton rengini tema rengine uygun yap / */
+                        color: white; /* / Buton metin rengi / */
+                        border-radius: 5px;
+                        padding: 8px 15px; /* / Buton boşluk düzenlemesi / */
+                        border: none; /* / Buton çerçevesini kaldır / */
+                        transition: background-color 0.3s ease; /* / Hover animasyonu */
+            }
+
+                .modal-footer .btn:hover {
+                    background-color: rgba(0, 90, 120, 1); /* Hover durumunda renk değiştirme*/
+                }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4); /* Arkaplan koyu renk */
+        }
+
+    </style>
+
+</head>
+<body>
+    <section class="login p-fixed d-flex text-center bg-primary2 ">
+        <!--common-img-bg-->
+        <!-- Container-fluid starts -->
+        <div class="container-fluid">
+            <div class="row">
+
+                <div class="col-sm-12">
+                    <div class="login-card card-block">
+                        <form class="md-float-material" method="post">
+                            <div class="text-center">
+                                <img src="~/Content/assets/images/doraLogo.png" alt="logo">
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-input-wrapper">
+                                        <input type="text" name="username" id="KullaniciAd" class="md-form-control" required="required" />
+                                        <label>Kullanıcı Adı</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="md-input-wrapper">
+                                        <input type="password" name="password" id="Sifre" class="md-form-control" required="required" />
+                                        <label>Şifre</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-xs-12">
+                                    <div class="rkmd-checkbox m-b-25">
+                                        <input type="checkbox" id="checkbox" class="input-checkbox" value="1" onclick="tik()">
+                                        <label for="checkbox" class="captions">Beni Hatırla</label>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-10 offset-xs-1">
+                                    <button type="submit" class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20">Giriş Yap</button>
+                                </div>
+                            </div>
+                            <!-- <div class="card-footer"> -->
+                            <!-- </div> -->
+                        </form>
+                        <!-- end of form -->
+                    </div>
+                    <!-- end of login-card -->
+                </div>
+                <!-- end of col-sm-12 -->
+            </div>
+            <!-- end of row -->
+        </div>
+        <!-- end of container-fluid -->
+    </section>
+
+    <script src="~/Content/assets/plugins/Jquery/dist/jquery.min.js"></script>
+    <script src="~/Content/assets/plugins/jquery-ui/jquery-ui.min.js"></script>
+    <script src="~/Content/assets/plugins/tether/dist/js/tether.min.js"></script>
+
+    <!-- Required Fremwork -->
+    <script src="~/Content/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- waves effects.js -->
+    <script src="~/Content/assets/plugins/Waves/waves.min.js"></script>
+    <!-- Custom js -->
+    <script src="~/Content/assets/pages/elements.js"></script>
+
+    <script>
+        document.getElementById("KullaniciAd").value = localStorage.getItem("KullaniciAd");
+        document.getElementById("Sifre").value = localStorage.getItem("Sifre");
+    </script>
+
+    <script>
+        function tik() {
+
+            var hatirla = document.querySelector('input[type=checkbox][id=checkbox]:checked').value
+
+            if (hatirla != null) {
+                var kullaniciAd = document.getElementById("KullaniciAd").value
+                var sifre = document.getElementById("Sifre").value
+                if (kullaniciAd != "" || sifre != "") {
+
+                    localStorage.setItem("KullaniciAd", kullaniciAd)
+                    localStorage.setItem("Sifre", sifre)
+
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Kullanıcı Adı ve Şifre Girmelisin!'
+                    })
+                    $('input[type=checkbox]').prop('checked', false);
+
+                }
+            }
+            else {
+                localStorage.clear();
+            }
+
+        }
+    </script>
+
+    @{
+        ViewData["Title"] = "ERP Yazılım ve Yönetim";
+    }
+
+    @if (TempData["ShowModal"] != null && (bool)TempData["ShowModal"])
+    {
+        <script>
+            $(document).ready(function () {
+                $('#erpModal').modal('show');
+            });
+        </script>
+    }
+
+    <!-- Modal Yapısı -->
+    <div class="modal fade" id="erpModal" tabindex="-1" role="dialog" aria-labelledby="erpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="erpModalLabel">ERP Yazılım ve Yönetim</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                        <button class="btn btn-secondary" id="btnMikro">Mikro</button>
+                        <button class="btn btn-secondary" id="btnLogo">Logo</button>
+                        <button class="btn btn-secondary" id="btnZirve">Zirve</button>
+                    </div>
+                    <div id="mikroOptions" class="mt-3 d-none">
+                        <button class="btn btn-outline-primary" id="btnV17">V17</button>
+                        <button class="btn btn-outline-primary" id="btnV16">V16</button>
+                        <button class="btn btn-outline-primary" id="btnAPI">API</button>
+                    </div>
+
+                    <div id="connectionFormContainer" class="mt-3 d-none">
+                        <form id="connectionForm">
+                            <div class="form-group">
+                                <label for="ipAddress">IP Adresi</label>
+                                <input type="text" id="ipAddress" class="form-control" placeholder="IP Adresi" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="username">Kullanıcı Adı</label>
+                                <input type="text" id="username" class="form-control" placeholder="Kullanıcı Adı" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Şifre</label>
+                                <input type="password" id="password" class="form-control" placeholder="Şifre" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Bağlan</button>
+                        </form>
+                    </div>
+
+                    <div id="databaseDropdownContainer">
+                        <label for="databaseDropdown">Veritabanı Seçiniz:</label>
+                        <select id="databaseDropdown" class="form-control">
+                            <option value="" disabled selected>Bir veritabanı seçin</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize variables
+            let selectedVersion = null;
+            const loginForm = document.querySelector('.md-float-material');
+            const checkbox = document.getElementById('checkbox');
+            const kullaniciAd = document.getElementById('KullaniciAd');
+            const sifre = document.getElementById('Sifre');
+
+            // Load saved credentials if they exist
+            if (localStorage.getItem('KullaniciAd')) {
+                kullaniciAd.value = localStorage.getItem('KullaniciAd');
+                sifre.value = localStorage.getItem('Sifre');
+                checkbox.checked = true;
+            }
+
+            // Remember me functionality
+            checkbox.addEventListener('change', function () {
+                if (this.checked) {
+                    if (kullaniciAd.value && sifre.value) {
+                        localStorage.setItem('KullaniciAd', kullaniciAd.value);
+                        localStorage.setItem('Sifre', sifre.value);
+                    } else {
+                        this.checked = false;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Hata',
+                            text: 'Kullanıcı Adı ve Şifre Girmelisin!'
+                        });
+                    }
+                } else {
+                    localStorage.removeItem('KullaniciAd');
+                    localStorage.removeItem('Sifre');
+                }
+            });
+
+            // ERP Modal functionality
+            const btnMikro = document.getElementById('btnMikro');
+            const btnLogo = document.getElementById('btnLogo');
+            const btnZirve = document.getElementById('btnZirve');
+            const mikroOptions = document.getElementById('mikroOptions');
+            const connectionFormContainer = document.getElementById('connectionFormContainer');
+            const databaseDropdownContainer = document.getElementById('databaseDropdownContainer');
+            const connectionForm = document.getElementById('connectionForm');
+            const databaseDropdown = document.getElementById('databaseDropdown');
+
+            function resetAllOptions() {
+                mikroOptions.classList.add('d-none');
+                connectionFormContainer.classList.add('d-none');
+                databaseDropdownContainer.classList.add('d-none');
+                [btnMikro, btnLogo, btnZirve].forEach(btn => btn.classList.remove('active'));
+                selectedVersion = null;
+            }
+
+            // ERP type selection
+            [btnMikro, btnLogo, btnZirve].forEach(btn => {
+                btn.addEventListener('click', function () {
+                    resetAllOptions();
+                    this.classList.add('active');
+                    if (this.id === 'btnMikro') {
+                        mikroOptions.classList.remove('d-none');
+                    }
+                });
+            });
+
+            // Version selection
+            const versionButtons = document.querySelectorAll('#mikroOptions .btn');
+            versionButtons.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    selectedVersion = this.id.replace('btn', '');
+                    versionButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    fetch('/api/Database/SetVersion', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ version: selectedVersion })
+                    })
+                        .then(response => {
+                            if (!response.ok) throw new Error('Versiyon bilgisi gönderilemedi');
+                            connectionFormContainer.classList.remove('d-none');
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Hata',
+                                text: error.message
+                            });
+                        });
+                });
+            });
+
+            // Connection form submission
+            connectionForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const formData = {
+            version: selectedVersion,
+            ipAddress: document.getElementById('ipAddress').value,
+            dbUsername: document.getElementById('username').value,
+            dbPassword: document.getElementById('password').value,
+            defaultDatabase: null  // Başlangıçta null
+        };
+
+                // First update connection info
+                     fetch('/Login/UpdateConnectionInfo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            return fetch('/api/Database/dynamic-connect', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    ipAddress: formData.ipAddress,
+                                    username: formData.dbUsername,
+                                    password: formData.dbPassword
+                                })
+                            });
+                        }
+                        throw new Error(data.message);
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            databaseDropdownContainer.classList.remove('d-none');
+                            loadDatabaseDropdown(selectedVersion);
+                        } else {
+                            throw new Error(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Bağlantı Hatası',
+                            text: error.message
+                        });
+                    });
+            });
+
+            // Load databases into dropdown
+            function loadDatabaseDropdown(version) {
+                fetch(`/api/Database/GetDatabase?version=${version}`)
+                    .then(response => response.json())
+                    .then(databases => {
+                        databaseDropdown.innerHTML = '<option value="" disabled selected>Bir veritabanı seçin</option>';
+                        databases.forEach(database => {
+                            const option = document.createElement('option');
+                            option.value = database;
+                            option.textContent = database;
+                            databaseDropdown.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Hata',
+                            text: 'Veritabanları yüklenirken bir hata oluştu'
+                        });
+                    });
+            }
+
+            // Database selection
+                 databaseDropdown.addEventListener('change', function () {
+            if (!this.value) return;
+
+            const selectedDb = this.value;
+            // Tüm bağlantı bilgilerini gönder
+            const formData = {
+                version: selectedVersion,  // Seçilen versiyon
+                ipAddress: document.getElementById('ipAddress').value,
+                dbUsername: document.getElementById('username').value,
+                dbPassword: document.getElementById('password').value,
+                defaultDatabase: selectedDb  // Seçilen veritabanı
+            };
+
+            // Önce tüm bilgileri kullanıcı ayarlarına kaydet
+            fetch('/Login/UpdateConnectionInfo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Veritabanı seçimini uygula
+                    return fetch('/api/Database/select-database', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ databaseName: selectedDb })
+                    });
+                }
+                throw new Error(data.message);
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Başarılı',
+                        text: 'Veritabanı başarıyla seçildi ve kaydedildi!'
+                    }).then(() => {
+                        window.location.href = '/Home/Index';
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata',
+                    text: error.message
+                });
+            });
+        });
+        // Bağlantı formu submit olduğunda
+connectionForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const formData = {
+        version: selectedVersion,
+        ipAddress: document.getElementById('ipAddress').value,
+        dbUsername: document.getElementById('username').value,
+        dbPassword: document.getElementById('password').value,
+        defaultDatabase: null // Bu aşamada henüz veritabanı seçilmedi
+    };
+
+    try {
+        // Bağlantı bilgilerini kaydet
+        const response = await fetch('/Login/UpdateConnectionInfo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+            // Bağlantı başarılıysa veritabanı listesini yükle
+            databaseDropdownContainer.classList.remove('d-none');
+            loadDatabaseDropdown(selectedVersion);
+        } else {
+            throw new Error(result.message);
+        }
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Bağlantı Hatası',
+            text: error.message
+        });
+    }
+});
+
+// Veritabanı seçildiğinde
+           databaseDropdown.addEventListener('change', async function () {
+            if (!this.value) return;
+
+            const selectedDb = this.value;
+            console.log('Seçilen veritabanı:', selectedDb);
+
+            // Tüm form bilgilerini tekrar gönder
+            const formData = {
+                version: selectedVersion,
+                ipAddress: document.getElementById('ipAddress').value,
+                dbUsername: document.getElementById('username').value,
+                dbPassword: document.getElementById('password').value,
+                defaultDatabase: selectedDb
+            };
+
+            try {
+                // Önce bağlantı bilgilerini güncelle
+                const updateResponse = await fetch('/Login/UpdateConnectionInfo', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const updateResult = await updateResponse.json();
+                console.log('UpdateConnectionInfo cevabı:', updateResult);
+
+                if (updateResult.success) {
+                    // FormData kullanarak veritabanı seçim isteği
+                    const dbFormData = new FormData();
+                    dbFormData.append('databaseName', selectedDb);
+
+                    const dbResponse = await fetch('/api/Database/select-database', {
+                        method: 'POST',
+                        body: dbFormData // FormData olarak gönder
+                    });
+
+                    // Yanıtı kontrol et
+                    if (dbResponse.ok) {  // HTTP 200-299 arası yanıt geldi mi?
+                        await Swal.fire({
+                            icon: 'success',
+                            title: 'Başarılı',
+                            text: 'Veritabanı başarıyla seçildi ve kaydedildi!'
+                        });
+
+                        window.location.href = '/Home/Index';
+                    } else {
+                        const errorData = await dbResponse.json();
+                        throw new Error(errorData.message || 'Veritabanı seçim işlemi başarısız oldu');
+                    }
+                } else {
+                    throw new Error(updateResult.message || 'Bağlantı bilgileri güncellenemedi');
+                }
+            } catch (error) {
+                console.error('Hata detayı:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata',
+                    text: error.message || 'Bir hata oluştu'
+                });
+            }
+        });
+            // Show modal if needed
+        @if (TempData["ShowModal"] != null && (bool)TempData["ShowModal"])
+        {
+            <text>
+                            $(document).ready(function() {
+                                $('#erpModal').modal('show');
+                                });
+            </text>
+        }
+                });
+    </script>
+
+</body>

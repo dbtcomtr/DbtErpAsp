@@ -1,0 +1,203 @@
+{
+  "emptyTable": "Tabloda herhangi bir veri mevcut degil",
+  "info": "_TOTAL_ kayittan _START_ - _END_ arasindaki kayitlar gosteriliyor",
+  "infoEmpty": "Kayit yok",
+  "infoFiltered": "(_MAX_ kayit icerisinden bulunan)",
+  "infoThousands": ".",
+  "lengthMenu": "Sayfada _MENU_ kayit goster",
+  "loadingRecords": "Yukleniyor...",
+  "processing": "Isleniyor...",
+  "search": "Ara:",
+  "zeroRecords": "Eslesen kayit bulunamadi",
+  "paginate": {
+    "first": "Ilk",
+    "last": "Son",
+    "next": "Sonraki",
+    "previous": "Onceki"
+  },
+  "aria": {
+    "sortAscending": ": artan sütun sýralamasýný aktifleþtir",
+    "sortDescending": ": azalan sütun sýralamasýný aktifleþtir"
+  },
+  "select": {
+    "rows": {
+      "_": "%d kayýt seçildi",
+      "1": "1 kayýt seçildi"
+    },
+    "cells": {
+      "1": "1 hücre seçildi",
+      "_": "%d hücre seçildi"
+    },
+    "columns": {
+      "1": "1 sütun seçildi",
+      "_": "%d sütun seçildi"
+    }
+  },
+  "autoFill": {
+    "cancel": "Ýptal",
+    "fillHorizontal": "Hücreleri yatay olarak doldur",
+    "fillVertical": "Hücreleri dikey olarak doldur",
+    "fill": "Bütün hücreleri <i>%d<\/i> ile doldur"
+  },
+  "buttons": {
+    "collection": "Koleksiyon <span class=\"ui-button-icon-primary ui-icon ui-icon-triangle-1-s\"><\/span>",
+    "colvis": "Sütun görünürlüðü",
+    "colvisRestore": "Görünürlüðü eski haline getir",
+    "copySuccess": {
+      "1": "1 satýr panoya kopyalandý",
+      "_": "%ds satýr panoya kopyalandý"
+    },
+    "copyTitle": "Panoya kopyala",
+    "csv": "CSV",
+    "excel": "Excel",
+    "pageLength": {
+      "-1": "Bütün satýrlarý göster",
+      "_": "%d satýr göster"
+    },
+    "pdf": "PDF",
+    "print": "Yazdir",
+    "copy": "Kopyala",
+    "copyKeys": "Tablodaki veriyi kopyalamak için CTRL veya u2318 + C tuþlarýna basýnýz. Ýptal etmek için bu mesaja týklayýn veya escape tuþuna basýn."
+  },
+  "searchBuilder": {
+    "add": "Koþul Ekle",
+    "button": {
+      "0": "Arama Oluþturucu",
+      "_": "Arama Oluþturucu (%d)"
+    },
+    "condition": "Koþul",
+    "conditions": {
+      "date": {
+        "after": "Sonra",
+        "before": "Önce",
+        "between": "Arasýnda",
+        "empty": "Boþ",
+        "equals": "Eþittir",
+        "not": "Deðildir",
+        "notBetween": "Dýþýnda",
+        "notEmpty": "Dolu"
+      },
+      "number": {
+        "between": "Arasýnda",
+        "empty": "Boþ",
+        "equals": "Eþittir",
+        "gt": "Büyüktür",
+        "gte": "Büyük eþittir",
+        "lt": "Küçüktür",
+        "lte": "Küçük eþittir",
+        "not": "Deðildir",
+        "notBetween": "Dýþýnda",
+        "notEmpty": "Dolu"
+      },
+      "string": {
+        "contains": "Ýçerir",
+        "empty": "Boþ",
+        "endsWith": "Ýle biter",
+        "equals": "Eþittir",
+        "not": "Deðildir",
+        "notEmpty": "Dolu",
+        "startsWith": "Ýle baþlar"
+      },
+      "array": {
+        "contains": "Ýçerir",
+        "empty": "Boþ",
+        "equals": "Eþittir",
+        "not": "Deðildir",
+        "notEmpty": "Dolu",
+        "without": "Hariç"
+      }
+    },
+    "data": "Veri",
+    "deleteTitle": "Filtreleme kuralýný silin",
+    "leftTitle": "Kriteri dýþarý çýkart",
+    "logicAnd": "ve",
+    "logicOr": "veya",
+    "rightTitle": "Kriteri içeri al",
+    "title": {
+      "0": "Arama Oluþturucu",
+      "_": "Arama Oluþturucu (%d)"
+    },
+    "value": "Deðer",
+    "clearAll": "Filtreleri Temizle"
+  },
+  "searchPanes": {
+    "clearMessage": "Hepsini Temizle",
+    "collapse": {
+      "0": "Arama Bölmesi",
+      "_": "Arama Bölmesi (%d)"
+    },
+    "count": "{total}",
+    "countFiltered": "{shown}\/{total}",
+    "emptyPanes": "Arama Bölmesi yok",
+    "loadMessage": "Arama Bölmeleri yükleniyor ...",
+    "title": "Etkin filtreler - %d"
+  },
+  "thousands": ".",
+  "datetime": {
+    "amPm": [
+      "öö",
+      "ös"
+    ],
+    "hours": "Saat",
+    "minutes": "Dakika",
+    "next": "Sonraki",
+    "previous": "Önceki",
+    "seconds": "Saniye",
+    "unknown": "Bilinmeyen",
+    "weekdays": {
+      "6": "Paz",
+      "5": "Cmt",
+      "4": "Cum",
+      "3": "Per",
+      "2": "Çar",
+      "1": "Sal",
+      "0": "Pzt"
+    },
+    "months": {
+      "9": "Ekim",
+      "8": "Eylül",
+      "7": "Aðustos",
+      "6": "Temmuz",
+      "5": "Haziran",
+      "4": "Mayýs",
+      "3": "Nisan",
+      "2": "Mart",
+      "11": "Aralýk",
+      "10": "Kasým",
+      "1": "Þubat",
+      "0": "Ocak"
+    }
+  },
+  "decimal": ",",
+  "editor": {
+    "close": "Kapat",
+    "create": {
+      "button": "Yeni",
+      "submit": "Kaydet",
+      "title": "Yeni kayýt oluþtur"
+    },
+    "edit": {
+      "button": "Düzenle",
+      "submit": "Güncelle",
+      "title": "Kaydý düzenle"
+    },
+    "error": {
+      "system": "Bir sistem hatasi oluþtu (Ayrýntýlý bilgi)"
+    },
+    "multi": {
+      "info": "Seçili kayýtlar bu alanda farklý deðerler içeriyor. Seçili kayýtlarýn hepsinde bu alana ayný deðeri atamak için buraya týklayýn; aksi halde her kayýt bu alanda kendi deðerini koruyacak.",
+      "noMulti": "Bu alan bir grup olarak deðil ancak tekil olarak düzenlenebilir.",
+      "restore": "Deðiþiklikleri geri al",
+      "title": "Çoklu deðer"
+    },
+    "remove": {
+      "button": "Sil",
+      "confirm": {
+        "_": "%d adet kaydý silmek istediðinize emin misiniz?",
+        "1": "Bu kaydý silmek istediðinizden emin misiniz?"
+      },
+      "submit": "Sil",
+      "title": "Kayýtlarý sil"
+    }
+  }
+}

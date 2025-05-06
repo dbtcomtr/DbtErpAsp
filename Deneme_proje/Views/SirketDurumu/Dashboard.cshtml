@@ -1,0 +1,1411 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<!-- CSS stillerini ekleyelim -->
+<style>
+    /* Global değişkenler ve temel stil güncellemeleri */
+    :root {
+        --primary-color: #1E3559;
+        --primary-hover-color: #194181;
+        --secondary-color: #f9f9f9;
+        --text-dark: #333;
+        --text-light: #666;
+        --text-lighter: #999;
+        --border-color: #e0e0e0;
+        --card-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    body {
+        background-color: #f5f7fa;
+        font-family: 'Helvetica Neue', sans-serif;
+    }
+
+    /* Dashboard grid güncellemesi */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 15px;
+        padding: 0 15px;
+    }
+
+    /* Kart stilleri */
+    .card {
+        background-color: white;
+        border-radius: 6px;
+        box-shadow: var(--card-shadow);
+        transition: transform 0.3s, box-shadow 0.3s;
+        overflow: hidden;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 15px;
+        border-bottom: 1px solid var(--border-color);
+        background-color: var(--secondary-color);
+    }
+
+    .card-title {
+        font-size: 14px;
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+
+    .card-tabs {
+        display: flex;
+        gap: 5px;
+    }
+
+    .card-tab {
+        padding: 5px 10px;
+        font-size: 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+        .card-tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+    .card-content {
+        padding: 15px;
+    }
+
+    /* View All butonu */
+    .view-all {
+        text-align: center;
+        padding: 10px;
+        background-color: var(--secondary-color);
+        color: var(--primary-color);
+        font-size: 12px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .view-all:hover {
+            background-color: #f0f0f0;
+        }
+
+    /* Specific component styles */
+    .date-display {
+        text-align: right;
+        font-size: 12px;
+        color: var(--text-lighter);
+        margin-bottom: 10px;
+    }
+
+    .currency-item, .expense-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+        .currency-item:last-child, .expense-item:last-child {
+            border-bottom: none;
+        }
+
+    .flag {
+        width: 24px;
+        height: 24px;
+        margin-right: 12px;
+        border-radius: 4px;
+    }
+
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 10px;
+        margin-top: 10px;
+        border-top: 1px solid var(--border-color);
+    }
+
+        .summary-total .label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .summary-total .value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+    /* Responsive ayarlar */
+    @@media (max-width: 768px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+<style>
+    /* Ana Tab Stilleri */
+    .main-tabs {
+        display: flex;
+        background-color: white;
+        border-bottom: 1px solid var(--border-color);
+        box-shadow: var(--card-shadow);
+    }
+
+    .main-tab {
+        padding: 12px 20px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-light);
+        cursor: pointer;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+        .main-tab:hover {
+            color: var(--primary-color);
+        }
+
+        .main-tab.active {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+            .main-tab.active::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background-color: var(--primary-color);
+            }
+
+    .main-tab-content {
+        display: none;
+    }
+
+        .main-tab-content.active {
+            display: block;
+        }
+
+    /* Dashboard Header Stilleri */
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 0 15px;
+    }
+
+    .dashboard-title {
+        font-size: 20px;
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+
+    .date-selector {
+        display: flex;
+        align-items: center;
+        background-color: white;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 8px 12px;
+        box-shadow: var(--card-shadow);
+        cursor: pointer;
+    }
+
+        .date-selector svg {
+            margin-right: 8px;
+        }
+
+        .date-selector span {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+</style>
+<style>
+    /* Stat Grid Stilleri */
+    .stat-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .stat-card {
+        background-color: var(--secondary-color);
+        padding: 12px;
+        border-radius: 6px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: var(--text-light);
+        margin-bottom: 5px;
+    }
+
+    .stat-value {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    .stat-change {
+        font-size: 11px;
+        margin-top: 5px;
+    }
+
+    .positive {
+        color: #2baa6d;
+    }
+
+    .negative {
+        color: #d9304f;
+    }
+
+    /* Bütçe ve İlerleme Çubuğu Stilleri */
+    .budget-progress {
+        margin: 12px 0;
+    }
+
+    .budget-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 6px;
+    }
+
+    .budget-title {
+        font-size: 12px;
+        color: var(--text-light);
+    }
+
+    .budget-values {
+        font-size: 12px;
+        color: var(--text-light);
+    }
+
+    .progress-bar {
+        height: 6px;
+        background-color: #e0e0e0;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        border-radius: 3px;
+    }
+
+    .progress-success {
+        background-color: #2baa6d;
+    }
+
+    .progress-warning {
+        background-color: #fb8c00;
+    }
+
+    .progress-danger {
+        background-color: #d9304f;
+    }
+
+    /* Rapor Tablosu Stilleri */
+    .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+        .report-table th,
+        .report-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 12px;
+        }
+
+        .report-table th {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .report-table tr:hover {
+            background-color: var(--secondary-color);
+        }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        padding: 24px;
+    }
+
+    .card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 16px;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #e0e0e0;
+        padding-bottom: 16px;
+        margin-bottom: 16px;
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .card-tabs {
+        display: flex;
+        gap: 8px;
+    }
+
+    .card-tab {
+        padding: 6px 12px;
+        font-size: 14px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+        .card-tab.active {
+            color: white;
+        }
+
+    .blue-card .card-title {
+        color: #1E3559;
+    }
+
+    .blue-card .card-tab.active {
+        background-color: #1E3559;
+    }
+
+    .yellow-card .card-title {
+        color: #194181;
+    }
+
+    .yellow-card .card-tab.active {
+        background-color: #194181;
+    }
+
+    .green-card .card-title {
+        color: #296299;
+    }
+
+    .green-card .card-tab.active {
+        background-color: #296299;
+    }
+</style>
+
+
+
+<div class="main-content pt-5 mt-5">
+    <div class="px-5">
+        <div class="row px-lg-5 px-1">
+        </div>
+
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Finansal Özet</h1>
+            <div class="date-selector">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 4H5C3.89543 4 3 4.89543 3 6V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V6C21 4.89543 20.1046 4 19 4Z" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M16 2V6" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M8 2V6" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M3 10H21" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span>26 Şubat, Çarşamba</span>
+            </div>
+        </div>
+
+        <!-- Ana Tablar -->
+        <!-- Dashboard Tab İçeriği -->
+        <div id="dashboard" class="main-tab-content active">
+            <div class="dashboard-grid">
+                <!-- Nakit Akışı Kartı -->
+                <div class="card blue-card">
+                    <div class="card-header">
+                        <div class="card-title">Nakit Akışı</div>
+                        <div class="card-tabs">
+                            <div class="card-tab active" data-tab="weekly-flow">Haftalık</div>
+                            <div class="card-tab" data-tab="monthly-flow">Aylık</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="date-display">26 Şubat, Çarşamba</div>
+                        <div class="stat-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Toplam Gelir</div>
+                                <div class="stat-value">35.250,00 TL</div>
+                                <div class="stat-change positive">+12,5% geçen haftaya göre</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Toplam Gider</div>
+                                <div class="stat-value">18.740,00 TL</div>
+                                <div class="stat-change negative">+8,2% geçen haftaya göre</div>
+                            </div>
+                        </div>
+                        <div class="summary-total" style="margin-top: 20px;">
+                            <div class="label">Net Nakit Akışı</div>
+                            <div class="value positive">+16.510,00 TL</div>
+                        </div>
+                    </div>
+                    <div class="view-all">Tüm Nakit Akışını Görüntüle</div>
+                </div>
+
+                <!-- Bakiye Kartı -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Toplam Bakiye</div>
+                        <div class="card-tabs">
+                            <div class="card-tab active" data-tab="cash-balance">Kasalar</div>
+                            <div class="card-tab" data-tab="bank-balance">Bankalar</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="date-display">26 Şubat, Çarşamba</div>
+                        <div class="currency-item">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Flag_of_Turkey.svg/800px-Flag_of_Turkey.svg.png" alt="TR" class="flag">
+                            <div class="currency-name">Türk Lirası</div>
+                            <div class="currency-value">28.500,00<span class="currency-unit">TL</span></div>
+                        </div>
+                        <div class="currency-item">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Flag_of_the_United_States.svg/800px-Flag_of_the_United_States.svg.png" alt="USD" class="flag">
+                            <div class="currency-name">Amerikan Doları</div>
+                            <div class="currency-value">7.200,00<span class="currency-unit">USD</span></div>
+                        </div>
+                        <div class="currency-item">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/800px-Flag_of_Europe.svg.png" alt="EUR" class="flag">
+                            <div class="currency-name">Euro</div>
+                            <div class="currency-value">5.450,00<span class="currency-unit">EUR</span></div>
+                        </div>
+                    </div>
+                    <div class="view-all">Tüm Kasa ve Bankaları Görüntüle</div>
+                </div>
+
+                <!-- Tahsilatlar Kartı -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Tahsilatlar ve Ödemeler</div>
+                        <div class="card-tabs">
+                            <div class="card-tab active" data-tab="collections">Tahsilatlar</div>
+                            <div class="card-tab" data-tab="payments">Ödemeler</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="date-display">26 Şubat, Çarşamba</div>
+                        <div class="currency-item">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Flag_of_Turkey.svg/800px-Flag_of_Turkey.svg.png" alt="TR" class="flag">
+                            <div class="currency-name">Türk Lirası</div>
+                            <div class="currency-value">15.400,00<span class="currency-unit">TL</span></div>
+                        </div>
+                        <div class="currency-item">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Flag_of_the_United_States.svg/800px-Flag_of_the_United_States.svg.png" alt="USD" class="flag">
+                            <div class="currency-name">Amerikan Doları</div>
+                            <div class="currency-value">2.850,00<span class="currency-unit">USD</span></div>
+                        </div>
+                        <div class="currency-item">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/800px-Flag_of_Europe.svg.png" alt="EUR" class="flag">
+                            <div class="currency-name">Euro</div>
+                            <div class="currency-value">1.200,00<span class="currency-unit">EUR</span></div>
+                        </div>
+                    </div>
+                    <div class="view-all">Tüm Tahsilat ve Ödemeleri Görüntüle</div>
+                </div>
+
+                <!-- Masraflar Kartı -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Masraflar ve Giderler</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="header-with-date">
+                            <div class="header-label">İşlem</div>
+                            <div class="header-value">26 Şubat, Çarşamba</div>
+                        </div>
+                        <div class="expense-list">
+                            <div class="expense-item">
+                                <div class="expense-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M12 6V12L16 14" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </div>
+                                <div class="expense-details">
+                                    <div class="expense-name">Personel Maaşları</div>
+                                    <div class="expense-category">İnsan Kaynakları</div>
+                                </div>
+                                <div class="expense-amount">4.500,00 TL</div>
+                            </div>
+                            <div class="expense-item">
+                                <div class="expense-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M9 22V12H15V22" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </div>
+                                <div class="expense-details">
+                                    <div class="expense-name">Kira Ödemesi</div>
+                                    <div class="expense-category">Ofis Giderleri</div>
+                                </div>
+                                <div class="expense-amount">2.800,00 TL</div>
+                            </div>
+                            <div class="expense-item">
+                                <div class="expense-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5 17H4C3.46957 17 2.96086 16.7893 2.58579 16.4142C2.21071 16.0391 2 15.5304 2 15V5C2 4.46957 2.21071 3.96086 2.58579 3.58579C2.96086 3.21071 3.46957 3 4 3H20C20.5304 3 21.0391 3.21071 21.4142 3.58579C21.7893 3.96086 22 4.46957 22 5V15C22 15.5304 21.7893 16.0391 21.4142 16.4142C21.0391 16.7893 20.5304 17 20 17H19" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M12 15L17 21H7L12 15Z" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </div>
+                                <div class="expense-details">
+                                    <div class="expense-name">İnternet Faturası</div>
+                                    <div class="expense-category">Telekomünikasyon</div>
+                                </div>
+                                <div class="expense-amount">350,00 TL</div>
+                            </div>
+                            <div class="expense-item">
+                                <div class="expense-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M14 2V8H20" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M16 13H8" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M16 17H8" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M10 9H9H8" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </div>
+                                <div class="expense-details">
+                                    <div class="expense-name">Ofis Malzemeleri</div>
+                                    <div class="expense-category">Genel Giderler</div>
+                                </div>
+                                <div class="expense-amount">750,00 TL</div>
+                            </div>
+                        </div>
+                        <div class="summary-total">
+                            <div class="label">Toplam Masraf</div>
+                            <div class="value">8.400,00 TL</div>
+                        </div>
+                    </div>
+                    <div class="view-all">Tüm Masrafları Görüntüle</div>
+                </div>
+
+                <!-- Satışlar Kartı -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Satışlar</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="date-display">26 Şubat, Çarşamba</div>
+                        <div class="currency-item">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Flag_of_Turkey.svg/800px-Flag_of_Turkey.svg.png" alt="TR" class="flag">
+                            <div class="currency-name">Türk Lirası</div>
+                            <div class="currency-value">32.450,00<span class="currency-unit">TL</span></div>
+                        </div>
+                        <div class="currency-item">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Flag_of_the_United_States.svg/800px-Flag_of_the_United_States.svg.png" alt="USD" class="flag">
+                            <div class="currency-name">Amerikan Doları</div>
+                            <div class="currency-value">5.120,00<span class="currency-unit">USD</span></div>
+                        </div>
+                        <div class="currency-item">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/800px-Flag_of_Europe.svg.png" alt="EUR" class="flag">
+                            <div class="currency-name">Euro</div>
+                            <div class="currency-value">3.750,00<span class="currency-unit">EUR</span></div>
+                        </div>
+
+                        <div class="summary-total">
+                            <div class="label">Toplam Satış (TL)</div>
+                            <div class="value">186.420,00 TL</div>
+                        </div>
+                    </div>
+                    <div class="view-all">Tüm Satışları Görüntüle</div>
+                </div>
+
+                <!-- Satın Almalar Kartı -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Satın Almalar</div>
+                        <div class="card-tabs">
+                            <div class="card-tab active" data-tab="stock">Stok</div>
+                            <div class="card-tab" data-tab="service">Hizmet</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="date-display">26 Şubat, Çarşamba</div>
+                        <div class="expense-list">
+                            <div class="expense-item">
+                                <div class="expense-item">
+                                    <div class="expense-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M16 4H18C18.5304 4 19.0391 4.21071 19.4142 4.58579C19.7893 4.96086 20 5.46957 20 6V20C20 20.5304 19.7893 21.0391 19.4142 21.4142C19.0391 21.7893 18.5304 22 18 22H6C5.46957 22 4.96086 21.7893 4.58579 21.4142C4.21071 21.0391 4 20.5304 4 20V6C4 5.46957 4.21071 4.96086 4.58579 4.58579C4.96086 4.21071 5.46957 4 6 4H8" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M15 2H9C8.44772 2 8 2.44772 8 3V5C8 5.55228 8.44772 6 9 6H15C15.5523 6 16 5.55228 16 5V3C16 2.44772 15.5523 2 15 2Z" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="expense-details">
+                                        <div class="expense-name">Hammadde Alımı</div>
+                                        <div class="expense-category">Üretim Malzemeleri</div>
+                                    </div>
+                                    <div class="expense-amount">12.500,00 TL</div>
+                                </div>
+                                <div class="expense-item">
+                                    <div class="expense-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M21 16V8C20.9996 7.64928 20.9071 7.30481 20.7315 7.00116C20.556 6.69752 20.3037 6.44536 20 6.27L13 2.27C12.696 2.09446 12.3511 2.00205 12 2.00205C11.6489 2.00205 11.304 2.09446 11 2.27L4 6.27C3.69626 6.44536 3.44398 6.69752 3.26846 7.00116C3.09294 7.30481 3.00036 7.64928 3 8V16C3.00036 16.3507 3.09294 16.6952 3.26846 16.9988C3.44398 17.3025 3.69626 17.5546 4 17.73L11 21.73C11.304 21.9055 11.6489 21.998 12 21.998C12.3511 21.998 12.696 21.9055 13 21.73L20 17.73C20.3037 17.5546 20.556 17.3025 20.7315 16.9988C20.9071 16.6952 20.9996 16.3507 21 16Z" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M3.27 6.96L12 12.01L20.73 6.96" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M12 22.08V12" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="expense-details">
+                                        <div class="expense-name">Ticari Mallar</div>
+                                        <div class="expense-category">Satış Ürünleri</div>
+                                    </div>
+                                    <div class="expense-amount">8.750,00 TL</div>
+                                </div>
+                               
+                            </div>
+                            <div class="summary-total">
+                                <div class="label">Toplam Satın Alma</div>
+                                <div class="value">24.500,00 TL</div>
+                            </div>
+                        </div>
+                        <div class="view-all">Tüm Satın Almaları Görüntüle</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nakit Akışı Tab İçeriği -->
+            <div id="cash-flow" class="main-tab-content">
+                <div class="dashboard-grid">
+                    <!-- Nakit Akışı Özeti Kartı -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Nakit Akışı Özeti</div>
+                            <div class="card-tabs">
+                                <div class="card-tab active" data-tab="weekly-summary">Haftalık</div>
+                                <div class="card-tab" data-tab="monthly-summary">Aylık</div>
+                                <div class="card-tab" data-tab="yearly-summary">Yıllık</div>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="date-display">26 Şubat, Çarşamba</div>
+                            <div class="summary-row">
+                                <div>Başlangıç Bakiyesi</div>
+                                <div class="total">142.560,00 TL</div>
+                            </div>
+                            <div class="summary-row">
+                                <div>Toplam Gelir</div>
+                                <div class="total positive">+35.250,00 TL</div>
+                            </div>
+                            <div class="summary-row">
+                                <div>Toplam Gider</div>
+                                <div class="total negative">-18.740,00 TL</div>
+                            </div>
+                            <div class="summary-total">
+                                <div class="label">Bitiş Bakiyesi</div>
+                                <div class="value">159.070,00 TL</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gelirler Kartı -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Gelirler</div>
+                        </div>
+                        <div class="card-content">
+                            <div class="date-display">26 Şubat, Çarşamba</div>
+                            <div class="expense-list">
+                                <div class="expense-item">
+                                    <div class="expense-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M22 12H18L15 21L9 3L6 12H2" stroke="#2baa6d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="expense-details">
+                                        <div class="expense-name">Nakit Satışlar</div>
+                                        <div class="expense-category">Mağaza Satışları</div>
+                                    </div>
+                                    <div class="expense-amount positive">+12.450,00 TL</div>
+                                </div>
+                                <div class="expense-item">
+                                    <div class="expense-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect x="3" y="5" width="18" height="14" rx="2" stroke="#2baa6d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <line x1="3" y1="10" x2="21" y2="10" stroke="#2baa6d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="expense-details">
+                                        <div class="expense-name">Kredi Kartı Tahsilatları</div>
+                                        <div class="expense-category">E-Ticaret</div>
+                                    </div>
+                                    <div class="expense-amount positive">+8.320,00 TL</div>
+                                </div>
+                                <div class="expense-item">
+                                    <div class="expense-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15M9 5C9 6.10457 9.89543 7 11 7H13C14.1046 7 15 6.10457 15 5M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5" stroke="#2baa6d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="expense-details">
+                                        <div class="expense-name">Müşteri Ödemeleri</div>
+                                        <div class="expense-category">Kurumsal Satışlar</div>
+                                    </div>
+                                    <div class="expense-amount positive">+14.480,00 TL</div>
+                                </div>
+                            </div>
+                            <div class="summary-total">
+                                <div class="label">Toplam Gelir</div>
+                                <div class="value positive">+35.250,00 TL</div>
+                            </div>
+                        </div>
+                        <div class="view-all">Tüm Gelirleri Görüntüle</div>
+                    </div>
+
+                    <!-- Giderler Kartı -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Giderler</div>
+                        </div>
+                        <div class="card-content">
+                            <div class="date-display">26 Şubat, Çarşamba</div>
+                            <div class="expense-list">
+                                <div class="expense-item">
+                                    <div class="expense-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#d9304f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M12 6V12L16 14" stroke="#d9304f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="expense-details">
+                                        <div class="expense-name">Personel Maaşları</div>
+                                        <div class="expense-category">İnsan Kaynakları</div>
+                                    </div>
+                                    <div class="expense-amount negative">-4.500,00 TL</div>
+                                </div>
+                                <div class="expense-item">
+                                    <div class="expense-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="#d9304f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M9 22V12H15V22" stroke="#d9304f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="expense-details">
+                                        <div class="expense-name">Kira Ödemesi</div>
+                                        <div class="expense-category">Ofis Giderleri</div>
+                                    </div>
+                                    <div class="expense-amount negative">-2.800,00 TL</div>
+                                </div>
+                                <div class="expense-item">
+                                    <div class="expense-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M16 4H18C18.5304 4 19.0391 4.21071 19.4142 4.58579C19.7893 4.96086 20 5.46957 20 6V20C20 20.5304 19.7893 21.0391 19.4142 21.4142C19.0391 21.7893 18.5304 22 18 22H6C5.46957 22 4.96086 21.7893 4.58579 21.4142C4.21071 21.0391 4 20.5304 4 20V6C4 5.46957 4.21071 4.96086 4.58579 4.58579C4.96086 4.21071 5.46957 4 6 4H8" stroke="#d9304f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M15 2H9C8.44772 2 8 2.44772 8 3V5C8 5.55228 8.44772 6 9 6H15C15.5523 6 16 5.55228 16 5V3C16 2.44772 15.5523 2 15 2Z" stroke="#d9304f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="expense-details">
+                                        <div class="expense-name">Hammadde Alımı</div>
+                                        <div class="expense-category">Üretim Malzemeleri</div>
+                                    </div>
+                                    <div class="expense-amount negative">-9.750,00 TL</div>
+                                </div>
+                                <div class="expense-item">
+                                    <div class="expense-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M5 17H4C3.46957 17 2.96086 16.7893 2.58579 16.4142C2.21071 16.0391 2 15.5304 2 15V5C2 4.46957 2.21071 3.96086 2.58579 3.58579C2.96086 3.21071 3.46957 3 4 3H20C20.5304 3 21.0391 3.21071 21.4142 3.58579C21.7893 3.96086 22 4.46957 22 5V15C22 15.5304 21.7893 16.0391 21.4142 16.4142C21.0391 16.7893 20.5304 17 20 17H19" stroke="#d9304f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M12 15L17 21H7L12 15Z" stroke="#d9304f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="expense-details">
+                                        <div class="expense-name">Elektrik Faturası</div>
+                                        <div class="expense-category">Genel Giderler</div>
+                                    </div>
+                                    <div class="expense-amount negative">-850,00 TL</div>
+                                </div>
+                            </div>
+                            <div class="summary-total">
+                                <div class="label">Toplam Gider</div>
+                                <div class="value negative">-18.740,00 TL</div>
+                            </div>
+                        </div>
+                        <div class="view-all">Tüm Giderleri Görüntüle</div>
+                    </div>
+
+                    <!-- Yaklaşan Ödemeler ve Tahsilatlar Kartı -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Yaklaşan İşlemler</div>
+                            <div class="card-tabs">
+                                <div class="card-tab active" data-tab="upcoming-payments">Ödemeler</div>
+                                <div class="card-tab" data-tab="upcoming-collections">Tahsilatlar</div>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="date-display">Önümüzdeki 7 Gün</div>
+                            <div class="expense-list">
+                                <div class="expense-item">
+                                    <div class="expense-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M19 5H5C3.89543 5 3 5.89543 3 7V17C3 18.1046 3.89543 19 5 19H19C20.1046 19 21 18.1046 21 17V7C21 5.89543 20.1046 5 19 5Z" stroke="#d9304f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M3 10H21" stroke="#d9304f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="expense-details">
+                                        <div class="expense-name">ABC Tedarikçi Ödemesi</div>
+                                        <div class="expense-category">21 Nisan, Salı</div>
+                                    </div>
+                                    <div class="expense-amount negative">-5.640,00 TL</div>
+                                </div>
+                                <div class="expense-item">
+                                    <div class="expense-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="#d9304f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M9 22V12H15V22" stroke="#d9304f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="expense-details">
+                                        <div class="expense-name">Kira Ödemesi</div>
+                                        <div class="expense-category">25 Nisan, Cumartesi</div>
+                                    </div>
+                                    <div class="expense-amount negative">-2.800,00 TL</div>
+                                </div>
+                                <div class="expense-item">
+                                    <div class="expense-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#d9304f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M12 6V12L16 14" stroke="#d9304f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="expense-details">
+                                        <div class="expense-name">Personel Maaşları</div>
+                                        <div class="expense-category">27 Nisan, Pazartesi</div>
+                                    </div>
+                                    <div class="expense-amount negative">-14.500,00 TL</div>
+                                </div>
+                            </div>
+                            <div class="summary-total">
+                                <div class="label">Toplam Yaklaşan Ödemeler</div>
+                                <div class="value negative">-22.940,00 TL</div>
+                            </div>
+                        </div>
+                        <div class="view-all">Tüm Yaklaşan İşlemleri Görüntüle</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Satışlar Tab İçeriği -->
+            <div id="sales" class="main-tab-content">
+                <div class="dashboard-grid">
+                    <!-- Satış Performansı Kartı -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Satış Performansı</div>
+                            <div class="card-tabs">
+                                <div class="card-tab active" data-tab="daily-sales">Günlük</div>
+                                <div class="card-tab" data-tab="weekly-sales">Haftalık</div>
+                                <div class="card-tab" data-tab="monthly-sales">Aylık</div>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="date-display">26 Şubat, Çarşamba</div>
+                            <div class="stat-grid">
+                                <div class="stat-card">
+                                    <div class="stat-label">Toplam Satış</div>
+                                    <div class="stat-value">32.450,00 TL</div>
+                                    <div class="stat-change positive">+8.2% önceki güne göre</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-label">Sipariş Adedi</div>
+                                    <div class="stat-value">48</div>
+                                    <div class="stat-change positive">+5 önceki güne göre</div>
+                                </div>
+                            </div>
+                            <div class="stat-grid" style="margin-top: 15px;">
+                                <div class="stat-card">
+                                    <div class="stat-label">Sepet Ortalaması</div>
+                                    <div class="stat-value">676,04 TL</div>
+                                    <div class="stat-change positive">+3.4% önceki güne göre</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-label">Dönüşüm Oranı</div>
+                                    <div class="stat-value">3.2%</div>
+                                    <div class="stat-change negative">-0.4% önceki güne göre</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Satış Kanalları Kartı -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Satış Kanalları</div>
+                        </div>
+                        <div class="card-content">
+                            <div class="date-display">26 Şubat, Çarşamba</div>
+                            <div class="expense-list">
+                                <div class="expense-item">
+                                    <div class="expense-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M21 11.5C21.0034 12.8199 20.6951 14.1219 20.1 15.3C19.3944 16.7118 18.3098 17.8992 16.9674 18.7293C15.6251 19.5594 14.0782 19.9994 12.5 20C11.1801 20.0035 9.87812 19.6951 8.7 19.1L3 21L4.9 15.3C4.30493 14.1219 3.99656 12.8199 4 11.5C4.00061 9.92179 4.44061 8.37488 5.27072 7.03258C6.10083 5.69028 7.28825 4.6056 8.7 3.90003C9.87812 3.30496 11.1801 2.99659 12.5 3.00003H13C15.0843 3.11502 17.053 3.99479 18.5291 5.47089C20.0052 6.94699 20.885 8.91568 21 11V11.5Z" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="expense-details">
+                                        <div class="expense-name">Mağaza Satışları</div>
+                                        <div class="expense-category">Fiziksel Satış Noktaları</div>
+                                    </div>
+                                    <div class="expense-amount">14.230,00 TL</div>
+                                </div>
+                                <div class="expense-item">
+                                    <div class="expense-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M16 4H8C5.79086 4 4 5.79086 4 8V16C4 18.2091 5.79086 20 8 20H16C18.2091 20 20 18.2091 20 16V8C20 5.79086 18.2091 4 16 4Z" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M8 11V13" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M12 8V16" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M16 11V13" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="expense-details">
+                                        <div class="expense-name">E-Ticaret</div>
+                                        <div class="expense-category">Web Sitesi ve Mobil Uygulama</div>
+                                    </div>
+                                    <div class="expense-amount">10.840,00 TL</div>
+                                </div>
+                                <div class="expense-item">
+                                    <div class="expense-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M3 5H21V19H3V5Z" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M3 9H21" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M9 15L7 17L9 19" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M15 19L17 17L15 15" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="expense-details">
+                                        <div class="expense-name">Kurumsal Satışlar</div>
+                                        <div class="expense-category">B2B Müşteriler</div>
+                                    </div>
+                                    <div class="expense-amount">7.380,00 TL</div>
+                                </div>
+                            </div>
+                            <div class="summary-total">
+                                <div class="label">Toplam Satış</div>
+                                <div class="value">32.450,00 TL</div>
+                            </div>
+                        </div>
+                        <div class="view-all">Tüm Satış Kanallarını Görüntüle</div>
+                    </div>
+
+                    <!-- En Çok Satan Ürünler Kartı -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">En Çok Satan Ürünler</div>
+                        </div>
+                        <div class="card-content">
+                            <div class="date-display">26 Şubat, Çarşamba</div>
+                            <table class="report-table">
+                                <thead>
+                                    <tr>
+                                        <th>Ürün</th>
+                                        <th>Adet</th>
+                                        <th>Tutar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Akıllı Telefon X-Pro</td>
+                                        <td>12</td>
+                                        <td>7.200,00 TL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Bluetooth Kulaklık</td>
+                                        <td>24</td>
+                                        <td>5.760,00 TL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Kablosuz Şarj Cihazı</td>
+                                        <td>18</td>
+                                        <td>3.240,00 TL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Akıllı Saat</td>
+                                        <td>9</td>
+                                        <td>2.970,00 TL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Taşınabilir Hoparlör</td>
+                                        <td>11</td>
+                                        <td>2.750,00 TL</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="view-all">Tüm Ürün Satışlarını Görüntüle</div>
+                    </div>
+
+                    <!-- Satış Hedefleri Kartı -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Satış Hedefleri</div>
+                            <div class="card-tabs">
+                                <div class="card-tab active" data-tab="monthly-goals">Aylık</div>
+                                <div class="card-tab" data-tab="quarterly-goals">Çeyreklik</div>
+                                <div class="card-tab" data-tab="yearly-goals">Yıllık</div>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="date-display">Nisan 2025</div>
+
+                            <div class="budget-progress">
+                                <div class="budget-header">
+                                    <div class="budget-title">Genel Satış Hedefi</div>
+                                    <div class="budget-values">480.000 / 650.000 TL</div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill progress-warning" style="width: 74%"></div>
+                                </div>
+                            </div>
+
+                            <div class="budget-progress">
+                                <div class="budget-header">
+                                    <div class="budget-title">Mağaza Satışları</div>
+                                    <div class="budget-values">210.000 / 250.000 TL</div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill progress-success" style="width: 84%"></div>
+                                </div>
+                            </div>
+
+                            <div class="budget-progress">
+                                <div class="budget-header">
+                                    <div class="budget-title">E-Ticaret</div>
+                                    <div class="budget-values">180.000 / 250.000 TL</div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill progress-warning" style="width: 72%"></div>
+                                </div>
+                            </div>
+
+                            <div class="budget-progress">
+                                <div class="budget-header">
+                                    <div class="budget-title">Kurumsal Satışlar</div>
+                                    <div class="budget-values">90.000 / 150.000 TL</div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill progress-danger" style="width: 60%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="view-all">Tüm Satış Hedeflerini Görüntüle</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Masraflar Tab İçeriği -->
+            <div id="expenses" class="main-tab-content">
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Masraf Dağılımı</div>
+                            <div class="card-tabs">
+                                <div class="card-tab active" data-tab="category-expenses">Kategoriye Göre</div>
+                                <div class="card-tab" data-tab="department-expenses">Departmana Göre</div>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="date-display">Nisan 2025</div>
+
+                            <div class="budget-progress">
+                                <div class="budget-header">
+                                    <div class="budget-title">Personel Giderleri</div>
+                                    <div class="budget-values">42.500,00 TL</div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 48%; background-color: #4CA7E1;"></div>
+                                </div>
+                            </div>
+
+                            <div class="budget-progress">
+                                <div class="budget-header">
+                                    <div class="budget-title">Kira ve Tesis Giderleri</div>
+                                    <div class="budget-values">18.400,00 TL</div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 21%; background-color: #296299;"></div>
+                                </div>
+                            </div>
+
+                            <div class="budget-progress">
+                                <div class="budget-header">
+                                    <div class="budget-title">Pazarlama ve Reklam</div>
+                                    <div class="budget-values">12.750,00 TL</div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 15%; background-color: #1E3559;"></div>
+                                </div>
+                            </div>
+
+                            <div class="budget-progress">
+                                <div class="budget-header">
+                                    <div class="budget-title">Genel Giderler</div>
+                                    <div class="budget-values">8.320,00 TL</div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 10%; background-color: #52B5AF;"></div>
+                                </div>
+                            </div>
+
+                            <div class="budget-progress">
+                                <div class="budget-header">
+                                    <div class="budget-title">Seyahat ve Konaklama</div>
+                                    <div class="budget-values">5.430,00 TL</div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 6%; background-color: #3B86A1;"></div>
+                                </div>
+                            </div>
+
+                            <div class="summary-total">
+                                <div class="label">Toplam Gider</div>
+                                <div class="value">87.400,00 TL</div>
+                            </div>
+                        </div>
+                        <div class="view-all">Tüm Gider Raporlarını Görüntüle</div>
+                    </div>
+
+                    <!-- Son Masraflar Kartı -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Son Masraflar</div>
+                        </div>
+                        <div class="card-content">
+                            <div class="date-display">Son 7 Gün</div>
+                            <div class="expense-list">
+                                <div class="expense-item">
+                                    <div class="expense-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M12 6V12L16 14" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="expense-details">
+                                        <div class="expense-name">Personel Maaşları</div>
+                                        <div class="expense-category">26 Şubat, Çarşamba</div>
+                                    </div>
+                                    <div class="expense-amount">4.500,00 TL</div>
+                                </div>
+                                <div class="expense-item">
+                                    <div class="expense-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M9 22V12H15V22" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="expense-details">
+                                        <div class="expense-name">Kira Ödemesi</div>
+                                        <div class="expense-category">18 Nisan, Cumartesi</div>
+                                    </div>
+                                    <div class="expense-amount">2.800,00 TL</div>
+                                </div>
+                                <div class="expense-item">
+                                    <div class="expense-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M5 17H4C3.46957 17 2.96086 16.7893 2.58579 16.4142C2.21071 16.0391 2 15.5304 2 15V5C2 4.46957 2.21071 3.96086 2.58579 3.58579C2.96086 3.21071 3.46957 3 4 3H20C20.5304 3 21.0391 3.21071 21.4142 3.58579C21.7893 3.96086 22 4.46957 22 5V15C22 15.5304 21.7893 16.0391 21.4142 16.4142C21.0391 16.7893 20.5304 17 20 17H19" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M12 15L17 21H7L12 15Z" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="expense-details">
+                                        <div class="expense-name">İnternet Faturası</div>
+                                        <div class="expense-category">17 Nisan, Cuma</div>
+                                    </div>
+                                    <div class="expense-amount">350,00 TL</div>
+                                </div>
+                                <div class="expense-item">
+                                    <div class="expense-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M16 4H18C18.5304 4 19.0391 4.21071 19.4142 4.58579C19.7893 4.96086 20 5.46957 20 6V20C20 20.5304 19.7893 21.0391 19.4142 21.4142C19.0391 21.7893 18.5304 22 18 22H6C5.46957 22 4.96086 21.7893 4.58579 21.4142C4.21071 21.0391 4 20.5304 4 20V6C4 5.46957 4.21071 4.96086 4.58579 4.58579C4.96086 4.21071 5.46957 4 6 4H8" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M15 2H9C8.44772 2 8 2.44772 8 3V5C8 5.55228 8.44772 6 9 6H15C15.5523 6 16 5.55228 16 5V3C16 2.44772 15.5523 2 15 2Z" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="expense-details">
+                                        <div class="expense-name">Hammadde Alımı</div>
+                                        <div class="expense-category">15 Nisan, Çarşamba</div>
+                                    </div>
+                                    <div class="expense-amount">12.500,00 TL</div>
+                                </div>
+                                <div class="expense-item">
+                                    <div class="expense-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M14 2V8H20" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M16 13H8" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M16 17H8" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M10 9H9H8" stroke="#0072bc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="expense-details">
+                                        <div class="expense-name">Ofis Malzemeleri</div>
+                                        <div class="expense-category">15 Nisan, Çarşamba</div>
+                                    </div>
+                                    <div class="expense-amount">750,00 TL</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="view-all">Tüm Masrafları Görüntüle</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diğer tab içerikleri benzer şekilde devam edecek -->
+
+
+
+        <!-- Aktivite tabları için JavaSript - Mevcut script'in sonuna ekleyin -->
+        
+    </div>
+</div>
+
+
+    <script>
+                 // Tab işlevselliği için genişletilmiş JavaScript
+
+        // Kart tabları arasında geçiş yapma
+        function initCardTabs() {
+            const cardTabs = document.querySelectorAll('.card-tab');
+            cardTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Kardeş tabların active class'ını kaldır
+                    const siblingTabs = this.parentElement.querySelectorAll('.card-tab');
+                    siblingTabs.forEach(siblingTab => {
+                        siblingTab.classList.remove('active');
+                    });
+
+                    // Tıklanan tab'ı aktifleştir
+                    this.classList.add('active');
+
+                    // Tab içeriğini değiştir
+                    const tabId = this.getAttribute('data-tab');
+                    const card = this.closest('.card');
+                    switchCardContent(card, tabId);
+                });
+            });
+        }
+
+        // Kart içindeki içeriği tab'a göre değiştirme
+        function switchCardContent(card, tabId) {
+            // Nakit Akışı Kartı
+            if (card.querySelector('.card-title').textContent === 'Nakit Akışı') {
+                const contentMap = {
+                    'weekly-flow': {
+                        income: '35.250,00 TL',
+                        expenses: '18.740,00 TL',
+                        netCashFlow: '+16.510,00 TL',
+                        incomeChange: '+12,5%',
+                        expensesChange: '+8,2%'
+                    },
+                    'monthly-flow': {
+                        income: '142.500,00 TL',
+                        expenses: '75.360,00 TL',
+                        netCashFlow: '+67.140,00 TL',
+                        incomeChange: '+18,7%',
+                        expensesChange: '+11,3%'
+                    }
+                };
+
+                const content = contentMap[tabId];
+                const statGrid = card.querySelector('.stat-grid');
+                const incomeCard = statGrid.children[0];
+                const expensesCard = statGrid.children[1];
+                const netCashFlow = card.querySelector('.summary-total .value');
+
+                incomeCard.querySelector('.stat-value').textContent = content.income;
+                incomeCard.querySelector('.stat-change').textContent = `${content.incomeChange} geçen ${tabId === 'weekly-flow' ? 'haftaya' : 'aya'} göre`;
+
+                expensesCard.querySelector('.stat-value').textContent = content.expenses;
+                expensesCard.querySelector('.stat-change').textContent = `${content.expensesChange} geçen ${tabId === 'weekly-flow' ? 'haftaya' : 'aya'} göre`;
+
+                netCashFlow.textContent = content.netCashFlow;
+            }
+
+            // Toplam Bakiye Kartı
+            if (card.querySelector('.card-title').textContent === 'Toplam Bakiye') {
+                const contentMap = {
+                    'cash-balance': [
+                        { name: 'Türk Lirası', value: '28.500,00', unit: 'TL' },
+                        { name: 'Amerikan Doları', value: '7.200,00', unit: 'USD' },
+                        { name: 'Euro', value: '5.450,00', unit: 'EUR' }
+                    ],
+                    'bank-balance': [
+                        { name: 'Banka Hesabı 1', value: '42.500,00', unit: 'TL' },
+                        { name: 'Banka Hesabı 2', value: '11.320,00', unit: 'USD' },
+                        { name: 'Banka Hesabı 3', value: '7.650,00', unit: 'EUR' }
+                    ]
+                };
+
+                const currencyItems = card.querySelectorAll('.currency-item');
+                const balanceContent = contentMap[tabId];
+
+                balanceContent.forEach((item, index) => {
+                    currencyItems[index].querySelector('.currency-name').textContent = item.name;
+                    currencyItems[index].querySelector('.currency-value').innerHTML = `${item.value}<span class="currency-unit">${item.unit}</span>`;
+                });
+            }
+
+            // Tahsilatlar ve Ödemeler Kartı
+            if (card.querySelector('.card-title').textContent === 'Tahsilatlar ve Ödemeler') {
+                const contentMap = {
+                    'collections': [
+                        { name: 'Türk Lirası', value: '15.400,00', unit: 'TL' },
+                        { name: 'Amerikan Doları', value: '2.850,00', unit: 'USD' },
+                        { name: 'Euro', value: '1.200,00', unit: 'EUR' }
+                    ],
+                    'payments': [
+                        { name: 'Ödeme 1', value: '8.740,00', unit: 'TL' },
+                        { name: 'Ödeme 2', value: '1.650,00', unit: 'USD' },
+                        { name: 'Ödeme 3', value: '950,00', unit: 'EUR' }
+                    ]
+                };
+
+                const currencyItems = card.querySelectorAll('.currency-item');
+                const collectionsContent = contentMap[tabId];
+
+                collectionsContent.forEach((item, index) => {
+                    currencyItems[index].querySelector('.currency-name').textContent = item.name;
+                    currencyItems[index].querySelector('.currency-value').innerHTML = `${item.value}<span class="currency-unit">${item.unit}</span>`;
+                });
+            }
+
+            // Satın Almalar Kartı
+            if (card.querySelector('.card-title').textContent === 'Satın Almalar') {
+                const contentMap = {
+                    'stock': [
+                        { name: 'Hammadde Alımı', category: 'Üretim Malzemeleri', amount: '12.500,00 TL' },
+                        { name: 'Ticari Mallar', category: 'Satış Ürünleri', amount: '8.750,00 TL' },
+                        { name: 'Ambalaj Malzemeleri', category: 'Üretim Destekleri', amount: '3.250,00 TL' }
+                    ],
+                    'service': [
+                        { name: 'Danışmanlık Hizmetleri', category: 'Profesyonel Destek', amount: '6.500,00 TL' },
+                        { name: 'IT Destek Hizmetleri', category: 'Teknoloji Çözümleri', amount: '4.750,00 TL' },
+                        { name: 'Eğitim Hizmetleri', category: 'Personel Gelişimi', amount: '2.800,00 TL' }
+                    ]
+                };
+
+                const expenseItems = card.querySelectorAll('.expense-item');
+                const purchasesContent = contentMap[tabId];
+
+                purchasesContent.forEach((item, index) => {
+                    expenseItems[index].querySelector('.expense-details .expense-name').textContent = item.name;
+                    expenseItems[index].querySelector('.expense-details .expense-category').textContent = item.category;
+                    expenseItems[index].querySelector('.expense-amount').textContent = item.amount;
+                });
+            }
+        }
+
+        // Sayfa yüklendiğinde çalışacak
+        document.addEventListener('DOMContentLoaded', function() {
+            initCardTabs();
+        });
+    </script>

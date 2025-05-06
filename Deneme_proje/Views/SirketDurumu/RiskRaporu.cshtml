@@ -1,0 +1,208 @@
+﻿@model List<Deneme_proje.Models.SirketDurumuEntites.BankaLimitViewModel>
+@{
+    ViewData["Title"] = "Banka Limitleri ve Teminatlar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+<style>
+    .table-header {
+        background-color: #162e54;
+        color: white;
+    }
+
+    .tooltip-container {
+        position: relative;
+        display: inline-block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+        .tooltip-container .tooltip-text {
+            visibility: hidden;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            padding: 5px 10px;
+            border-radius: 6px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: normal;
+            max-width: 300px;
+            font-size: 12px;
+        }
+
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 0.8;
+        }
+
+        .tooltip-container .truncate {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+            display: inline-block;
+        }
+
+    .table-responsive tr{
+        white-space:nowrap;
+    } 
+
+</style>
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">Banka Limitleri ve Teminatlar</h5>
+                    </div>
+
+                    <div class="card-block accordion-block">
+                        <div class="col-md-12">
+                            @if (TempData["ErrorMessage"] != null)
+                            {
+                                <div class="alert alert-danger">
+                                    @TempData["ErrorMessage"]
+                                </div>
+                            }
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="bankaLimitleriTable">
+                                    <thead>
+                                        <tr class="table-header">
+                                            <th colspan="7">Risk</th>
+                                            <th colspan="4">Teminat</th>
+                                            <th colspan="3">Genel Risk Durumu</th>
+                                        </tr>
+                                        <tr class="sub-header">
+                                            <th style="white-space: nowrap">BANKA ADI</th>
+                                            <th>TEM. MEKTUBU TOPLAM</th>
+                                            <th>ŞAHSİ ÇEK</th>
+                                            <th>KMH LİMİTİ</th>
+                                            <th>KREDİ KARTI LİMİTİ</th>
+                                            <th>KREDİ SÖZLEŞMESİ TUTARI</th>
+                                            <th>BCH LİMİTİ</th>
+                                            <th>ÇEK TEMİNAT LİMİTİ</th>
+                                            <th>İPOTEK TEMİNAT LİMİTİ</th>
+                                            <th>GAYRiMENKUL</th>
+                                            <th>KEFALET KARŞILIĞI LİMİT</th>
+                                            <th>KEFALET+TEMİNAT+İPOTEK</th>
+                                            <th>GENEL TOPLAM RİSK</th>
+                                            <th>KULLANILABİLİR LİMİT-RİSK(BOŞLUK)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model != null && Model.Any())
+                                        {
+                                            foreach (var banka in Model)
+                                            {
+                                                <tr>
+                                                    <td class="banka-adi">@banka.BankaAdi</td>
+                                                    <td>@string.Format("{0:N2} ₺", banka.TeminatMektubuToplam)</td>
+                                                    <td>@string.Format("{0:N2} ₺", banka.KendiCekToplam)</td>
+                                                    <td>@string.Format("{0:N2} ₺", banka.KMHLimiti)</td> 
+                                                    <td>@string.Format("{0:N2} ₺", banka.KrediKartiLimiti)</td>
+                                                    <td>@string.Format("{0:N2} ₺", banka.KrediSozlesmesiTutari)</td>
+                                                    <td>@string.Format("{0:N2} ₺", banka.BCHLimiti)</td>
+
+                                                    <td>@string.Format("{0:N2} ₺", banka.CekTeminatLimiti)</td>
+                                                    <td>@string.Format("{0:N2} ₺", banka.IpotekTeminatLimiti)</td>
+                                               
+                                                    <td>?</td>
+                                       @*              <td>@string.Format("{0:N2} ₺", banka.GayriNakdiLimiti)</td> *@
+                                                    <td>@string.Format("{0:N2} ₺", banka.KefaletKarsiligiLimit)</td>
+                                                    <td>@string.Format("{0:N2} ₺", banka.KefaletKarsiligiLimit+banka.CekTeminatLimiti+banka.IpotekTeminatLimiti)</td>
+                                                    <td>@string.Format("{0:N2} ₺", banka.TeminatMektubuToplam+banka.KendiCekToplam+banka.KMHLimiti+banka.KrediKartiLimiti+banka.KrediSozlesmesiTutari+banka.BCHLimiti)</td>
+                                                    <td>@string.Format("{0:N2} ₺", (banka.KefaletKarsiligiLimit + banka.CekTeminatLimiti + banka.IpotekTeminatLimiti) - (banka.TeminatMektubuToplam + banka.KendiCekToplam + banka.KMHLimiti + banka.KrediKartiLimiti + banka.KrediSozlesmesiTutari + banka.BCHLimiti))</td>
+                                                    
+                                                   
+                                                    
+                                                    
+                                               
+                                                    
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="12" class="text-center">Veri bulunamadı.</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="table-header">
+                                            <td>TOPLAM</td>
+                                            <td>@string.Format("{0:N2} ₺", Model?.Sum(b => b.TeminatMektubuToplam) ?? 0)</td>
+                                            <td>@string.Format("{0:N2} ₺", Model?.Sum(b => b.KendiCekToplam) ?? 0)</td>
+                                            <td>@string.Format("{0:N2} ₺", Model?.Sum(b => b.KMHLimiti) ?? 0)</td>
+                                            <td>@string.Format("{0:N2} ₺", Model?.Sum(b => b.KrediKartiLimiti) ?? 0)</td>
+                                            <td>@string.Format("{0:N2} ₺", Model?.Sum(b => b.KrediSozlesmesiTutari) ?? 0)</td>
+                                            <td>@string.Format("{0:N2} ₺", Model?.Sum(b => b.BCHLimiti) ?? 0)</td>
+                                            <td>@string.Format("{0:N2} ₺", Model?.Sum(b => b.CekTeminatLimiti) ?? 0)</td>
+                                            <td>@string.Format("{0:N2} ₺", Model?.Sum(b => b.IpotekTeminatLimiti) ?? 0)</td>
+                                        
+                                            <td>?</td>
+                                          @*   <td>@string.Format("{0:N2} ₺", Model?.Sum(b => b.GayriNakdiLimiti) ?? 0)</td> *@
+                                            <td>@string.Format("{0:N2} ₺", Model?.Sum(b => b.KefaletKarsiligiLimit) ?? 0)</td>
+                                          
+                                         
+                                           
+                       
+                                           
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
+<script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#bankaLimitleriTable').DataTable({
+            "dom": '<"row"<"col-sm-12"B>>' +
+                '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+                't' +
+                '<"row"<"col-sm-6"i><"col-sm-6"p>>',
+            "language": {
+                "url": "/Content/DataTables/turkish.json"
+            },
+            "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'],
+            "columnDefs": [
+                { "targets": "_all" }
+            ]
+        });
+    });
+</script>

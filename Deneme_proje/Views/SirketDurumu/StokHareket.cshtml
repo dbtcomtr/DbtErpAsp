@@ -1,0 +1,483 @@
+﻿@model IEnumerable<Deneme_proje.Models.SirketDurumuEntites.StokHareketFoyu>
+@{
+    ViewData["Title"] = "Stok Hareket";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+<style>
+    .footer {
+        bottom: 0;
+        padding: 20px 40px;
+        position: relative;
+        right: 0;
+        color: #707070;
+        left: 0;
+        height: 35px;
+        -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, .08);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, .08);
+        background-color: #fff;
+        align-items: center;
+        display: flex;
+        justify-content: center;
+    }
+    
+    /* Additional styling for better search form */
+    .search-form {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    
+    .search-form label {
+        font-weight: 500;
+        margin-right: 5px;
+    }
+    
+    .search-form .form-group {
+        margin-bottom: 10px;
+    }
+    
+    /* Style autocomplete dropdown */
+    .ui-autocomplete {
+        max-height: 300px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    
+    .ui-menu-item div {
+        padding: 8px 10px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    <style >
+    /* Fix for Select2 container width in responsive layouts */
+    .select2-container {
+        width: 100% !important;
+    }
+
+    /* Make the table responsive with horizontal scrolling */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Additional styling for select2 dropdowns to fit in the form */
+    .select2-selection {
+        height: calc(1.5em + .75rem + 2px) !important;
+        padding: .375rem .75rem;
+        border: 1px solid #ced4da !important;
+        border-radius: .25rem !important;
+    }
+
+    .select2-selection__rendered {
+        line-height: calc(1.5em + .15rem) !important;
+    }
+
+    .select2-selection__arrow {
+        height: calc(1.5em + .5rem) !important;
+    }
+
+    /* Fix for the search form to stay inside container */
+    .search-form {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    /* Fix for DataTables buttons container */
+    div.dt-buttons {
+        margin-bottom: 10px;
+    }
+
+    /* Mobile optimization */
+        @@media (max-width: 768px) {
+        .search-form
+
+    {
+        padding: 10px;
+    }
+
+    .btn-block {
+        width: 100%;
+    }
+
+    }
+</style>
+</style>
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <h4>Stok Hareket Raporu</h4>
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="/SirketDurumu/StokHareket">Stok Hareket</a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Search Form -->
+<!-- Search Form with proper responsive classes -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="search-form">
+            <form method="get">
+                <div class="row">
+                    <div class="col-md-3 col-lg-3 mb-2">
+                        <label for="stokKodu">Stok Kodu:</label>
+                        <select id="stokKodu" name="stokKodu" class="form-control">
+                            <option value="">Seçiniz</option>
+                            @foreach (var stok in ViewBag.Stoklar)
+                            {
+                                <option value="@stok.StokKodu" @@(Context.Request.Query["stokKodu"] == stok.StokKodu ? "selected" : "")>
+                                    @stok.StokKodu - @stok.StokAdi
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2 col-lg-2 mb-2">
+                        <label for="baslamaTarihi">Başlama Tarihi:</label>
+                        <input type="date" id="baslamaTarihi" name="baslamaTarihi" class="form-control" 
+                               value="@(Context.Request.Query["baslamaTarihi"].ToString() ?? DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd"))" />
+                    </div>
+                    <div class="col-md-2 col-lg-2 mb-2">
+                        <label for="bitisTarihi">Bitiş Tarihi:</label>
+                        <input type="date" id="bitisTarihi" name="bitisTarihi" class="form-control" 
+                               value="@(Context.Request.Query["bitisTarihi"].ToString() ?? DateTime.Now.ToString("yyyy-MM-dd"))" />
+                    </div>
+                    <div class="col-md-2 col-lg-2 mb-2">
+                        <label for="depolar">Depo:</label>
+                       <select id="depolar" name="depolar" class="form-control">
+    <option value="">Tüm Depolar</option>
+    @foreach (var depo in ViewBag.Depolar)
+    {
+        <option value="@depo.DepoNo" @@(Context.Request.Query["depolar"] == depo.DepoNo ? "selected" : "")>
+            @depo.DepoAdi
+        </option>
+    }
+</select>
+                    </div>
+                    <div class="col-md-2 col-lg-2 mb-2">
+                        <label for="paraBirimi">Para Birimi:</label>
+                        <select id="paraBirimi" name="paraBirimi" class="form-control">
+                            <option value="0" @@(Context.Request.Query["paraBirimi"] == "0" ? "selected" : "")>TL</option>
+                            <option value="1" @@(Context.Request.Query["paraBirimi"] == "1" ? "selected" : "")>USD</option>
+                            <option value="2" @@(Context.Request.Query["paraBirimi"] == "2" ? "selected" : "")>EUR</option>
+                        </select>
+                    </div>
+                    <div class="col-md-1 col-lg-1 mb-2">
+                        <label class="d-block" style="visibility: hidden;">Ara</label>
+                        <button type="submit" class="btn btn-primary btn-block">Ara</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">Stok Hareket Listesi</h5>
+                    </div>
+
+                    <div class="card-block accordion-block">
+                        <div class="col-md-12">
+                            <div id="example_wrapper" class="dataTables_wrapper py-lg-3">
+                                @if (Model != null && Model.Any())
+                                {
+                                    <div class="table-responsive">
+                                        <table id="example" class="display dataTable" style="width:100%">
+                                            <thead>
+                                                <tr class="tablo-icerik-yazi">
+                                                    <th class="sorting text-left">Stok Kodu</th>
+                                                    <th class="sorting text-left">Stok Adı</th>
+                                                    <th class="sorting text-left">Tarih</th>
+                                                    <th class="sorting text-left">Seri</th>
+                                                    <th class="sorting text-left">Sıra</th>
+                                                    <th class="sorting text-left">Evrak Tipi</th>
+                                                    <th class="sorting text-left">Hareket Cinsi</th>
+                                                    <th class="sorting text-left">Tipi</th>
+                                                    <th class="sorting text-left">Normal/İade</th>
+                                                    <th class="sorting text-left">Belge No</th>
+                                                    <th class="sorting text-left">Belge Tarihi</th>
+                                                    <th class="sorting text-left">Depo</th>
+                                                    <th class="sorting text-left">Karşı Depo</th>
+                                                    <th class="sorting text-right">Giren Miktar</th>
+                                                    <th class="sorting text-right">Çıkan Miktar</th>
+                                                    <th class="sorting text-right">Kalan Miktar</th>
+                                                    <th class="sorting text-left">Birim Adı</th>
+                                                    <th class="sorting text-left">Proje Kodu</th>
+                                                    <th class="sorting text-left">Proje Adı</th>
+                                                    <th class="sorting text-left">Sorumlu Merkezi Kodu</th>
+                                                    <th class="sorting text-left">Sorumlu Merkezi Adı</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var item in Model)
+                                                {
+                                                    <tr>
+                                                        <td>@item.StokKodu</td>
+                                                        <td>@item.StokAdi</td>
+                                                        <td>@item.Tarih.ToString("dd.MM.yyyy")</td>
+                                                        <td>@item.Seri</td>
+                                                        <td>@item.Sira</td>
+                                                        <td>@item.EvrakTipi</td>
+                                                        <td>@item.HareketCinsi</td>
+                                                        <td>@item.Tipi</td>
+                                                        <td>@item.NormalIade</td>
+                                                        <td>@item.BelgeNo</td>
+                                                        <td>@(item.BelgeTarihi?.ToString("dd.MM.yyyy"))</td>
+                                                        <td>@item.Depo</td>
+                                                        <td>@item.KarsiDepo</td>
+                                                        <td class="text-right">@item.GirenMiktar.ToString("N2")</td>
+                                                        <td class="text-right">@item.CikanMiktar.ToString("N2")</td>
+                                                        <td class="text-right">@item.KalanMiktar.ToString("N2")</td>
+                                                        <td>@item.BirimAdi</td>
+                                                        <td>@item.ProjeKodu</td>
+                                                        <td>@item.ProjeAdi</td>
+                                                        <td>@item.SrmMrkzKodu</td>
+                                                        <td>@item.SrmMrkzAdi</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-info" role="alert">
+                                        @(string.IsNullOrEmpty(Context.Request.Query["stokKodu"]) ? "Lütfen bir stok kodu seçiniz." : "Seçilen kriterlere uygun kayıt bulunamadı.")
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include necessary scripts -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- Add this script at the end of your page -->
+<script>
+    $(document).ready(function() {
+        // Önce DataTable'ı başlat
+        var table = $('#example').DataTable({
+            "dom": '<"row"<"col-sm-12 col-md-6"B><"col-sm-12 col-md-6"f>>' +
+                  '<"row"<"col-sm-12"tr>>' +
+                  '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+            "language": {
+                "url": "/Content/DataTables/turkish.json"
+            },
+            "buttons": [
+                {
+                    extend: 'excel',
+                    text: 'Excel',
+                    exportOptions: {
+                        columns: ':visible'
+                    },
+                    title: 'Stok Hareket Raporu'
+                },
+                {
+                    extend: 'pdf',
+                    text: 'PDF',
+                    exportOptions: {
+                        columns: ':visible'
+                    },
+                    title: 'Stok Hareket Raporu'
+                },
+                {
+                    extend: 'print',
+                    text: 'Yazdır',
+                    exportOptions: {
+                        columns: ':visible'
+                    },
+                    title: 'Stok Hareket Raporu'
+                }
+            ],
+            "responsive": true,
+            "ordering": true,
+            "paging": true,
+            "pageLength": 25,
+            "order": [[2, 'desc']],
+            "scrollX": true
+        });
+
+        // Sonra Select2 ve diğer bileşenleri başlat
+        $("#stokKodu").select2({
+            placeholder: "Stok Kodu veya Adı Girin...",
+            allowClear: true,
+            width: '100%',
+            language: "tr",
+            templateResult: formatStok,
+            templateSelection: formatStokSelection
+        });
+
+        $("#depolar").select2({
+            placeholder: "Depo Seçiniz",
+            allowClear: true,
+            width: '100%',
+            language: "tr"
+        });
+
+        function formatStok(stok) {
+            if (!stok.id) return stok.text;
+
+            var $stok = $(
+                '<div class="select2-result-item">' +
+                '<strong>' + stok.text.split(' - ')[0] + '</strong><br>' +
+                '<small>' + stok.text.split(' - ')[1] + '</small>' +
+                '</div>'
+            );
+
+            return $stok;
+        }
+
+        function formatStokSelection(stok) {
+            if (!stok.id) return stok.text;
+
+            return stok.text.split(' - ')[0];
+        }
+
+        // Şimdi table değişkeni tanımlandıktan sonra buttons ekleyebilirsiniz
+        if (table) {
+            new $.fn.dataTable.Buttons(table, {
+                buttons: [
+                    {
+                        extend: 'excel',
+                        text: '<i class="fa fa-file-excel-o"></i> Excel',
+                        className: 'btn btn-sm btn-outline-success mr-1',
+                        exportOptions: { columns: ':visible' }
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="fa fa-file-pdf-o"></i> PDF',
+                        className: 'btn btn-sm btn-outline-danger mr-1',
+                        exportOptions: { columns: ':visible' }
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fa fa-print"></i> Yazdır',
+                        className: 'btn btn-sm btn-outline-primary',
+                        exportOptions: { columns: ':visible' }
+                    }
+                ]
+            });
+        }
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        // Initialize DataTable with proper responsive options
+        var table = $('#example').DataTable({
+            "dom": '<"row"<"col-sm-12 col-md-6"B><"col-sm-12 col-md-6"f>>' +
+                  '<"row"<"col-sm-12"tr>>' +
+                  '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+            "language": {
+                "url": "/Content/DataTables/turkish.json"
+            },
+            "buttons": [
+                {
+                    extend: 'excel',
+                    text: 'Excel',
+                    exportOptions: {
+                        columns: ':visible'
+                    },
+                    title: 'Stok Hareket Raporu'
+                },
+                {
+                    extend: 'pdf',
+                    text: 'PDF',
+                    exportOptions: {
+                        columns: ':visible'
+                    },
+                    title: 'Stok Hareket Raporu'
+                },
+                {
+                    extend: 'print',
+                    text: 'Yazdır',
+                    exportOptions: {
+                        columns: ':visible'
+                    },
+                    title: 'Stok Hareket Raporu'
+                }
+            ],
+            "responsive": true,
+            "ordering": true,
+            "paging": true,
+            "pageLength": 25,
+            "order": [[2, 'desc']], // Sort by date by default
+            "scrollX": true // Enable horizontal scrolling
+        });
+
+        // Enhanced stock code dropdown with search
+        $("#stokKodu").select2({
+            placeholder: "Stok Kodu veya Adı Girin...",
+            allowClear: true,
+            width: '100%',
+            language: "tr",
+            templateResult: formatStok,
+            templateSelection: formatStokSelection
+        });
+
+        // Enhanced depot dropdown with search
+        $("#depolar").select2({
+            placeholder: "Depo Seçiniz",
+            allowClear: true,
+            width: '100%',
+            language: "tr"
+        });
+
+        // Format stok display in dropdown
+        function formatStok(stok) {
+            if (!stok.id) return stok.text;
+
+            var $stok = $(
+                '<div class="select2-result-item">' +
+                '<strong>' + stok.text.split(' - ')[0] + '</strong><br>' +
+                '<small>' + stok.text.split(' - ')[1] + '</small>' +
+                '</div>'
+            );
+
+            return $stok;
+        }
+
+        // Format selected stok display
+        function formatStokSelection(stok) {
+            if (!stok.id) return stok.text;
+
+            // For selected option, show just the code for cleaner display
+            return stok.text.split(' - ')[0];
+        }
+    });
+</script>

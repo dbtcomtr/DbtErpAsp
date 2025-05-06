@@ -1,0 +1,1720 @@
+﻿@model Deneme_proje.Models.ServisEntities.IsEmirleri
+@{
+	ViewData["Title"] = "Servis Formu ve Liste";
+}
+
+<!-- Modern CSS Styles -->
+<!-- Modern CSS Styles -->
+<style>
+	/* Global styles and variables */
+	:root {
+		--primary: #4361ee;
+		--primary-dark: #3a56d4;
+		--secondary: #2ec4b6;
+		--success: #38b000;
+		--danger: #e71d36;
+		--warning: #ff9f1c;
+		--light: #f8f9fa;
+		--dark: #212529;
+		--gray: #6c757d;
+		--border-radius: 0.5rem;
+		--box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+		--transition: all 0.2s ease-in-out;
+	}
+
+	body {
+		font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+		font-size: 14px;
+		line-height: 1.5;
+		color: var(--dark);
+		background-color: #f5f7fa;
+	}
+
+	/* Card styles */
+	.card {
+		background-color: #fff;
+		border-radius: var(--border-radius);
+		box-shadow: var(--box-shadow);
+		transition: var(--transition);
+		margin-bottom: 1.5rem;
+		border: none;
+	}
+
+	.card-header {
+		padding: 1rem 1.5rem;
+		background-color: #fff;
+		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+		border-top-left-radius: var(--border-radius);
+		border-top-right-radius: var(--border-radius);
+	}
+
+	.card-body {
+		padding: 1.5rem;
+	}
+
+	/* Form elements */
+	.form-control, .form-select {
+		border-radius: 0.375rem;
+		padding: 0.5rem 0.75rem;
+		border: 1px solid #ced4da;
+		transition: var(--transition);
+	}
+
+		.form-control:focus, .form-select:focus {
+			border-color: var(--primary);
+			box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+		}
+
+	.form-control-sm {
+		height: calc(1.5em + 0.5rem + 2px);
+		padding: 0.25rem 0.5rem;
+		font-size: 0.875rem;
+	}
+
+	.form-label {
+		font-weight: 500;
+		margin-bottom: 0.5rem;
+		color: var(--dark);
+	}
+
+	/* Button styles */
+	.btn {
+		border-radius: 0.375rem;
+		padding: 0.5rem 1rem;
+		font-weight: 500;
+		transition: var(--transition);
+	}
+
+	.btn-sm {
+		padding: 0.25rem 0.5rem;
+		font-size: 0.875rem;
+	}
+
+	.btn-primary {
+		background-color: var(--primary);
+		border-color: var(--primary);
+	}
+
+		.btn-primary:hover {
+			background-color: var(--primary-dark);
+			border-color: var(--primary-dark);
+		}
+
+	.btn-success {
+		background-color: var(--success);
+		border-color: var(--success);
+	}
+
+	.btn-danger {
+		background-color: var(--danger);
+		border-color: var(--danger);
+	}
+
+	.btn-warning {
+		background-color: var(--warning);
+		border-color: var(--warning);
+		color: #fff;
+	}
+
+	/* Table styles */
+	.table {
+		width: 100%;
+		margin-bottom: 1rem;
+		color: var(--dark);
+		vertical-align: middle;
+		border-color: #dee2e6;
+	}
+
+		.table th {
+			font-weight: 600;
+			padding: 0.75rem;
+			vertical-align: middle;
+			background-color: #f8f9fa;
+		}
+
+		.table td {
+			padding: 0.75rem;
+			vertical-align: middle;
+		}
+
+	.table-sm td, .table-sm th {
+		padding: 0.3rem;
+	}
+
+	.table-responsive {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	/* Status styles */
+	.active-status {
+		color: var(--success);
+		font-weight: 600;
+	}
+
+	.red-status {
+		color: var(--danger);
+		font-weight: 600;
+	}
+
+	/* Accordion styles */
+	.accordion-header {
+		cursor: pointer;
+		background-color: #fff;
+		transition: var(--transition);
+	}
+
+		.accordion-header:hover {
+			background-color: #f8f9fa;
+		}
+
+	.toggle-icon {
+		transition: transform 0.2s ease;
+	}
+
+	.accordion-header[aria-expanded="true"] .toggle-icon {
+		transform: rotate(180deg);
+	}
+
+	.nested-table-container {
+		padding: 15px;
+		background-color: #f8f9fa;
+		border-radius: var(--border-radius);
+		margin: 0.5rem 0;
+	}
+
+	/* Section styles */
+	.section-title {
+		font-size: 1.25rem;
+		font-weight: 600;
+		margin-bottom: 1.5rem;
+		color: var(--dark);
+		padding-bottom: 0.5rem;
+		border-bottom: 2px solid var(--primary);
+	}
+
+	.page-title {
+		font-size: 1.5rem;
+		font-weight: 600;
+		color: var(--dark);
+		margin-bottom: 1.5rem;
+		text-align: center;
+	}
+
+	/* Tag styles for iş türü */
+	.is-turu-container, .modal-is-turu-container {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+	}
+
+	.is-turu-tag, .modal-is-turu-tag {
+		display: inline-flex;
+		align-items: center;
+		background-color: #e9ecef;
+		padding: 5px 10px;
+		border-radius: 4px;
+		margin-right: 5px;
+		margin-bottom: 5px;
+	}
+
+	.is-turu-tag-remove, .modal-is-turu-tag-remove {
+		cursor: pointer;
+		margin-left: 5px;
+		font-weight: bold;
+		color: #6c757d;
+	}
+
+		.is-turu-tag-remove:hover, .modal-is-turu-tag-remove:hover {
+			color: var(--danger);
+		}
+
+	/* Totals section */
+	.totals {
+		background-color: #f8f9fa;
+		padding: 1rem;
+		border-radius: var(--border-radius);
+		margin-top: 1.5rem;
+	}
+
+		.totals p {
+			display: flex;
+			justify-content: space-between;
+			margin-bottom: 0.5rem;
+			font-weight: 500;
+		}
+
+			.totals p:last-child {
+				font-weight: 700;
+				color: var(--primary);
+				border-top: 1px solid #dee2e6;
+				padding-top: 0.5rem;
+				margin-top: 0.5rem;
+			}
+
+	/* Button row */
+	.button-row {
+		display: flex;
+		gap: 10px;
+		margin-top: 20px;
+		justify-content: flex-end;
+	}
+
+	/* Responsive layout */
+	.container-wrapper {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	/* Desktop layout */
+	@@media (min-width: 992px) {
+		.container-wrapper {
+			flex-direction: row;
+		}
+
+		.form-container {
+			flex: 0.4;
+		}
+
+		.list-container {
+			flex: 0.6;
+		}
+	}
+
+	/* Tablet layout */
+	@@media (min-width: 768px) and (max-width: 991px) {
+		.form-row {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			gap: 1rem;
+		}
+	}
+
+	/* Mobile layout */
+	@@media (max-width: 767px) {
+		.form-row {
+			display: flex;
+			flex-direction: column;
+			gap: 1rem;
+		}
+
+		.table-responsive {
+			overflow-x: auto;
+		}
+		/* Convert tables to cards on mobile */
+		.mobile-card-table thead {
+			display: none;
+		}
+
+		.mobile-card-table tr {
+			display: block;
+			margin-bottom: 1rem;
+			border-radius: var(--border-radius);
+			box-shadow: var(--box-shadow);
+			background-color: #fff;
+		}
+
+		.mobile-card-table td {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			text-align: right;
+			padding: 0.75rem 1rem;
+			border-bottom: 1px solid #dee2e6;
+		}
+
+			.mobile-card-table td:last-child {
+				border-bottom: none;
+			}
+
+			.mobile-card-table td::before {
+				content: attr(data-label);
+				font-weight: 600;
+				text-align: left;
+				color: var(--dark);
+			}
+
+		.mobile-card-table .btn {
+			margin: 0.25rem 0;
+		}
+	}
+
+	}
+
+	.modal-content {
+		background-color: #fefefe;
+		margin: 75% auto;
+		padding: 20px;
+		border: 1px solid #888;
+		width: 100%;
+		height: 87%;
+	}
+
+	/* Modal styles - Z-index düzenlemeleri yapıldı */
+	.modal-backdrop {
+		z-index: 1050 !important;
+	}
+
+	.modal {
+		z-index: 1055 !important;
+	}
+
+	.modal-content {
+		border-radius: var(--border-radius);
+		border: none;
+		box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+	}
+
+	.modal-header {
+		background-color: var(--primary);
+		color: #fff;
+		border-top-left-radius: var(--border-radius);
+		border-top-right-radius: var(--border-radius);
+	}
+
+	.modal-title {
+		font-weight: 600;
+		color: #fff;
+	}
+
+	.modal-footer {
+		border-top: 1px solid #dee2e6;
+		padding: 1rem;
+	}
+
+	.btn-close {
+		color: #fff;
+		opacity: 1;
+		filter: brightness(0) invert(1);
+	}
+
+	.modal-content {
+		background-color: #fefefe;
+		margin: 50% auto;
+		padding: 20px;
+		border: 1px solid #888;
+		width: 100%;
+		height: 100%;
+	}
+
+	.collapse {
+		display: none;
+	}
+
+		.collapse.show {
+			display: table-row;
+		}
+
+	.accordion-content {
+		display: none; /* Varsayılan olarak gizli */
+	}
+
+	.toggle-icon {
+		transition: transform 0.2s ease;
+	}
+</style>
+
+
+<div class="main-content mt-5 pt-3">
+	<div class="container-fluid px-lg-5 px-3">
+		<div class="container-wrapper">
+			<!-- Form Container -->
+			<div class="form-container card">
+				<div class="card-header">
+					<h2 class="page-title mb-0">Servis Formu</h2>
+				</div>
+				<div class="card-body">
+					@if (ViewBag.Username != null)
+					{
+						<div class="user-info">
+							<span class="text-muted">Kullanıcı: @ViewBag.Username</span>
+						</div>
+					}
+					<form asp-action="IsEmriGiris" method="post">
+						<div class="form-row mb-3">
+							<!-- Tarih ve Servis Merkezi -->
+							<div class="form-group">
+								<label class="form-label">Onarım Tarihi</label>
+								<input asp-for="Tarih" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+							</div>
+							<div class="form-group">
+								<label for="ServisMerkezi" class="form-label">Servis Merkezi</label>
+								<select class="form-select" id="ServisMerkezi" name="Servis_Merkezi" required>
+									<option value="">Seçiniz</option>
+									<option value="Hatay">Hatay</option>
+									<option value="Mersin">Mersin</option>
+									<option value="Sakarya">Sakarya</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label class="form-label">No</label>
+								<input asp-for="No" class="form-control" readonly />
+							</div>
+						</div>
+
+						<div class="form-group mb-3">
+							<label class="form-label">Müşteri Adı</label>
+							<input asp-for="MusteriAdi" class="form-control" required />
+						</div>
+
+						<div class="form-row mb-3">
+							<div class="form-group">
+								<label class="form-label">Getiren Şoför Adı</label>
+								<input asp-for="SoforAdi" class="form-control" />
+							</div>
+							<div class="form-group">
+								<label class="form-label">Şoför İrtibat Numarası</label>
+								<input asp-for="SoforTelefon" class="form-control" />
+							</div>
+						</div>
+
+						<div class="form-group mb-3">
+							<label class="form-label">Plaka No</label>
+							<input asp-for="PlakaNo" class="form-control" required />
+						</div>
+						<div class="form-group mb-3">
+							<label class="form-label">Ünite Seri Numarası</label>
+							<input asp-for="UniteSeriNo" class="form-control" />
+						</div>
+
+						<div class="form-row mb-3">
+							<div class="form-group">
+								<label class="form-label">Cihaz Marka / Model</label>
+								<input asp-for="CihazMarkaModel" class="form-control" />
+							</div>
+							<div class="form-group">
+								<label class="form-label">Teknisyen Adı</label>
+								<input asp-for="TeknisyenAdi" class="form-control" />
+							</div>
+						</div>
+
+						<div class="form-row mb-3">
+							<div class="form-group">
+								<label class="form-label">Çalışma Saati</label>
+								<input asp-for="CalismaSaati" class="form-control" type="number" />
+							</div>
+							<div class="form-group">
+								<label class="form-label">Servise Giriş Tarihi</label>
+								<input asp-for="ServiseGirisTarihi" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+							</div>
+						</div>
+
+						<div class="form-group mb-3">
+							<label class="form-label">İş Türü (Birden fazla seçebilirsiniz)</label>
+							<div class="is-turu-container">
+								<div class="form-check">
+									<input type="checkbox" class="form-check-input is-turu-checkbox" id="isTuruMotor" value="Motor">
+									<label class="form-check-label" for="isTuruMotor">Motor</label>
+								</div>
+								<div class="form-check">
+									<input type="checkbox" class="form-check-input is-turu-checkbox" id="isTuruDorseElektrik" value="Dorse (Elektrik)">
+									<label class="form-check-label" for="isTuruDorseElektrik">Dorse (Elektrik)</label>
+								</div>
+								<div class="form-check">
+									<input type="checkbox" class="form-check-input is-turu-checkbox" id="isTuruDorseAltTakim" value="Dorse (Alt takım)">
+									<label class="form-check-label" for="isTuruDorseAltTakim">Dorse (Alt takım)</label>
+								</div>
+								<div class="form-check">
+									<input type="checkbox" class="form-check-input is-turu-checkbox" id="isTuruDorseUstYapi" value="Dorse (Üst yapı)">
+									<label class="form-check-label" for="isTuruDorseUstYapi">Dorse (Üst yapı)</label>
+								</div>
+								<div class="form-check">
+									<input type="checkbox" class="form-check-input is-turu-checkbox" id="isTuruDorseFRC" value="Dorse (FRC)">
+									<label class="form-check-label" for="isTuruDorseFRC">Dorse (FRC)</label>
+								</div>
+							</div>
+							<div id="secilen-is-turleri-container" class="mt-2"></div>
+							<input type="hidden" id="IsTuru" name="IsTuru" />
+						</div>
+
+						<div class="form-group mb-3">
+							<label class="form-label">İlk Gözlem</label>
+							<textarea asp-for="IlkGozlem" class="form-control" rows="3"></textarea>
+						</div>
+
+						<div class="section-title d-flex justify-content-between align-items-center">
+							<span>Stok / Hizmet Listesi</span>
+							<button type="button" class="btn btn-success btn-sm" id="add-row-btn">
+								<i class="fas fa-plus"></i> Yeni Satır
+							</button>
+						</div>
+
+						<div class="table-responsive">
+							<table class="table table-sm" id="stok-hizmet-listesi">
+								<thead>
+									<tr>
+										<th>Yedek Parça No</th>
+										<th>Yedek Parça Adı</th>
+										<th>Adet</th>
+										<th>Birim Fiyat</th>
+										<th>İskonto %</th> <!-- Yeni eklenen sütun -->
+										<th>İşçilik Tutarı</th>
+										<th>Harici İşçilik Tutarı</th>
+										<th>Tutar</th>
+										<th>İşlem</th>
+									</tr>
+								</thead>
+								<tbody id="stok-hizmet-body">
+									<tr>
+										<td><input type="text" name="StokHizmet[0].YedekParcaNo" class="form-control form-control-sm" /></td>
+										<td><input type="text" name="StokHizmet[0].YedekParcaAdi" class="form-control form-control-sm" /></td>
+										<td><input type="number" name="StokHizmet[0].Adet" class="form-control form-control-sm" oninput="calculateTutar(this)" /></td>
+										<td><input type="number" name="StokHizmet[0].BirimFiyat" class="form-control form-control-sm" step="0.01" oninput="calculateTutar(this)" /></td>
+										<td><input type="number" name="StokHizmet[0].IskontoYuzde" class="form-control form-control-sm" step="0.01" min="0" max="100" oninput="calculateTutar(this)" /></td> <!-- Yeni eklenen input -->
+										<td><input type="number" name="StokHizmet[0].IscilikTutari" class="form-control form-control-sm" oninput="calculateTutar(this)" /></td>
+										<td><input type="number" name="StokHizmet[0].HariciIscilikTutari" class="form-control form-control-sm" oninput="calculateTutar(this)" /></td>
+										<td><input type="number" name="StokHizmet[0].Tutar" class="form-control form-control-sm" step="0.01" readonly /></td>
+										<td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Sil</button></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<div class="totals">
+							<p>A Toplam: <span id="a-toplam">0.00</span> ₺</p>
+							<p>Vergi (%20): <span id="vergi">0.00</span> ₺</p>
+							<p>G Toplam: <span id="g-toplam">0.00</span> ₺</p>
+							<input type="hidden" id="hidden-a-toplam" name="AToplam" />
+							<input type="hidden" id="hidden-vergi" name="Vergi" />
+							<input type="hidden" id="hidden-g-toplam" name="GToplam" />
+						</div>
+
+						<div class="button-row">
+							<button type="reset" class="btn btn-warning">
+								<i class="fas fa-sync-alt"></i> Temizle
+							</button>
+							<button id="submit-button" type="submit" class="btn btn-primary">
+								<i class="fas fa-save"></i> Kaydet
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+
+			<!-- List Container -->
+			<div class="list-container card">
+				<div class="card-header">
+					<h2 class="page-title mb-0">Servis Hareketleri Listesi</h2>
+				</div>
+				<div class="card-body">
+					@if (ViewBag.ServisHareketGruplari != null)
+					{
+						<div class="table-responsive">
+							<table class="table table-bordered table-sm mobile-card-table">
+								<thead>
+									<tr>
+										<th style="width: 40px;">Detay</th>
+										<th>Evrak No</th>
+										<th>Servis Merkezi</th>
+										<th>Müşteri</th>
+										<th>Plaka No</th>
+										<th>Tarih</th>
+										<th>Model</th>
+										<th>Çalışma Saati</th>
+										<th>Durum</th>
+										<th>İşlem</th>
+									</tr>
+								</thead>
+								<tbody>
+									@foreach (var grup in (IEnumerable<IGrouping<dynamic, Deneme_proje.Models.ServisEntities.IsEmirleri>>)ViewBag.ServisHareketGruplari)
+									{
+										var firstItem = grup.FirstOrDefault();
+										if (firstItem != null)
+										{
+											bool allRejected = grup.All(item => item.Durum == 0);
+											<tr class="accordion-header">
+												<td>
+													<i class="fas fa-chevron-down toggle-icon"></i>
+												</td>
+												<td data-label="Evrak No">@grup.Key.EvrakNo</td>
+												<td data-label="Servis Merkezi">@grup.Key.Servis_Merkezi</td>
+												<td data-label="Müşteri">@firstItem.MusteriAdi</td>
+												<td data-label="Plaka No">@firstItem.PlakaNo</td>
+												<td data-label="Tarih">@firstItem.Tarih.ToString("yyyy-MM-dd")</td>
+												<td data-label="Model">@firstItem.CihazMarkaModel</td>
+												<td data-label="Çalışma Saati">@firstItem.CalismaSaati</td>
+												<td data-label="Durum" class="@(allRejected ? "red-status" : "active-status")">
+													@(allRejected ? "Red Edildi" : "Aktif")
+												</td>
+												<!-- Mevcut tablo içinde düzenlenecek kısım -->
+												<td data-label="İşlem">
+													<button type="button" class="btn btn-primary btn-sm evrak-duzenle-btn"
+															data-evrakno="@grup.Key.EvrakNo"
+															data-servismerkezi="@grup.Key.Servis_Merkezi">
+														<i class="fas fa-edit"></i> Düzenle
+													</button>
+													@if (!allRejected)
+													{
+														<button type="button" class="btn btn-danger btn-sm evrak-red-btn"
+																data-evrakno="@grup.Key.EvrakNo"
+																data-servismerkezi="@grup.Key.Servis_Merkezi">
+															<i class="fas fa-times"></i> Red
+														</button>
+													}
+													@if (ViewBag.Username != null && ViewBag.Username.ToString().Equals("SRV", StringComparison.OrdinalIgnoreCase))
+													{
+														<form action="/ServisHareketleri/SilEvrakForm" method="post" style="display:inline;" class="evrak-sil-form">
+															<input type="hidden" name="evrakNo" value="@grup.Key.EvrakNo" />
+															<input type="hidden" name="servisMerkezi" value="@grup.Key.Servis_Merkezi" />
+															@Html.AntiForgeryToken()
+															<button type="button" class="btn btn-danger btn-sm evrak-sil-btn-form">
+																<i class="fas fa-trash"></i> Sil
+															</button>
+														</form>
+													}
+												</td>
+											</tr>
+											<tr class="accordion-content" style="display: none;">
+												<td colspan="10" class="p-0">
+													<div class="nested-table-container">
+														<div class="table-responsive">
+															<table class="table table-sm">
+																<thead>
+																	<tr>
+																		<th>Yedek Parça No</th>
+																		<th>Yedek Parça Adı</th>
+																		<th>Adet</th>
+																		<th>Birim Fiyat</th>
+																		<th>Tutar</th>
+																		<th>Durum</th>
+																		<th>İşlem</th>
+																	</tr>
+																</thead>
+																<tbody>
+																	@foreach (var item in grup)
+																	{
+																		<tr>
+																			<td>@item.YedekParcaNo</td>
+																			<td>@item.YedekParcaAdi</td>
+																			<td>@item.Adet</td>
+																			<td>@item.BirimFiyat</td>
+																			<td>@item.Tutar</td>
+																			<td class="@(item.Durum == 1 ? "active-status" : "red-status")">
+																				@(item.Durum == 1 ? "Aktif" : "Red Edildi")
+																			</td>
+																			<td>
+																				@if (item.Durum == 1)
+																				{
+																					<button type="button" class="btn btn-danger btn-sm satir-red-btn"
+																							data-evrakno="@item.EvrakNo"
+																							data-evraksirano="@item.EvrakSiraNo">
+																						<i class="fas fa-times"></i> Red
+																					</button>
+																				}
+																			</td>
+																		</tr>
+																	}
+																</tbody>
+															</table>
+														</div>
+													</div>
+												</td>
+											</tr>
+										}
+									}
+								</tbody>
+							</table>
+						</div>
+					}
+					else
+					{
+						<div class="alert alert-info">
+							<i class="fas fa-info-circle"></i> Gösterilecek veri bulunamadı.
+						</div>
+					}
+					<div class="mt-3">
+						<a href="/ServisHareketleri/AllIsEmri" class="btn btn-success">
+							<i class="fas fa-list"></i> Tüm Kayıtları Görüntüle
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modern Modal Design -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="editModalLabel">Servis Düzenle</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+				<form id="editForm" method="post">
+					<input type="hidden" id="modalEvrakNo" name="evrakNo">
+
+					<div class="row mb-3">
+						<div class="col-md-4">
+							<div class="form-group">
+								<label for="modalTarih" class="form-label">Onarım Tarihi</label>
+								<input type="date" class="form-control" id="modalTarih" name="tarih">
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="form-group">
+								<label for="modalServisMerkezi">Servis Merkezi</label>
+								<input type="text" class="form-control" id="modalServisMerkezi" name="Servis_Merkezi" readonly>
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="form-group">
+								<label for="modalNo" class="form-label">No</label>
+								<input type="text" class="form-control" id="modalNo" name="no" readonly>
+							</div>
+						</div>
+					</div>
+
+					<div class="row mb-3">
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="modalMusteriAdi" class="form-label">Müşteri Adı</label>
+								<input type="text" class="form-control" id="modalMusteriAdi" name="musteriAdi">
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="modalPlakaNo" class="form-label">Plaka No</label>
+								<input type="text" class="form-control" id="modalPlakaNo" name="plakaNo">
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							<label for="modalUniteSeriNo" class="form-label">Ünite Seri Numarası</label>
+							<input type="text" class="form-control" id="modalUniteSeriNo" name="uniteSeriNo">
+						</div>
+					</div>
+					<div class="row mb-3">
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="modalSoforAdi" class="form-label">Getiren Şoför Adı</label>
+								<input type="text" class="form-control" id="modalSoforAdi" name="soforAdi">
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="modalSoforTelefon" class="form-label">Şoför İrtibat Numarası</label>
+								<input type="text" class="form-control" id="modalSoforTelefon" name="soforTelefon">
+							</div>
+						</div>
+					</div>
+
+					<div class="row mb-3">
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="modalCihazMarkaModel" class="form-label">Cihaz Marka/Model</label>
+								<input type="text" class="form-control" id="modalCihazMarkaModel" name="cihazMarkaModel">
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="modalTeknisyenAdi" class="form-label">Teknisyen Adı</label>
+								<input type="text" class="form-control" id="modalTeknisyenAdi" name="teknisyenAdi">
+							</div>
+						</div>
+					</div>
+
+					<div class="row mb-3">
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="modalCalismaSaati" class="form-label">Çalışma Saati</label>
+								<input type="number" class="form-control" id="modalCalismaSaati" name="calismaSaati">
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="modalServiseGirisTarihi" class="form-label">Servise Giriş Tarihi</label>
+								<input type="date" class="form-control" id="modalServiseGirisTarihi" name="serviseGirisTarihi">
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group mb-3">
+						<label class="form-label">İş Türü (Birden fazla seçebilirsiniz)</label>
+						<div class="modal-is-turu-container d-flex flex-wrap gap-2">
+							<div class="form-check me-3">
+								<input type="checkbox" class="form-check-input modal-is-turu-checkbox" id="modalIsTuruMotor" value="Motor">
+								<label class="form-check-label" for="modalIsTuruMotor">Motor</label>
+							</div>
+							<div class="form-check me-3">
+								<input type="checkbox" class="form-check-input modal-is-turu-checkbox" id="modalIsTuruDorseElektrik" value="Dorse (Elektrik)">
+								<label class="form-check-label" for="modalIsTuruDorseElektrik">Dorse (Elektrik)</label>
+							</div>
+							<div class="form-check me-3">
+								<input type="checkbox" class="form-check-input modal-is-turu-checkbox" id="modalIsTuruDorseAltTakim" value="Dorse (Alt takım)">
+								<label class="form-check-label" for="modalIsTuruDorseAltTakim">Dorse (Alt takım)</label>
+							</div>
+							<div class="form-check me-3">
+								<input type="checkbox" class="form-check-input modal-is-turu-checkbox" id="modalIsTuruDorseUstYapi" value="Dorse (Üst yapı)">
+								<label class="form-check-label" for="modalIsTuruDorseUstYapi">Dorse (Üst yapı)</label>
+							</div>
+							<div class="form-check me-3">
+								<input type="checkbox" class="form-check-input modal-is-turu-checkbox" id="modalIsTuruDorseFRC" value="Dorse (FRC)">
+								<label class="form-check-label" for="modalIsTuruDorseFRC">Dorse (FRC)</label>
+							</div>
+						</div>
+						<div id="modal-secilen-is-turleri-container" class="mt-2"></div>
+						<input type="hidden" id="modalIsTuru" name="isTuru" />
+					</div>
+
+					<div class="form-group mb-3">
+						<label for="modalIlkGozlem" class="form-label">İlk Gözlem</label>
+						<textarea class="form-control" id="modalIlkGozlem" name="ilkGozlem" rows="3"></textarea>
+					</div>
+
+					<!-- Stok Hizmet Listesi Tablosu -->
+				
+
+					<div class="table-responsive">
+						<table class="table table-sm table-striped" id="modal-stok-hizmet-listesi">
+							<thead>
+								<tr>
+									<th>Yedek Parça No</th>
+									<th>Yedek Parça Adı</th>
+									<th>Adet</th>
+									<th>Birim Fiyat</th>
+									<th>İskonto %</th> <!-- Yeni eklenen sütun -->
+									<th>İşçilik Tutarı</th>
+									<th>Harici İşçilik Tutarı</th>
+									<th>Tutar</th>
+									<th>İşlem</th>
+								</tr>
+							</thead>
+							<tbody id="modal-stok-hizmet-body">
+								<!-- Dinamik olarak doldurulacak -->
+							</tbody>
+						</table>
+					</div>
+
+					<!-- Totals for Modal -->
+					<div class="totals mt-3">
+						<p>A Toplam: <span id="modal-a-toplam">0.00</span> ₺</p>
+						<p>Vergi (%20): <span id="modal-vergi">0.00</span> ₺</p>
+						<p>G Toplam: <span id="modal-g-toplam">0.00</span> ₺</p>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+
+				<button type="button" class="btn btn-primary" id="saveChanges">Kaydet</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+
+
+
+<!-- Font Awesome CDN - İkonlar için -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<!-- JS Kısmı - Fonksiyonalite korunmuştur -->
+ <script>
+		document.addEventListener('DOMContentLoaded', function() {
+		// İş Türü işlevselliği
+		const isTuruCheckboxes = document.querySelectorAll('.is-turu-checkbox');
+		const isTuruHidden = document.getElementById('IsTuru');
+		const secilenIsTurleriContainer = document.getElementById('secilen-is-turleri-container');
+
+		function updateIsTuruTags() {
+			// Önce container'ı temizle
+			secilenIsTurleriContainer.innerHTML = '';
+
+			// Seçili checkboxları bul ve etiketleri oluştur
+			const secilenIsTurleri = [];
+			isTuruCheckboxes.forEach(checkbox => {
+				if (checkbox.checked) {
+					secilenIsTurleri.push(checkbox.value);
+
+					// Etiket oluştur
+					const tag = document.createElement('span');
+					tag.className = 'is-turu-tag';
+					tag.innerHTML = `${checkbox.value} <span class="is-turu-tag-remove" data-value="${checkbox.value}">×</span>`;
+					secilenIsTurleriContainer.appendChild(tag);
+				}
+			});
+
+			// Hidden input değerini güncelle
+			isTuruHidden.value = secilenIsTurleri.join(',');
+		}
+
+		// Checkbox'lara event listener ekle
+		isTuruCheckboxes.forEach(checkbox => {
+			checkbox.addEventListener('change', updateIsTuruTags);
+		});
+
+		// Etiket kaldırma işlemi için event delegation
+		secilenIsTurleriContainer.addEventListener('click', function(e) {
+			if (e.target.classList.contains('is-turu-tag-remove')) {
+				const valueToRemove = e.target.getAttribute('data-value');
+
+				// İlgili checkbox'ı bul ve işaretini kaldır
+				isTuruCheckboxes.forEach(checkbox => {
+					if (checkbox.value === valueToRemove) {
+						checkbox.checked = false;
+					}
+				});
+
+				// Etiketleri güncelle
+				updateIsTuruTags();
+			}
+		});
+
+		// Modal için iş türü işlemleri
+		const modalIsTuruCheckboxes = document.querySelectorAll('.modal-is-turu-checkbox');
+		const modalIsTuruHidden = document.getElementById('modalIsTuru');
+		const modalSecilenIsTurleriContainer = document.getElementById('modal-secilen-is-turleri-container');
+
+		function updateModalIsTuruTags() {
+			// Önce container'ı temizle
+			modalSecilenIsTurleriContainer.innerHTML = '';
+
+			// Seçili checkboxları bul ve etiketleri oluştur
+			const secilenIsTurleri = [];
+			modalIsTuruCheckboxes.forEach(checkbox => {
+				if (checkbox.checked) {
+					secilenIsTurleri.push(checkbox.value);
+
+					// Etiket oluştur
+					const tag = document.createElement('span');
+					tag.className = 'modal-is-turu-tag';
+					tag.innerHTML = `${checkbox.value} <span class="modal-is-turu-tag-remove" data-value="${checkbox.value}">×</span>`;
+					modalSecilenIsTurleriContainer.appendChild(tag);
+				}
+			});
+
+			// Hidden input değerini güncelle
+			modalIsTuruHidden.value = secilenIsTurleri.join(',');
+		}
+
+		// Modal checkbox'lara event listener ekle
+		modalIsTuruCheckboxes.forEach(checkbox => {
+			checkbox.addEventListener('change', updateModalIsTuruTags);
+		});
+
+		// Modal etiket kaldırma işlemi için event delegation
+		modalSecilenIsTurleriContainer.addEventListener('click', function(e) {
+			if (e.target.classList.contains('modal-is-turu-tag-remove')) {
+				const valueToRemove = e.target.getAttribute('data-value');
+
+				// İlgili checkbox'ı bul ve işaretini kaldır
+				modalIsTuruCheckboxes.forEach(checkbox => {
+					if (checkbox.value === valueToRemove) {
+						checkbox.checked = false;
+					}
+				});
+
+				// Etiketleri güncelle
+				updateModalIsTuruTags();
+			}
+		});
+
+		// Form doğrulama script
+		const form = document.querySelector('form[asp-action="IsEmriGiris"]');
+		if (form) {
+			form.addEventListener('submit', function(e) {
+				const secilenIsTurleri = isTuruHidden.value;
+				if (!secilenIsTurleri) {
+					e.preventDefault();
+					alert('Lütfen en az bir iş türü seçiniz!');
+					return;
+				}
+
+				const rows = document.querySelectorAll('#stok-hizmet-body tr');
+				rows.forEach(row => {
+					const iscilikTutariInput = row.querySelector('input[name$=".IscilikTutari"]');
+					const hariciIscilikTutariInput = row.querySelector('input[name$=".HariciIscilikTutari"]');
+					const iskontoYuzdeInput = row.querySelector('input[name$=".IskontoYuzde"]');
+
+					// Boş işçilik değerlerini 0 olarak ata
+					if (!iscilikTutariInput.value) {
+						iscilikTutariInput.value = "0";
+					}
+
+					if (!hariciIscilikTutariInput.value) {
+						hariciIscilikTutariInput.value = "0";
+					}
+
+					if (!iskontoYuzdeInput.value) {
+						iskontoYuzdeInput.value = "0";
+					}
+				});
+
+				// Toplam değerleri güncelle
+				updateTotals();
+			});
+		}
+
+		// Düzenleme butonu işlevselliği
+		document.querySelectorAll('.evrak-duzenle-btn').forEach(button => {
+			button.addEventListener('click', function(event) {
+				event.stopPropagation();
+
+				// Evrak numarası ve servis merkezi bilgilerini al
+				const evrakNo = this.getAttribute('data-evrakno');
+				const servisMerkezi = this.getAttribute('data-servismerkezi');
+
+				// API'yi çağır ve veriyi getir
+				fetch(`/ServisHareketleri/GetEvrakDetayFull?evrakNo=${evrakNo}&servisMerkezi=${encodeURIComponent(servisMerkezi)}`)
+				.then(response => {
+					if (!response.ok) {
+						throw new Error('Veri alınamadı');
+					}
+					return response.json();
+				})
+				.then(data => {
+					console.log("Gelen veri:", data); // Debug için
+
+					// Form alanlarını doldur
+					document.getElementById('modalEvrakNo').value = data.evrakNo || '';
+					document.getElementById('modalTarih').value = data.tarih || '';
+					document.getElementById('modalServisMerkezi').value = data.servisMerkezi || '';
+					document.getElementById('modalNo').value = data.no || '';
+					document.getElementById('modalMusteriAdi').value = data.musteriAdi || '';
+					document.getElementById('modalSoforAdi').value = data.soforAdi || '';
+					document.getElementById('modalSoforTelefon').value = data.soforTelefon || '';
+					document.getElementById('modalPlakaNo').value = data.plakaNo || '';
+					document.getElementById('modalUniteSeriNo').value = data.UniteSeriNo || '';
+					document.getElementById('modalCihazMarkaModel').value = data.cihazMarkaModel || '';
+					document.getElementById('modalTeknisyenAdi').value = data.teknisyenAdi || '';
+					document.getElementById('modalCalismaSaati').value = data.calismaSaati || '';
+					document.getElementById('modalServiseGirisTarihi').value = data.serviseGirisTarihi || '';
+					document.getElementById('modalIlkGozlem').value = data.ilkGozlem || '';
+
+					if (data.isTuru) {
+						const isTurleri = data.isTuru.split(',');
+						modalIsTuruCheckboxes.forEach(checkbox => {
+							checkbox.checked = isTurleri.includes(checkbox.value);
+						});
+						updateModalIsTuruTags();
+					}
+
+					const tableBody = document.getElementById('modal-stok-hizmet-body');
+					tableBody.innerHTML = '';
+					const stokHizmetListesi = data.stokHizmetListesi || [];
+					if (stokHizmetListesi.length > 0) {
+						stokHizmetListesi.forEach((item, index) => {
+							console.log(`Stok/Hizmet öğesi ${index}:`, item);
+
+							// Değerleri doğru formatta al
+							const adet = Number(item.adet) || 0;
+							const birimFiyat = Number(item.birimFiyat.replace(',', '.')) || 0;
+							const iskontoYuzde = Number(item.IskontoYuzde?.replace(',', '.')) || 0;
+							const iscilikTutari = Number(item.iscilikTutari.replace(',', '.')) || 0;
+							const hariciIscilikTutari = Number(item.hariciIscilikTutari.replace(',', '.')) || 0;
+							const tutar = Number(item.tutar.replace(',', '.')) || 0;
+
+							const row = document.createElement('tr');
+							row.innerHTML = `
+								<td><input type="text" name="StokHizmet[${index}].YedekParcaNo" value="${item.yedekParcaNo || ''}" class="form-control form-control-sm"></td>
+								<td><input type="text" name="StokHizmet[${index}].YedekParcaAdi" value="${item.yedekParcaAdi || ''}" class="form-control form-control-sm"></td>
+								<td><input type="number" name="StokHizmet[${index}].Adet" value="${adet}" class="form-control form-control-sm" oninput="calculateModalTutar(this)"></td>
+								<td><input type="number" name="StokHizmet[${index}].BirimFiyat" value="${birimFiyat}" class="form-control form-control-sm" step="0.01" oninput="calculateModalTutar(this)"></td>
+								<td><input type="number" name="StokHizmet[${index}].IskontoYuzde" value="${iskontoYuzde}" class="form-control form-control-sm" step="0.01" min="0" max="100" oninput="calculateModalTutar(this)"></td>
+								<td><input type="number" name="StokHizmet[${index}].IscilikTutari" value="${iscilikTutari}" class="form-control form-control-sm" step="0.01" oninput="calculateModalTutar(this)"></td>
+								<td><input type="number" name="StokHizmet[${index}].HariciIscilikTutari" value="${hariciIscilikTutari}" class="form-control form-control-sm" step="0.01" oninput="calculateModalTutar(this)"></td>
+								<td><input type="number" name="StokHizmet[${index}].Tutar" value="${tutar}" class="form-control form-control-sm" step="0.01" readonly></td>
+								<td><button type="button" class="btn btn-danger btn-sm" onclick="removeModalRow(this)"><i class="fas fa-trash"></i></button></td>
+							`;
+							tableBody.appendChild(row);
+						});
+					} else {
+						addModalRow();
+					}
+
+					calculateModalTotals();
+					const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+					editModal.show();
+				})
+				.catch(error => {
+					console.error('Hata:', error);
+					alert('Evrak bilgileri yüklenirken hata oluştu.');
+				});
+			});
+		});
+
+		// "+" butonu için olay dinleyici ekle
+		const addRowBtn = document.getElementById('add-row-btn');
+		if (addRowBtn) {
+			addRowBtn.addEventListener('click', addRow);
+		}
+
+		// Servis Merkezi seçimi sonrası evrak no getirme
+		const servisMerkeziSelect = document.querySelector('select[name="Servis_Merkezi"]');
+		if (servisMerkeziSelect) {
+			servisMerkeziSelect.addEventListener('change', function() {
+				const servisMerkezi = this.value;
+				if (servisMerkezi) {
+					fetch(`/ServisHareketleri/GetNextEvrakNo?servisMerkezi=${servisMerkezi}`)
+						.then(response => {
+							if (!response.ok) {
+								throw new Error(`HTTP hata! Durum: ${response.status}`);
+							}
+							return response.json();
+						})
+						.then(data => {
+							document.querySelector('input[name="No"]').value = data.nextEvrakNo;
+						})
+						.catch(error => {
+							console.error('Evrak No alınırken hata:', error);
+							alert("Evrak No alınırken bir hata oluştu: " + error.message);
+						});
+				} else {
+					document.querySelector('input[name="No"]').value = "";
+				}
+			});
+		}
+
+		// Red butonları için olay dinleyicileri
+		document.querySelectorAll('.evrak-red-btn').forEach(button => {
+			button.addEventListener('click', function(event) {
+				event.stopPropagation();
+				const evrakNo = parseInt(this.getAttribute('data-evrakno'));
+				if (confirm('Bu evrakı reddetmek istediğinize emin misiniz?')) {
+					fetch('/ServisHareketleri/RedEvrak', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							'X-CSRF-TOKEN': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+						},
+						body: JSON.stringify(evrakNo)
+					})
+					.then(response => response.json())
+					.then(data => {
+						if (data.success) {
+							alert('Evrak başarıyla reddedildi.');
+							location.reload();
+						} else {
+							alert('Bir hata oluştu: ' + data.message);
+						}
+					})
+					.catch(error => console.error('Hata:', error));
+				}
+			});
+		});
+
+		// Satır red butonları
+		document.querySelectorAll('.satir-red-btn').forEach(button => {
+			button.addEventListener('click', function(event) {
+				event.stopPropagation();
+				const evrakNo = parseInt(this.getAttribute('data-evrakno'));
+				const evrakSiraNo = parseInt(this.getAttribute('data-evraksirano'));
+				if (confirm('Bu satırı reddetmek istediğinize emin misiniz?')) {
+					fetch('/ServisHareketleri/RedSatir', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							'X-CSRF-TOKEN': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+						},
+						body: JSON.stringify({ evrakNo: evrakNo, evrakSiraNo: evrakSiraNo })
+					})
+					.then(response => response.json())
+					.then(data => {
+						if (data.success) {
+							alert('Satır başarıyla reddedildi.');
+							location.reload();
+						} else {
+							alert('Bir hata oluştu: ' + data.message);
+						}
+					})
+					.catch(error => console.error('Hata:', error));
+				}
+			});
+		});
+
+		// Modal içine yeni satır ekle butonu ekleme ve işlevselliği
+		const modalBodyDiv = document.querySelector('.modal-body .table-responsive');
+		if (modalBodyDiv) {
+			const addRowButton = document.createElement('button');
+			addRowButton.type = 'button';
+			addRowButton.className = 'btn btn-success btn-sm mb-2';
+			addRowButton.id = 'modal-add-row-btn';
+			addRowButton.innerHTML = '<i class="fas fa-plus"></i> Yeni Satır';
+			addRowButton.addEventListener('click', addModalRow);
+
+			modalBodyDiv.insertAdjacentElement('beforebegin', addRowButton);
+		}
+
+		// Modalda kaydet butonu
+			document.getElementById('saveChanges').addEventListener('click', function() {
+		// Zorunlu alan kontrolleri
+		const musteriAdi = document.getElementById('modalMusteriAdi').value.trim();
+		const plakaNo = document.getElementById('modalPlakaNo').value.trim();
+		const evrakNo = document.getElementById('modalEvrakNo').value.trim();
+		const tarih = document.getElementById('modalTarih').value;
+		const servisMerkezi = document.getElementById('modalServisMerkezi').value.trim();
+
+		if (!musteriAdi || !plakaNo || !evrakNo || !tarih) {
+			alert('Zorunlu alanlar doldurulmalıdır!');
+			return;
+		}
+
+		// Stok/Hizmet listesini sıfırdan oluştur
+		const stokHizmetRows = document.querySelectorAll('#modal-stok-hizmet-body tr');
+		const stokHizmet = [];
+		let aToplam = 0;
+
+		console.log('Toplam satır sayısı:', stokHizmetRows.length);
+
+		stokHizmetRows.forEach((row, index) => {
+			// Input alanlarını dinamik olarak seç
+			const yedekParcaNoInput = row.querySelector('input[name$=".YedekParcaNo"]');
+			const yedekParcaAdiInput = row.querySelector('input[name$=".YedekParcaAdi"]');
+			const adetInput = row.querySelector('input[name$=".Adet"]');
+			const birimFiyatInput = row.querySelector('input[name$=".BirimFiyat"]');
+			const iskontoYuzdeInput = row.querySelector('input[name$=".IskontoYuzde"]');
+			const iscilikTutariInput = row.querySelector('input[name$=".IscilikTutari"]');
+			const hariciIscilikTutariInput = row.querySelector('input[name$=".HariciIscilikTutari"]');
+			const tutarInput = row.querySelector('input[name$=".Tutar"]');
+
+			const yedekParcaNo = yedekParcaNoInput ? yedekParcaNoInput.value.trim() : '';
+			const yedekParcaAdi = yedekParcaAdiInput ? yedekParcaAdiInput.value.trim() : '';
+
+			console.log(`Satır ${index}: Yedek Parça No: ${yedekParcaNo}, Yedek Parça Adı: ${yedekParcaAdi}`);
+
+			if (yedekParcaNo || yedekParcaAdi) {
+				const adet = adetInput ? parseFloat(adetInput.value) || 0 : 0;
+				const birimFiyat = birimFiyatInput ? parseFloat(birimFiyatInput.value) || 0 : 0;
+				const iskontoYuzde = iskontoYuzdeInput ? parseFloat(iskontoYuzdeInput.value) || 0 : 0;
+				const iscilikTutari = iscilikTutariInput ? parseFloat(iscilikTutariInput.value) || 0 : 0;
+				const hariciIscilikTutari = hariciIscilikTutariInput ? parseFloat(hariciIscilikTutariInput.value) || 0 : 0;
+				const tutar = tutarInput ? parseFloat(tutarInput.value) || 0 : 0;
+
+				// Doğrudan tutar inputundan değeri al
+				aToplam += tutar;
+
+				stokHizmet.push({
+					YedekParcaNo: yedekParcaNo || '-',
+					YedekParcaAdi: yedekParcaAdi || 'Boş Giriş',
+					Adet: adet,
+					BirimFiyat: birimFiyat,
+					IskontoYuzde: iskontoYuzde,
+					IscilikTutari: iscilikTutari,
+					HariciIscilikTutari: hariciIscilikTutari,
+					Tutar: tutar
+				});
+
+				console.log('Eklenen satır:', stokHizmet[stokHizmet.length - 1]);
+			}
+		});
+
+		// Modal içindeki toplam değerlerini al (hesaplanmış değerleri)
+		const modalAToplam = parseFloat(document.getElementById('modal-a-toplam').textContent.replace("₺", "").trim()) || 0;
+		const modalVergi = parseFloat(document.getElementById('modal-vergi').textContent.replace("₺", "").trim()) || 0;
+		const modalGToplam = parseFloat(document.getElementById('modal-g-toplam').textContent.replace("₺", "").trim()) || 0;
+
+		console.log('Son stok hizmet listesi:', stokHizmet);
+		console.log('Hesaplanan A Toplam:', modalAToplam);
+		console.log('Hesaplanan Vergi:', modalVergi);
+		console.log('Hesaplanan G Toplam:', modalGToplam);
+
+		const modalFormData = {
+			EvrakNo: parseInt(evrakNo),
+			Servis_Merkezi: servisMerkezi,
+			Tarih: tarih,
+			No: document.getElementById('modalNo').value || '',
+			MusteriAdi: musteriAdi,
+			PlakaNo: plakaNo,
+			UniteSeriNo: document.getElementById('modalUniteSeriNo').value || '',
+			SoforAdi: document.getElementById('modalSoforAdi').value || '',
+			SoforTelefon: document.getElementById('modalSoforTelefon').value || '',
+			CihazMarkaModel: document.getElementById('modalCihazMarkaModel').value || '',
+			TeknisyenAdi: document.getElementById('modalTeknisyenAdi').value || '',
+			CalismaSaati: parseInt(document.getElementById('modalCalismaSaati').value) || 0,
+			ServiseGirisTarihi: document.getElementById('modalServiseGirisTarihi').value,
+			IsTuru: document.getElementById('modalIsTuru').value || '',
+			IlkGozlem: document.getElementById('modalIlkGozlem').value || '',
+			AToplam: modalAToplam,
+			Vergi: modalVergi,
+			GToplam: modalGToplam
+		};
+
+		console.log('Gönderilecek form verisi:', modalFormData);
+
+		fetch('/ServisHareketleri/UpdateEvrak', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-Requested-With': 'XMLHttpRequest'
+			},
+			body: JSON.stringify({
+				model: modalFormData,
+				stokHizmet: stokHizmet
+			})
+		})
+		.then(response => {
+			if (!response.ok) throw new Error('Sunucu hatası: ' + response.status);
+			return response.json();
+		})
+		.then(data => {
+			if (data.success) {
+				alert('Kayıt başarıyla güncellendi');
+				location.reload();
+			} else {
+				alert('Güncelleme sırasında hata oluştu: ' + (data.message || 'Bilinmeyen bir hata'));
+			}
+		})
+		.catch(error => {
+			console.error('Hata:', error);
+			alert('Güncelleme sırasında bir hata oluştu: ' + error.message);
+		});
+	});
+
+		// Modal kapatma düğmeleri
+		const modalCloseButtons = document.querySelectorAll('.btn-close');
+		modalCloseButtons.forEach(button => {
+			button.addEventListener('click', function() {
+				const modal = this.closest('.modal');
+				if (modal) {
+					modal.style.display = 'none';
+				}
+			});
+		});
+
+		// Accordion işlemleri
+		console.log('DOM yüklendi, akordeon başlatılıyor...');
+		const accordionHeaders = document.querySelectorAll('.accordion-header');
+		console.log('Bulunan accordion-header sayısı:', accordionHeaders.length);
+
+		accordionHeaders.forEach(header => {
+			header.addEventListener('click', function (e) {
+				console.log('Accordion header tıklandı:', this);
+				// Butona tıklandıysa akordeon açılmasını engelle
+				if (!e.target.closest('button')) {
+					const content = this.nextElementSibling;
+					const toggleIcon = this.querySelector('.toggle-icon');
+					console.log('Hedef content:', content);
+
+					if (!content) {
+						console.error('Content bulunamadı, HTML yapısını kontrol et!');
+						return;
+					}
+
+					if (content.style.display === 'none' || content.style.display === '') {
+						console.log('Content açılıyor...');
+						content.style.display = 'table-row';
+						toggleIcon.classList.remove('fa-chevron-down');
+						toggleIcon.classList.add('fa-chevron-up');
+					} else {
+						console.log('Content kapanıyor...');
+						content.style.display = 'none';
+						toggleIcon.classList.remove('fa-chevron-up');
+						toggleIcon.classList.add('fa-chevron-down');
+					}
+				} else {
+					console.log('Butona tıklandı, akordeon tetiklenmedi.');
+				}
+			});
+		});
+
+		// Butonların akordeon açmasını engelle
+		const buttons = document.querySelectorAll('.btn');
+		buttons.forEach(button => {
+			button.addEventListener('click', function (e) {
+				e.stopPropagation();
+				console.log('Buton tıklandı:', this);
+			});
+		});
+
+		// Silme formu işlemleri
+		const silFormuButonlari = document.querySelectorAll('.evrak-sil-btn-form');
+		silFormuButonlari.forEach(button => {
+			button.addEventListener('click', function(event) {
+				event.preventDefault();
+				event.stopPropagation();
+
+				// Yetki kontrolü için normal sayfa yönlendirmesi kullanın
+				if (confirm('Bu evrakı silmek istediğinize emin misiniz?')) {
+					// Form nesnesini al
+					const form = this.closest('.evrak-sil-form');
+					// Formu gönder
+					form.submit();
+				}
+			});
+		});
+	});
+
+	// Tutar hesaplama fonksiyonu
+	function calculateTutar(input) {
+		// Mevcut satırı al
+		const row = input.closest('tr');
+
+		// Satırdaki değerleri al
+		const adet = parseFloat(row.querySelector('input[name$=".Adet"]').value) || 0;
+		const birimFiyat = parseFloat(row.querySelector('input[name$=".BirimFiyat"]').value) || 0;
+		const iskontoYuzde = parseFloat(row.querySelector('input[name$=".IskontoYuzde"]').value) || 0;
+		const iscilikTutari = parseFloat(row.querySelector('input[name$=".IscilikTutari"]').value) || 0;
+		const hariciIscilikTutari = parseFloat(row.querySelector('input[name$=".HariciIscilikTutari"]').value) || 0;
+
+		// Parça tutarı hesaplama (iskonto dahil)
+		const parcaTutari = adet * birimFiyat;
+		const iskontoTutari = parcaTutari * (iskontoYuzde / 100);
+		const indirimliFiyat = parcaTutari - iskontoTutari;
+
+		// Tutarı hesapla: ((adet*birimfiyat) - iskonto tutarı + işçilik tutarı + harici işçilik tutarı)
+		const tutar = indirimliFiyat + iscilikTutari + hariciIscilikTutari;
+
+		// Tutar alanını güncelle
+		row.querySelector('input[name$=".Tutar"]').value = tutar.toFixed(2);
+
+		// Toplamları güncelle
+		updateTotals();
+	}
+
+	// Toplamları güncelleme fonksiyonu
+	function updateTotals() {
+		// Tüm Tutar değerlerini al
+		const tutarInputs = document.querySelectorAll('#stok-hizmet-body input[name$=".Tutar"]');
+		let aToplamValue = 0;
+
+		// Tüm Tutar değerlerini topla
+		tutarInputs.forEach(input => {
+			aToplamValue += parseFloat(input.value) || 0;
+		});
+
+		// Vergiyi hesapla (%20)
+		const vergiValue = aToplamValue * 0.20;
+
+		// Genel toplamı hesapla
+		const gToplamValue = aToplamValue + vergiValue;
+
+		// Görüntülenen değerleri güncelle
+		const aToplamEl = document.getElementById('a-toplam');
+		const vergiEl = document.getElementById('vergi');
+		const gToplamEl = document.getElementById('g-toplam');
+
+		if (aToplamEl) aToplamEl.textContent = aToplamValue.toFixed(2);
+		if (vergiEl) vergiEl.textContent = vergiValue.toFixed(2);
+		if (gToplamEl) gToplamEl.textContent = gToplamValue.toFixed(2);
+
+		// Form gönderimi için gizli inputları güncelle
+		const hiddenAToplamEl = document.getElementById('hidden-a-toplam');
+		const hiddenVergiEl = document.getElementById('hidden-vergi');
+		const hiddenGToplamEl = document.getElementById('hidden-g-toplam');
+
+		if (hiddenAToplamEl) hiddenAToplamEl.value = aToplamValue.toFixed(2);
+		if (hiddenVergiEl) hiddenVergiEl.value = vergiValue.toFixed(2);
+		if (hiddenGToplamEl) hiddenGToplamEl.value = gToplamValue.toFixed(2);
+	}
+
+		// Yeni satır ekleme fonksiyonu (devam)
+	function addRow() {
+		const tbody = document.getElementById('stok-hizmet-body');
+		const rowCount = tbody.rows.length;
+
+		// Yeni satır oluştur
+		const newRow = document.createElement('tr');
+		newRow.innerHTML = `
+			<td><input type="text" name="StokHizmet[${rowCount}].YedekParcaNo" class="form-control form-control-sm" /></td>
+			<td><input type="text" name="StokHizmet[${rowCount}].YedekParcaAdi" class="form-control form-control-sm" /></td>
+			<td><input type="number" name="StokHizmet[${rowCount}].Adet" class="form-control form-control-sm" oninput="calculateTutar(this)" /></td>
+			<td><input type="number" name="StokHizmet[${rowCount}].BirimFiyat" class="form-control form-control-sm" step="0.01" oninput="calculateTutar(this)" /></td>
+			<td><input type="number" name="StokHizmet[${rowCount}].IskontoYuzde" class="form-control form-control-sm" step="0.01" min="0" max="100" oninput="calculateTutar(this)" /></td>
+			<td><input type="number" name="StokHizmet[${rowCount}].IscilikTutari" class="form-control form-control-sm" oninput="calculateTutar(this)" /></td>
+			<td><input type="number" name="StokHizmet[${rowCount}].HariciIscilikTutari" class="form-control form-control-sm" oninput="calculateTutar(this)" /></td>
+			<td><input type="number" name="StokHizmet[${rowCount}].Tutar" class="form-control form-control-sm" step="0.01" readonly /></td>
+			<td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Sil</button></td>
+		`;
+
+		// Yeni satırı ekle
+		tbody.appendChild(newRow);
+	}
+
+	// Modal satır ekleme
+	function addModalRow() {
+		const tbody = document.getElementById('modal-stok-hizmet-body');
+		const rowCount = tbody.querySelectorAll('tr').length;
+
+		const row = document.createElement('tr');
+		row.innerHTML = `
+			<td><input type="text" name="StokHizmet[${rowCount}].YedekParcaNo" class="form-control form-control-sm"></td>
+			<td><input type="text" name="StokHizmet[${rowCount}].YedekParcaAdi" class="form-control form-control-sm"></td>
+			<td><input type="number" name="StokHizmet[${rowCount}].Adet" value="0" class="form-control form-control-sm" oninput="calculateModalTutar(this)"></td>
+			<td><input type="number" name="StokHizmet[${rowCount}].BirimFiyat" value="0" class="form-control form-control-sm" step="0.01" oninput="calculateModalTutar(this)"></td>
+			<td><input type="number" name="StokHizmet[${rowCount}].IskontoYuzde" value="0" class="form-control form-control-sm" step="0.01" min="0" max="100" oninput="calculateModalTutar(this)"></td>
+			<td><input type="number" name="StokHizmet[${rowCount}].IscilikTutari" value="0" class="form-control form-control-sm" step="0.01" oninput="calculateModalTutar(this)"></td>
+			<td><input type="number" name="StokHizmet[${rowCount}].HariciIscilikTutari" value="0" class="form-control form-control-sm" step="0.01" oninput="calculateModalTutar(this)"></td>
+			<td><input type="number" name="StokHizmet[${rowCount}].Tutar" value="0" class="form-control form-control-sm" step="0.01" readonly></td>
+			<td><button type="button" class="btn btn-danger btn-sm" onclick="removeModalRow(this)"><i class="fas fa-trash"></i></button></td>
+		`;
+
+		tbody.appendChild(row);
+		calculateModalTotals();
+	}
+
+	// Satır silme fonksiyonu
+	function removeRow(button) {
+		const tbody = document.getElementById('stok-hizmet-body');
+
+		// Sadece bir satır varsa silme
+		if (tbody.rows.length > 1) {
+			const row = button.closest('tr');
+			tbody.removeChild(row);
+
+			// Satır sildikten sonra toplamları güncelle
+			updateTotals();
+		}
+	}
+
+	// Modal için tutar hesaplama fonksiyonu
+	function calculateModalTutar(inputElement) {
+		const row = inputElement.closest('tr');
+
+		// Gerekli tüm girdileri al
+		const adetInput = row.querySelector('input[name$=".Adet"]');
+		const birimFiyatInput = row.querySelector('input[name$=".BirimFiyat"]');
+		const iskontoYuzdeInput = row.querySelector('input[name$=".IskontoYuzde"]'); // Yeni eklenen
+		const iscilikTutariInput = row.querySelector('input[name$=".IscilikTutari"]');
+		const hariciIscilikTutariInput = row.querySelector('input[name$=".HariciIscilikTutari"]');
+		const tutarInput = row.querySelector('input[name$=".Tutar"]');
+
+		if (adetInput && birimFiyatInput && tutarInput && iscilikTutariInput && hariciIscilikTutariInput && iskontoYuzdeInput) {
+			// Değerleri parse et, yoksa 0 kullan
+			const adet = parseFloat(adetInput.value) || 0;
+			const birimFiyat = parseFloat(birimFiyatInput.value) || 0;
+			const iskontoYuzde = parseFloat(iskontoYuzdeInput.value) || 0; // Yeni eklenen
+			const iscilikTutari = parseFloat(iscilikTutariInput.value) || 0;
+			const hariciIscilikTutari = parseFloat(hariciIscilikTutariInput.value) || 0;
+
+			// Parça tutarı hesaplama (iskonto dahil)
+			const parcaTutari = adet * birimFiyat;
+			const iskontoTutari = parcaTutari * (iskontoYuzde / 100);
+			const indirimliFiyat = parcaTutari - iskontoTutari;
+
+			// Toplam hesapla: (miktar * birim fiyat) - iskonto + işçilik maliyetleri + harici işçilik maliyetleri
+			const tutar = indirimliFiyat + iscilikTutari + hariciIscilikTutari;
+
+			// Tutar girdisini güncelle
+			tutarInput.value = tutar.toFixed(2);
+
+			// Tüm toplamları yeniden hesapla
+			calculateModalTotals();
+		}
+	}
+
+	// Modal için toplam hesaplama fonksiyonu
+	function calculateModalTotals() {
+		let aToplam = 0;
+
+		// Modaldaki tüm tutar girdilerini bul
+		const tutarInputs = document.querySelectorAll('#modal-stok-hizmet-body input[name$=".Tutar"]');
+
+		// Tüm tutar değerlerini topla
+		tutarInputs.forEach(function(tutarInput) {
+			aToplam += parseFloat(tutarInput.value) || 0;
+		});
+
+		// Toplamları güncelle
+		const vergi = aToplam * 0.20; // %20 vergi
+		const gToplam = aToplam + vergi;
+
+		const modalAToplam = document.getElementById('modal-a-toplam');
+		const modalVergi = document.getElementById('modal-vergi');
+		const modalGToplam = document.getElementById('modal-g-toplam');
+
+		if (modalAToplam) modalAToplam.textContent = aToplam.toFixed(2);
+		if (modalVergi) modalVergi.textContent = vergi.toFixed(2);
+		if (modalGToplam) modalGToplam.textContent = gToplam.toFixed(2);
+	}
+
+	// Modal içindeki satır silme fonksiyonu
+	function removeModalRow(button) {
+		const tbody = document.getElementById('modal-stok-hizmet-body');
+
+		// Eğer son satır ise silme
+		if (tbody.rows.length > 1) {
+			const row = button.closest('tr');
+			tbody.removeChild(row);
+
+			// Satır sildikten sonra toplamları güncelle
+			calculateModalTotals();
+		}
+	}
+
+	// Sayısal değer dönüşümü yardımcı fonksiyonu
+	function convertToDecimal(value) {
+		if (typeof value === 'string') {
+			// Virgülleri nokta ile değiştir
+			return value.replace(',', '.');
+		}
+		return value;
+	}
+
+</script>
+
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		console.log('DOM yüklendi, akordeon başlatılıyor...');
+		const accordionHeaders = document.querySelectorAll('.accordion-header');
+		console.log('Bulunan accordion-header sayısı:', accordionHeaders.length);
+
+		accordionHeaders.forEach(header => {
+			header.addEventListener('click', function (e) {
+				console.log('Accordion header tıklandı:', this);
+				// Butona tıklandıysa akordeon açılmasını engelle
+				if (!e.target.closest('button')) {
+					const content = this.nextElementSibling;
+					const toggleIcon = this.querySelector('.toggle-icon');
+					console.log('Hedef content:', content);
+
+					if (!content) {
+						console.error('Content bulunamadı, HTML yapısını kontrol et!');
+						return;
+					}
+
+					if (content.style.display === 'none' || content.style.display === '') {
+						console.log('Content açılıyor...');
+						content.style.display = 'table-row';
+						toggleIcon.classList.remove('fa-chevron-down');
+						toggleIcon.classList.add('fa-chevron-up');
+					} else {
+						console.log('Content kapanıyor...');
+						content.style.display = 'none';
+						toggleIcon.classList.remove('fa-chevron-up');
+						toggleIcon.classList.add('fa-chevron-down');
+					}
+				} else {
+					console.log('Butona tıklandı, akordeon tetiklenmedi.');
+				}
+			});
+		});
+
+		// Butonların akordeon açmasını engelle
+		const buttons = document.querySelectorAll('.btn');
+		buttons.forEach(button => {
+			button.addEventListener('click', function (e) {
+				e.stopPropagation();
+				console.log('Buton tıklandı:', this);
+			});
+		});
+	});
+</script>
+<!-- CSRF Token Eklenmesi Gerekiyor -->
+@Html.AntiForgeryToken()
+
+<script>
+		document.addEventListener('DOMContentLoaded', function() {
+		const silFormuButonlari = document.querySelectorAll('.evrak-sil-btn-form');
+
+		silFormuButonlari.forEach(button => {
+			button.addEventListener('click', function(event) {
+				event.preventDefault();
+				event.stopPropagation();
+
+				// Yetki kontrolü için normal sayfa yönlendirmesi kullanın
+				if (confirm('Bu evrakı silmek istediğinize emin misiniz?')) {
+					// Form nesnesini al
+					const form = this.closest('.evrak-sil-form');
+					// Formu gönder
+					form.submit();
+				}
+			});
+		});
+	});
+</script>

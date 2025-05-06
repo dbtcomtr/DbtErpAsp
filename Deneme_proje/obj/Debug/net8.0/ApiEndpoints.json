@@ -1,0 +1,66 @@
+[
+  {
+    "ContainingType": "DatabaseController",
+    "Method": "DynamicConnect",
+    "RelativePath": "api/Database/dynamic-connect",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "DatabaseController\u002BDatabaseConnectionRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "DatabaseController",
+    "Method": "GetDatabase",
+    "RelativePath": "api/Database/GetDatabase",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "version",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "DatabaseController",
+    "Method": "SelectDatabase",
+    "RelativePath": "api/Database/select-database",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "databaseName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "DatabaseController",
+    "Method": "SetVersion",
+    "RelativePath": "api/Database/SetVersion",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "DatabaseController\u002BVersionRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

@@ -1,0 +1,197 @@
+﻿@model IEnumerable<Deneme_proje.Models.GunayEntities.FiloKiralamaViewModel>
+
+@{
+    ViewData["Title"] = "Ağır Vasıta Servis";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // Tarih parametrelerini kontrol edelim ve ViewBag'den değerleri alalım
+    var startDate = ViewBag.SelectedStartDate != null ? ((DateTime)ViewBag.SelectedStartDate).ToString("yyyy-MM-dd") : null;
+    var endDate = ViewBag.SelectedEndDate != null ? ((DateTime)ViewBag.SelectedEndDate).ToString("yyyy-MM-dd") : null;
+}
+
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+<style>
+    table.dataTable tbody th, table.dataTable tbody td {
+        padding: 5px 21px !important;
+    }
+
+    @@media only screen and (max-width: 576px) {
+        .form-inline .btn {
+            margin-top: 0;
+        }
+    }
+</style>
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <h4>Ağır Vasıta Servis</h4>
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index"><i class="icofont icofont-home"></i></a>
+                        </li>
+            
+                        <li class="breadcrumb-item"><a href="/Gunay/AgirVasitaServis">Ağır Vasıta Servis</a></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-lg-5 mb-1">
+            <div class="col-lg-4">
+                <form method="get" action="/Gunay/AgirVasitaServis" class="px-4 py-3">
+                    <div class="form-group mb-3">
+                        <label for="startDate" class="sr-only">Başlangıç Tarihi</label>
+                        <input type="date" id="startDate" name="startDate" class="form-control form-control-sm" value="@startDate" />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="endDate" class="sr-only">Bitiş Tarihi</label>
+                        <input type="date" id="endDate" name="endDate" class="form-control form-control-sm" value="@endDate" />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="srmrkodu" class="sr-only">Sorumlu Kodu</label>
+                        @Html.DropDownList("srmrkodu", (SelectList)ViewBag.SorumluKodlari, "Sorumlu Kodu Seçin", new { @class = "form-control form-control-sm" })
+                    </div>
+                    <div class="col-md-3 mb-2 text-right">
+                        <button type="submit" class="btn btn-primary btn-sm">Getir</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-8">
+                <div class="row">
+                  
+                    <div class="col">
+                        <div class="alert alert-info" role="alert">
+
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Kapsam</th>
+                                        <th>Ücret</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Servis 250 Altı</td>
+                                        <td>@ViewBag.Servis250Alti TL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Servis 250 - 2500</td>
+                                        <td>@ViewBag.Servis250_2500 TL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Servis 2500 - 5000</td>
+                                        <td>@ViewBag.Servis2500_5000 TL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Servis 5000 Üzeri</td>
+                                        <td>@ViewBag.Servis5000Uzeri TL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ekstra Montaj</td>
+                                        <td>@ViewBag.ServisEkstraMontaj TL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Yeni Motor Montajı</td>
+                                        <td>@ViewBag.ServisYeniMotorMontaj TL</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                            <h5 class="card-header-text text-white">Ağırr Vasıta Servis</h5>
+                        </div>
+
+                        <div class="card-block accordion-block px-0">
+                            <div class="col-md-12">
+
+
+                                <div id="tablesContainer">
+
+
+                                    @if (Model != null && Model.Any())
+                                    {
+                                        <div class="card-body px-4 py-3">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h5>Genel Bilgiler</h5>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-striped">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Srmrkodu</th>
+                                                                    <th>Tarih</th>
+                                                                    <th>Kod</th>
+                                                                    <th>Hizmet Isim</th>
+                                                                    <th>Meblag</th>
+                                                                    <th>Kiralanan Gün</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach (var item in Model)
+                                                                {
+                                                                    <tr>
+                                                                        <td>@item.ChaSrmrkodu</td>
+                                                                        <td>@item.ChaTarihi.ToString("yyyy-MM-dd")</td>
+                                                                        <td>@item.ChaKod</td>
+                                                                        <td>@item.HizIsim</td>
+                                                                        <td>@item.ChaMeblag.ToString("N2")</td>
+                                                                        <td>@item.TotalMiktar.ToString("N2")</td>
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-warning d-flex align-items-center mx-5" role="alert">
+                                            <span class="ms-2">Şu anda görüntüleyecek veri bulunmamaktadır. Lütfen parametreleri seçin.</span>
+                                        </div>
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+
+    <script>
+        // Initialize DataTables for the example table
+        document.addEventListener('DOMContentLoaded', function () {
+            new DataTable('#example');
+        });
+
+        // Initialize DataTables for the digerdepolar table
+        document.addEventListener('DOMContentLoaded', function () {
+            new DataTable('#digerdepolar');
+        });
+    </script>
+
+
+
+

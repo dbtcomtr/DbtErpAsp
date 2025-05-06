@@ -1,0 +1,79 @@
+﻿@model List<Deneme_proje.Models.HrEntities.IzinTalepModel>
+
+@{
+    ViewData["Title"] = "Reddedilen İzin Talepleri";
+}
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">Reddedilen İzin Talepleri</h5>
+                    </div>
+                    <div class="table-responsive">
+                        @if (!Model.Any())
+                        {
+                            <div class="alert alert-info">
+                                Görüntülenecek reddedilen izin talebi bulunmamaktadır.
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="table-mobile-container">
+                                <table class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Personel</th>
+                                            <th>Talep Tarihi</th>
+                                            <th>Gün Sayısı</th>
+                                            <th>Başlangıç</th>
+                                            <th>Amaç</th>
+                                            <th>Reddeden</th>
+                                            <th>Reddetme Nedeni</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var izin in Model)
+                                        {
+                                            <tr>
+                                                <td>@izin.PersonelAdSoyad</td>
+                                                <td>@izin.TalepTarihi.ToShortDateString()</td>
+                                                <td>@izin.GunSayisi</td>
+                                                <td>@izin.BaslangicTarihi.ToShortDateString()</td>
+                                                <td>@izin.Amac</td>
+                                                <td>@izin.OnaylayanKullanici</td>
+                                                <td>@izin.ReddetmeNedeni</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Kullanılmayan fonksiyonları kaldırdık -->
+
+<style>
+    /* Stilleriniz burada ... */
+</style>

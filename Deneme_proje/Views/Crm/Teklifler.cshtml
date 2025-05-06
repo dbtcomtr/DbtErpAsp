@@ -1,0 +1,732 @@
+﻿@{
+    ViewData["Title"] = "Rapor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+<style>
+    .tablo {
+        padding: 0 20px;
+    }
+
+    .dataTables_wrapper {
+        position: relative;
+        clear: none;
+    }
+
+    table.dataTable tbody td {
+        font-size: 12px;
+        word-wrap: break-word;
+        white-space: normal;
+    }
+
+    .metrics-container {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        gap: 8px; /* Boşluğu azalttık */
+        margin-bottom: 15px; /* Margin'i azalttık */
+        padding: 0 15px; /* Yanlara padding ekledik */
+    }
+
+    .metric-card {
+        padding: 10px;
+        border-radius: 6px;
+        text-align: center;
+        transition: transform 0.3s, box-shadow 0.3s;
+        width: 150px;
+        height: 70px;
+    }
+
+    .metric-title {
+        font-size: 12px; /* Font boyutunu küçülttük */
+        margin-bottom: 6px;
+    }
+
+    .metric-value {
+        font-size: 20px; /* Font boyutunu küçülttük */
+        font-weight: bold;
+        margin-bottom: 3px;
+    }
+
+    .metric-unit {
+        font-size: 10px; /* Font boyutunu küçülttük */
+    }
+
+    .blue-card {
+        background-color: #1E3559;
+        color: #fff;
+    }
+
+    .yellow-card {
+        background-color: #194181;
+        color: #fff;
+    }
+
+    .green-card {
+        background-color: #296299;
+        color: #fff;
+    }
+
+    .pink-card {
+        background-color: #4CA7E1;
+        color: #fff;
+    }
+
+    .purple-card {
+        background-color: #3B86A1;
+        color: #fff;
+    }
+
+    .orange-card {
+        background-color: #A13B47;
+        color: #fff;
+    }
+
+    /* Tab yapısı için stil */
+    .tab-container {
+        margin-bottom: 15px;
+    }
+
+    .tab-buttons {
+        display: flex;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .tab-button {
+        padding: 10px 20px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-bottom: none;
+        border-radius: 5px 5px 0 0;
+        margin-right: 5px;
+        cursor: pointer;
+        font-weight: 500;
+        color: #495057;
+    }
+
+        .tab-button.active {
+            background-color: #1E3559;
+            color: white;
+            border-color: #1E3559;
+        }
+
+    .tab-content {
+        display: none;
+        padding: 15px 0;
+    }
+
+        .tab-content.active {
+            display: block;
+        }
+
+    /* Pipeline görünümü için stiller */
+    .pipeline-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        overflow-x: auto;
+        padding: 15px 5px;
+    }
+
+    .pipeline-column {
+        min-width: 250px;
+        width: 19%;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .column-header {
+        padding: 10px 15px;
+        color: white;
+        border-radius: 8px 8px 0 0;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .column-count {
+        background-color: rgba(255,255,255,0.3);
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+
+    .column-body {
+        flex-grow: 1;
+        padding: 10px;
+        min-height: 300px;
+    }
+
+    .quote-card {
+        background-color: white;
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 10px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        cursor: grab;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+        .quote-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .quote-card:active {
+            cursor: grabbing;
+        }
+
+    .quote-id {
+        font-size: 14px;
+        font-weight: bold;
+        color: #1E3559;
+        margin-bottom: 5px;
+    }
+
+    .quote-client {
+        font-size: 13px;
+        margin-bottom: 8px;
+    }
+
+    .quote-details {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: #666;
+    }
+
+    .quote-amount {
+        font-weight: bold;
+        color: #1E3559;
+    }
+
+    /* Kartların renkleri */
+    .blue-column .column-header {
+        background-color: #1E3559;
+    }
+
+    .yellow-column .column-header {
+        background-color: #194181;
+    }
+
+    .green-column .column-header {
+        background-color: #296299;
+    }
+
+    .pink-column .column-header {
+        background-color: #4CA7E1;
+    }
+
+    .purple-column .column-header {
+        background-color: #3B86A1;
+    }
+
+    .orange-column .column-header {
+        background-color: #A13B47;
+    }
+
+    /* Sürükle bırak için vurgulama */
+    .drop-highlight {
+        background-color: #e9f5ff;
+        border: 2px dashed #1E3559;
+    }
+
+    /* Mobil görünüm için düzenlemeler */
+    @@media (max-width: 992px) {
+        .pipeline-container
+
+    {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .pipeline-column {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .metrics-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    }
+
+    /* Metriklerin sayı değişiminde animasyon */
+    .metric-value {
+        transition: all 0.3s ease;
+    }
+
+    .value-change {
+        animation: pulse 0.5s ease;
+    }
+
+    @@keyframes pulse {
+        0%
+
+    {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+
+    }
+</style>
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <div class="metrics-container">
+                        <div class="metric-card blue-card" id="total-quotes">
+                            <div class="metric-title">Teklif</div>
+                            <div class="metric-value">10</div>
+                            <div class="metric-unit">Adet</div>
+                        </div>
+                        <div class="metric-card yellow-card" id="open-quotes">
+                            <div class="metric-title">Açık Teklifler</div>
+                            <div class="metric-value">1</div>
+                            <div class="metric-unit">Adet</div>
+                        </div>
+                        <div class="metric-card green-card" id="won-quotes">
+                            <div class="metric-title">Kazanılan Teklifler</div>
+                            <div class="metric-value">3</div>
+                            <div class="metric-unit">Adet</div>
+                        </div>
+                        <div class="metric-card pink-card" id="lost-quotes">
+                            <div class="metric-title">Kaybedilen Teklifler</div>
+                            <div class="metric-value">1</div>
+                            <div class="metric-unit">Adet</div>
+                        </div>
+                        <div class="metric-card purple-card" id="postponed-quotes">
+                            <div class="metric-title">Ertelenen Teklifler</div>
+                            <div class="metric-value">1</div>
+                            <div class="metric-unit">Adet</div>
+                        </div>
+                        <div class="metric-card orange-card" id="canceled-quotes">
+                            <div class="metric-title">İptal Edilen Teklifler</div>
+                            <div class="metric-value">2</div>
+                            <div class="metric-unit">Adet</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row tablo">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">Teklifler</h5>
+                    </div>
+
+                    <div class="mt-2 mx-3 mb-2">
+                        <button class="btn btn-primary my-2 mx-2" onclick="window.location.href='/crm/yeniteklif';">Yeni Teklif</button>
+                    </div>
+
+                    <!-- Tab Butonları -->
+                    <div class="tab-container mx-3">
+                        <div class="tab-buttons">
+                            <button class="tab-button active" onclick="openTab('list-tab')">Liste Görünümü</button>
+                            <button class="tab-button" onclick="openTab('pipeline-tab')">Pipeline Görünümü</button>
+                        </div>
+                    </div>
+
+                    <!-- Tab İçerikleri -->
+                    <!-- Liste Görünümü Tabı -->
+                    <div id="list-tab" class="tab-content active">
+                        <div id="example_wrapper" class="dataTables_wrapper tablo">
+                            <div class="dataTables_length" id="example_length"></div>
+                            <div class="dataTables_filter" id="example_filter"></div>
+                            <div id="example_wrapper">
+                                <table id="example" class="display dataTable" style="width:100%">
+                                    <thead>
+                                        <tr class="tablo-icerik-yazi">
+                                            <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                <div class="th-content">
+                                                    <span># Teklif</span>
+                                                </div>
+                                            </th>
+                                            <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                <div class="th-content">
+                                                    <span>Konu</span>
+                                                </div>
+                                            </th>
+                                            <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                <div class="th-content">
+                                                    <span>Kime</span>
+                                                </div>
+                                            </th>
+                                            <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                <div class="th-content">
+                                                    <span>Toplam</span>
+                                                </div>
+                                            </th>
+                                            <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                <div class="th-content">
+                                                    <span>Tarih</span>
+                                                </div>
+                                            </th>
+                                            <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                <div class="th-content">
+                                                    <span>Geçerlilik Tarihi</span>
+                                                </div>
+                                            </th>
+                                            <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                <div class="th-content">
+                                                    <span>Etiketler</span>
+                                                </div>
+                                            </th>
+                                            <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                <div class="th-content">
+                                                    <span>Oluşturma Tarihi</span>
+                                                </div>
+                                            </th>
+                                            <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                <div class="th-content">
+                                                    <span>Durum</span>
+                                                </div>
+                                            </th>
+                                            <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                <div class="th-content">
+                                                    <span>Teklif Konusu</span>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>DBT-20000341</td>
+                                            <td>DBT Dora Bilişim</td>
+                                            <td>DBT Dora Bilişim</td>
+                                            <td>48.000,00TL</td>
+                                            <td>2024-12-14</td>
+                                            <td>2024-12-21</td>
+                                            <td></td>
+                                            <td>2024-12-14 20:34:29</td>
+                                            <td>Taslak</td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pipeline Görünümü Tabı -->
+                    <div id="pipeline-tab" class="tab-content">
+                        <div class="pipeline-container">
+                            <!-- Açık Teklifler -->
+                            <div class="pipeline-column yellow-column" id="open">
+                                <div class="column-header">
+                                    <span>Açık Teklifler</span>
+                                    <span class="column-count">1</span>
+                                </div>
+                                <div class="column-body" ondragover="allowDrop(event)" ondrop="drop(event, 'open')">
+                                    <div class="quote-card" draggable="true" ondragstart="drag(event)" id="quote-1" data-status="open">
+                                        <div class="quote-id">DBT-20000341</div>
+                                        <div class="quote-client">DBT Dora Bilişim</div>
+                                        <div class="quote-details">
+                                            <span>14.12.2024</span>
+                                            <span class="quote-amount">48.000,00 TL</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Kazanılan Teklifler -->
+                            <div class="pipeline-column green-column" id="won">
+                                <div class="column-header">
+                                    <span>Kazanılan Teklifler</span>
+                                    <span class="column-count">3</span>
+                                </div>
+                                <div class="column-body" ondragover="allowDrop(event)" ondrop="drop(event, 'won')">
+                                    <div class="quote-card" draggable="true" ondragstart="drag(event)" id="quote-2" data-status="won">
+                                        <div class="quote-id">DBT-20000322</div>
+                                        <div class="quote-client">Megatek Ltd.</div>
+                                        <div class="quote-details">
+                                            <span>10.12.2024</span>
+                                            <span class="quote-amount">75.500,00 TL</span>
+                                        </div>
+                                    </div>
+                                    <div class="quote-card" draggable="true" ondragstart="drag(event)" id="quote-3" data-status="won">
+                                        <div class="quote-id">DBT-20000315</div>
+                                        <div class="quote-client">Teknosa A.Ş.</div>
+                                        <div class="quote-details">
+                                            <span>05.12.2024</span>
+                                            <span class="quote-amount">34.250,00 TL</span>
+                                        </div>
+                                    </div>
+                                    <div class="quote-card" draggable="true" ondragstart="drag(event)" id="quote-6" data-status="won">
+                                        <div class="quote-id">DBT-20000301</div>
+                                        <div class="quote-client">Ankara Belediyesi</div>
+                                        <div class="quote-details">
+                                            <span>02.12.2024</span>
+                                            <span class="quote-amount">92.300,00 TL</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Kaybedilen Teklifler -->
+                            <div class="pipeline-column pink-column" id="lost">
+                                <div class="column-header">
+                                    <span>Kaybedilen Teklifler</span>
+                                    <span class="column-count">1</span>
+                                </div>
+                                <div class="column-body" ondragover="allowDrop(event)" ondrop="drop(event, 'lost')">
+                                    <div class="quote-card" draggable="true" ondragstart="drag(event)" id="quote-4" data-status="lost">
+                                        <div class="quote-id">DBT-20000299</div>
+                                        <div class="quote-client">İzmir Holding</div>
+                                        <div class="quote-details">
+                                            <span>29.11.2024</span>
+                                            <span class="quote-amount">28.750,00 TL</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Ertelenen Teklifler -->
+                            <div class="pipeline-column purple-column" id="postponed">
+                                <div class="column-header">
+                                    <span>Ertelenen Teklifler</span>
+                                    <span class="column-count">1</span>
+                                </div>
+                                <div class="column-body" ondragover="allowDrop(event)" ondrop="drop(event, 'postponed')">
+                                    <div class="quote-card" draggable="true" ondragstart="drag(event)" id="quote-5" data-status="postponed">
+                                        <div class="quote-id">DBT-20000305</div>
+                                        <div class="quote-client">Marmara Üniversitesi</div>
+                                        <div class="quote-details">
+                                            <span>04.12.2024</span>
+                                            <span class="quote-amount">52.800,00 TL</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- İptal Edilen Teklifler -->
+                            <div class="pipeline-column orange-column" id="canceled">
+                                <div class="column-header">
+                                    <span>İptal Edilen Teklifler</span>
+                                    <span class="column-count">2</span>
+                                </div>
+                                <div class="column-body" ondragover="allowDrop(event)" ondrop="drop(event, 'canceled')">
+                                    <div class="quote-card" draggable="true" ondragstart="drag(event)" id="quote-7" data-status="canceled">
+                                        <div class="quote-id">DBT-20000287</div>
+                                        <div class="quote-client">Finansbank</div>
+                                        <div class="quote-details">
+                                            <span>25.11.2024</span>
+                                            <span class="quote-amount">18.500,00 TL</span>
+                                        </div>
+                                    </div>
+                                    <div class="quote-card" draggable="true" ondragstart="drag(event)" id="quote-8" data-status="canceled">
+                                        <div class="quote-id">DBT-20000265</div>
+                                        <div class="quote-client">Bahçeşehir Koleji</div>
+                                        <div class="quote-details">
+                                            <span>18.11.2024</span>
+                                            <span class="quote-amount">15.750,00 TL</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scriptler -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
+<script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let table = new DataTable('#example');
+
+        // Sayfa yüklendiğinde metrik kartlarını güncelle
+        updateMetricCards();
+    });
+</script>
+
+<script>
+    $('#example').DataTable({
+        "dom": '<"row"<"col-sm-12"B>>' +
+            '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+            't' +
+            '<"row"<"col-sm-6"i><"col-sm-6"p>>',
+        "language": {
+            "url": "/Content/DataTables/turkish.json"
+        },
+        "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'], // Butonlar
+        "columnDefs": [
+            { "targets": "_all" } // Kolon genişliklerini sabitleme
+        ]
+    });
+</script>
+
+<!-- Tab fonksiyonları için script -->
+<script>
+    function openTab(tabId) {
+        // Tüm tab içeriklerini gizle
+        let tabContents = document.getElementsByClassName('tab-content');
+        for (let i = 0; i < tabContents.length; i++) {
+            tabContents[i].classList.remove('active');
+        }
+
+        // Tüm tab butonlarının active class'ını kaldır
+        let tabButtons = document.getElementsByClassName('tab-button');
+        for (let i = 0; i < tabButtons.length; i++) {
+            tabButtons[i].classList.remove('active');
+        }
+
+        // Seçilen tab'ı ve butonunu aktifleştir
+        document.getElementById(tabId).classList.add('active');
+
+        // Tıklanan butonu bul ve aktifleştir
+        let clickedButton;
+        if (tabId === 'list-tab') {
+            clickedButton = document.getElementsByClassName('tab-button')[0];
+        } else {
+            clickedButton = document.getElementsByClassName('tab-button')[1];
+        }
+        clickedButton.classList.add('active');
+    }
+
+    // Sürükleme işlemleri için değişkenler
+    let draggedElementOldStatus = '';
+
+    // Sürükle bırak fonksiyonları
+    function allowDrop(ev) {
+        ev.preventDefault();
+        // Bırakma alanını vurgula
+        ev.currentTarget.classList.add('drop-highlight');
+    }
+
+    function drag(ev) {
+        // Sürüklenen elemanın önceki durumunu kaydet
+        draggedElementOldStatus = ev.target.getAttribute('data-status');
+        ev.dataTransfer.setData("text", ev.target.id);
+        // Sürükleme efekti
+        ev.target.style.opacity = "0.4";
+    }
+
+    function drop(ev, targetStatus) {
+        ev.preventDefault();
+        const data = ev.dataTransfer.getData("text");
+        const draggedElement = document.getElementById(data);
+
+        // Elemanın önceki durumunu kaydet
+        const oldStatus = draggedElement.getAttribute('data-status');
+
+        // Elemanı orijinal konumundan kaldır
+        draggedElement.parentNode.removeChild(draggedElement);
+
+        // Elemanı yeni konuma ekle
+        ev.currentTarget.appendChild(draggedElement);
+
+        // Opacity'yi sıfırla
+        draggedElement.style.opacity = "1";
+
+        // Vurgulamayı kaldır
+        ev.currentTarget.classList.remove('drop-highlight');
+
+        // Durumu güncelle
+        draggedElement.setAttribute('data-status', targetStatus);
+
+        // Sayaçları güncelle
+        updateCounters();
+
+        // Metrik kartlarını güncelle
+        updateMetricCards(oldStatus, targetStatus);
+
+        // Normalde burada veritabanını güncellemek için AJAX isteği gönderilebilir
+        console.log(`Teklif ${data} durumu '${oldStatus}' -> '${targetStatus}' olarak güncellendi`);
+    }
+
+    function dragLeave(ev) {
+        // Sürükleme alanından çıkıldığında vurgulamayı kaldır
+        ev.currentTarget.classList.remove('drop-highlight');
+    }
+
+    function updateCounters() {
+        // Tüm pipeline sütunlarını al
+        const columns = document.querySelectorAll('.pipeline-column');
+
+        // Her sütun için sayacı güncelle
+        columns.forEach(column => {
+            const cards = column.querySelectorAll('.quote-card').length;
+            const counter = column.querySelector('.column-count');
+            counter.textContent = cards;
+        });
+    }
+
+    function updateMetricCards(oldStatus, newStatus) {
+        // Pipeline kolonlarındaki toplam teklif sayılarını al
+        const openQuotes = document.querySelectorAll('#open .quote-card').length;
+        const wonQuotes = document.querySelectorAll('#won .quote-card').length;
+        const lostQuotes = document.querySelectorAll('#lost .quote-card').length;
+        const postponedQuotes = document.querySelectorAll('#postponed .quote-card').length;
+        const canceledQuotes = document.querySelectorAll('#canceled .quote-card').length;
+        const totalQuotes = openQuotes + wonQuotes + lostQuotes + postponedQuotes + canceledQuotes;
+
+        // Metrik kartlarını güncelle
+        updateMetricValue('total-quotes', totalQuotes);
+        updateMetricValue('open-quotes', openQuotes);
+        updateMetricValue('won-quotes', wonQuotes);
+        updateMetricValue('lost-quotes', lostQuotes);
+        updateMetricValue('postponed-quotes', postponedQuotes);
+        updateMetricValue('canceled-quotes', canceledQuotes);
+
+        // Değişen metrik kartlarına animasyon ekle
+        if (oldStatus && newStatus && oldStatus !== newStatus) {
+            const oldCard = document.getElementById(`${oldStatus}-quotes`);
+            const newCard = document.getElementById(`${newStatus}-quotes`);
+
+            if (oldCard) {
+                const valueElement = oldCard.querySelector('.metric-value');
+                valueElement.classList.add('value-change');
+                setTimeout(() => {
+                    valueElement.classList.remove('value-change');
+                }, 500);
+            }
+
+            if (newCard) {
+                const valueElement = newCard.querySelector('.metric-value');
+                valueElement.classList.add('value-change');
+                setTimeout(() => {
+                    valueElement.classList.remove('value-change');
+                }, 500);
+            }
+        }
+    }
+
+    function updateMetricValue(cardId, value) {
+        const valueElement = document.querySelector(`#${cardId} .metric-value`);
+        if (valueElement) {
+            valueElement.textContent = value;
+        }
+    }
+
+    // Drag leave için event listener'ları ekle
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.column-body').forEach(column => {
+            column.addEventListener('dragleave', dragLeave);
+        });
+
+        // Sayfa yüklendiğinde metrik kartlarını güncelle
+        updateMetricCards();
+    });
+</script>

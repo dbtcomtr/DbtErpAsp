@@ -1,0 +1,540 @@
+﻿
+.ellipsis::after {
+    display: none
+}
+@media (max-width: 640px) {
+    .table-container {
+        margin: 10px 0;
+        border-radius: 6px;
+    }
+    .footer {
+        bottom: 0;
+        padding: 20px 40px;
+        position: relative;
+        right: 0;
+        color: #707070;
+        left: 0;
+        height: 35px;
+        -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, .08);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, .08);
+        background-color: #fff;
+        align-items: center;
+        display: flex;
+        justify-content: center;
+    }
+
+    .table-wrapper {
+        padding: 0.5rem;
+    }
+
+        .table-wrapper::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 2px;
+        }
+
+    .leave-table th,
+    .leave-table td {
+        padding: 10px 12px;
+        font-size: 0.875rem;
+    }
+}
+
+.text-ellipsis {
+    white-space: nowrap; /* Tek satır yap */
+    overflow: hidden; /* Taşan kısmı gizle */
+    text-overflow: ellipsis; /* Taşan kısmı ... olarak göster */
+    max-width: 150px; /* Genişliği sınırlandır */
+    /*display: inline-block;*/ /* Blok yapısını koru */
+    vertical-align: middle; /* Metni dikey ortalar */
+}
+
+@media screen and (max-width: 992px) {
+    .table thead {
+        display: none;
+    }
+
+    .table, .table tbody, .table tr, .table td {
+        display: block;
+        width: 100%;
+    }
+
+        .table tr {
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            background-color: #fff !important;
+        }
+
+        .table td {
+            text-align: right;
+            padding: 8px 10px;
+            position: relative;
+            border-bottom: 1px solid #eee;
+        }
+
+            .table td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 10px;
+                font-weight: bold;
+                text-align: left;
+                color: #1D3A67;
+            }
+
+            .table td:last-child {
+                border-bottom: none;
+            }
+
+    .px-lg-5 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    .card-header {
+        padding: 10px !important;
+    }
+
+    .badge {
+        float: right;
+    }
+}
+
+
+
+.th-content {
+    display: flex;
+    justify-content: flex-start; /* Ortaya hizala */
+    align-items: center; /* Dikeyde ortala */
+    gap: 5px; /* İkon ve metin arasında boşluk */
+    white-space: nowrap; /* Satır taşmasını engelle */
+    margin-right: 20px;
+}
+
+/* Tablonun genel stil düzenlemesi */
+table {
+    width: 100% !important;
+    border-collapse: collapse !important; /* Hücre kenarlarını birleştir */
+}
+
+    table th, table td {
+        padding: 8px 4px !important; /* Hücreler arası boşluk azaltıldı */
+        border-bottom: 1px solid #dee2e6 !important;
+        font-size: 12px; /* Yazı boyutları küçültüldü */
+    }
+
+
+/* Hücrelerin içindeki veriler için tooltip ayarları */
+[data-toggle="tooltip"] {
+    cursor: pointer !important;
+}
+/* Arama filtresi kapsayıcısının stilini düzenleme */
+.dataTables_filter {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Arama filtresini sağa hizala */
+    margin-bottom: 20px; /* Tablo üstündeki boşluk */
+}
+
+    /* Arama giriş kutusunun stilini düzenleme */
+    .dataTables_filter input[type="search"] {
+        border: 1px solid #ced4da; /* Kenarlık rengi */
+        border-radius: 4px; /* Köşe yuvarlatma */
+        padding: 3px 8px; /* İç boşluk */
+        font-size: 12px; /* Yazı boyutu */
+        width: 180px; /* Genişlik */
+        margin-left: 10px; /* Arama butonu ile arası */
+        outline: none; /* Kenarlık yok */
+        box-shadow: none; /* Gölge yok */
+    }
+
+
+/* dataTables_length kapsayıcısının stilini düzenleme */
+.dataTables_length {
+    display: flex;
+    align-items: center;
+    margin-top: 12px;
+}
+
+    /* Seçim etiketinin stilini düzenleme */
+    .dataTables_length label {
+        font-size: 14px; /* Yazı boyutu */
+        margin-right: 10px; /* Seçim kutusundan önce boşluk */
+    }
+
+
+    /* Seçim kutusunun stilini düzenleme */
+    .dataTables_length select {
+        border: 1px solid #ced4da !important; /* Kenarlık rengi */
+        border-radius: 4px !important; /* Köşe yuvarlatma */
+        font-size: 12px; /* Yazı boyutu */
+        background-color: #ffffff !important; /* Arka plan rengi */
+        color: #495057; /* Yazı rengi */
+        outline: none; /* Kenarlık yok */
+        box-shadow: none; /* Gölge yok */
+        max-width: 100px; /* Genişlik sınırı */
+    }
+
+        /* Seçim kutusuna focus efekti ekleme */
+        .dataTables_length select:focus {
+            border-color: #80bdff !important; /* Focus rengi */
+            box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25); /* Focus gölgesi */
+        }
+
+/* dataTables_info stilini düzenleme */
+.dataTables_wrapper .dataTables_info {
+    font-size: 12px; /* Yazı boyutu */
+    color: #495057; /* Yazı rengi */
+    margin-top: 10px; /* Üst boşluk */
+    margin-bottom: 10px; /* Alt boşluk */
+    text-align: left; /* Yazıları sola hizala */
+}
+
+/* Sayfalama butonlarının genel stilini düzenleme */
+.dataTables_wrapper .dataTables_paginate {
+    display: flex;
+    justify-content: flex-end; /* Sayfalama butonlarını sağa hizala */
+    margin: 10px; /* Üst boşluk */
+}
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 4px 8px; /* Buton iç boşlukları */
+        border: 1px solid #dee2e6 !important; /* Kenarlık */
+        margin: 0 2px; /* Butonlar arasındaki boşluk */
+        background-color: #ffffff; /* Arka plan rengi */
+        color: #007bff; /* Buton yazı rengi */
+        border-radius: 4px; /* Köşe yuvarlatma */
+        cursor: pointer; /* İmleç */
+        transition: background-color 0.2s ease; /* Hover animasyonu */
+        font-size: 12px; /* Yazı boyutu */
+    }
+        /* Sayfalama butonlarına focus efekti ekleme */
+        .dataTables_wrapper .dataTables_paginate .paginate_button:focus {
+            outline: none; /* Focus outline'ı kaldır */
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Focus gölgesi */
+        }
+
+.git-btn {
+    padding: .2rem .5rem !important;
+}
+
+table.dataTable tbody th, table.dataTable tbody td {
+    padding: 5px 4px !important;
+}
+
+button.dt-button, div.dt-button, a.dt-button, input.dt-button {
+    background: #162E54;
+    color: #fff;
+    border: #162E54;
+}
+
+    button.dt-button:hover:not(.disabled), div.dt-button:hover:not(.disabled), a.dt-button:hover:not(.disabled), input.dt-button:hover:not(.disabled) {
+        color: #162E54;
+        border: #162E54 !important;
+    }
+
+/* Form içindeki elementleri yan yana hizalayalım */
+.form-inline {
+    display: flex;
+    gap: 30px; /* Aralarındaki boşluk */
+    align-items: center;
+}
+
+    .form-inline .form-group {
+        margin-bottom: 0; /* Alt boşlukları kaldır */
+    }
+
+    /* Formun input alanına ve butona stil ekleyelim */
+    .form-inline .form-control {
+        padding: 6px 10px; /* İç boşluk */
+        font-size: 12px; /* Küçük yazı boyutu */
+        width: auto; /* İçeriğe göre genişlik */
+    }
+
+    .form-inline .btn-bas {
+        padding: 6px 12px; /* Buton iç boşluğu */
+        font-size: 12px; /* Küçük yazı boyutu */
+        background-color: #; /* Buton arka plan rengi */
+        color: #fff; /* Buton yazı rengi */
+        border: none;
+        border-radius: 4px;
+    }
+
+
+/* Card İçin Scroll ve Padding */
+.card-block {
+    overflow-x: auto;
+    padding: 15px; /* Card içi padding */
+}
+
+    /* Modern Scrollbar Tasarımı */
+    .card-block::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .card-block::-webkit-scrollbar-thumb {
+        background: #162E54; /* Scrollbar thumb rengi */
+        border-radius: 4px;
+    }
+
+    .card-block::-webkit-scrollbar-track {
+        background: #f1f1f1; /* Scrollbar track rengi */
+    }
+
+/* Tablo başlık stilini düzeltme */
+thead th {
+    background-color: #f8f9fa !important;
+    color: #343a40 !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    padding: 8px !important; /* İç boşlukları azaltıldı */
+    white-space: nowrap !important;
+    border-bottom: 2px solid #dee2e6 !important;
+    font-size: 12px; /* Başlık yazı boyutu daha büyük */
+}
+
+/* Tablonun genel stil düzenlemesi */
+table.dataTable tbody td {
+    font-size: 10px; /* İçerik yazı boyutunu küçültme */
+    word-wrap: break-word; /* Hücre içeriğinin alt satıra geçmesini sağlama */
+    white-space: normal; /* Normal satır kırılmasına izin ver */
+}
+
+.table-wrapper {
+    max-height: calc(100vh - 250px); /* Ekran boyutuna göre dinamik yükseklik */
+    overflow-y: auto; /* Dikey kaydırma */
+    overflow-x: auto; /* Yatay kaydırma */
+    position: relative;
+}
+
+
+    /* Başlıkları sabitleyelim */
+    .table-wrapper thead th {
+        position: sticky; /* Sabit durmasını sağlar */
+        top: 0; /* Üstte sabitlenmesi için */
+        z-index: 100; /* Başlıkların önde görünmesi için */
+        background-color: #f8f9fa; /* Arka plan rengi */
+        border-bottom: 2px solid #dee2e6 !important; /* Alt kenarlık */
+    }
+
+/* Data filter ve data length alanlarını sabit tutalım */
+.dataTables_filter, .dataTables_length {
+    position: sticky;
+    top: 0;
+    background-color: #fff; /* Arka plan beyaz */
+    z-index: 50;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+/* Scrollbar tasarımı */
+.table-wrapper::-webkit-scrollbar {
+    height: 5px; /* Scroll yüksekliği */
+    width: 5px; /* Scroll genişliği */
+    padding: 0;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background-color: #162E54; /* Scroll thumb rengi */
+    border-radius: 4px; /* Yuvarlatma */
+    padding: 0;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+    background-color: #f1f1f1; /* Scroll track rengi */
+    padding: 0;
+}
+
+
+
+/* DataTable Butonları Stil Düzenlemesi */
+.dt-button, .dt-button:hover {
+    background: #162E54;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    transition: background-color 0.3s ease;
+}
+
+    .dt-button:hover {
+        background-color: #0077b3;
+    }
+
+
+.modal-backdrop {
+    z-index: 1040 !important; /* Backdrop için z-index */
+}
+
+.modal {
+    z-index: 1050 !important; /* Modalın diğer her şeyin üzerinde olduğundan emin olun */
+}
+
+.modal-dialog {
+    max-width: 100%;
+    width: 50%;
+    margin: auto;
+    top: 50%;
+    transform: translate(-50%, -50%) !important;
+    position: fixed;
+    left: 50%;
+}
+
+
+.modal-content {
+    border-radius: 10px; /* Kenarları yuvarlat */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Hafif gölge ekle */
+    border: none; /* Çerçeve kaldır */
+    background-color: #f8f9fa; /* Modern açık arka plan rengi */
+}
+
+.modal-header {
+    background-color: rgba(22, 46, 84, 1); /* Başlık kısmına sayfanızın temasına uygun renk */
+    border-bottom: none; /* Alt çizgiyi kaldır */
+    color: white; /* Başlık metin rengini beyaz yap */
+    padding: 15px 20px; /* İç boşluk düzenlemesi */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top-left-radius: 10px; /* Üst kenarları yuvarla */
+    border-top-right-radius: 10px; /* Üst kenarları yuvarla */
+}
+
+.modal-title {
+    font-size: 1.25rem; /* Başlık boyutunu büyüt */
+    font-weight: 500; /* Başlık font kalınlığını düzenle */
+}
+
+.btn-close {
+    background-color: #fff;
+    border: none;
+    font-size: 1rem;
+    color: #fff;
+    opacity: 0.8;
+    padding: 0;
+}
+
+    .btn-close:hover {
+        opacity: 1; /* Hoverda tamamen beyaz */
+    }
+
+.modal-body {
+    padding: 20px; /* İçerik için geniş padding */
+    max-height: 500px; /* Maksimum yükseklik */
+    overflow-y: auto; /* İçeriğin taşması durumunda scroll */
+}
+
+.modal-footer {
+    border-top: none; /* Üst çizgiyi kaldır */
+    padding: 15px 20px; /* İç boşluk düzenlemesi */
+    display: flex;
+    justify-content: flex-end;
+}
+
+    .modal-footer .btn {
+        background-color: rgba(0, 118, 168, 1); /* Buton rengini tema rengine uygun yap */
+        color: white; /* Buton metin rengi */
+        border-radius: 5px;
+        padding: 8px 15px; /* Buton boşluk düzenlemesi */
+        border: none; /* Buton çerçevesini kaldır */
+        transition: background-color 0.3s ease; /* Hover animasyonu */
+    }
+
+        .modal-footer .btn:hover {
+            background-color: rgba(0, 90, 120, 1); /* Hover durumunda renk değiştirme */
+        }
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4); /* Arkaplan koyu renk */
+}
+
+/* Mobil uyumluluk */
+/* Table Styling */
+#creditDetailsTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+}
+
+    #creditDetailsTable th,
+    #creditDetailsTable td {
+        padding: 6px 12px;
+        text-align: left;
+        border: 1px solid #ddd;
+    }
+
+    #creditDetailsTable th {
+        background-color: #f9f9f9;
+        font-weight: bold;
+        text-align: center;
+    }
+@media (max-width: 768px) {
+    .mobile-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        background: white;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .breadcrumb {
+        display: none;
+    }
+}
+
+/* Tablet ve büyük ekranlar için ek düzenlemeler */
+
+
+    /* Required alan gösterimi */
+    .required-field::after {
+        content: "*";
+        color: red;
+        margin-left: 4px;
+    }
+    /* Fixed Aylar column styling */
+    .sticky-column {
+        position: sticky;
+        left: 0;
+        background-color: #f1f1f1;
+        z-index: 2;
+    }
+
+    /* Month header row */
+    .month-header {
+        background-color: #f1f1f1;
+        text-align: center;
+    }
+
+    /* Styling for row totals */
+    .total-row {
+        font-weight: bold;
+        background-color: #f1f1f1;
+        text-align: right;
+    }
+
+    /* Scrollable container */
+    .table-container {
+        overflow-x: auto;
+        <<<<<<< HEAD
+    }
+
+    =======
+}
+>>>>>>> 0e67e99b750ba98d0705c1c22036101106ae1f02

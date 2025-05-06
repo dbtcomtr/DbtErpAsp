@@ -1,0 +1,27 @@
+﻿@model IEnumerable<Deneme_proje.Models.Entities.KrediDetayModel>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Yıl</th>
+            <th>Ay</th>
+            <th>Vade Tarihi</th>
+            <th>Taksit Anapara</th>
+            <th>Taksit Faiz</th>
+            <th>Taksit BSMV</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var detay in Model)
+        {
+            <tr>
+                <td>@detay.Yıl</td>
+                <td>@detay.Ay</td>
+                <td>@detay.VadeTarihi.ToString()</td>
+                <td>@detay.TaksitAnapara.ToString()</td>
+                <td>@detay.TaksitFaiz.ToString()</td>
+                <td>@detay.TaksitBSMV.ToString()</td>
+            </tr>
+        }
+    </tbody>
+</table>

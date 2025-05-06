@@ -1,0 +1,397 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = Deneme_proje
+build_property.RootNamespace = Deneme_proje
+build_property.ProjectDir = C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Bahcepinar/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmFoY2VwaW5hclxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Bahcepinar/KapaliMusteriFatura.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmFoY2VwaW5hclxLYXBhbGlNdXN0ZXJpRmF0dXJhLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Cari/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FyaVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Crm/AktiviteEkle.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3JtXEFrdGl2aXRlRWtsZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Crm/Aktiviteler.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3JtXEFrdGl2aXRlbGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Crm/CariAnaliz.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3JtXENhcmlBbmFsaXouY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Crm/Dashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3JtXERhc2hib2FyZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Crm/Firsatlar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3JtXEZpcnNhdGxhci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Crm/MusteriEkle.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3JtXE11c3RlcmlFa2xlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Crm/Musteriler.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3JtXE11c3RlcmlsZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Crm/SiparisEkle.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3JtXFNpcGFyaXNFa2xlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Crm/Siparisler.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3JtXFNpcGFyaXNsZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Crm/StokEkle.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3JtXFN0b2tFa2xlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Crm/Stoklar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3JtXFN0b2tsYXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Crm/Teklifler.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3JtXFRla2xpZmxlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Crm/YeniTeklif.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3JtXFllbmlUZWtsaWYuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Denizler/AliciSatici.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVuaXpsZXJcQWxpY2lTYXRpY2kuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Denizler/AracKmYakitBilgileri.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVuaXpsZXJcQXJhY0ttWWFraXRCaWxnaWxlcmkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Denizler/AracMasraf - Copy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVuaXpsZXJcQXJhY01hc3JhZiAtIENvcHkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Denizler/AracMasraf.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVuaXpsZXJcQXJhY01hc3JhZi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Denizler/CariAnaliz.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVuaXpsZXJcQ2FyaUFuYWxpei5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Denizler/FirmaCekleri.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVuaXpsZXJcRmlybWFDZWtsZXJpLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Denizler/FirmaCekleri2.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVuaXpsZXJcRmlybWFDZWtsZXJpMi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Denizler/GelirGider.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVuaXpsZXJcR2VsaXJHaWRlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Denizler/KrediSozlesmeleri.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVuaXpsZXJcS3JlZGlTb3psZXNtZWxlcmkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Denizler/MusteriCekleri.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVuaXpsZXJcTXVzdGVyaUNla2xlcmkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Dioki/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGlva2lcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Dioki/ÜretimListesi.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGlva2lcw5xyZXRpbUxpc3Rlc2kuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/ErrorView.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXJyb3JWaWV3LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/aokf.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXGFva2YuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/CanliBilanco.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXENhbmxpQmlsYW5jby5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/CariBazliMusteri.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXENhcmlCYXpsaU11c3RlcmkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/CariBazliTedarikci.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXENhcmlCYXpsaVRlZGFyaWtjaS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/CiroRaporuDepoBazli.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXENpcm9SYXBvcnVEZXBvQmF6bGkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/CustomerAnalysis.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXEN1c3RvbWVyQW5hbHlzaXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/DENEME.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXERFTkVNRS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/EnCokSatilan.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXEVuQ29rU2F0aWxhbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/IsEmirleri.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXElzRW1pcmxlcmkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/IsEmriDurumu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXElzRW1yaUR1cnVtdS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/maliBorc.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXG1hbGlCb3JjLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/MusteriRiskAnalizi.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXE11c3RlcmlSaXNrQW5hbGl6aS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/MusteriYaslandirma.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXE11c3RlcmlZYXNsYW5kaXJtYS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/NakitAkisi.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXE5ha2l0QWtpc2kuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/Rapor.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXFJhcG9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/SatilanMalinKarlilikveMaliyet.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXFNhdGlsYW5NYWxpbkthcmxpbGlrdmVNYWxpeWV0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/SiparisDurum.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXFNpcGFyaXNEdXJ1bS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/SiparisYuklemeRampa1.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXFNpcGFyaXNZdWtsZW1lUmFtcGExLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/SiparisYuklemeRampa2.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXFNpcGFyaXNZdWtsZW1lUmFtcGEyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/Stok.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXFN0b2suY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/StokRaporu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXFN0b2tSYXBvcnUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/StokYaslandirma.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXFN0b2tZYXNsYW5kaXJtYS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/TedarikciKapaliFatura.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXFRlZGFyaWtjaUthcGFsaUZhdHVyYS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/TedarikciYaslandirma.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXFRlZGFyaWtjaVlhc2xhbmRpcm1hLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/YazdirIsEmri.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXFlhemRpcklzRW1yaS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/_KrediDetayPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXF9LcmVkaURldGF5UGFydGlhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Gunay/AgirVasitaSatis.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3VuYXlcQWdpclZhc2l0YVNhdGlzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Gunay/AgirVasitaServis.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3VuYXlcQWdpclZhc2l0YVNlcnZpcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Gunay/FiloKiralama.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3VuYXlcRmlsb0tpcmFsYW1hLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Gunay/GenelKurallar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3VuYXlcR2VuZWxLdXJhbGxhci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Gunay/Otokoc.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3VuYXlcT3Rva29jLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Gunay/Tanimlar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3VuYXlcVGFuaW1sYXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Home/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Home/Settings.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxTZXR0aW5ncy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Hr/hakedisraporu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSHJcaGFrZWRpc3JhcG9ydS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Hr/Izinlerim.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSHJcSXppbmxlcmltLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Hr/izinlipersonel.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSHJcaXppbmxpcGVyc29uZWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Hr/IzinTalepFormu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSHJcSXppblRhbGVwRm9ybXUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Hr/IzinTalepleri.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSHJcSXppblRhbGVwbGVyaS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Hr/ReddedilenIzinler.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSHJcUmVkZGVkaWxlbkl6aW5sZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/KullaniciYonetimi/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS3VsbGFuaWNpWW9uZXRpbWlcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Login/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Login/LoginKullanici.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cTG9naW5LdWxsYW5pY2kuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Login/SecondStageLogin.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cU2Vjb25kU3RhZ2VMb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/MenuYonetimi/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVlvbmV0aW1pXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/ServisHareketleri/AllIsEmri.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmlzSGFyZWtldGxlcmlcQWxsSXNFbXJpLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/ServisHareketleri/IsEmriGiris.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmlzSGFyZWtldGxlcmlcSXNFbXJpR2lyaXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/SirketDurumu/BankaAnaliz.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2lya2V0RHVydW11XEJhbmthQW5hbGl6LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/SirketDurumu/CariHareket.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2lya2V0RHVydW11XENhcmlIYXJla2V0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/SirketDurumu/Cekanaliz.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2lya2V0RHVydW11XENla2FuYWxpei5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/SirketDurumu/Dashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2lya2V0RHVydW11XERhc2hib2FyZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/SirketDurumu/EvrakAktarim.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2lya2V0RHVydW11XEV2cmFrQWt0YXJpbS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/SirketDurumu/KasaRaporu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2lya2V0RHVydW11XEthc2FSYXBvcnUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/SirketDurumu/RiskRaporu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2lya2V0RHVydW11XFJpc2tSYXBvcnUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/SirketDurumu/StokHareket.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2lya2V0RHVydW11XFN0b2tIYXJla2V0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/SirketDurumu/_BankDetailsGrid.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2lya2V0RHVydW11XF9CYW5rRGV0YWlsc0dyaWQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-qg8gqoxyth

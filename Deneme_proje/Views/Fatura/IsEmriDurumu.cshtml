@@ -1,0 +1,269 @@
+﻿@model IEnumerable<Deneme_proje.Models.Entities.IsEmriModel>
+@{
+    ViewData["Title"] = "İş Emirleri";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+
+
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">İş Emri Operasyonu</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>İş Emri Kodu</th>
+                                    <th>Durum</th>
+                                    <th>Başlangıç Tarihi</th>
+                                    <th>Ürün Kodu</th>
+                                    <th>Üretim</th>
+                                    <th>Ürün Adı</th>
+                                    <th>İşlemler</th>
+                                    <th>Miktar</th>
+                                    <th>İş Merkezi</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var isEmri in Model)
+                                {
+                                    <tr>
+                                        <td>@isEmri.is_Kod</td>
+                                        <td>
+                                            <span class="badge badge-@(isEmri.is_EmriDurumu == 1 ? "success" : "warning")">
+                                                @(isEmri.is_EmriDurumu == 1 ? "Aktif" : "Pasif")
+                                            </span>
+                                        </td>
+                                        <td>@(isEmri.is_BaslangicTarihi?.ToString("dd.MM.yyyy"))</td>
+                                        <td>@isEmri.UrunKodu</td>
+                                        <td>
+                                            @{
+                                                var hasProductionPermission = ViewBag.HasProductionPermission ?? false;
+                                            }
+
+                                            @if (hasProductionPermission)
+                                            {
+                                                <button onclick="uretIsEmri('@isEmri.is_Kod', '@isEmri.UrunKodu', 3)"
+                                                        class="btn btn-primary btn-sm onay">
+                                                    Üret
+                                                </button>
+                                            }
+                                        </td>
+                                        <td>@isEmri.UrunAdi</td>
+                                        <td>
+                                            <form method="post" action="@Url.Action("UpdateIsEmriDurumu", "Fatura")" style="display:inline;">
+                                                <input type="hidden" name="isEmriKodu" value="@isEmri.is_Kod" />
+                                                @if (isEmri.is_EmriDurumu == 0)
+                                                {
+                                                    <input type="hidden" name="yeniDurum" value="1" />
+                                                    <button type="submit" class="btn btn-success btn-sm onay">
+                                                        Aktif Yap
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <input type="hidden" name="yeniDurum" value="0" />
+                                                    <button type="submit" class="btn btn-warning btn-sm onay">
+                                                        Pasif Yap
+                                                    </button>
+                                                }
+                                            </form>
+
+
+                                        </td>
+                                        <td>@(isEmri.Miktar?.ToString("N2"))</td>
+                                        <td>@isEmri.IsMerkezi</td>
+
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function uretIsEmri(isEmriKodu, urunKodu, depoNo) {
+            $.ajax({
+                url: '@Url.Action("UretIsEmri", "Fatura")',
+                type: 'POST',
+                data: {
+                    isEmriKodu: isEmriKodu,
+                    urunKodu: urunKodu,
+                    depoNo: depoNo
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            title: 'Başarılı!',
+                            text: response.message,
+                            icon: 'success',
+                            confirmButtonText: 'Tamam'
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Hata!',
+                            text: 'Üretim yetkiniz blunmamaktadır.',
+                            icon: 'error',
+                            confirmButtonText: 'Tamam'
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        title: 'Hata!',
+                        text: 'İşlem sırasında bir hata oluştu.',
+                        icon: 'error',
+                        confirmButtonText: 'Tamam'
+                    });
+                }
+            });
+        }
+    </script>
+    <script>
+             function updateIsEmirleri() {
+            $.ajax({
+                url: '@Url.Action("GetIsEmirleri", "Fatura")',
+                type: 'GET',
+                success: function(response) {
+                    if (response.success && response.isEmirleri.length > 0) {
+                        var tbody = $("table tbody");
+                        tbody.empty(); // Eski verileri temizle
+
+                        // Debug - check what properties are actually in the response
+                        console.log("First item properties:", response.isEmirleri[0]);
+
+                        response.isEmirleri.forEach(function(isEmri) {
+                            var durumBadge = isEmri.is_EmriDurumu == 1
+                                ? '<span class="badge badge-success">Aktif</span>'
+                                : '<span class="badge badge-warning">Pasif</span>';
+
+                            var uretButton = response.hasProductionPermission
+                                ? `<button onclick="uretIsEmri('${isEmri.is_Kod}', '${isEmri.urunKodu || isEmri.UrunKodu}', 3)"
+                                        class="btn btn-primary btn-sm onay">Üret</button>`
+                                : '';
+
+                            var updateButton = isEmri.is_EmriDurumu == 0
+                                ? `<form method="post" action="@Url.Action("UpdateIsEmriDurumu", "Fatura")" style="display:inline;">
+                                        <input type="hidden" name="isEmriKodu" value="${isEmri.is_Kod}" />
+                                        <input type="hidden" name="yeniDurum" value="1" />
+                                        <button type="submit" class="btn btn-success btn-sm onay">Aktif Yap</button>
+                                    </form>`
+                                : `<form method="post" action="@Url.Action("UpdateIsEmriDurumu", "Fatura")" style="display:inline;">
+                                        <input type="hidden" name="isEmriKodu" value="${isEmri.is_Kod}" />
+                                        <input type="hidden" name="yeniDurum" value="0" />
+                                        <button type="submit" class="btn btn-warning btn-sm onay">Pasif Yap</button>
+                                    </form>`;
+
+                            // Try both camelCase and PascalCase property names
+                            var urunKodu = isEmri.urunKodu || isEmri.UrunKodu || '';
+                            var urunAdi = isEmri.urunAdi || isEmri.UrunAdi || '';
+                            var miktar = isEmri.miktar || isEmri.Miktar || '';
+                            var isMerkezi = isEmri.isMerkezi || isEmri.IsMerkezi || '';
+
+                            var row = `<tr>
+                                <td>${isEmri.is_Kod}</td>
+                                <td>${durumBadge}</td>
+                                <td>${isEmri.is_BaslangicTarihi ? new Date(isEmri.is_BaslangicTarihi).toLocaleDateString() : ''}</td>
+                                <td>${urunKodu}</td>
+                                <td>${uretButton}</td>
+                                <td>${urunAdi}</td>
+                                <td>${updateButton}</td>
+                                <td>${miktar ? parseFloat(miktar).toFixed(2) : ''}</td>
+                                <td>${isMerkezi}</td>
+                            </tr>`;
+
+                            tbody.append(row);
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("İş emirleri güncellenirken hata oluştu:", error);
+                    console.log("XHR:", xhr.responseText);
+                }
+            });
+        }
+
+        // 5 saniyede bir verileri yenile
+        setInterval(updateIsEmirleri, 5000);
+
+        // Sayfa yüklendiğinde ilk veriyi al
+        $(document).ready(function() {
+            updateIsEmirleri();
+        });
+    </script>
+
+}
+
+<style>
+    .onay {
+        width: 67px;
+        font-size: 9px;
+        justify-content: center;
+        display: inline-flex; /* Changed from flex to inline-flex */
+        margin: 0 3px; /* Changed from margin: 0 auto to add horizontal spacing */
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .table td {
+            font-size: 12px;
+            padding: 2px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .table th {
+            background-color: #1D3A67;
+            font-size: 12px;
+            padding: 8px 15px;
+            color: white;
+            font-weight: 600;
+        }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #f9f9f9;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .card, .accordion-content {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+    }
+
+        .card:hover, .accordion-content:hover {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+</style>

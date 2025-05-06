@@ -1,0 +1,282 @@
+﻿@model IEnumerable<Deneme_proje.Models.GunayEntities.FiloKiralamaViewModel>
+
+@{
+    ViewData["Title"] = "Filo Kiralama";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // HttpContext kullanarak parametreleri alalım
+    var startDate = Context.Request.Query["startDate"].ToString();
+    var endDate = Context.Request.Query["endDate"].ToString();
+    var srmrkodu = Context.Request.Query["srmrkodu"].ToString();
+
+    // Parametreler boşsa sayfa açılsın
+    var hasParameters = !string.IsNullOrEmpty(startDate) || !string.IsNullOrEmpty(endDate) || !string.IsNullOrEmpty(srmrkodu);
+
+    var oneDay = 0;
+    var twoToSevenDays = 0;
+    var sevenToFifteenDays = 0;
+    var fifteenPlusDays = 0;
+
+    // Eğer parametreler mevcutsa hesaplamalar yapılacak
+    if (hasParameters && Model != null && Model.Any())
+    {
+        oneDay = Model.Count(m => m.TotalMiktar == 1);
+        twoToSevenDays = Model.Count(m => m.TotalMiktar > 1 && m.TotalMiktar <= 7);
+        sevenToFifteenDays = Model.Count(m => m.TotalMiktar > 7 && m.TotalMiktar <= 15);
+        fifteenPlusDays = Model.Count(m => m.TotalMiktar > 15);
+
+    }
+
+    // Prim toplama işlemleri
+    var birGunlukToplam = hasParameters ? (float)ViewBag.Prim1Gunluk * oneDay : 0;
+    var ikiYediGunlukToplam = hasParameters ? (float)ViewBag.Prim2_7Gunluk * twoToSevenDays : 0;
+    var yediOnbesGunlukToplam = hasParameters ? (float)ViewBag.Prim7_15Gunluk * sevenToFifteenDays : 0;
+    var onbesGunlukToplam = hasParameters ? (float)ViewBag.Prim15PlusGunluk * fifteenPlusDays : 0;
+}
+
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+<style>
+    table.dataTable tbody th, table.dataTable tbody td {
+        padding: 5px 21px !important;
+    }
+
+    @@media only screen and (max-width: 576px) {
+        .form-inline .btn {
+            margin-top: 0;
+        }
+    }
+</style>
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <h4>Filo Kiralama</h4>
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index"><i class="icofont icofont-home"></i></a>
+                        </li>
+                  
+                        <li class="breadcrumb-item"><a href="/Gunay/Filo Kiralama">Filo Kiralama</a></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-lg-5 mb-1">
+            <div class="col-lg-4">
+                <form method="get" action="/Gunay/FiloKiralama" class="px-4 py-3">
+                    <div class="row d-flex flex-column mb-3">
+                        <div class="form-group col">
+                            <label for="startDate" class="sr-only">Başlangıç Tarihi Giriniz</label>
+                            <input type="date" id="startDate" name="startDate" class="form-control form-control-sm"
+                                   value="@ViewBag.SelectedStartDate?.ToString("yyyy-MM-dd")" />
+                        </div>
+                        <div class="form-group col">
+                            <label for="endDate" class="sr-only">Bitiş Tarihi Giriniz</label>
+                            <input type="date" id="endDate" name="endDate" class="form-control form-control-sm"
+                                   value="@ViewBag.SelectedEndDate?.ToString("yyyy-MM-dd")" />
+                        </div>
+                        <div class="form-group col">
+                            <label for="srmrkodu" class="sr-only">Sorumlu Kodu</label>
+                            @Html.DropDownList("srmrkodu", (SelectList)ViewBag.SorumluKodlari, "Select Sorumlu Kodu", new { @class = "form-control form-control-sm" })
+                        </div>
+                        <div class="col-md-3 mb-2 text-right">
+                            <button type="submit" class="btn btn-primary btn-sm">Getir</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col">
+                        <div class="alert alert-info" role="alert">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Kapsam</th>
+                                        <th>Ücret</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Ek Sigorta Kapsamı Ekstra (Aylık)</td>
+                                        <td>@ViewBag.EkSigortaKapsamiEkstraAylik TL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ek Sürücü (Günlük)</td>
+                                        <td>@ViewBag.EkSurucuGunluk TL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ek Sürücü</td>
+                                        <td>@ViewBag.EkSurucu TL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Bebek Koltuğu Ekstrası (Aylık)</td>
+                                        <td>@ViewBag.BebekKoltuguEkstrasiAylik TL</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="alert alert-info" role="alert">
+
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Kapsam</th>
+                                        <th>Ücret</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1 Günlük açılan iş emri başına</td>
+                                        <td>@ViewBag.Prim1Gunluk TL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2-7 gün arası açılan iş emri başına</td>
+                                        <td>@ViewBag.Prim2_7Gunluk TL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>7-15 gün arası açılan iş emirleri başına</td>
+                                        <td>@ViewBag.Prim7_15Gunluk TL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>15 gün ve daha fazlası açılan iş emirleri için</td>
+                                        <td>@ViewBag.Prim15PlusGunluk TL</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+
+                </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">Filo Kiralama</h5>
+                    </div>
+
+                    <div class="card-block accordion-block px-0">
+                        <div class="col-md-12">
+
+
+                            <div id="tablesContainer">
+                              
+                                
+                     
+                                @if (Model != null && Model.Any())
+                                {
+                                    <div class="card-body px-4 py-3">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h5>Genel Bilgiler</h5>
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Srmrkodu</th>
+                                                                <th>Tarih</th>
+                                                                <th>Kod</th>
+                                                                <th>Hizmet Isim</th>
+                                                                <th>Meblag</th>
+                                                                <th>Kiralanan Gün</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (var item in Model)
+                                                            {
+                                                                <tr>
+                                                                    <td>@item.ChaSrmrkodu</td>
+                                                                    <td>@item.ChaTarihi.ToString("yyyy-MM-dd")</td>
+                                                                    <td>@item.ChaKod</td>
+                                                                    <td>@item.HizIsim</td>
+                                                                    <td>@item.ChaMeblag.ToString("N2")</td>
+                                                                    <td>@item.TotalMiktar.ToString("N2")</td>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h5>Metrikler</h5>
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>1 Günlük</th>
+                                                                <th>Primi</th>
+                                                                <th>2-7 Günlük</th>
+                                                                <th>Primi</th>
+                                                                <th>7-15 Günlük</th>
+                                                                <th>Primi</th>
+                                                                <th>15+ Günlük</th>
+                                                                <th>Primi</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>@oneDay</td>
+                                                                <td>@birGunlukToplam</td>
+                                                                <td>@twoToSevenDays</td>
+                                                                <td>@ikiYediGunlukToplam TL</td>
+                                                                <td>@sevenToFifteenDays</td>
+                                                                <td>@yediOnbesGunlukToplam</td>
+                                                                <td>@fifteenPlusDays</td>
+                                                                <td>@onbesGunlukToplam</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-warning d-flex align-items-center mx-5" role="alert">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+                                            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.965 0L.165 13.233c-.457.778.091 1.767.982 1.767h13.706c.89 0 1.439-.99.982-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 7a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+                                        </svg>
+                                        <span class="ms-2">Şu anda görüntüleyecek veri bulunmamaktadır. Lütfen parametreleri seçin.</span>
+                                    </div>
+                                }
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+
+<script>
+    // Initialize DataTables for the example table
+    document.addEventListener('DOMContentLoaded', function () {
+        new DataTable('#example');
+    });
+
+    // Initialize DataTables for the digerdepolar table
+    document.addEventListener('DOMContentLoaded', function () {
+        new DataTable('#digerdepolar');
+    });
+</script>
+
+
+
+

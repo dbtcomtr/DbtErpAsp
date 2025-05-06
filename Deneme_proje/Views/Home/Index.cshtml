@@ -1,0 +1,232 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<!-- CSS stillerini ekleyelim -->
+<style>
+    body {
+        font-family: 'Helvetica Neue', sans-serif;
+    }
+
+    .card {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s, background-color 0.3s, color 0.3s;
+        border: none;
+        margin: 5px; /* Kartlar arasındaki boşlukları azaltıyoruz */
+        text-align: center; /* Kart içeriğini ortalıyoruz */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 10px 0;
+    }
+
+        .card:hover {
+            transform: scale(1.05);
+            background-color: #1D3A67; /* Hover durumunda arka plan rengi */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .card img {
+            height: 80px; /* Resim boyutunu küçük tutuyoruz */
+            object-fit: contain;
+            padding: 10px;
+            filter: invert(0) brightness(1);
+            transition: filter 0.3s ease;
+        }
+
+        .card:hover img {
+            filter: invert(1) brightness(2); /* Hover durumunda resim beyaz olacak */
+        }
+
+    .card-body p {
+        font-weight: bold;
+        font-size: 0.9rem; /* Yazı boyutunu küçülttük */
+        color: #707070; /* İlk hali gri (#707070) */
+        font-family: 'Helvetica Neue', sans-serif;
+    }
+
+    .card:hover .card-body p {
+        color: white; /* Hover durumunda yazı beyaz */
+    }
+
+    /* Kartların her satıra 5 tane sığmasını sağlayan yapı */
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .col-lg-3, .col-md-4, .col-sm-6 {
+        flex: 1 1 calc(20% - 5px); /* Kart genişliği her satırda 5 tane olacak şekilde ayarlandı */
+        max-width: calc(20% - 5px); /* Daha az boşluk bırakıldı */
+        box-sizing: border-box;
+    }
+
+    @@media only screen and (max-width: 992px) {
+        .col-lg-3, .col-md-4, .col-6 {
+            flex: none; /* Kart genişliği her satırda 5 tane olacak şekilde ayarlandı */
+            max-width: 100%; /* Daha az boşluk bırakıldı */
+            box-sizing: border-box;
+        }
+    }
+    .footer{
+        position: relative;
+    }
+</style>
+
+<div class="main-content pt-5 mt-5">
+    <div class="px-5">
+        <div class="row px-lg-5 px-1">
+            <!-- Card 1: Stok Detay -->
+            <div class="col-lg-3 col-md-4 col-6 mb-4">
+                <a href="@Url.Action("StokHareket", "SirketDurumu")">
+                    <div class="card text-center">
+                        <img src="~/content/dashboard-img/stok-detay.svg" alt="Stok Detay" class="card-img-top">
+                        <div class="card-body">
+                            <p class="card-text">Stok Detay</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Card 2: Cari Ürün -->
+            <div class="col-lg-3 col-md-4 col-6 mb-4">
+                <a href="@Url.Action("CariHareket", "SirketDurumu")">
+                    <div class="card text-center">
+                        <img src="~/content/dashboard-img/cari-detay.svg" alt="Cari Detay" class="card-img-top">
+                        <div class="card-body">
+                            <p class="card-text">Cari Detay</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Card 3: Depo Stok -->
+            <div class="col-lg-3 col-md-4 col-6 mb-4">
+                <a href="@Url.Action("DepoStok", "Depo")">
+                    <div class="card text-center">
+                        <img src="~/content/dashboard-img/depo-sevk.svg" alt="Depo Stok" class="card-img-top">
+                        <div class="card-body">
+                            <p class="card-text">Depo Sevk</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Card 4: Depo Nakliye -->
+            <div class="col-lg-3 col-md-4 col-6 mb-4">
+                <a href="@Url.Action("DepoNakliye", "Nakliye")">
+                    <div class="card text-center">
+                        <img src="~/content/dashboard-img/depo-nakliye.svg" alt="Depo Nakliye" class="card-img-top">
+                        <div class="card-body">
+                            <p class="card-text">Depo Nakliye</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Card 5: Sayım Fişi -->
+            <div class="col-lg-3 col-md-4 col-6 mb-4">
+                <a href="@Url.Action("SayimFisi", "Sayim")">
+                    <div class="card text-center">
+                        <img src="~/content/dashboard-img/sayim-fisi.svg" alt="Sayım Fişi" class="card-img-top">
+                        <div class="card-body">
+                            <p class="card-text">Sayım Fişi</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Card 6: Depo Sipariş -->
+            <div class="col-lg-3 col-md-4 col-6 mb-4">
+                <a href="@Url.Action("DepoSiparis", "Depo")">
+                    <div class="card text-center">
+                        <img src="~/content/dashboard-img/depo-siparis.svg" alt="Depo Sipariş" class="card-img-top">
+                        <div class="card-body">
+                            <p class="card-text">Depo Sipariş</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Card 7: Satış Faturası -->
+            <div class="col-lg-3 col-md-4 col-6 mb-4">
+                <a href="@Url.Action("SatisFaturasi", "Satis")">
+                    <div class="card text-center">
+                        <img src="~/content/dashboard-img/satis-faturasi.svg" alt="Satış Faturası" class="card-img-top">
+                        <div class="card-body">
+                            <p class="card-text">Satış Faturası</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Card 8: Alım Siparişi -->
+            <div class="col-lg-3 col-md-4 col-6 mb-4">
+                <a href="@Url.Action("AlimSiparisi", "Alim")">
+                    <div class="card text-center">
+                        <img src="~/content/dashboard-img/alinan-siparis.svg" alt="Alım Siparişi" class="card-img-top">
+                        <div class="card-body">
+                            <p class="card-text">Alınan Siparişi</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Card 9: Alış Faturası -->
+            <div class="col-lg-3 col-md-4 col-6 mb-4">
+                <a href="@Url.Action("AlisFaturasi", "Alim")">
+                    <div class="card text-center">
+                        <img src="~/content/dashboard-img/alis-faturasi.svg" alt="Alış Faturası" class="card-img-top">
+                        <div class="card-body">
+                            <p class="card-text">Alış Faturası</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Card 10: Alış İrsaliyesi -->
+            <div class="col-lg-3 col-md-4 col-6 mb-4">
+                <a href="@Url.Action("AlisIrsaliyesi", "Alim")">
+                    <div class="card text-center">
+                        <img src="~/content/dashboard-img/alis-irsaliyesi.svg" alt="Alış İrsaliyesi" class="card-img-top">
+                        <div class="card-body">
+                            <p class="card-text">Alış İrsaliyesi</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Card 11: Verilen Sipariş -->
+            <div class="col-lg-3 col-md-4 col-6 ">
+                <a href="@Url.Action("VerilenSiparis", "Siparis")">
+                    <div class="card text-center">
+                        <img src="~/content/dashboard-img/verilen-siparis.svg" alt="Verilen Sipariş" class="card-img-top">
+                        <div class="card-body">
+                            <p class="card-text">Verilen Sipariş</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        @* <h2>Veritabanı Seç</h2>
+
+        <form asp-action="SelectDatabase" method="post">
+            <label for="databaseName">Veritabanı:</label>
+            <select name="databaseName" id="databaseName">
+                @foreach (var db in ViewBag.Databases)
+                {
+                    <option value="@db">@db</option>
+                }
+            </select>
+            <button type="submit">Devam Et</button>
+        </form>
+
+        @if (TempData["SelectedDatabase"] != null)
+        {
+            <p>Seçilen Veritabanı: @TempData["SelectedDatabase"]</p>
+        }
+ *@
+    </div>
+</div>

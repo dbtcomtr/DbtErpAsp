@@ -1,0 +1,141 @@
+﻿@model Deneme_proje.Models.MenuYonetimiViewModel
+
+@{
+    ViewData["Title"] = "Menü Yönetimi";
+}
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+<input type="hidden" name="__RequestVerificationToken" value="@Xsrf.GetAndStoreTokens(Context).RequestToken" />
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">
+                            <span id="selectedUserName">
+                                @Model.Kullanicilar.FirstOrDefault(x => x.UserNo == Model.SelectedUserNo)?.UserName
+                            </span>
+                            - Menü Yetkileri
+                        </h5>
+                    </div>
+                    <div class="row p-3">
+                        <div class="col-md-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Kullanıcılar</h5>
+                                </div>
+                                <div class="card-body">
+                                    <select id="userSelect" class="form-select">
+                                        @foreach (var kullanici in Model.Kullanicilar)
+                                        {
+                                            if (kullanici.UserNo == Model.SelectedUserNo)
+                                            {
+                                                <option value="@kullanici.UserNo" selected>@kullanici.UserName</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@kullanici.UserNo">@kullanici.UserName</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-9">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Yetkiler</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Menü Adı</th>
+                                                    <th>Controller</th>
+                                                    <th>Action</th>
+                                                    <th class="text-center" style="width: 100px;">Yetki</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var menuItem in Model.MenuItems)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            @if (!string.IsNullOrEmpty(menuItem.Icon))
+                                                            {
+                                                                <i class="feather-@menuItem.Icon me-2"></i>
+                                                            }
+                                                            @menuItem.MenuAdi
+                                                        </td>
+                                                        <td>@menuItem.ControllerAdi</td>
+                                                        <td>@menuItem.ActionAdi</td>
+                                                        <td class="text-center">
+                                                            <div class="form-check form-switch d-flex justify-content-center">
+                                                                <input type="checkbox"
+                                                                       class="form-check-input"
+                                                                       style="cursor: pointer;"
+                                                                       onchange="updateYetki(@menuItem.Id, this.checked)"
+                                                                       @(menuItem.HasUserPermission(Model.SelectedUserNo) ? "checked" : "")>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+             function updateYetki(menuId, hasPermission) {
+            var userNo = parseInt(document.getElementById('userSelect').value);
+
+            // CSRF token'ı al
+            var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            fetch('/MenuYonetimi/UpdateYetki', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': token
+                },
+                body: `menuId=${menuId}&userNo=${userNo}&hasPermission=${hasPermission}`
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    toastr.success('Yetki güncellendi');
+                } else {
+                    toastr.error(data.message || 'Bir hata oluştu');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                toastr.error('Bir hata oluştu: ' + error.message);
+            });
+        }
+
+        document.getElementById('userSelect').addEventListener('change', function() {
+            var userNo = this.value;
+            var userName = this.options[this.selectedIndex].text;
+            document.getElementById('selectedUserName').textContent = userName;
+            window.location.href = `/MenuYonetimi/Index?userNo=${userNo}`;
+        });
+    </script>
+}

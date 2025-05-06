@@ -1,0 +1,279 @@
+﻿@model IEnumerable<Deneme_proje.Models.DenizlerEntities.FirmaCekleri>
+@{
+	ViewData["Title"] = "FirmaCekleri";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+<div class="main-content mt-5">
+	<div class="px-lg-5 px-3">
+		<div class="row">
+			<div class="col-sm-12 p-0">
+				<div class="main-header">
+			
+					<ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+						<li class="breadcrumb-item">
+							<a href="/Home/Index">
+								<i class="icofont icofont-home"></i>
+							</a>
+						</li>
+					
+					</ol>
+				</div>
+			</div>
+		</div>
+		<div class="row mb-lg-5 mb-1">
+			<div class="col-lg-4">
+				<form asp-action="FirmaCekleri" method="get" class="mb-4 px-5 pt-5">
+					<div class="row d-flex align-items-center" style="width:max-content;">
+						<div class="form-group col-md-4">
+							<label for="baslamaTarihi">Başlama Tarihi:</label>
+							<input type="date" id="baslamaTarihi" name="baslamaTarihi" class="form-control" required value="@ViewBag.BaslamaTarihi" />
+						</div>
+						<div class="form-group col-md-4">
+							<label for="bitisTarihi">Bitiş Tarihi:</label>
+							<input type="date" id="bitisTarihi" name="bitisTarihi" class="form-control" required value="@ViewBag.BitisTarihi" />
+						</div>
+						<div class="form-group col-md-3 m-0">
+							<button type="submit" class="btn btn-primary">Ara</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+
+		<div class="card">
+			<div class="card-header" style=" background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;"
+				 ">
+				<h5 class="card-header-text text-white">Firma  Çekleri</h5>
+			</div>
+			<div class="card-block accordion-block">
+				<div class="col-md-12">
+
+						@if (Model != null && Model.Any())
+					{
+
+						<div id="example_wrapper" class="dataTables_wrapper py-lg-3">
+							<div class="dataTables_length" id="example_length"></div>
+							<div class="dataTables_filter" id="example_filter"></div>
+							<div id="example_wrapper" class="table-wrapper">
+								<table id="example" class="display dataTable" style="width:100%">
+									<thead>
+										<tr class="tablo-icerik-yazi">
+											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+												<div class="th-content">
+													<span>Sahip Cari Kodu<span>
+												</div>
+											</th>
+											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+												<div class="th-content">
+													<span>Sahip Cari Adı</span>
+												</div>
+											</th>
+											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+												<div class="th-content">
+													<span>Nerede Cari Kodu</span>
+												</div>
+											</th>
+											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+												<div class="th-content">
+													<span>Nerede Cari Adı</span>
+												</div>
+											</th>
+											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+												<div class="th-content">
+													<span>Ref No</span>
+												</div>
+											</th>
+											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+												<div class="th-content">
+													<span>Pozisyonu</span>
+												</div>
+											</th>
+											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+												<div class="th-content">
+													<span>Tarih</span>
+												</div>
+											</th>
+											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+												<div class="th-content">
+													<span>Vade</span>
+												</div>
+											</th>
+											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+												<div class="th-content">
+													<span>Tutar</span>
+												</div>
+											</th>
+											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+												<div class="th-content">
+													<span>Ödenen</span>
+												</div>
+											</th>
+											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+												<div class="th-content">
+													<span>Kalan</span>
+												</div>
+											</th>
+											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+												<div class="th-content">
+													<span>PB</span>
+												</div>
+											</th>
+
+										</tr>
+									</thead>
+									<tbody>
+								@foreach (var cek in Model)
+								{
+											<tr>
+												<td>@cek.SahipCariKodu</td>
+												<td>@cek.SahipCariAdi</td>
+												<td>@cek.NeredeCariKodu</td>
+												<td>@cek.NeredeCariAdi</td>
+												<td>@cek.RefNo</td>
+												<td>@cek.Pozisyonu</td>
+												<td>@cek.Tarih.ToString("dd.MM.yyyy")</td>
+												<td>@cek.Vade.ToString("dd.MM.yyyy")</td>
+												<td class="right-align">@string.Format("{0:N2}", @cek.Tutar)</td>
+												<td class="right-align">@string.Format("{0:N2}", @cek.Odenen)</td>
+												<td class="right-align">@string.Format("{0:N2}", @cek.Kalan)</td>
+												<td>@cek.PB</td>
+											</tr>
+								}
+									</tbody>
+									<tfoot>
+										<tr>
+											<th>Toplam</th>
+											<th></th>
+											<th></th>
+											<th></th>
+											<th></th>
+											<th></th>
+											<th></th>
+											<th></th>
+											<th class="right-align"></th> <!-- Tutar toplamı için -->
+											<th class="right-align"></th> <!-- Ödenen toplamı için -->
+											<th class="right-align"></th> <!-- Kalan toplamı için -->
+											<th></th>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+							<div class="bottom">
+								<div class="dataTables_info" id="example_info"></div>
+								<div class="dataTables_paginate" id="example_paginate"></div>
+							</div>
+						</div>
+
+
+
+
+			}
+
+					
+						</div>
+					
+				
+				</div>
+			</div>
+		</div>
+	</div>
+	
+
+</div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
+<script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+
+
+
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		let table = new DataTable('#example');
+	});
+</script>
+
+
+<script>
+				$('#example').dataTable({
+		"dom": '<"row"<"col-sm-12"B>>' +
+			'<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+			't' +
+			'<"row"<"col-sm-6"i><"col-sm-6"p>>',
+		"language": {
+			"url": "/Content/DataTables/turkish.json"
+		},
+		"buttons": ['copy', 'csv', 'excel', 'pdf', 'print'], // Butonlar
+		"pageLength": 5000, // Varsayılan olarak 5000 gösterim
+		"lengthMenu": [[10, 25, 50, 100, 5000], [10, 25, 50, 100, "5000"]], // Kullanıcıya seçim için seçenekler
+		"columnDefs": [
+			{
+				"targets": [8, 9, 10], // Tutar, Ödenen, Kalan sütunları
+				"render": function (data, type, row) {
+					if (type === 'display' || type === 'filter') {
+						// Virgülle ayırarak ve 2 ondalık basamakla formatla
+						return parseFloat(data).toLocaleString('tr-TR', {
+							minimumFractionDigits: 2,
+							maximumFractionDigits: 2
+						});
+					}
+					return parseFloat(data);
+				}
+			}
+		],
+		"footerCallback": function (row, data, start, end, display) {
+			var api = this.api();
+
+			// Toplam sütunların indexleri (Tutar, Ödenen, Kalan)
+			var tutarIndex = 8;
+			var odenenIndex = 9;
+			var kalanIndex = 10;
+
+			// Toplam hesaplama - parseFloat kullanarak kesin hesaplama
+			var tutarToplam = api
+				.column(tutarIndex, { page: 'current' })
+				.data()
+				.reduce(function (a, b) {
+					return parseFloat(a.toString().replace(',', '.')) + parseFloat(b.toString().replace(',', '.'));
+				}, 0);
+
+			var odenenToplam = api
+				.column(odenenIndex, { page: 'current' })
+				.data()
+				.reduce(function (a, b) {
+					return parseFloat(a.toString().replace(',', '.')) + parseFloat(b.toString().replace(',', '.'));
+				}, 0);
+
+			var kalanToplam = api
+				.column(kalanIndex, { page: 'current' })
+				.data()
+				.reduce(function (a, b) {
+					return parseFloat(a.toString().replace(',', '.')) + parseFloat(b.toString().replace(',', '.'));
+				}, 0);
+
+			// Toplamları Türkçe formatında gösterme
+			var formattedTutarToplam = tutarToplam.toLocaleString('tr-TR', {
+				minimumFractionDigits: 2,
+				maximumFractionDigits: 2
+			});
+			var formattedOdenenToplam = odenenToplam.toLocaleString('tr-TR', {
+				minimumFractionDigits: 2,
+				maximumFractionDigits: 2
+			});
+			var formattedKalanToplam = kalanToplam.toLocaleString('tr-TR', {
+				minimumFractionDigits: 2,
+				maximumFractionDigits: 2
+			});
+
+			// Toplam satırı footer'a ekleme
+			$(api.column(0).footer()).html('Toplam');
+			$(api.column(tutarIndex).footer()).html(formattedTutarToplam);
+			$(api.column(odenenIndex).footer()).html(formattedOdenenToplam);
+			$(api.column(kalanIndex).footer()).html(formattedKalanToplam);
+		}
+	});
+</script>

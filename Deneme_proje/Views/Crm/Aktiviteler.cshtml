@@ -1,0 +1,573 @@
+﻿
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    .modal-content {
+        background-color: #fefefe;
+        margin: 50% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 100%;
+        height: 25%;
+    }
+
+    .modal-body {
+        padding: 20px;
+        max-height: 500px;
+        overflow-y: auto;
+        width: 100%;
+    }
+
+
+    .dataTables_wrapper {
+        position: relative;
+        clear: none;
+    }
+
+    table.dataTable tbody td {
+        font-size: 12px;
+        word-wrap: break-word;
+        white-space: normal;
+    }
+
+    .footer {
+        bottom: 0;
+        padding: 20px 40px;
+        position: relative;
+        right: 0;
+        color: #707070;
+        left: 0;
+        height: 35px;
+        -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, .08);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, .08);
+        background-color: #fff;
+        align-items: center;
+        display: flex;
+        justify-content: center;
+    }
+
+    .blue-card {
+        background-color: #1E3559;
+        color: #fff
+    }
+
+    .yellow-card {
+        background-color: #A13B47;
+        color: #fff
+    }
+
+    .metrics-container {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        gap: 8px; /* Boşluğu azalttık */
+        margin-bottom: 15px; /* Margin'i azalttık */
+        padding: 0 15px; /* Yanlara padding ekledik */
+    }
+
+    .metric-card {
+        padding: 10px;
+        border-radius: 6px;
+        text-align: center;
+        transition: transform 0.3s, box-shadow 0.3s;
+        width: 150px;
+        height: 70px;
+    }
+
+    .metric-title {
+        font-size: 12px; /* Font boyutunu küçülttük */
+        margin-bottom: 6px;
+    }
+
+    .metric-value {
+        font-size: 20px; /* Font boyutunu küçülttük */
+        font-weight: bold;
+        margin-bottom: 3px;
+    }
+
+    .metric-unit {
+        font-size: 10px; /* Font boyutunu küçülttük */
+    }
+
+</style>
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+
+                    <div class="metrics-container">
+                        <div class="metric-card blue-card">
+                            <div class="metric-title">Açık</div>
+                            <div class="metric-value">1</div>
+
+                        </div>
+                        <div class="metric-card yellow-card">
+                            <div class="metric-title">Kapalı</div>
+                            <div class="metric-value">1</div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style=" background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;"
+                         ">
+                        <h5 class="card-header-text text-white">Aktiviteler</h5>
+                    </div>
+
+                    <div class="card-block accordion-block">
+                        <div class="col-md-12">
+
+
+
+                            <!-- Butonlar -->
+                            <div class="mb-3">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addOpportunityModal">Yeni Aktivite Ekle</button>
+
+                               @*  <button class="btn btn-outline-secondary">Kanban Görünümüne Geç</button> *@
+                            </div>
+
+                            <!-- Tablo -->
+                            <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="acik-tab" data-bs-toggle="tab" data-bs-target="#yenilemesi_yaklasan" type="button" role="tab" aria-controls="yenilemesi_yaklasan" aria-selected="true">
+                                        Açık Aktiviteler
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="kapali-tab" data-bs-toggle="tab" data-bs-target="#onay_bekleyen" type="button" role="tab" aria-controls="onay_bekleyen" aria-selected="false">
+                                        Kapalı Aktiviteler
+                                    </button>
+                                </li>
+                            </ul>
+                            <div class="card modern-dashboard-card mt-2">
+
+
+                                <div class="card-body p-0">
+                                    <!-- Mevcut tab ve içerik yapısı -->
+
+
+                                    <div class="tab-content" id="myTabContent">
+                                        <div class="tab-pane fade show active" id="yenilemesi_yaklasan" role="tabpanel">
+                                            <!-- Açık aktiviteler tablosu -->
+                                            <div id="example_wrapper" class="dataTables_wrapper">
+                                                <table id="example3" class="display dataTable" style="width:100%">
+                                                    <thead>
+                                                        <tr class="tablo-icerik-yazi">
+                                                            <th id="th_subject" class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                                <div class="th-content">
+                                                                    <span>Konu</span>
+                                                                </div>
+                                                            </th>
+                                                            <th id="th_customer" class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                                <div class="th-content">
+                                                                    <span>Müşteri</span>
+                                                                </div>
+                                                            </th>
+                                                            <th id="th_authorized" class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                                <div class="th-content">
+                                                                    <span>Yetkili</span>
+                                                                </div>
+                                                            </th>
+                                                            <th id="th_phone" class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                                <div class="th-content">
+                                                                    <span>Telefon</span>
+                                                                </div>
+                                                            </th>
+                                                            <th id="th_company_phone" class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                                <div class="th-content">
+                                                                    <span>Firma Telefon</span>
+                                                                </div>
+                                                            </th>
+                                                            <th id="th_email" class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                                <div class="th-content">
+                                                                    <span>Mail</span>
+                                                                </div>
+                                                            </th>
+                                                            <th id="th_type" class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                                <div class="th-content">
+                                                                    <span>Tipi</span>
+                                                                </div>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td id="td_subject_1">Rutin Görüşme</td>
+                                                            <td id="td_customer_1">DBT DORA BİLİŞİM</td>
+                                                            <td id="td_authorized_1">Hüseyin KARADENİZLİ</td>
+                                                            <td id="td_phone_1">03242370767</td>
+                                                            <td id="td_company_phone_1">05327036575</td>
+                                                            <td id="td_email_1">huseyin@dbt.com.tr</td>
+                                                            <td id="td_type_1">Telefon Görüşmesi</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card modern-dashboard-card mt-2">
+                                <div class="card-body p-0">
+                                    <!-- Mevcut tab ve içerik yapısı -->
+
+
+                                    <div class="tab-content" id="myTabContent">
+                                        <div class="tab-pane fade" id="onay_bekleyen" role="tabpanel">
+                                            <!-- Kapalı aktiviteler tablosu -->
+                                            <div id="example_wrapper" class="dataTables_wrapper">
+
+
+                                                <table id="example2" class="display dataTable" style="width:100%" aria-describedby="example_info">
+                                                    <thead>
+                                                        <tr class="tablo-icerik-yazi">
+                                                            <th id="th_subject" class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                                <div class="th-content">
+                                                                    <span>Konu</span>
+                                                                </div>
+                                                            </th>
+                                                            <th id="th_customer" class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                                <div class="th-content">
+                                                                    <span>Müşteri</span>
+                                                                </div>
+                                                            </th>
+                                                            <th id="th_authorized" class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                                <div class="th-content">
+                                                                    <span>Yetkili</span>
+                                                                </div>
+                                                            </th>
+                                                            <th id="th_phone" class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                                <div class="th-content">
+                                                                    <span>Telefon</span>
+                                                                </div>
+                                                            </th>
+                                                            <th id="th_company_phone" class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                                <div class="th-content">
+                                                                    <span>Firma Telefon</span>
+                                                                </div>
+                                                            </th>
+                                                            <th id="th_email" class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                                <div class="th-content">
+                                                                    <span>Mail</span>
+                                                                </div>
+                                                            </th>
+                                                            <th id="th_type" class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                                <div class="th-content">
+                                                                    <span>Tipi</span>
+                                                                </div>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td id="td_subject_1">Rutin Görüşme</td>
+                                                            <td id="td_customer_1">DBT DORA BİLİŞİM</td>
+                                                            <td id="td_authorized_1">Hüseyin KARADENİZLİ</td>
+                                                            <td id="td_phone_1">03242370767</td>
+                                                            <td id="td_company_phone_1">05327036575</td>
+                                                            <td id="td_email_1">huseyin@dbt.com.tr</td>
+                                                            <td id="td_type_1">Telefon Görüşmesi</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Yeni Fırsat Pop-up -->
+            <div class="modal fade" id="addOpportunityModal" tabindex="-1" aria-labelledby="addOpportunityLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addOpportunityLabel">Yeni Aktivite Ekle</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <div class="card">
+                                    <div class="card-body">
+                                        <!-- İlk Form Alanları -->
+                                        <div class="row">
+                                            <!-- Sol Alan -->
+                                            <div class="col-md-9">
+                                                <div class="mb-3">
+                                                    <label class="form-label required">Konu</label>
+                                                    <input type="text" class="form-control">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label required">Müşteri</label>
+                                                    <input type="text" class="form-control">
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label required">Başlangıç Tarihi</label>
+                                                        <input type="date" class="form-control">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Bitiş Tarihi</label>
+                                                        <input type="date" class="form-control">
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label required">Notlar</label>
+                                                    <input style="height:100px" type="text" class="form-control">
+                                                </div>
+
+                                                <div class=" mt-3">
+
+                                                    <button class="btn btn-primary">Kaydet</button>
+                                                </div>
+                                            </div>
+                                            <!-- Sağ Alan -->
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Temsilci</label>
+                                                    <select class="form-select">
+                                                        <option>Melahat Aydın</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Yetkili</label>
+                                                    <select class="form-select">
+                                                        <option>Melahat Aydın</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Telefon</label>
+                                                    <input type="text" class="form-control">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Mail</label>
+                                                    <input type="text" class="form-control">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Tipi</label>
+                                                    <select class="form-select">
+                                                        <option>Telefon Görüşmesi</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Öncelik</label>
+                                                    <select class="form-select">
+                                                        <option>Seçiniz</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Durum</label>
+                                                    <select class="form-select">
+                                                        <option>Beklemede</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label">Lokasyon</label>
+                                                    <div id="map" style="height: 190px;"></div>
+                                                    <input type="text" class="form-control mt-2" id="locationInput" placeholder="Seçilen koordinat burada görünecek">
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                            <button type="button" class="btn btn-primary">Kaydet</button>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+<!-- Required Fremwork -->
+<script src="~/Content/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Bootstrap tab'ı initialize et
+        var firstTabEl = document.querySelector('#myTab li:first-child button');
+        var firstTab = new bootstrap.Tab(firstTabEl);
+        firstTab.show();
+
+        // DataTable'ları başlat
+        const tableConfig = {
+            responsive: true,
+            language: {
+                url: '/Content/DataTables/turkish.json'
+            },
+            dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+                '<"row"<"col-sm-12"tr>>' +
+                '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+            pageLength: 10,
+            ordering: true
+        };
+
+        // Tabloları initialize et
+        $('#example2, #example3').each(function () {
+            $(this).DataTable(tableConfig);
+        });
+    });
+</script>
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        let table = new DataTable('#example');
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        let table = new DataTable('#example1');
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        let table = new DataTable('#example2');
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        let table = new DataTable('#example3');
+    });
+</script>
+                        @*<script>
+            $(function () {
+            $('#myTab li:first-child a').tab('show')
+            })
+            </script>*@
+
+<script>
+    $('#example').dataTable({
+        "responsive": true,
+        "language": {
+            "url": "/Content/DataTables/turkish.json"
+        }
+    });
+
+    $('#example1').dataTable({
+        "responsive": true,
+        "language": {
+            "url": "/Content/DataTables/turkish.json"
+        }
+    });
+
+    $('#example2').dataTable({
+        "responsive": true,
+        "language": {
+            "url": "/Content/DataTables/turkish.json"
+        }
+    });
+
+    $('#example3').dataTable({
+        "responsive": true,
+        "language": {
+            "url": "/Content/DataTables/turkish.json"
+        }
+    });
+
+
+
+
+    $('#myTab a').on('click', function (e) {
+        e.preventDefault();
+        $(this).tab('show');
+        $('#myTab a').not(this).removeClass('active'); // Diğer tablardan 'active' sınıfını kaldırır
+    });
+
+
+</script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+<script>
+    // Haritayı başlat
+    var map = L.map('map').setView([36.8121, 34.6415], 13); // Ankara koordinatları
+
+    // OpenStreetMap katmanı ekle
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // İşaretleyici değişkeni
+    var marker;
+
+    // Geokodlama işlemi için geocoder
+    var geocoder = L.Control.Geocoder.nominatim();
+
+    // Haritaya tıklama olayını dinle
+    map.on('click', function (e) {
+        var lat = e.latlng.lat;
+        var lng = e.latlng.lng;
+
+        // İşaretleyiciyi kaldır ve yenisini ekle
+        if (marker) {
+            map.removeLayer(marker);
+        }
+        marker = L.marker([lat, lng]).addTo(map);
+
+        // Koordinatları input alanına yazdır
+        document.getElementById('locationInput').value = lat + ', ' + lng;
+
+        // Geokodlama işlemi: Koordinatları kullanarak adresi al
+        geocoder.reverse([lat, lng], map.options.crs.scale(map.getZoom()), function (results) {
+            var address = results && results.length > 0 ? results[0].formatted : "Adres bulunamadı";
+            document.getElementById('addressInput').value = address; // Adresi input'a yazdır
+        });
+    });
+
+    // Adres girildiğinde işaretleme yapma
+    document.getElementById('addressInput').addEventListener('blur', function () {
+        var address = document.getElementById('addressInput').value;
+        if (address) {
+            geocoder.geocode(address, function (results) {
+                if (results && results.length > 0) {
+                    var latlng = results[0].center;
+                    // Harita üzerinde işaretleyici ekle
+                    if (marker) {
+                        map.removeLayer(marker);
+                    }
+                    marker = L.marker(latlng).addTo(map);
+                    map.setView(latlng, 13); // Haritayı yeni konuma odakla
+
+                    // Koordinatları input'a yazdır
+                    document.getElementById('locationInput').value = latlng.lat + ', ' + latlng.lng;
+                } else {
+                    alert("Adres bulunamadı.");
+                }
+            });
+        }
+    });
+</script>
+
+
+
+
+

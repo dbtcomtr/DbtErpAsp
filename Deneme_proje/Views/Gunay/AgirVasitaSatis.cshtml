@@ -1,0 +1,236 @@
+﻿@model IEnumerable<Deneme_proje.Models.GunayEntities.AgirVasitaSatisViewModel>
+
+@{
+    ViewData["Title"] = "Ağır Vasıta Satış";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var selectedScopes = ViewBag.SelectedScopes as List<string> ?? new List<string>();
+    var startDate = ViewBag.SelectedStartDate as DateTime? ?? DateTime.Now.Date.AddDays(-30);
+    var endDate = ViewBag.SelectedEndDate as DateTime? ?? DateTime.Now.Date;
+}
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+<style>
+    .checkbox-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        margin-right: 15px;
+    }
+
+        .checkbox-item input {
+            margin-right: 5px;
+        }
+
+    table.dataTable tbody th, table.dataTable tbody td {
+        padding: 5px 10px !important;
+    }
+</style>
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <h4>Ağır Vasıta Satış</h4>
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index"><i class="icofont icofont-home"></i></a>
+                        </li>
+                        <li class="breadcrumb-item"><a href="/Gunay/AgirVasitaSatis">Ağır Vasıta Satış</a></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-lg-5 mb-1">
+            <div class="col-lg-4">
+                <form method="get" action="/Gunay/AgirVasitaSatis" class="px-4 py-3">
+                    <div class="form-group mb-3">
+                        <label class="form-label">Tarih Aralığı</label>
+                        <div class="d-flex">
+                            <input type="date" name="startDate" class="form-control mr-2"
+                                   value="@startDate.ToString("yyyy-MM-dd")" />
+                            <input type="date" name="endDate" class="form-control ml-2"
+                                   value="@endDate.ToString("yyyy-MM-dd")" />
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">Kapsamlar</label>
+                        <div class="checkbox-container">
+                            @{
+                                var scopes = new[] {
+                            "SKO_FP60", "SCS", "SCU_FP45_FPK_DD",
+                            "Rayic0_250", "Rayic250_500", "Rayic500Uzeri",
+                            "ThermoKing", "Valohr"
+                            };
+                            }
+                            @foreach (var scope in scopes)
+                            {
+                                <div class="checkbox-item">
+                                    <input type="checkbox"
+                                           id="scope_@scope"
+                                           name="selectedScopes"
+                                           value="@scope"
+                                    @(selectedScopes.Contains(scope) ? "checked" : "") />
+                                    <label for="scope_@scope">@scope</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-primary btn-sm">Verileri Getir</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col">
+                        <div class="alert alert-info" role="alert">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Kapsam</th>
+                                        <th>Ücret</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>SKO_FP60</td>
+                                        <td>@ViewBag.SKO_FP60 €</td>
+                                    </tr>
+                                    <tr>
+                                        <td>SCS</td>
+                                        <td>@ViewBag.SCS €</td>
+                                    </tr>
+                                    <tr>
+                                        <td>SCU_FP45_FPK_DD</td>
+                                        <td>@ViewBag.SCU_FP45_FPK_DD €</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Rayic0_250</td>
+                                        <td>@ViewBag.Rayic0_250 €</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Rayic250_500</td>
+                                        <td>@ViewBag.Rayic250_500 €</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Rayic500Uzeri</td>
+                                        <td>@ViewBag.Rayic500Uzeri €</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ThermoKing</td>
+                                        <td>@ViewBag.Thermoking €</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Valohr</td>
+                                        <td>@ViewBag.Valohr TL</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tablo kısmı aynen kalacak -->
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                            <h5 class="card-header-text text-white">Ağır Vasıta Satış</h5>
+                        </div>
+
+                        <div class="card-block accordion-block px-0">
+                            <div class="col-md-12">
+                                <div id="tablesContainer">
+                                    @if (Model != null && Model.Any())
+                                    {
+                                        <div class="card-body px-4 py-3">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <h5>Genel Bilgiler</h5>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-striped">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Dönem</th>
+                                                                    <th>Ana Grup</th>
+                                                                    <th>Stok Kodu</th>
+                                                                    <th>Stok Adı</th>
+                                                                    <th>Satış Miktarı</th>
+                                                                    <th>Satış Tutarı (TL)</th>
+                                                             
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach (var item in Model)
+                                                                {
+                                                                    <tr>
+                                                                        <td>@item.DonemBilgisi</td>
+                                                                        <td>@item.AnaGrup</td>
+                                                                        <td>@item.StokKodu</td>
+                                                                        <td>@item.StokAdi</td>
+                                                                        <td>@item.SatisMiktari.ToString("N2")</td>
+                                                                        <td>@item.SatisTutari.ToString("N2")</td>
+                                                                       
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-warning d-flex align-items-center mx-5" role="alert">
+                                            <span class="ms-2">Şu anda görüntüleyecek veri bulunmamaktadır. Lütfen parametreleri seçin.</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (document.querySelector('.table-striped')) {
+                new DataTable('.table-striped', {
+                    responsive: true,
+                    language: {
+                        search: "Ara:",
+                        lengthMenu: "_MENU_ kayıt göster",
+                        info: "_TOTAL_ kayıttan _START_ - _END_ arası gösteriliyor",
+                        paginate: {
+                            first: "İlk",
+                            last: "Son",
+                            next: "Sonraki",
+                            previous: "Önceki"
+                        }
+                    },
+                    pageLength: 10,
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Tümü"]]
+                });
+            }
+        });
+    </script>
+</div>

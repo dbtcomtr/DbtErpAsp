@@ -1,0 +1,183 @@
+﻿@model IEnumerable<Deneme_proje.Models.GunayEntities.OtokocViewModel>
+
+@{
+    ViewData["Title"] = "Ağır Vasıta Servis";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // Tarih parametrelerini kontrol edelim ve ViewBag'den değerleri alalım
+    var startDate = ViewBag.SelectedStartDate != null ? ((DateTime)ViewBag.SelectedStartDate).ToString("yyyy-MM-dd") : null;
+    var endDate = ViewBag.SelectedEndDate != null ? ((DateTime)ViewBag.SelectedEndDate).ToString("yyyy-MM-dd") : null;
+
+    // 0, 1-30, 31-60 gün aralığındaki araç sayısını hesapla
+    var satilanSifirGun = Model.Count(x => x.tarih_farki == 0);
+    var satilanBirOtuzGun = Model.Count(x => x.tarih_farki >= 1 && x.tarih_farki <= 30);
+    var satilanOtuzBirAltmisGun = Model.Count(x => x.tarih_farki >= 31 && x.tarih_farki <= 60);
+}
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+<style>
+    table.dataTable tbody th, table.dataTable tbody td {
+        padding: 5px 21px !important;
+    }
+
+   
+</style>
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <h4>Otokoç</h4>
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index"><i class="icofont icofont-home"></i></a>
+                        </li>
+                       
+                        <li class="breadcrumb-item"><a href="/Gunay/Otokoc">Otokoç</a></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-lg-5 mb-1">
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col">
+                        <div class="alert alert-info" role="alert">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Kapsam</th>
+                                        <th>Ücret</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Günay Grup satışı</td>
+                                        <td>@ViewBag.gunay_grup_satis TL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Şirket dışı peşin satış</td>
+                                        <td>@ViewBag.sirket_disi_pesin TL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Şirket dışı 30 gün içinde satış</td>
+                                        <td>@ViewBag.sirket_disi_otuz_gun TL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Şirket dışı 60 gün içinde satış</td>
+                                        <td>@ViewBag.sirket_disi_altmis_gun TL</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                            <h5 class="card-header-text text-white">Otokoç</h5>
+                        </div>
+
+                        <div class="card-block accordion-block px-0">
+                            <div class="col-md-12">
+                                <div id="tablesContainer">
+                                    @if (Model != null && Model.Any())
+                                    {
+                                        <div class="card-body px-4 py-3">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h5>Genel Bilgiler</h5>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-striped">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Stok</th>
+                                                                    <th>Adı</th>
+                                                                    <th>Kaç günde satıldı</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach (var item in Model)
+                                                                {
+                                                                    <tr>
+                                                                        <td>@item.sth_stok_kod</td>
+                                                                        <td>@item.sto_isim</td>
+                                                                        <td>@item.tarih_farki</td>
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Satış Durumu Tablosu -->
+                                                <!-- Satış Durumu Tablosu -->
+                                                <div class="col-md-6">
+                                                    <h5>Satış Durumları</h5>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Gün Aralığı</th>
+                                                                    <th>Satılan Araç Sayısı</th>
+                                                                    <th>Pirim</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>0 Gün</td>
+                                                                    <td>@satilanSifirGun</td>
+                                                                    <td>@(satilanSifirGun * (decimal)ViewBag.sirket_disi_pesin)</td> <!-- 0 gün içerisinde satılan araçların primi -->
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>1-30 Gün</td>
+                                                                    <td>@satilanBirOtuzGun</td>
+                                                                    <td>@(satilanBirOtuzGun * (decimal)ViewBag.sirket_disi_otuz_gun)</td> <!-- 1-30 gün arasında satılan araçların primi -->
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>31-60 Gün</td>
+                                                                    <td>@satilanOtuzBirAltmisGun</td>
+                                                                    <td>@(satilanOtuzBirAltmisGun * (decimal)ViewBag.sirket_disi_altmis_gun)</td> <!-- 31-60 gün arasında satılan araçların primi -->
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-warning d-flex align-items-center mx-5" role="alert">
+                                            <span class="ms-2">Şu anda görüntüleyecek veri bulunmamaktadır. Lütfen parametreleri seçin.</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        new DataTable('#example');
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        new DataTable('#digerdepolar');
+    });
+</script>

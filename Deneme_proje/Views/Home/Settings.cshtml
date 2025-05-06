@@ -1,0 +1,91 @@
+﻿
+@{
+    ViewData["Title"] = "Settings";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    ViewData["Title"] = "ERP Yazılım ve Yönetim";
+}
+
+<div class="modal fade" id="erpModal" tabindex="-1" role="dialog" aria-labelledby="erpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="erpModalLabel">ERP Yazılım ve Yönetim</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                    <label class="btn btn-secondary" id="btnMikro">
+                        <input type="radio" name="erpOptions" autocomplete="off"> Mikro
+                    </label>
+                    <label class="btn btn-secondary" id="btnLogo">
+                        <input type="radio" name="erpOptions" autocomplete="off"> Logo
+                    </label>
+                    <label class="btn btn-secondary" id="btnZirve">
+                        <input type="radio" name="erpOptions" autocomplete="off"> Zirve
+                    </label>
+                </div>
+
+                <div id="mikroOptions" class="mt-3 d-none">
+                    <button class="btn btn-outline-primary" id="btnV17">V17</button>
+                    <button class="btn btn-outline-primary" id="btnV16">V16</button>
+                    <button class="btn btn-outline-primary" id="btnAPI">API</button>
+                </div>
+
+                <form id="mikroForm" class="mt-3 d-none">
+                    <div id="v17v16Inputs" class="d-none">
+                        <div class="form-group">
+                            <label for="username">Kullanıcı Adı</label>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Kullanıcı Adı">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Şifre</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Şifre">
+                        </div>
+                        <div class="form-group">
+                            <label for="ipAddress">IP Adresi</label>
+                            <input type="text" class="form-control" id="ipAddress" name="ipAddress" placeholder="IP Adresi">
+                        </div>
+                    </div>
+                    <div id="apiInput" class="d-none">
+                        <div class="form-group">
+                            <label for="apiAddress">API Adresi</label>
+                            <input type="text" class="form-control" id="apiAddress" name="apiAddress" placeholder="API Adresi">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Gönder</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("btnMikro").addEventListener("click", function () {
+        document.getElementById("mikroOptions").classList.remove("d-none");
+    });
+
+    document.getElementById("btnV17").addEventListener("click", function () {
+        toggleForm("v17v16Inputs");
+    });
+
+    document.getElementById("btnV16").addEventListener("click", function () {
+        toggleForm("v17v16Inputs");
+    });
+
+    document.getElementById("btnAPI").addEventListener("click", function () {
+        toggleForm("apiInput");
+    });
+
+    function toggleForm(sectionId) {
+        document.getElementById("v17v16Inputs").classList.add("d-none");
+        document.getElementById("apiInput").classList.add("d-none");
+        document.getElementById("mikroForm").classList.remove("d-none");
+        document.getElementById(sectionId).classList.remove("d-none");
+    }
+</script>
+
+

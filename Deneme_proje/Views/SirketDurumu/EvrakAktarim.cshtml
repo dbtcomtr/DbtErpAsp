@@ -1,0 +1,158 @@
+﻿@{
+    ViewData["Title"] = "Mikro Cari Hareket Evrakları Aktarımı";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <h4>Mikro Cari Hareket Evrakları Aktarımı</h4>
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-lg-5 mb-1">
+            <div class="col-lg-12">
+                <div class="d-flex align-items-center">
+                    <div class="form-group mx-2">
+                        <label for="ilkTarih">İlk Tarihi:</label>
+                        <input type="date" id="ilkTarih" class="form-control" value="2018-12-01" />
+                    </div>
+                    <div class="form-group mx-2">
+                        <label for="sonTarih">Son Tarihi:</label>
+                        <input type="date" id="sonTarih" class="form-control" value="2019-02-15" />
+                    </div>
+                    <div class="form-group mx-2">
+                        <label>Kaynak Veritabanı:</label>
+                        <select class="form-control">
+                            <option>DbtR</option>
+                        </select>
+                    </div>
+                    <div class="form-group mx-2">
+                        <label>Aktarılacak Veritabanı:</label>
+                        <select class="form-control">
+                            <option>Dorag</option>
+                        </select>
+                    </div>
+                    <div class="form-group mt-4">
+                        <button class="btn btn-tumblr btn-shadow waves-effect waves-light">Yenile</button>
+                    </div>
+                    <div class="form-group mt-4 ms-2">
+                        <button id="aktarButton" class="btn btn-success btn-shadow waves-effect waves-light">
+                            <i class="fa fa-upload me-1"></i>Seçili Evrakları Aktar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">Evrak Listesi</h5>
+                    </div>
+
+                    <div class="card-block accordion-block">
+                        <div class="col-md-12">
+                            <div id="example_wrapper" class="dataTables_wrapper py-lg-3">
+                                <table id="example" class="display dataTable" style="width:100%">
+                                    <thead>
+                                        <tr class="tablo-icerik-yazi">
+                                            <th><input type="checkbox" id="selectAll" /></th>
+                                            <th>Cinsi</th>
+                                            <th>Evrak Tipi</th>
+                                            <th>N/İ</th>
+                                            <th>Seri</th>
+                                            <th>Sıra</th>
+                                            <th>Tarih</th>
+                                            <th>Tutar</th>
+                                            <th>Aktarıldı</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="checkbox" class="evrak-check" /></td>
+                                            <td>Nakit</td>
+                                            <td>Kasa tediye fişi</td>
+                                            <td>Normal</td>
+                                            <td>GR</td>
+                                            <td>1451</td>
+                                            <td>30.01.2025</td>
+                                            <td>2.708,00</td>
+                                            <td><input type="checkbox" disabled /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input type="checkbox" class="evrak-check" /></td>
+                                            <td>Dekont</td>
+                                            <td>Kasalar arası virman dekontu</td>
+                                            <td>Normal</td>
+                                            <td>GR</td>
+                                            <td>827</td>
+                                            <td>11.02.2025</td>
+                                            <td>6.880,00</td>
+                                            <td><input type="checkbox" checked disabled /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input type="checkbox" class="evrak-check" /></td>
+                                            <td>Müşteri çeki</td>
+                                            <td>Çek giriş bordrosu</td>
+                                            <td>Normal</td>
+                                            <td>OMS</td>
+                                            <td>526</td>
+                                            <td>12.02.2025</td>
+                                            <td>22.500,00</td>
+                                            <td><input type="checkbox" checked disabled /></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
+<script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#example').DataTable({
+            "language": {
+                "url": "/Content/DataTables/turkish.json"
+            },
+            "buttons": ['copy', 'csv', 'excel', 'pdf', 'print']
+        });
+
+        // Tüm checkbox'ları seçme/kaldırma
+        $('#selectAll').change(function() {
+            $('.evrak-check').prop('checked', $(this).prop('checked'));
+        });
+
+        // Seçili evrakları aktar butonu tıklama
+        $('#aktarButton').click(function() {
+            var seciliEvrakSayisi = $('.evrak-check:checked').length;
+            if (seciliEvrakSayisi > 0) {
+                alert(seciliEvrakSayisi + ' adet evrak aktarılacak');
+                // Burada aktarım işlemi için gerekli kod yazılabilir
+            } else {
+                alert('Lütfen aktarılacak evrakları seçiniz');
+            }
+        });
+    });
+</script>

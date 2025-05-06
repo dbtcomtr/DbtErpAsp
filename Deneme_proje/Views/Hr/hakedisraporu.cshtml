@@ -1,0 +1,397 @@
+﻿@model List<Deneme_proje.Models.HrEntities.LeaveEntitlementReportModel>
+@{
+    ViewData["Title"] = "Hakediş Raporu ";
+}
+
+<!-- Stil tanımları -->
+<style>
+    .container-wrapper {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .form-container {
+        flex: 0.35; /* Servis formunu küçült */
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        background-color: #f9f9f9;
+    }
+
+    .list-container {
+        transform: translate(-50%, 0%);
+        top: 50%;
+        flex: 0.65;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        background-color: #f9f9f9;
+        left: 50%;
+        position: relative;
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+
+
+    .form-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+        .form-group label {
+            font-size: 14px;
+            margin-right: 10px;
+            flex: 0 0 70px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            flex: 1;
+            font-size: 14px;
+            padding: 5px;
+        }
+
+    .form-row {
+        display: flex;
+        justify-content: space-between;
+    }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+            .form-row .form-group:last-child {
+                margin-right: 0;
+            }
+
+    .button-row {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .totals {
+        text-align: center;
+        margin-top: 15px;
+    }
+
+    .table-responsive {
+        margin-top: 20px;
+    }
+
+    .servis-table {
+        font-size: 12px;
+    }
+
+    .modal-backdrop {
+        z-index: -1;
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 50% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 100%;
+        height: 25%;
+    }
+</style>
+<style>
+    .accordion-header {
+        cursor: pointer;
+        position: relative;
+    }
+
+        .accordion-header:hover {
+            background-color: #f8f9fa;
+        }
+
+    .nested-table-container {
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+    }
+
+    .active-status {
+        color: green;
+        font-weight: bold;
+    }
+
+    .red-status {
+        color: red;
+        font-weight: bold;
+    }
+
+    .accordion-content {
+        display: none;
+        background-color: #fff;
+    }
+
+        /* Açık durum için ek stil */
+        .accordion-content.show {
+            display: table-row;
+        }
+</style>
+<style>
+    .form-container {
+        padding: 20px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+        .form-group.no {
+            width: 100%;
+        }
+
+    .form-control-sm {
+        height: calc(1.5em + 0.5rem + 2px);
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    /* Stok/Hizmet tablosu için stiller */
+    .table-responsive {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    /* Toplam alanları için stiller */
+    .totals {
+        margin-top: 20px;
+        text-align: right;
+    }
+
+        .totals p {
+            margin-bottom: 5px;
+        }
+
+    /* Buton satırı için stiller */
+    .button-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        justify-content: flex-end;
+    }
+</style>
+
+<div class="main-content mt-5 pt-5">
+    <!-- Form Container -->
+    <!-- List Container -->
+    <div class="px-lg-5 px-3">
+
+
+     @*    <form method="get" action="/hr/izinli-personel" class="form-inline">
+            <div class="form-group">
+                <label for="baslangicTarihi" style="font-size: 12px;">İlgili Yıl:</label>
+                <input type="text" id="baslangicTarihi" name="baslangicTarihi" class="form-control">
+            </div>
+            <div class="form-group mx-3">
+                <label for="bitisTarihi" style="font-size: 12px;">Hakediş Kontrol Tarihi:</label>
+                <input type="date" id="bitisTarihi" name="bitisTarihi" class="form-control">
+            </div>
+            <div class="form-group mx-3">
+                <input type="radio" id="acikizin" name="durum" value="Açık" @(ViewBag.Durum == "Açık" ? "checked" : "") />
+                <label for="acik">Hakedişten önce yıllık izin kullanabilsin</label>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-tumblr btn-shadow waves-effect waves-light">Sorgula</button>
+            </div>
+        </form> *@
+        <div class="list-container">
+            <h2>Hakediş Listesi</h2>
+            <div id="example_wrapper" class="dataTables_wrapper tablo">
+                <div class="dataTables_length" id="example_length"></div>
+                <div class="dataTables_filter" id="example_filter"></div>
+                <div id="example_wrapper">
+                    <table id="example" class="display dataTable" style="width:100%">
+                        <thead>
+                            <tr class="tablo-icerik-yazi">
+                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                    <div class="th-content">
+                                        <span>Personel Kodu<span>
+                                    </div>
+                                </th>
+                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                    <div class="th-content">
+                                        <span>Adı Soyadı</span>
+                                    </div>
+                                </th>
+                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                    <div class="th-content">
+                                        <span>Departman</span>
+                                    </div>
+                                </th>
+                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                    <div class="th-content">
+                                        <span>Görev</span>
+                                    </div>
+                                </th>
+                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                    <div class="th-content">
+                                        <span>İşe Giriş Tarihi</span>
+                                    </div>
+                                </th>
+                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                    <div class="th-content">
+                                        <span>Çalışma Süresi (Yıl)</span>
+                                    </div>
+                                </th>
+                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                    <div class="th-content">
+                                        <span>Yıllık İzin Hakkı (Gün)</span>
+                                    </div>
+                                </th>
+                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                    <div class="th-content">
+                                        <span>Geçen Yıldan Devreden (Gün)</span>
+                                    </div>
+                                </th>
+                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+    <div class="th-content">
+        <span>Geçen Yıldan Devreden (Saat)</span>
+    </div>
+</th>
+                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                    <div class="th-content">
+                                        <span>Kullanılan İzin (Gün)</span>
+                                    </div>
+                                </th>
+                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                    <div class="th-content">
+                                        <span>Kalan İzin Bakiyesi</span>
+                                    </div>
+                                </th>
+                              
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.PersonelKodu</td>
+                                    <td>@item.PersonelAdi @item.PersonelSoyadi</td>
+                                    <td>@item.Departman</td>
+                                    <td>@item.Gorev</td>
+                                    <td>@item.IseGirisTarihi.ToString("dd.MM.yyyy")</td>
+                                    <td>@item.CalismaSuresiYil</td>
+                                    <td>@item.YillikIzinHakki</td>
+                                    <td>@item.GecenYilDevirGun.ToString("N2")</td>
+                                        <td>@item.GecenYilDevirSaat.ToString("N2")</td>
+                                    <td>@item.KullanilanIzinGun.ToString("N2")</td>
+                                    <td class="@(item.KalanIzinBakiyesi >= 0 ? "value-positive" : "value-negative")">
+                                        @item.KalanIzinBakiyesi.ToString("N2")
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+<!-- Modal Yapısı -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
+<script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let table = new DataTable('#example');
+    });
+</script>
+
+
+<script>
+    $('#example').dataTable({
+              "dom": '<"row"<"col-sm-12"B>>' +
+                  '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+                  't' +
+                  '<"row"<"col-sm-6"i><"col-sm-6"p>>',
+              "language": {
+                  "url": "/Content/DataTables/turkish.json"
+              },
+              "buttons": [
+                  'copy',
+                  {
+                      extend: 'csv',
+                      exportOptions: {
+                          format: {
+                              body: function (data, row, column, node) {
+                                  // Check if the data contains currency symbol (₺)
+                                  if (typeof data === 'string' && data.includes('₺')) {
+                                      // Remove currency symbol and thousand separators, replace decimal comma with dot
+                                      return data.replace('₺', '')
+                                          .replace(/\./g, '')
+                                          .replace(',', '.');
+                                  }
+                                  // For other decimal numbers (like those with F2 or F4 format)
+                                  if (typeof data === 'string' && data.includes(',')) {
+                                      return data.replace(',', '.');
+                                  }
+                                  return data;
+                              }
+                          }
+                      }
+                  },
+                  {
+                      extend: 'excel',
+                      exportOptions: {
+                          format: {
+                              body: function (data, row, column, node) {
+                                  // Check if the data contains currency symbol (₺)
+                                  if (typeof data === 'string' && data.includes('₺')) {
+                                      // Remove currency symbol and thousand separators, replace decimal comma with dot
+                                      return data.replace('₺', '')
+                                          .replace(/\./g, '')
+                                          .replace(',', '.');
+                                  }
+                                  // For other decimal numbers (like those with F2 or F4 format)
+                                  if (typeof data === 'string' && data.includes(',')) {
+                                      return data.replace(',', '.');
+                                  }
+                                  return data;
+                              }
+                          }
+                      }
+                  },
+                  {
+                      extend: 'pdf',
+                      exportOptions: {
+                          format: {
+                              body: function (data, row, column, node) {
+                                  return data;  // Keep original formatting for PDF
+                              }
+                          }
+                      }
+                  },
+                  'print'
+              ],
+              "pageLength": 5000,
+              "lengthMenu": [[10, 25, 50, 100, 5000], [10, 25, 50, 100, "5000"]]
+          });
+
+</script>

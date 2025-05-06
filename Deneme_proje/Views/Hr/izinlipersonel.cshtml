@@ -1,0 +1,290 @@
+﻿@model List<Deneme_proje.Models.HrEntities.IzinTalepModel>
+
+@{
+    ViewData["Title"] = "İzinli Personeller";
+}
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">İzinli Personeller</h5>
+                    </div>
+                    <div class="card-block px-0 py-0">
+                        @if (!Model.Any())
+                        {
+                            <div class="alert alert-info m-3">
+                                Görüntülenecek onaylı izin bulunmamaktadır.
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="table-responsive">
+                                <table id="example" class="table table-bordered table-striped" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th class="min-tablet">Personel</th>
+                                            <th class="min-tablet">İzin Tipi</th>
+                                            <th class="min-tablet">Gün</th>
+                                            <th class="min-tablet">Saat</th>
+                                            <th class="min-tablet">Başlangıç</th>
+                                            <th class="min-tablet">Bitiş</th>
+                                            <th class="min-tablet">Amaç</th>
+                                            <th class="min-tablet">İdari Amir</th>
+                                            <th class="min-tablet">Onaylayan</th>
+                                            <th class="min-tablet">İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var izin in Model)
+                                        {
+                                            <tr>
+                                                <td>@izin.PersonelAdSoyad</td>
+                                                <td>
+                                                    @{
+                                                        string izinTipi = izin.IzinTipi switch
+                                                        {
+                                                            0 => "Yıllık İzin",
+                                                            3 => "Askerlik",
+                                                            5 => "Devamsızlık",
+                                                            7 => "Diğer",
+                                                            8 => "Ücretsiz",
+                                                            10 => "Evlilik",
+                                                            11 => "Doğum",
+                                                            12 => "Babalık",
+                                                            13 => "Süt",
+                                                            14 => "Ölüm",
+                                                            15 => "İş Arama",
+                                                            _ => "Diğer"
+                                                        };
+                                                    }
+                                                    @izinTipi
+                                                </td>
+                                                <td>@izin.GunSayisi</td>
+                                                <td>@izin.IzinSaat</td>
+                                                <td>@izin.BaslangicTarihi.ToShortDateString()</td>
+                                                <td>@izin.BitisTarihi.ToShortDateString()</td>
+                                                <td>@izin.Amac</td>
+                                                <td>@(string.IsNullOrEmpty(izin.IdariAmirAdi) ? "-" : izin.IdariAmirAdi)</td>
+                                                <td>@(string.IsNullOrEmpty(izin.OnaylayanKullanici) ? "-" : izin.OnaylayanKullanici)</td>
+                                                <td>
+                                                    <div class="btn-group" role="group">
+                                                        <a href="@Url.Action("IzinTalepPdfIndir", "Hr", new { izinGuid = izin.Guid })"
+                                                           class="btn btn-sm btn-danger"
+                                                           title="PDF İndir">
+                                                            <i class="fa fa-file-pdf-o"></i> PDF İndir
+                                                        </a>
+                                                    </div>
+                                                </td>
+
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: #1D3A67 #f0f0f0;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+
+        .table::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .table::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .table::-webkit-scrollbar-thumb {
+            background: #1D3A67;
+            border-radius: 4px;
+        }
+
+    @@media screen and (max-width: 768px) {
+        .table {
+            position: relative !important;
+            display: block !important;
+            width: 100% !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+
+        .table-mobile-container {
+            overflow-x: auto !important;
+            max-width: 100% !important;
+            position: relative !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+
+        .table thead th {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 10 !important;
+            background-color: #f8f9fa !important;
+            white-space: nowrap !important;
+            min-width: 120px !important;
+            padding: 10px !important;
+            font-size: 14px !important;
+            box-shadow: inset 0 1px 0 #dee2e6, inset 0 -1px 0 #dee2e6 !important;
+        }
+
+        .table tbody td {
+            white-space: nowrap !important;
+            min-width: 120px !important;
+            padding: 10px !important;
+            font-size: 14px !important;
+            vertical-align: middle !important;
+        }
+
+        .card {
+            margin: 0 -15px !important;
+            border-radius: 0 !important;
+        }
+
+        .px-lg-5 {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+    }
+
+    .table-mobile-container::-webkit-scrollbar {
+        width: 8px !important;
+        height: 8px !important;
+    }
+
+    .table-mobile-container::-webkit-scrollbar-track {
+        background: #f0f0f0 !important;
+        border-radius: 4px !important;
+    }
+
+    .table-mobile-container::-webkit-scrollbar-thumb {
+        background: #1D3A67 !important;
+        border-radius: 4px !important;
+    }
+</style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<!-- DataTables -->
+<script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+
+<!-- Buttons ve Uzantıları -->
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        $('#example').DataTable({
+            "dom": '<"row"<"col-sm-12"B>>' +
+                '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+                't' +
+                '<"row"<"col-sm-6"i><"col-sm-6"p>>',
+            "language": {
+                "url": "/Content/DataTables/turkish.json"
+            },
+            "buttons": [
+                {
+                    extend: 'copy',
+                    text: '<i class="fa fa-copy"></i> Kopyala',
+                    className: 'btn btn-info',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'csv',
+                    text: '<i class="fa fa-file-csv"></i> CSV',
+                    className: 'btn btn-primary',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'excel',
+                    text: '<i class="fa fa-file-excel"></i> Excel',
+                    className: 'btn btn-success',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    text: '<i class="fa fa-file-pdf"></i> PDF',
+                    className: 'btn btn-danger',
+                    exportOptions: {
+                        columns: ':visible'
+                    },
+                    customize: function(doc) {
+                        doc.content[1].table.widths =
+                            Array(doc.content[1].table.body[0].length + 1).join('*').split('');
+                        doc.defaultStyle.fontSize = 10;
+                        doc.styles.tableHeader.fontSize = 11;
+                        doc.styles.tableHeader.alignment = 'left';
+                        doc.styles.title.fontSize = 14;
+                        doc.content[0].text = 'İzinli Personeller Raporu';
+
+                        doc.styles.tableHeader.fillColor = '#162e54';
+                        doc.styles.tableHeader.color = '#fff';
+                    }
+                },
+                {
+                    extend: 'print',
+                    text: '<i class="fa fa-print"></i> Yazdır',
+                    className: 'btn btn-secondary',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                }
+            ],
+            "columnDefs": [
+                { "targets": "_all" },
+                {
+                    "targets": -1,
+                    "orderable": false,
+                    "searchable": false
+                }
+            ],
+            "responsive": true,
+            "ordering": true,
+            "paging": true,
+            "pageLength": 5000
+        });
+    });
+</script>

@@ -1,0 +1,81 @@
+﻿@model IEnumerable<Deneme_proje.Models.DenizlerEntities.CariAnaliz>
+
+@{
+    ViewData["Title"] = "Cari Analiz";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid content-inner mt-n5 py-0">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <div class="header-title">
+                        <h4 class="card-title px-4">Cari Analiz</h4>
+                    </div>
+                </div>
+
+                <form asp-action="CariAnaliz" method="get" class="mb-4 px-5 pt-5">
+                    <div class="row d-flex align-items-center">
+                        <div class="form-group col-md-4">
+                            <label for="cariKod">Cari Kodu:</label>
+                            <input type="text" id="cariKod" name="cariKod" class="form-control" value="@ViewBag.CariKod" />
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="chaDCins">Döviz Cinsi:</label>
+                            <input type="text" id="chaDCins" name="chaDCins" class="form-control" value="@ViewBag.ChaDCins" />
+                        </div>
+                        <div class="form-group col-md-3 m-0">
+                            <button type="submit" class="btn btn-primary">Ara</button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="card-body px-5">
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Cari Kod</th>
+                                        <th>Döviz Cinsi</th>
+                                        <th>Döviz Kod</th>
+                                        <th>Bakiye</th>
+                                        <th>Geciken Bakiye</th>
+                                        <th>Ağırkli Ortalama Vade</th>
+                                        <th>Vade Farkı</th>
+                                        <th>Kapanmayan Bakiye</th>
+                                        <th>Toplam Bakiye</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>@item.CariKod</td>
+                                            <td>@item.DovizCinsi</td>
+                                            <td>@item.DovizKod</td>
+                                            <td>@item.Bakiye</td>
+                                            <td>@item.GecikenBakiye</td>
+                                            <td>@item.AgirlikliOrtalamaVade</td>
+                                            <td>@item.VadeFark</td>
+                                            <td>@item.KapanmayanBakiye</td>
+                                            <td>@item.ToplamBakiye</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning" role="alert">
+                            Sonuç bulunamadı.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

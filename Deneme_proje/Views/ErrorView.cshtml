@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-danger">
+                <h4 class="alert-heading">Hata Oluştu!</h4>
+                <p><strong>Hata Mesajı:</strong> @ViewData["ErrorMessage"]</p>
+                @if (ViewData["StackTrace"] != null)
+                {
+                    <hr>
+                    <div class="stack-trace">
+                        <p><strong>Stack Trace:</strong></p>
+                        <pre>@ViewData["StackTrace"]</pre>
+                    </div>
+                }
+            </div>
+            <div class="mt-3">
+                <a href="javascript:history.back()" class="btn btn-primary">Geri Dön</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .stack-trace {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+            .stack-trace pre {
+                margin-bottom: 0;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+    </style>
+}

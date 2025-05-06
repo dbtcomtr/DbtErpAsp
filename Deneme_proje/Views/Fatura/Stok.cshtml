@@ -1,0 +1,63 @@
+﻿@model IEnumerable<Deneme_proje.Models.Entities.StokYaslandirmaViewModel>
+@{
+    ViewData["Title"] = "Stok Yaşlandirma";
+}
+
+<h2>Stok Yaşlandirma</h2>
+
+<form asp-action="Stok" method="post">
+    <div class="form-group">
+        <label for="stokKod">Stok Kodu:</label>
+        <select id="stokKod" name="stokKod" class="form-control">
+            <option value="">Seçiniz</option>
+            @foreach (var stockCode in ViewBag.StockCodes as List<string>)
+            {
+                <option value="@stockCode">@stockCode</option>
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="raporTarihi">Rapor Tarihi:</label>
+        <input type="date" id="raporTarihi" name="raporTarihi" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Göster</button>
+</form>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Stok Kodu</th>
+                <th>Stok İsmi</th>
+                <th>Stok Yaşı</th>
+                <th>Yaş Grubu</th>
+                <th>0-30 Gün</th>
+                <th>31-60 Gün</th>
+                <th>61-90 Gün</th>
+                <th>90+ Gün</th>
+                <th>Stokta Giren Miktar</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.StokKod</td>
+                    <td>@item.StokIsmi</td>
+                    <td>@item.StokYasi</td>
+                    <td>@item.YasGrubu</td>
+                    <td>@item.Days0To30</td>
+                    <td>@item.Days31To60</td>
+                    <td>@item.Days61To90</td>
+                    <td>@item.Days90Plus</td>
+                    <td>@item.StoktaGirenMiktar</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Veri bulunamadı.</p>
+}

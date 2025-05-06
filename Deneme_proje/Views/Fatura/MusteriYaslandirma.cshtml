@@ -1,0 +1,315 @@
+﻿@model IEnumerable<Deneme_proje.Models.Entities.CariBakiyeYaslandirma>
+@{
+    ViewData["Title"] = "Rapor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <h4>Müşteri Yaşlandırma</h4>
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="/Fatura/"></a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="/Fatura/">Müşteri Yaşlandırma</a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-lg-5 mb-1">
+            <div class="col-lg-4">
+                <form method="get" class="form-inline">
+                    <div class="form-group">
+                        <label for="filter" style="font-size: 12px;">Filter:</label>
+                        <input type="text" id="filter" name="filter" class="form-control" placeholder="Enter filter criteria" required />
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-tumblr btn-shadow waves-effect waves-light">Ara</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style=" background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;"
+                         ">
+                        <h5 class="card-header-text text-white">Müşteri Yaşlandırma</h5>
+                    </div>
+
+                    <div class="card-block accordion-block">
+                        <div class="col-md-12">
+
+                            <div id="example_wrapper" class="dataTables_wrapper py-lg-3">
+                                <div class="dataTables_length" id="example_length"></div>
+                                <div class="dataTables_filter" id="example_filter"></div>
+                    @if (Model != null && Model.Any())
+                    {
+                                    <div id="example_wrapper" class="table-wrapper">
+                                        <table id="example" class="display dataTable" style="width:100%">
+                                            <thead>
+                                                <tr class="tablo-icerik-yazi">
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Müşteri Kodu<span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Unvan</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>-120'den fazla'</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>-120-91 Gün</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>-90-61 Gün</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>-60-31 Gün</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>-30-0 Gün</span>
+                                                        </div>
+                                                    </th>
+
+
+
+
+
+
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Vadesi Geçmiş Bakiye</span>
+                                                        </div>
+                                                    </th>
+
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Toplam Bakiye</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Vadesi Yaklaşan Bakiye</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Bakiye Tipi</span>
+                                                        </div>
+                                                    </th>
+
+
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>0-30 Gün</span>
+                                                        </div>
+                                                    </th>
+
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>31-60 Gün</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>61-90 Gün</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>91-120 Gün</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" ToString("N2")colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>+120 Gün Üstü</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Vadesi Geçen Bakiye Kontrol</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Vadesi Yaklaşan Bakiye Kontrol</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Toplam Bakiye Kontrol</span>
+                                                        </div>
+                                                    </th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                                    <tr>
+                                                        <td>@item.MusteriKodu</td>
+                                                        <td>@item.Unvan</td>
+                                                        <td class="text-right">@item.eksi120GunUstu.ToString("N2")</td>
+                                                        <td class="text-right">@item.Gun120.ToString("N2")</td>
+                                                        <td class="text-right">@item.Gun90.ToString("N2")</td>
+                                                        <td class="text-right">@item.Gun60.ToString("N2")</td>
+                                                        <td class="text-right">@item.Gun30.ToString("N2")</td>
+                                                        <td class="text-right">@item.VadesiGecmisBakiye.ToString("N2")</td>
+                                                        <td class="text-right">@item.ToplamBakiye.ToString("N2")</td>
+                                                        <td class="text-right">@item.VadesiGecenBakiye.ToString("N2")</td>
+                                                        <td>@item.BakiyeTipi</td>
+                                                        <td class="text-right">@item.gecmisGun30.ToString("N2")</td>
+                                                        <td class="text-right">@item.gecmisGun60.ToString("N2")</td>
+                                                        <td class="text-right">@item.gecmisGun90.ToString("N2")</td>
+                                                        <td class="text-right">@item.gecmisGun120.ToString("N2")</td>
+                                                        <td class="text-right">@item.GunUstu120.ToString("N2")</td>
+                                                        <td class="text-right">@((item.VadesiGecmisBakiye - (item.eksi120GunUstu + item.Gun120 + item.Gun90 + item.Gun60 + item.Gun30)).ToString("N2"))</td>
+                                                        <td class="text-right">@((item.VadesiGecenBakiye - (item.GunUstu120 + item.gecmisGun120 + item.gecmisGun90 + item.gecmisGun60 + item.gecmisGun30)).ToString("N2"))</td>
+                                                        <td class="text-right">@((item.ToplamBakiye - (item.VadesiGecenBakiye + item.VadesiGecmisBakiye)).ToString("N2"))</td>
+                                                    </tr>
+                                    }
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                    }
+
+                    else
+                    {
+                                    <div class="alert alert-warning" role="alert">
+                                        Veri bulunamadı.
+                                    </div>
+                    }
+                                <div class="bottom">
+                                    <div class="dataTables_info" id="example_info"></div>
+                                    <div class="dataTables_paginate" id="example_paginate"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
+        <script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let table = new DataTable('#example');
+            });
+        </script>
+
+
+        <script>
+
+
+            $('#example').dataTable({
+                "dom": '<"row"<"col-sm-12"B>>' +
+                    '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+                    't' +
+                    '<"row"<"col-sm-6"i><"col-sm-6"p>>',
+                "language": {
+                    "url": "/Content/DataTables/turkish.json"
+                },
+                "buttons": [
+                    'copy',
+                    {
+                        extend: 'csv',
+                        exportOptions: {
+                            format: {
+                                body: function (data, row, column, node) {
+                                    // Check if the data contains currency symbol (₺)
+                                    if (typeof data === 'string' && data.includes('₺')) {
+                                        // Remove currency symbol and thousand separators, replace decimal comma with dot
+                                        return data.replace('₺', '')
+                                            .replace(/\./g, '')
+                                            .replace(',', '.');
+                                    }
+                                    // For other decimal numbers (like those with F2 or F4 format)
+                                    if (typeof data === 'string' && data.includes(',')) {
+                                        return data.replace(',', '.');
+                                    }
+                                    return data;
+                                }
+                            }
+                        }
+                    },
+                    {
+                        extend: 'excel',
+                        exportOptions: {
+                            format: {
+                                body: function (data, row, column, node) {
+                                    // Check if the data contains currency symbol (₺)
+                                    if (typeof data === 'string' && data.includes('₺')) {
+                                        // Remove currency symbol and thousand separators, replace decimal comma with dot
+                                        return data.replace('₺', '')
+                                            .replace(/\./g, '')
+                                            .replace(',', '.');
+                                    }
+                                    // For other decimal numbers (like those with F2 or F4 format)
+                                    if (typeof data === 'string' && data.includes(',')) {
+                                        return data.replace(',', '.');
+                                    }
+                                    return data;
+                                }
+                            }
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        exportOptions: {
+                            format: {
+                                body: function (data, row, column, node) {
+                                    return data;  // Keep original formatting for PDF
+                                }
+                            }
+                        }
+                    },
+                    'print'
+                ],
+                "pageLength": 5000,
+                "lengthMenu": [[10, 25, 50, 100, 5000], [10, 25, 50, 100, "5000"]]
+            });
+
+
+
+        </script>
+
+
+
+
+
+

@@ -1,0 +1,633 @@
+﻿@model IEnumerable<Deneme_proje.Models.SirketDurumuEntites.KasaRaporuOdemeModel>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Mali Durum Özeti</title>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/js/bootstrap.bundle.min.js"></script>
+	<style>
+		body {
+			background-color: #f5f5f5;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		}
+
+		.container-fluid {
+			padding: 20px;
+		}
+
+		.card {
+			border-radius: 4px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+			margin-bottom: 20px;
+			border: none;
+		}
+
+		.card-header {
+			font-weight: bold;
+			text-align: center;
+		}
+
+		.table th, .table td {
+			vertical-align: middle;
+			padding: 0.5rem 0.75rem;
+		}
+
+		.table-bordered {
+			border: 1px solid #dee2e6;
+		}
+
+			.table-bordered th, .table-bordered td {
+				border: 1px solid #dee2e6;
+			}
+
+		.text-danger {
+			color: #dc3545 !important;
+		}
+
+		.bg-danger {
+			background-color: #f8d7da !important;
+			color: #721c24 !important;
+		}
+
+		.text-success {
+			color: #198754 !important;
+		}
+
+		.bg-success {
+			background-color: #d1e7dd !important;
+			color: #0f5132 !important;
+		}
+
+		.text-primary {
+			color: #0d6efd !important;
+		}
+
+		.bg-primary {
+			background-color: #cfe2ff !important;
+			color: #084298 !important;
+		}
+
+		.table-danger {
+			background-color: rgba(220, 53, 69, 0.1);
+		}
+
+		.table-success {
+			background-color: rgba(25, 135, 84, 0.1);
+		}
+
+		.red-row {
+			color: red;
+			font-weight: bold;
+		}
+
+		tfoot {
+			font-weight: bold;
+		}
+
+		.badge-info {
+			display: inline-block;
+			padding: 0.25em 0.4em;
+			font-size: 75%;
+			font-weight: 700;
+			line-height: 1;
+			text-align: center;
+			white-space: nowrap;
+			vertical-align: baseline;
+			border-radius: 0.25rem;
+			background-color: #17a2b8;
+			color: #fff;
+		}
+
+		/* Yan yana tablolar */
+		.balance-columns {
+			display: flex;
+			gap: 20px;
+			width: 100%;
+		}
+
+		.balance-column {
+			flex: 1;
+		}
+
+		/* Responsive */
+		@@media (max-width: 768px) {
+			.balance-columns
+
+		{
+			flex-direction: column;
+		}
+
+		}
+
+		.btn-block {
+			display: block;
+			width: 40%;
+		}
+
+		.gradient-blue {
+			background: linear-gradient(135deg, #1E3559, #296299);
+		}
+
+		.gradient-teal {
+			background: linear-gradient(135deg, #296299, #52B5AF);
+		}
+
+		.gradient-purple {
+			background: linear-gradient(135deg, #4CA7E1, #3B86A1);
+		}
+
+		.gradient-orange {
+			background: linear-gradient(135deg, #52B5AF, #4CA7E1);
+		}
+
+		/* Tablo başlıkları için gradientler */
+		.header-gradient-blue {
+			background: linear-gradient(to right, #1E3559, #296299);
+			color: white;
+			border: none;
+		}
+
+		.header-gradient-teal {
+			background: linear-gradient(to right, #296299, #4CA7E1);
+			color: white;
+			border: none;
+		}
+
+		/* Tab stilleri */
+		.nav-tabs .nav-link {
+			font-weight: bold;
+			color: #333;
+			border: 1px solid #dee2e6;
+			border-bottom: none;
+			background-color: #f8f9fa;
+			border-radius: 4px 4px 0 0;
+		}
+
+			.nav-tabs .nav-link.active {
+				border-color: #dee2e6 #dee2e6 #fff;
+				background-color: #fff;
+				color: #007bff;
+			}
+
+		/* Özel tab header stilleri */
+		.tab-header-danger {
+			background-color: #f8d7da;
+			color: #721c24;
+		}
+
+		.tab-header-success {
+			background-color: #d1e7dd;
+			color: #0f5132;
+		}
+
+		.tab-header-primary {
+			background-color: #cfe2ff;
+			color: #084298;
+		}
+
+		/* Tahsilat satırları için stil */
+		.odeme-row {
+			background-color: #ffebeb !important;
+		}
+
+			.odeme-row td {
+				color: red !important;
+			}
+	</style>
+</head>
+<body>
+	<div class="main-content mt-5">
+		<div class="px-lg-5 px-3">
+			<form method="get" asp-action="KasaRaporu" class="form-inline">
+				<div class="form-group mr-2">
+					<label for="baslamaTarihi" class="mr-2">Başlangıç Tarihi:</label>
+					<input type="date" id="baslamaTarihi" name="baslamaTarihi"
+						   class="form-control"
+						   value="@ViewData["BaslamaTarihi"]" />
+				</div>
+				<div class="form-group mr-2">
+					<label for="bitisTarihi" class="mr-2">Bitiş Tarihi:</label>
+					<input type="date" id="bitisTarihi" name="bitisTarihi"
+						   class="form-control"
+						   value="@ViewData["BitisTarihi"]" />
+				</div>
+				<button type="submit" class="btn btn-primary">Filtrele</button>
+			</form>
+
+			<!-- Ana İçerik -->
+			<div class="row mt-4">
+				<div class="col-sm-12">
+					<div class="card">
+						<div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+							<h5 class="card-header-text text-white">Kasa Raporu</h5>
+						</div>
+						<!-- Yan Yana Tablolar -->
+						<div class="balance-columns pt-4 px-2">
+							<!-- Sol Tablo (Toplam Bakiye) -->
+							<div class="balance-column">
+								<div class="card">
+									<div class="card-header bg-danger">
+										<h5 class="mb-0">TOPLAM BAKİYE</h5>
+									</div>
+									<div class="card-body p-0">
+										<div class="table-responsive">
+											<table class="table table-bordered mb-0">
+												<thead>
+													<tr>
+														<th class="text-center" width="50%">HESAP ADI</th>
+														<th class="text-center" width="50%">BAKİYE</th>
+													</tr>
+												</thead>
+												<tbody id="accountsTable">
+													@foreach (var hesap in ViewBag.ToplamBakiyeListesi)
+													{
+														<tr class="@(hesap.Bakiye < 0 ? "table-danger" : "")">
+															<td class="text-left">@hesap.Isim</td>
+															<td class="text-right">@hesap.DovizCinsi@hesap.Bakiye.ToString("N2")</td>
+														</tr>
+													}
+												</tbody>
+												<tfoot>
+													<tr class="bg-light">
+														<th class="text-left">KASADAKİ TOPLAM PARA (TL)</th>
+														<th class="text-right @(ViewBag.TLToplam < 0 ? "text-danger" : "text-success")">
+															₺@ViewBag.TLToplam.ToString("N2")
+														</th>
+													</tr>
+													<tr class="bg-light">
+														<th class="text-left">KASADAKİ TOPLAM PARA (USD)</th>
+														<th class="text-right @(ViewBag.USDToplam < 0 ? "text-danger" : "text-success")">
+															$@ViewBag.USDToplam.ToString("N2")
+														</th>
+													</tr>
+													<tr class="bg-light">
+														<th class="text-left">KASADAKİ TOPLAM PARA (EURO)</th>
+														<th class="text-right @(ViewBag.EuroToplam < 0 ? "text-danger" : "text-success")">
+															€@ViewBag.EuroToplam.ToString("N2")
+														</th>
+													</tr>
+													<tr class="bg-light">
+														<th class="text-left">KASADAKİ TOPLAM PARA (GENEL)</th>
+														<th class="text-right @(ViewBag.KasadakiToplamPara < 0 ? "text-danger" : "text-success")">
+															₺@ViewBag.KasadakiToplamPara.ToString("N2")
+														</th>
+													</tr>
+												</tfoot>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Sağ Tablo (Ödeme/Tahsilat Listesi) - Tab menü ile -->
+							<div class="balance-column">
+								<div class="card">
+									<!-- Tablar için menü -->
+									<ul class="nav nav-tabs" id="kasaTab" role="tablist">
+										<li class="nav-item">
+											<a class="nav-link active tab-header-success" id="tahsilatlar-tab" data-toggle="tab" href="#tahsilatlar" role="tab">
+												<i class="fas fa-arrow-down"></i> TAHSİLATLAR (@ViewBag.ToplamTahsilatSayisi)
+											</a>
+										</li>
+										<li class="nav-item">
+											<a class="nav-link tab-header-danger" id="odemeler-tab" data-toggle="tab" href="#odemeler" role="tab">
+												<i class="fas fa-arrow-up"></i> ÖDEMELER (@ViewBag.ToplamOdemeSayisi)
+											</a>
+										</li>
+										<li class="nav-item">
+											<a class="nav-link tab-header-primary" id="tumhareketler-tab" data-toggle="tab" href="#tumhareketler" role="tab">
+												<i class="fas fa-exchange-alt"></i> TÜM HAREKETLER
+											</a>
+										</li>
+									</ul>
+
+									<!-- Tab içerikleri -->
+									<div class="tab-content">
+										<!-- TAHSİLATLAR TABLOSU -->
+										<div class="tab-pane fade show active" id="tahsilatlar" role="tabpanel">
+											<div class="card-header bg-success">
+												<h5 class="mb-0" id="tahsilatlarListTitle">TAHSİLAT LİSTESİ</h5>
+											</div>
+											<div class="card-body p-0">
+												<div class="table-responsive">
+													<table class="table table-bordered mb-0">
+														<thead>
+															<tr>
+																<th>Vade Tarihi</th>
+																<th>Evrak Tipi</th>
+																<th>Açıklama</th>
+																<th>Banka</th>
+																<th class="text-right">Tutar</th>
+																<th>Para Birimi</th>
+															</tr>
+														</thead>
+														<tbody>
+															@foreach (var tahsilat in ViewBag.Tahsilatlar)
+															{
+																<tr>
+																	<td>@tahsilat.VadeTarihi.ToString("dd.MM.yyyy")</td>
+																	<td>@tahsilat.EvrakTipi</td>
+																	<td>@tahsilat.Açıklama</td>
+																	<td>@tahsilat.Banka</td>
+																	<td class="text-right">@tahsilat.Tutar.ToString("N2")</td>
+																	<td>@tahsilat.PB</td>
+																</tr>
+															}
+														</tbody>
+														<tfoot>
+															<tr class="table-success font-weight-bold">
+																<td colspan="4" class="text-right">Toplam Tahsilat:</td>
+																<td class="text-right">@ViewBag.ToplamTahsilatTutari.ToString("N2")</td>
+																<td></td>
+															</tr>
+														</tfoot>
+													</table>
+												</div>
+											</div>
+										</div>
+
+										<!-- ÖDEMELER TABLOSU -->
+										<div class="tab-pane fade" id="odemeler" role="tabpanel">
+											<div class="card-header bg-danger">
+												<h5 class="mb-0" id="odemelerListTitle">ÖDEME LİSTESİ</h5>
+											</div>
+											<div class="card-body p-0">
+												<div class="table-responsive">
+													<table class="table table-bordered mb-0">
+														<thead>
+															<tr>
+																<th>Vade Tarihi</th>
+																<th>Evrak Tipi</th>
+																<th>Açıklama</th>
+																<th>Banka</th>
+																<th class="text-right">Tutar</th>
+																<th>Para Birimi</th>
+															</tr>
+														</thead>
+														<tbody>
+															@foreach (var odeme in ViewBag.Odemeler)
+															{
+																<tr>
+																	<td>@odeme.VadeTarihi.ToString("dd.MM.yyyy")</td>
+																	<td>@odeme.EvrakTipi</td>
+																	<td>@odeme.Açıklama</td>
+																	<td>@odeme.Banka</td>
+																	<td class="text-right">@odeme.Tutar.ToString("N2")</td>
+																	<td>@odeme.PB</td>
+																</tr>
+															}
+														</tbody>
+														<tfoot>
+															<tr class="table-danger font-weight-bold">
+																<td colspan="4" class="text-right">Toplam Ödeme:</td>
+																<td class="text-right">@ViewBag.ToplamOdemeTutari.ToString("N2")</td>
+																<td></td>
+															</tr>
+														</tfoot>
+													</table>
+												</div>
+											</div>
+										</div>
+
+										<!-- TÜM HAREKETLER TABLOSU -->
+										<div class="tab-pane fade" id="tumhareketler" role="tabpanel">
+											<div class="card-header bg-primary">
+												<h5 class="mb-0" id="tumHareketlerListTitle">TÜM HAREKETLER</h5>
+											</div>
+											<div class="card-body p-0">
+												<div class="table-responsive">
+													<table class="table table-bordered mb-0">
+														<thead>
+															<tr>
+																<th>Vade Tarihi</th>
+																<th>Evrak Tipi</th>
+																<th>Açıklama</th>
+																<th>Banka</th>
+																<th class="text-right">Tutar</th>
+																<th>Para Birimi</th>
+															</tr>
+														</thead>
+														<tbody>
+															@{
+																// Banka ve evrak tipine göre kredi kartlarını gruplandırma
+																var krediKartlari = Model.Where(h => h.EvrakTipi.Contains("Kredi Kartı")).ToList();
+																var grupluKrediKartlari = krediKartlari
+																.GroupBy(h => new { h.Banka, h.EvrakTipi })
+																.Select(g => new
+																{
+																	VadeTarihi = g.First().VadeTarihi,
+																	EvrakTipi = g.Key.EvrakTipi,
+																	Açıklama = g.Key.EvrakTipi,
+																	Banka = g.Key.Banka,
+																	Tutar = g.Sum(x => x.Tutar),
+																	PB = g.First().PB,
+																	IsTahsilat = g.Key.EvrakTipi.Contains("Müşteri")
+																})
+																.ToList();
+
+																// Kredi kartı olmayan diğer hareketler
+																var digerHareketler = Model.Where(h => !h.EvrakTipi.Contains("Kredi Kartı")).ToList();
+
+																// Çoğaltılmış satış faturalarını ayıklama - aynı müşteri ve aynı tutarda olanları gruplayarak
+																var satisFaturalari = digerHareketler.Where(h => h.EvrakTipi == "Satış Faturası").ToList();
+																var tekillesmisF = satisFaturalari
+																.GroupBy(h => new { h.Açıklama, h.Tutar })
+																.Select(g => g.First())
+																.ToList();
+
+																// Kredi kartı ve çoğaltılmış faturalar hariç diğer hareketler
+																var filtrelenmisHareketler = digerHareketler
+																.Where(h => h.EvrakTipi != "Satış Faturası")
+																.Concat(tekillesmisF)
+																.OrderBy(h => h.VadeTarihi)
+																.ToList();
+
+																// Tüm filtrelenmiş ve gruplandırılmış hareketleri birleştir
+																var tumFiltrelenmisHareketler = filtrelenmisHareketler.Concat(grupluKrediKartlari.Cast<dynamic>()).OrderBy(h => h.VadeTarihi);
+															}
+
+															@foreach (var hareket in tumFiltrelenmisHareketler)
+															{
+																var isTahsilat = hareket.EvrakTipi == "Satış Faturası" ||
+																hareket.EvrakTipi == "Müşteri Çeki" ||
+																hareket.EvrakTipi == "Müşteri Senedi" ||
+																hareket.EvrakTipi == "Müşteri DBS" ||
+																hareket.EvrakTipi == "Müşteri Ödeme Sözü" ||
+																hareket.EvrakTipi == "Müşteri Kredi Kartı" ||
+																hareket.EvrakTipi == "Müşteri Teminat Mektubu";
+
+																<tr class="@(!isTahsilat ? "odeme-row" : "")">
+																	<td>@hareket.VadeTarihi.ToString("dd.MM.yyyy")</td>
+																	<td>@hareket.EvrakTipi</td>
+																	<td>@hareket.Açıklama</td>
+																	<td>@hareket.Banka</td>
+																	<td class="text-right">
+																		@if (isTahsilat)
+																		{
+																			<span>@hareket.Tutar.ToString("N2")</span>
+																		}
+																		else
+																		{
+																			<span>-@hareket.Tutar.ToString("N2")</span>
+																		}
+																	</td>
+																	<td>@hareket.PB</td>
+																</tr>
+															}
+														</tbody>
+														<tfoot>
+															<tr class="table-info font-weight-bold">
+																<td colspan="4" class="text-right">Genel Toplam (Net):</td>
+																<td class="text-right">@ViewBag.NetBakiye.ToString("N2")</td>
+																<td></td>
+															</tr>
+														</tfoot>
+													</table>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Özet Bilgiler -->
+			<div class="row mt-4">
+				<div class="col-12">
+					<div class="card animated-border">
+						<div class="card-header header-gradient-blue">
+							<h5 class="mb-0">ÖZET BİLGİLER</h5>
+						</div>
+						<div class="card-body py-4">
+							<div class="row">
+								<div class="col-md-3 mb-3">
+									<div class="card metric-card gradient-blue">
+										<div class="card-body p-3 text-center">
+											<div style="color: white" class="metric-title">Toplam Tahsilat</div>
+											<div style="color: white" class="metric-value">₺@ViewBag.ToplamTahsilatTutari.ToString("N2")</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3 mb-3">
+									<div class="card metric-card gradient-teal">
+										<div class="card-body p-3 text-center">
+											<div style="color: white" class="metric-title">Toplam Ödeme</div>
+											<div style="color: white" class="metric-value">₺@ViewBag.ToplamOdemeTutari.ToString("N2")</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3 mb-3">
+									<div class="card metric-card gradient-purple">
+										<div class="card-body p-3 text-center">
+											<div style="color: white" class="metric-title">Net Bakiye</div>
+											<div style="color: white" class="metric-value">₺@ViewBag.NetBakiye.ToString("N2")</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3 mb-3">
+									<div class="card metric-card gradient-orange">
+										<div class="card-body p-3 text-center">
+											<div style="color: white" class="metric-title">Toplam İşlem Sayısı</div>
+											<div style="color: white" class="metric-value">@(ViewBag.ToplamOdemeSayisi + ViewBag.ToplamTahsilatSayisi)</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	@section Scripts {
+		<script>
+			$(document).ready(function() {
+				// Tarih seçicilerin bugünün tarihini varsayılan olarak ayarlaması
+				if (!$('#baslamaTarihi').val()) {
+					var today = new Date().toISOString().split('T')[0];
+					$('#baslamaTarihi').val(today);
+				}
+				if (!$('#bitisTarihi').val()) {
+					var today = new Date().toISOString().split('T')[0];
+					$('#bitisTarihi').val(today);
+				}
+
+				// Form submit event listener
+				$('form').on('submit', function(e) {
+					const startDate = new Date($("#baslamaTarihi").val());
+					const endDate = new Date($("#bitisTarihi").val());
+
+					// Tarih geçerliliği kontrolü
+					if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+						e.preventDefault();
+						alert("Lütfen geçerli tarih aralığı seçin!");
+						return;
+					}
+
+					// Başlangıç tarihi bitiş tarihinden sonra olamaz
+					if (startDate > endDate) {
+						e.preventDefault();
+						alert("Başlangıç tarihi bitiş tarihinden sonra olamaz!");
+						return;
+					}
+
+					// Başlıkları güncelleme
+					updateListTitles(startDate, endDate);
+				});
+
+				// Başlıkları güncelleme fonksiyonu
+				function updateListTitles(startDate, endDate) {
+					const months = ["OCAK", "ŞUBAT", "MART", "NİSAN", "MAYIS", "HAZİRAN",
+								   "TEMMUZ", "AĞUSTOS", "EYLÜL", "EKİM", "KASIM", "ARALIK"];
+
+					const startMonth = months[startDate.getMonth()];
+					const endMonth = months[endDate.getMonth()];
+
+					let title = "";
+					if (startMonth === endMonth && startDate.getFullYear() === endDate.getFullYear()) {
+						title = startMonth + " AYI";
+					} else {
+						title = startMonth + " - " + endMonth;
+					}
+
+					// Başlıkları güncelle
+					$("#tahsilatlarListTitle").text(title + " TAHSİLAT LİSTESİ");
+					$("#odemelerListTitle").text(title + " ÖDEME LİSTESİ");
+					$("#tumHareketlerListTitle").text(title + " TÜM HAREKETLER");
+				}
+
+				// Varsayılan tarih ayarları
+				function setDefaultDates() {
+					const today = new Date();
+					const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+					// Başlangıç tarihi boşsa ayın ilk günü olarak ayarla
+					if (!$("#baslamaTarihi").val()) {
+						$("#baslamaTarihi").val(firstDayOfMonth.toISOString().split('T')[0]);
+					}
+
+					// Bitiş tarihi boşsa bugünün tarihi olarak ayarla
+					if (!$("#bitisTarihi").val()) {
+						$("#bitisTarihi").val(today.toISOString().split('T')[0]);
+					}
+
+					// Varsayılan tarihlere göre başlığı güncelle
+					const startDate = new Date($("#baslamaTarihi").val());
+					const endDate = new Date($("#bitisTarihi").val());
+					updateListTitles(startDate, endDate);
+				}
+
+				// Sayfa yüklendiğinde varsayılan tarihleri ayarla
+				setDefaultDates();
+			});
+		</script>
+	}
+</body>
+</html>

@@ -1,0 +1,325 @@
+﻿@model IEnumerable<IGrouping<string, Deneme_proje.Models.Entities.KrediDetayi>>
+
+@{
+    ViewData["Title"] = "Kredi Detay Listesi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <h4>Kredi Detay Listesi</h4>
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+                    
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">AOKF</h5>
+                    </div>
+
+                    <div class="card-block accordion-block">
+                        <div class="col-md-12">
+
+                            <div id="example_wrapper" class="dataTables_wrapper py-lg-3">
+                                <div class="dataTables_length" id="example_length"></div>
+                                <div class="dataTables_filter" id="example_filter"></div>
+                                @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+                                {
+                                    <div class="alert alert-danger">
+                                        @ViewBag.ErrorMessage
+                                    </div>
+                                }
+                                <div id="example_wrapper" class="table-wrapper">
+                                    <table id="example" class="display dataTable" style="width:100%">
+                                        <thead>
+                                            <tr class="tablo-icerik-yazi">
+                                                <th class="sorting text-left" style="width: 100px;">
+                                                    <div class="th-content">
+                                                        <span>Banka Adı</span>
+                                                    </div>
+                                                </th>
+                                                <th class="sorting text-left" style="width: 100px;">
+                                                    <div class="th-content">
+                                                        <span>A.O.K.T.F</span>
+                                                    </div>
+                                                </th>
+                                                <th class="sorting text-left" style="width: 100px;">
+                                                    <div class="th-content">
+                                                        <span>Kalan Ana Para</span>
+                                                    </div>
+                                                </th>
+                                                <th class="sorting text-left" style="width: 100px;">
+                                                    <div class="th-content">
+                                                        <span>Detay</span>
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var group in Model)
+                                            {
+                                                var sanitizedGroupKey = group.Key.Replace(" ", "-").Replace("_", "-");
+
+                                                var groupedBySozlesmeKodu = group
+                                                .GroupBy(item => item.krsoztaksit_sozkodu)
+                                                .ToList();
+
+                                                var toplamAOKTF = groupedBySozlesmeKodu.Sum(subGroup =>
+                                                {
+                                                    var filteredItems = subGroup.Where(item => item.krsoztaksit_odemeevraksira == 0).ToList();
+                                                    var toplamKalanAnapara = Math.Round(filteredItems.Sum(item => item.krsoztaksit_anapara), 2);
+                                                    var faizOrani = Math.Round(filteredItems.Any() ? filteredItems.First().krsoztaksit_faizorani * 12 : 0, 2);
+                                                    return Math.Round(toplamKalanAnapara * faizOrani, 2);
+                                                });
+
+                                                var toplamkalan = groupedBySozlesmeKodu.Sum(subGroup =>
+                                                {
+                                                    var filteredItems = subGroup.Where(item => item.krsoztaksit_odemeevraksira == 0).ToList();
+                                                    return Math.Round(filteredItems.Sum(item => item.krsoztaksit_anapara), 2);
+                                                });
+
+                                                var aokf = toplamkalan > 0 ? Math.Round(toplamAOKTF / toplamkalan, 2) : 0;
+
+                                                <tr>
+                                                    <td>@group.Key</td>
+                                                    <td>@aokf.ToString()</td>
+                                                    <td>@toplamkalan.ToString("C")</td>
+                                                    <td>
+                                                        <button class="accordion-button btn-tumblr git-btn" onclick="toggleAccordion('accordion-@sanitizedGroupKey')">Detay</button>
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td colspan="4" class="p-0">
+                                                        <div id="accordion-@sanitizedGroupKey" class="accordion-content">
+                                                            <table class="table table-striped table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Sözleşme Kodu</th>
+                                                                        <th>Faiz Oranı</th>
+                                                                        <th>Kalan Anapara</th>
+                                                                        <th>AOKTF Toplam</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @foreach (var subGroup in groupedBySozlesmeKodu)
+                                                                    {
+                                                                        var filteredItems = subGroup.Where(item => item.krsoztaksit_odemeevraksira == 0).ToList();
+                                                                        if (filteredItems.Any())
+                                                                        {
+                                                                            var toplamKalanAnapara = Math.Round(filteredItems.Sum(item => item.krsoztaksit_anapara), 2);
+                                                                            var faizOrani = Math.Round(filteredItems.First().krsoztaksit_faizorani * 12, 2);
+                                                                            var toplamAOKTFSubGroup = Math.Round(toplamKalanAnapara * faizOrani, 2);
+
+                                                                            <tr>
+                                                                                <td>@subGroup.Key</td>
+                                                                                <td>@faizOrani.ToString()</td>
+                                                                                <td>@toplamKalanAnapara.ToString("C")</td>
+                                                                                <td>@toplamAOKTFSubGroup.ToString("C")</td>
+                                                                            </tr>
+                                                                        }
+                                                                    }
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                        <tfoot>
+                                            @{
+                                                var toplamGenelAOKTF = Model.Sum(group =>
+                                                {
+                                                    var groupedBySozlesmeKodu = group.GroupBy(item => item.krsoztaksit_sozkodu).ToList();
+                                                    return groupedBySozlesmeKodu.Sum(subGroup =>
+                                                                                    {
+                                                                                        var filteredItems = subGroup.Where(item => item.krsoztaksit_odemeevraksira == 0).ToList();
+                                                                                        var toplamKalanAnapara = Math.Round(filteredItems.Sum(item => item.krsoztaksit_anapara), 2);
+                                                                                        var faizOrani = Math.Round(filteredItems.Any() ? filteredItems.First().krsoztaksit_faizorani * 12 : 0, 2);
+                                                                                        return Math.Round(toplamKalanAnapara * faizOrani, 2);
+                                                                                    });
+                                                });
+
+                                                var toplamGenelKalan = Model.Sum(group =>
+                                                {
+                                                    var groupedBySozlesmeKodu = group.GroupBy(item => item.krsoztaksit_sozkodu).ToList();
+                                                    return groupedBySozlesmeKodu.Sum(subGroup =>
+                                                                                    {
+                                                                                        var filteredItems = subGroup.Where(item => item.krsoztaksit_odemeevraksira == 0).ToList();
+                                                                                        return Math.Round(filteredItems.Sum(item => item.krsoztaksit_anapara), 2);
+                                                                                    });
+                                                });
+
+                                                var genelAOKTF = toplamGenelKalan > 0 ? Math.Round(toplamGenelAOKTF / toplamGenelKalan, 2) : 0;
+                                            }
+                                            <tr>
+                                                <td><strong>Genel Toplam</strong></td>
+                                                <td><strong>@genelAOKTF.ToString()</strong></td>
+                                                <td><strong>@toplamGenelKalan.ToString("C")</strong></td>
+                                                <td></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                                <div class="bottom">
+                                    <div class="dataTables_info" id="example_info"></div>
+                                    <div class="dataTables_paginate" id="example_paginate"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <style>
+            /* Tablo stili */
+            .table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+                .table td {
+                    font-size: 12px;
+                    padding: 2px 15px;
+                    text-align: left;
+                    border-bottom: 1px solid #e5e5e5;
+                }
+
+                .table th {
+                    background-color: #1D3A67;
+                    font-size: 12px;
+                    padding: 8px 15px;
+                    color: white;
+                    font-weight: 600;
+                }
+
+            .table-striped tbody tr:nth-of-type(odd) {
+                background-color: #f9f9f9;
+            }
+
+            .table-hover tbody tr:hover {
+                background-color: #f1f1f1;
+            }
+
+            .accordion-button {
+                padding: 1px 10px;
+                font-size: 12px;
+                background-color: #1D3A67 !important;
+                color: white !important;
+                border: none;
+                border-radius: 5px;
+                width: auto;
+                display: inline-flex;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+
+                .accordion-button:hover {
+                    background-color: #1D3A67;
+                    color: white;
+                }
+
+            .accordion-content {
+                display: none;
+                padding: 20px;
+                background-color: #f8f8f8;
+                border-radius: 5px;
+                box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+                margin-top: 10px;
+            }
+
+                /* İç tablo stili */
+                .accordion-content table th {
+                    background-color: #1D3A67;
+                    color: white;
+                    font-weight: 600;
+                }
+
+                .accordion-content table td {
+                    padding: 12px;
+                    border-bottom: 1px solid #1D3A67;
+                }
+
+            /* Button Stilleri */
+            .btn {
+                padding: 10px 20px;
+                font-size: 14px;
+                border-radius: 5px;
+                cursor: pointer;
+                text-decoration: none;
+                display: inline-block;
+                transition: background-color 0.3s ease;
+            }
+
+            .btn-info {
+                background-color: #17a2b8;
+                color: white;
+            }
+
+                .btn-info:hover {
+                    background-color: #138496;
+                }
+
+            /* Gölgeler ve geçiş efektleri */
+            .card, .accordion-content {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                transition: box-shadow 0.3s ease;
+            }
+
+                .card:hover, .accordion-content:hover {
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                }
+        </style>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
+        <script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let table = new DataTable('#example');
+            });
+        </script>
+
+
+        <script>
+            $('#example').DataTable({
+                "dom": '<"row"<"col-sm-12"B>>' +
+                    '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+                    't' +
+                    '<"row"<"col-sm-6"i><"col-sm-6"p>>',
+                "language": {
+                    "url": "/Content/DataTables/turkish.json"
+                },
+                "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'], // Butonlar
+                "columnDefs": [
+                    { "targets": "_all" } // Kolon genişliklerini sabitleme
+                ]
+            });
+            function toggleAccordion(id) {
+                var content = document.getElementById(id);
+                if (content.style.display === "none" || content.style.display === "") {
+                    content.style.display = "block";
+                } else {
+                    content.style.display = "none";
+                }
+            }
+        </script>

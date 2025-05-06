@@ -1,0 +1,343 @@
+﻿@{
+    ViewData["Title"] = "Rapor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<style>
+    .required::after {
+        content: " *";
+        color: red;
+    }
+
+    .form-control {
+        display: block;
+        width: 95%;
+        padding: .5rem .75rem;
+        font-size: 1rem;
+        line-height: 1.25;
+        color: #55595c;
+        background-color: #fff;
+        background-image: none;
+        -webkit-background-clip: padding-box;
+        background-clip: padding-box;
+        border: 1px solid rgba(0, 0, 0, .15);
+        border-radius: .25rem;
+        font-size: 12px;
+        margin: 0;
+        text-wrap: nowrap;
+        height: 32px;
+    }
+
+    .col-md-6 {
+        float: left;
+        width: 49%;
+    }
+
+    #map {
+        height: 190px; /* Harita yüksekliği */
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .modal {
+        z-index: 1055 !important; /* Modal için z-index */
+    }
+
+    /* Modal Arka Planının Z-Index Değerini Yüksek Ayarlayın */
+    .modal-backdrop {
+        z-index: 1050 !important; /* Arka plan için z-index */
+    }
+
+    /* Modal header, body ve footer için daha yüksek z-index */
+    .modal-content {
+        z-index: 1060 !important;
+    }
+
+    .form-select {
+        display: block;
+        width: 95%;
+        padding: .5rem .75rem;
+        font-size: 1rem;
+        line-height: 1.25;
+        color: #55595c;
+        background-color: #fff;
+        background-image: none;
+        -webkit-background-clip: padding-box;
+        background-clip: padding-box;
+        border: 1px solid rgba(0, 0, 0, .15);
+        border-radius: .25rem;
+        font-size: 12px;
+        margin: 0;
+        text-wrap: nowrap;
+        height: 32px;
+    }
+</style>
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+
+                        <li class="breadcrumb-item">
+                            <a href="#">CRM</a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style=" background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;"
+                         ">
+                        <h5 class="card-header-text text-white">Müşteri Ekle</h5>
+                    </div>
+
+
+
+
+
+                    <!-- Tablo -->
+                    @{
+                        ViewData["Title"] = "Teklif Sayfası";
+                        Layout = "~/Views/Shared/_Layout.cshtml";
+                    }
+
+                    <link href="~/content/assets/css/custom-style.css" rel="stylesheet" />
+
+                    <div class="container-fluid mt-4">
+
+
+                        <!-- Ana Form -->
+                        <form>
+                            <div class="card">
+                                <div class="card-body">
+                                    <!-- İlk Form Alanları -->
+                                    <div class="row">
+                                        <!-- Sol Alan -->
+                                        <div class="col-md-9">
+                                            <div class="mb-3">
+                                                <label class="form-label required">Müşteri Adı</label>
+                                                <input type="text" class="form-control">
+                                            </div>
+                                           
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label required">Firma Telefon</label>
+                                                    <input type="text" class="form-control">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Firma GSM</label>
+                                                    <input type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label required">Tipi</label>
+                                                    <select class="form-select">
+                                                        <option>Müşteri</option>
+                                                     
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Web</label>
+                                                    <input type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label required">Vergi Dairesi</label>
+                                                    <input type="text" class="form-control">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Verigi No</label>
+                                                    <input type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label required">Sektör</label>
+                                                    <select class="form-select">
+                                                        <option>Bilişim</option>
+
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Referans</label>
+                                                    <select class="form-select">
+                                                        <option>Melahat Aydın</option>
+
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label required">Özel Kod 1</label>
+                                                    <input type="text" class="form-control">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Özel Kod 2</label>
+                                                    <input type="text" class="form-control">
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label required">Liste No</label>
+                                                    <select class="form-select">
+                                                        <option>Satış Fiyatı</option>
+
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Cari Bakiye</label>
+                                                    <input type="text" class="form-control">
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label required">Durum</label>
+                                                <input type="text" class="form-control">
+                                            </div>
+
+                                            <div class=" mt-3">
+
+                                                <button class="btn btn-primary">Kaydet</button>
+                                            </div>
+                                        </div>
+                                        <!-- Sağ Alan -->
+                                        <div class="col-md-3">
+                                            <div class="mb-3">
+                                                <label class="form-label">Temsilci</label>
+                                                <select class="form-select">
+                                                    <option>Melahat Aydın</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Mail</label>
+                                                <input type="text" class="form-control">
+                                            </div>
+                                            
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Ticari Kod</label>
+                                                <input type="text" class="form-control">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Kuruluş Tarihi</label>
+                                                <input type="date" class="form-control">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Özel Kod 3</label>
+                                                <input type="text" class="form-control">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Lokasyon</label>
+                                                <div id="map" style="height: 190px;"></div>
+                                                <input type="text" class="form-control mt-2" id="locationInput" placeholder="Seçilen koordinat burada görünecek">
+                                            </div>
+                                           
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                         
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
+<script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+<script>
+    // Haritayı başlat
+    var map = L.map('map').setView([36.8121, 34.6415], 13); // Ankara koordinatları
+
+    // OpenStreetMap katmanı ekle
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // İşaretleyici değişkeni
+    var marker;
+
+    // Geokodlama işlemi için geocoder
+    var geocoder = L.Control.Geocoder.nominatim();
+
+    // Haritaya tıklama olayını dinle
+    map.on('click', function (e) {
+        var lat = e.latlng.lat;
+        var lng = e.latlng.lng;
+
+        // İşaretleyiciyi kaldır ve yenisini ekle
+        if (marker) {
+            map.removeLayer(marker);
+        }
+        marker = L.marker([lat, lng]).addTo(map);
+
+        // Koordinatları input alanına yazdır
+        document.getElementById('locationInput').value = lat + ', ' + lng;
+
+        // Geokodlama işlemi: Koordinatları kullanarak adresi al
+        geocoder.reverse([lat, lng], map.options.crs.scale(map.getZoom()), function (results) {
+            var address = results && results.length > 0 ? results[0].formatted : "Adres bulunamadı";
+            document.getElementById('addressInput').value = address; // Adresi input'a yazdır
+        });
+    });
+
+    // Adres girildiğinde işaretleme yapma
+    document.getElementById('addressInput').addEventListener('blur', function () {
+        var address = document.getElementById('addressInput').value;
+        if (address) {
+            geocoder.geocode(address, function (results) {
+                if (results && results.length > 0) {
+                    var latlng = results[0].center;
+                    // Harita üzerinde işaretleyici ekle
+                    if (marker) {
+                        map.removeLayer(marker);
+                    }
+                    marker = L.marker(latlng).addTo(map);
+                    map.setView(latlng, 13); // Haritayı yeni konuma odakla
+
+                    // Koordinatları input'a yazdır
+                    document.getElementById('locationInput').value = latlng.lat + ', ' + latlng.lng;
+                } else {
+                    alert("Adres bulunamadı.");
+                }
+            });
+        }
+    });
+</script>
+

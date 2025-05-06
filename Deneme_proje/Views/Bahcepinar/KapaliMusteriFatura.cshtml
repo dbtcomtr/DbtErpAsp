@@ -1,0 +1,164 @@
+﻿@* @model IEnumerable<Deneme_proje.Models.Entities.FaturaViewModel>
+
+<form action="@Url.Action("Index", "Fatura")" method="get">
+    <div class="form-group">
+        <label for="cariKodu">Cari Kodu:</label>
+        <input type="text" name="cariKodu" id="cariKodu" class="form-control" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Sorgula</button>
+</form>
+
+@if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+{
+    <div class="alert alert-danger">
+        @ViewBag.ErrorMessage
+    </div>
+}
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-striped table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Ödeme Türü</th>
+                <th>Cari Unvanı</th>
+                <th>Fatura Tarihi (Sayı)</th>
+                <th>Fatura Tarihi</th>
+                <th>Fatura Vade Tarihi</th>
+                <th>Fatura Vadesi</th>
+                <th>Taksit Tutarı</th>
+                <th>Faott</th>
+                <th>Faots</th>
+                <th>Vs</th>
+                <th>Fm</th>
+                <th>Fgg</th>
+                <th>Faiz Oranı</th>
+                <th>Borç Tutarı</th>
+                <th>Detay</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var group in Model.GroupBy(x => x.EvrakNo))
+            {
+                var firstItem = group.First();
+                var totalPayment = group.Sum(x => x.TaksitTutar);
+                var sonuc1 = group.Sum(x => x.AlacakVadeTarihiSayi * Math.Round(x.TaksitTutar, 2));
+                var faott1 = Math.Round((sonuc1 / (decimal)firstItem.FaturaTutari), 2);
+
+                var baseDate1 = new DateTime(1899, 12, 30); // Başlangıç tarihi
+                var daysToAdd1 = (double)faott1; // Yuvarlanmış değeri double olarak kullan
+
+                DateTime resultDate1;
+                try
+                {
+                    // Gün sayısını sınırlandırma
+                    if (daysToAdd1 < -1 * (int.MaxValue - (baseDate1 - DateTime.MinValue).Days) ||
+                    daysToAdd1 > (DateTime.MaxValue - baseDate1).Days)
+                    {
+                        throw new ArgumentOutOfRangeException("daysToAdd1", "Gün sayısı geçerli tarih aralığının dışında.");
+                    }
+
+                    resultDate1 = baseDate1.AddDays(daysToAdd1); // Gün ekleme
+                }
+                catch (ArgumentOutOfRangeException ex)
+                {
+                    // Hata durumunda varsayılan tarih ve hata mesajı
+                    resultDate1 = baseDate1; // Varsayılan olarak başlangıç tarihini kullanın
+                    ViewBag.ErrorMessage = "Tarih hesaplamasında bir hata oluştu: " + ex.Message;
+                }
+
+                var faotsayi1 = faott1 - firstItem.FaturaTarihiSayi;
+                var sapma1 = faotsayi1 - firstItem.FaturaVadesi;
+                var fm1 = (firstItem.FaizOrani / 360) * sapma1;
+                var fgg1 = Math.Round((firstItem.FaturaTutari * fm1) / 100, 2);
+
+                <tr>
+                    <td>Toplam ödeme</td>
+                    <td>@firstItem.CariUnvani</td>
+                    <td>@firstItem.FaturaTarihiSayi</td>
+                    <td>@firstItem.FaturaTarihi.ToShortDateString()</td>
+                    <td>@firstItem.FaturaVadeTarihi.ToShortDateString()</td>
+                    <td>@firstItem.FaturaVadesi</td>
+                    <td>@totalPayment.ToString("C")</td>
+                    <td>@resultDate1.ToShortDateString()</td>
+                    <td>@faotsayi1.ToString("F2")</td>
+                    <td>@sapma1</td>
+                    <td>@fm1</td>
+                    <td>@fgg1</td>
+                    <td>@firstItem.FaizOrani.ToString("P2")</td>
+                    <td>@sonuc1</td>
+                    <td>
+                        <!-- Detay butonu -->
+                        <button class="btn btn-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#content-@group.Key" aria-expanded="false" aria-controls="content-@group.Key">
+                            Detay
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="14" class="p-0">
+                        <!-- Akordeon içeriği -->
+                        <div id="content-@group.Key" class="collapse">
+                            <div class="card card-body">
+                                <!-- Toplam Ödeme Detaylarını Göster -->
+                                <table class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Fatura Tarihi</th>
+                                            <th>Taksit Tutarı</th>
+                                            <th>Borç Tutarı</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in group)
+                                        {
+                                            decimal yuvarlanmisTaksitTutari = Math.Round(item.TaksitTutar, 2);
+                                            var sonuc = item.AlacakVadeTarihiSayi * yuvarlanmisTaksitTutari;
+                                            var faott2 = Math.Round(sonuc / yuvarlanmisTaksitTutari, 2);
+
+                                            var baseDate = new DateTime(1899, 12, 30); // Başlangıç tarihi
+                                            var daysToAdd = (double)faott2; // Yuvarlanmış değeri double olarak kullan
+
+                                            DateTime resultDate;
+                                            try
+                                            {
+                                                // Gün sayısını sınırlandırma
+                                                if (daysToAdd < -1 * (int.MaxValue - (baseDate - DateTime.MinValue).Days) ||
+                                                daysToAdd > (DateTime.MaxValue - baseDate).Days)
+                                                {
+                                                    throw new ArgumentOutOfRangeException("daysToAdd", "Gün sayısı geçerli tarih aralığının dışında.");
+                                                }
+
+                                                resultDate = baseDate.AddDays(daysToAdd); // Gün ekleme
+                                            }
+                                            catch (ArgumentOutOfRangeException ex)
+                                            {
+                                                // Hata durumunda varsayılan tarih
+                                                resultDate = baseDate; // Varsayılan olarak başlangıç tarihini kullanın
+                                            }
+
+                                            var faotsayi = item.AlacakVadeTarihiSayi - item.FaturaTarihiSayi;
+                                            var sapma = faotsayi - item.FaturaVadesi;
+                                            var fm = (item.FaizOrani / 360) * sapma;
+                                            var fgg = Math.Round((item.FaturaTutari * fm) / 100, 2);
+
+                                            <tr>
+                                                <td>@item.AlacakVade.ToShortDateString()</td>
+                                                <td>@item.TaksitTutar.ToString("F2")</td>
+                                                <td>@sonuc</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Veri bulunamadı.</p>
+}
+ *@

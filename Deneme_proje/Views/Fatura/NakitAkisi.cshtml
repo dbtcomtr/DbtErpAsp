@@ -1,0 +1,1188 @@
+﻿@model Deneme_proje.Models.Entities.CekDurumuViewModel
+
+<style>
+    .para-birimi {
+        font-weight: bold;
+        background-color: #001f3f;
+        color: white;
+        "
+    }
+
+
+    .toggle-header {
+        cursor: pointer;
+        background-color: #001f3f; /* Lacivert renk */
+        color: #ffffff;
+    }
+
+    .table-responsive {
+        max-height: 500px; /* Tablo yüksekliği (gerektiğinde ayarlanabilir) */
+        overflow-y: auto; /* Dikey kaydırma */
+        overflow-x: auto; /* Yatay kaydırma */
+        border: 1px solid #ddd; /* Çerçeve eklemek için */
+    }
+
+    .table thead th {
+        vertical-align: bottom;
+        border-bottom: 2px solid #eceeef;
+        position: sticky;
+        top: 0;
+        background-color: #001f3f;
+        color: white;
+        z-index: 2;
+    }
+    /* Birinci kolonu sabitlemek için */
+    .table tbody td:first-child {
+        position: sticky;
+        left: 0; /* Sol tarafa sabitler */
+        background-color: #efefef; /* Arka plan rengi */
+        z-index: 1; /* Diğer elemanların üstünde tutar */
+        color: black; /* Yazı rengi */
+        font-weight: bold;
+    }
+
+</style>
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <h4>Nakit Akışı</h4>
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-lg-5 mb-1">
+            <div class="col-lg-4">
+                <form method="post" class="form-inline">
+                    <div class="form-group">
+                        <label for="baslamaTarihi" style="font-size: 12px; font-weight: bold; color: #333;">Başlama Tarihi:</label>
+                        <input type="date" id="baslamaTarihi" name="baslamaTarihi" class="form-control" required style="padding: 8px; border-radius: 4px; font-size: 12px;" />
+                    </div>
+                    <div class="form-group">
+                        <label for="bitisTarihi" style="font-size: 12px; font-weight: bold; color: #333;">Bitiş Tarihi:</label>
+                        <input type="date" id="bitisTarihi" name="bitisTarihi" class="form-control" required style="padding: 8px; border-radius: 4px; font-size: 12px;" />
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-tumblr btn-shadow waves-effect waves-light">Getir</button>
+                    </div>
+                    <div style="margin-bottom: 10px; text-align: center;">
+                        <button onclick="showTable('dailyTable')" class="btn btn-primary">Günlük</button>
+                        <button onclick="showTable('monthlyTable')" class="btn btn-secondary">Aylık</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- Nakit Girişleri Card (Müşteri ile ilgili olanlar) -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style=" background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;"
+                         ">
+                        <h5 class="card-header-text text-white">Nakit Akışı</h5>
+                    </div>
+
+                    <div class="card-block accordion-block">
+                        <div class="col-md-12">
+
+                            <div id="example_wrapper" class="dataTables_wrapper py-lg-3">
+                                <div class="dataTables_length" id="example_length"></div>
+                                <div class="dataTables_filter" id="example_filter"></div>
+
+
+
+
+
+
+                                <!-- Müşteri Çekleri - Günlük Görünüm -->
+                                <div class="dailyTable" style="display: block;">
+                    @if (Model != null && Model.MusteriCekleri != null)
+                    {
+                                        <h4 style="font-weight: bold; font-size: 1.5em; color: #333;">Alınan Müşteri Çekleri</h4>
+                                        <button class="btn btn-primary" data-toggle="modal" data-target="#vadesiGecmisMusteriCekleriModal">
+                                            Vadesi Geçenler
+                                        </button>
+
+                                        <div class="modal fade" id="vadesiGecmisMusteriCekleriModal" tabindex="-1" role="dialog" aria-labelledby="vadesiGecmisModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="vadesiGecmisModalLabel">Vadesi Geçen Çekler</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="table-responsive">
+                                                            <table class="table table-bordered">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Sahip Cari Adı</th>
+                                                                        <th>Vadesi Geçen Tutar</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                    @if (Model != null && Model.VadesiGecmisMusteriCekleri != null)
+                                                    {
+                                                        @foreach (var cek in Model.VadesiGecmisMusteriCekleri)
+                                                        {
+                                                                            <tr>
+                                                                                <td>@cek.SahipCariAdi</td>
+                                                                                <td class="para-birimi">@cek.KalanTutar</td>
+                                                                            </tr>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                                        <tr><td colspan="2">Veri mevcut değil.</td></tr>
+                                                    }
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                        @if (Model != null && Model.MusteriCekleri != null)
+                        {
+                            var cekGruplari = new[] { "Portföyde", "Tahsilde", "Teminatta" };
+                            var days = Enumerable.Range(0, (Model.BitisTarihi - Model.BaslamaTarihi).Days + 1)
+                            .Select(offset => Model.BaslamaTarihi.AddDays(offset))
+                            .Where(day => cekGruplari.Any(grup => Model.MusteriCekleri.Any(c => c.Pozisyonu == grup && c.Vade.Date == day.Date && c.Kalan > 0)))
+                            .ToList();
+
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="font-weight: bold; background-color: #001f3f; color: white;">Sahip Cari Adı</th>
+                                            @foreach (var day in days)
+                                            {
+                                                                <th style="font-weight: bold; background-color: #001f3f; color: white;">@day.ToString("dd/MM/yyyy")</th>
+                                            }
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                        @foreach (var grup in cekGruplari)
+                                        {
+                                            var grupToplamlar = days.Select(day => Model.MusteriCekleri
+                                            .Where(c => c.Pozisyonu == grup && c.Vade.Date == day.Date && c.Kalan > 0)
+                                            .Sum(c => c.Kalan)).ToList();
+
+                                                            <tr class="toggle-header" onclick="toggleRow('@grup')" style="cursor: pointer; background-color: #0069d9; color: #ffffff;">
+                                                                <td>@grup Müşteri Çekleri</td>
+                                                @foreach (var toplam in grupToplamlar)
+                                                {
+                                                                    <td style="font-weight: bold; background-color: #001f3f color: black;">@(toplam > 0 ? toplam.ToString("N2") : "")</td>
+                                                }
+                                                            </tr>
+                                            @foreach (var cek in Model.MusteriCekleri.Where(c => c.Pozisyonu == grup && c.Kalan > 0))
+                                            {
+                                                                <tr class="@grup" style="display: none;">
+                                                                    <td>@cek.SahipCariAdi</td>
+                                                    @foreach (var day in days)
+                                                    {
+                                                                        <td>@(cek.Vade.Date == day.Date ? cek.Kalan.ToString("N2") : "")</td>
+                                                    }
+                                                                </tr>
+                                            }
+                                        }
+                                                        <tr style="font-weight: bold; background-color: #e6e6e6;">
+                                                            <td style="font-weight: bold; background-color: #ffffff; color: white;"> Genel Toplam</td>
+                                            @foreach (var day in days)
+                                            {
+                                                var genelToplam = Model.MusteriCekleri
+                                                .Where(c => cekGruplari.Contains(c.Pozisyonu) && c.Vade.Date == day.Date && c.Kalan > 0)
+                                                .Sum(c => c.Kalan);
+                                                                <td style="font-weight: bold; background-color: #ffffff; color: white;">@(genelToplam > 0 ? genelToplam.ToString("N2") : "")</td>
+                                            }
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                        }
+                    }
+                                </div>
+
+                                <!-- Müşteri Çekleri - Aylık Görünüm -->
+                                <div class="monthlyTable" style="display: none;">
+                                    <h4 style="font-weight: bold; font-size: 1.5em; color: #333;">Alınan Müşteri Çekleri - Aylık Görünüm</h4>
+                    @if (Model != null && Model.MusteriCekleri != null)
+                    {
+                        var cekGruplari = new[] { "Portföyde", "Tahsilde", "Teminatta" };
+                        var months = Enumerable.Range(0, (Model.BitisTarihi.Year - Model.BaslamaTarihi.Year) * 12 + Model.BitisTarihi.Month - Model.BaslamaTarihi.Month + 1)
+                        .Select(offset => Model.BaslamaTarihi.AddMonths(offset))
+                        .Where(month => cekGruplari.Any(grup => Model.MusteriCekleri.Any(c => c.Pozisyonu == grup && c.Vade.Year == month.Year && c.Vade.Month == month.Month && c.Kalan > 0)))
+                        .ToList();
+
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Sahip Cari Adı</th>
+                                        @foreach (var month in months)
+                                        {
+                                                            <th>@month.ToString("MM/yyyy")</th>
+                                        }
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                    @foreach (var grup in cekGruplari)
+                                    {
+                                        var grupToplamlar = months.Select(month => Model.MusteriCekleri
+                                        .Where(c => c.Pozisyonu == grup && c.Vade.Year == month.Year && c.Vade.Month == month.Month && c.Kalan > 0)
+                                        .Sum(c => c.Kalan)).ToList();
+
+                                                        <tr class="toggle-header" onclick="toggleRow('@grup')" style="cursor: pointer; background-color: #0069d9; color: #ffffff;">
+                                                            <td>@grup Müşteri Çekleri</td>
+                                            @foreach (var toplam in grupToplamlar)
+                                            {
+                                                                <td style="font-weight: bold; background-color: #001f3f; color: white;">@(toplam > 0 ? toplam.ToString("N2") : "")</td>
+                                            }
+                                                        </tr>
+                                        @foreach (var cek in Model.MusteriCekleri.Where(c => c.Pozisyonu == grup && c.Kalan > 0))
+                                        {
+                                                            <tr class="@grup" style="display: none;">
+                                                                <td>@cek.SahipCariAdi</td>
+                                                @foreach (var month in months)
+                                                {
+                                                                    <td>@(cek.Vade.Year == month.Year && cek.Vade.Month == month.Month ? cek.Kalan.ToString("N2") : "")</td>
+                                                }
+                                                            </tr>
+                                        }
+                                    }
+                                                    <tr style="font-weight: bold; background-color: #e6e6e6;">
+                                                        <td style="font-weight: bold; background-color: #001f3f; color: white;">Genel Toplam</td>
+                                        @foreach (var month in months)
+                                        {
+                                            var genelToplam = Model.MusteriCekleri
+                                            .Where(c => cekGruplari.Contains(c.Pozisyonu) && c.Vade.Year == month.Year && c.Vade.Month == month.Month && c.Kalan > 0)
+                                            .Sum(c => c.Kalan);
+                                                            <td style="font-weight: bold; background-color: #001f3f; color: white;">@(genelToplam > 0 ? genelToplam.ToString("N2") : "")</td>
+                                        }
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                    }
+                                </div>
+
+                                <!-- Müşteri Kredi Kartları - Günlük Görünüm -->
+                                <div class="dailyTable" style="display: block;">
+                    @if (Model != null && Model.MusteriKrediKartlari != null)
+                    {
+                                        <h4 style="font-weight: bold; font-size: 1.5em; color: #333;">Poslardan Çekilen Müşteri Kredi Kartları</h4>
+
+                        var krediKartDays = Enumerable.Range(0, (Model.BitisTarihi - Model.BaslamaTarihi).Days + 1)
+                        .Select(offset => Model.BaslamaTarihi.AddDays(offset))
+                        .Where(day => Model.MusteriKrediKartlari.Any(k => k.VadeTarihi.Date == day.Date && k.Kalan > 0))
+                        .ToList();
+
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Borçlu</th>
+                                        @foreach (var day in krediKartDays)
+                                        {
+                                                            <th>@day.ToString("dd/MM/yyyy")</th>
+                                        }
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="toggle-header" onclick="toggleRow('KrediKartlari')" style="cursor: pointer;">
+                                                        <td>Müşteri Kredi Kartları</td>
+                                        @foreach (var day in krediKartDays)
+                                        {
+                                            var toplam = Model.MusteriKrediKartlari
+                                            .Where(k => k.VadeTarihi.Date == day.Date && k.Kalan > 0)
+                                            .Sum(k => k.Kalan);
+                                                            <td style="font-weight: bold; background-color: #001f3f; color: white;" class="para-birimi">@(toplam > 0 ? toplam.ToString("C") : "")</td>
+                                        }
+                                                    </tr>
+                                    @foreach (var krediKart in Model.MusteriKrediKartlari.Where(k => k.Kalan > 0))
+                                    {
+                                                        <tr class="KrediKartlari" style="display: none;">
+                                                            <td>@krediKart.Borçlu</td>
+                                            @foreach (var day in krediKartDays)
+                                            {
+                                                                <td class="para-birimi">@(krediKart.VadeTarihi.Date == day.Date ? krediKart.Kalan.ToString("C") : "")</td>
+                                            }
+                                                        </tr>
+                                    }
+                                                    <tr style="font-weight: bold;">
+                                                        <td>Genel Toplam</td>
+                                        @foreach (var day in krediKartDays)
+                                        {
+                                            var genelToplam = Model.MusteriKrediKartlari
+                                            .Where(k => k.VadeTarihi.Date == day.Date && k.Kalan > 0)
+                                            .Sum(k => k.Kalan);
+                                                            <td style="font-weight: bold; background-color: #001f3f; color: white;" class="para-birimi">@(genelToplam > 0 ? genelToplam.ToString("C") : "")</td>
+                                        }
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                    }
+                                </div>
+
+                                <!-- Müşteri Kredi Kartları - Aylık Görünüm -->
+                                <div class="monthlyTable" style="display: none;">
+                                    <h4 style="font-weight: bold; font-size: 1.5em; color: #333;">Poslardan Çekilen Müşteri Kredi Kartları - Aylık Görünüm</h4>
+                    @if (Model != null && Model.MusteriKrediKartlari != null)
+                    {
+                        var krediKartMonths = Enumerable.Range(0, (Model.BitisTarihi.Year - Model.BaslamaTarihi.Year) * 12 + Model.BitisTarihi.Month - Model.BaslamaTarihi.Month + 1)
+                        .Select(offset => new DateTime(Model.BaslamaTarihi.Year, Model.BaslamaTarihi.Month, 1).AddMonths(offset))
+                        .Where(month => Model.MusteriKrediKartlari.Any(k => k.VadeTarihi.Year == month.Year && k.VadeTarihi.Month == month.Month && k.Kalan > 0))
+                        .ToList();
+
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Borçlu</th>
+                                        @foreach (var month in krediKartMonths)
+                                        {
+                                                            <th>@month.ToString("MM/yyyy")</th>
+                                        }
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="toggle-header" onclick="toggleRow('KrediKartlariAylik')" style="cursor: pointer;">
+                                                        <td>Müşteri Kredi Kartları</td>
+                                        @foreach (var month in krediKartMonths)
+                                        {
+                                            var toplam = Model.MusteriKrediKartlari
+                                            .Where(k => k.VadeTarihi.Year == month.Year && k.VadeTarihi.Month == month.Month && k.Kalan > 0)
+                                            .Sum(k => k.Kalan);
+                                                            <td style="font-weight: bold; background-color: #001f3f; color: white;" class="para-birimi">@(toplam > 0 ? toplam.ToString("C") : "")</td>
+                                        }
+                                                    </tr>
+                                    @foreach (var krediKart in Model.MusteriKrediKartlari.Where(k => k.Kalan > 0))
+                                    {
+                                                        <tr class="KrediKartlariAylik" style="display: none;">
+                                                            <td>@krediKart.Borçlu</td>
+                                            @foreach (var month in krediKartMonths)
+                                            {
+                                                var kalan = krediKart.VadeTarihi.Year == month.Year && krediKart.VadeTarihi.Month == month.Month ? krediKart.Kalan : 0;
+                                                                <td class="para-birimi">@(kalan > 0 ? kalan.ToString("C") : "")</td>
+                                            }
+                                                        </tr>
+                                    }
+                                                    <tr style="font-weight: bold;">
+                                                        <td>Genel Toplam</td>
+                                        @foreach (var month in krediKartMonths)
+                                        {
+                                            var genelToplam = Model.MusteriKrediKartlari
+                                            .Where(k => k.VadeTarihi.Year == month.Year && k.VadeTarihi.Month == month.Month && k.Kalan > 0)
+                                            .Sum(k => k.Kalan);
+                                                            <td style="font-weight: bold; background-color: #001f3f; color: white;" class="para-birimi">@(genelToplam > 0 ? genelToplam.ToString("C") : "")</td>
+                                        }
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                    }
+                                </div>
+                            </div>
+
+                            <!-- Artı Bakiye Fatura Müşterileri -->
+                            <div class="dailyTable" style="display: block;">
+                    @if (Model != null && Model.ArtiBakiyeFaturaMusteri != null)
+                    {
+                                    <h4 style="font-weight: bold; font-size: 1.5em; color: #333;">Açıkta Bekleyen Müşteri Faturaları</h4>
+
+                        var bakiyeDays = Enumerable.Range(0, (Model.BitisTarihi - Model.BaslamaTarihi).Days + 1)
+                        .Select(offset => Model.BaslamaTarihi.AddDays(offset))
+                        .Where(day => Model.ArtiBakiyeFaturaMusteri.Any(m => m.Vade.Date == day.Date))
+                        .ToList();
+
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Unvan</th>
+                                                    <th>Fatura No</th>
+                                        @foreach (var day in bakiyeDays)
+                                        {
+                                                        <th>@day.ToString("dd/MM/yyyy")</th>
+                                        }
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="toggle-header" onclick="toggleRow('ArtıBakiye')" style="cursor: pointer;">
+                                                    <td>Artı Bakiye</td>
+                                                    <td>Fatura</td>
+                                        @foreach (var day in bakiyeDays)
+                                        {
+                                            var toplam = Model.ArtiBakiyeFaturaMusteri
+                                            .Where(m => m.Vade.Date == day.Date && m.Bakiye > 0)
+                                            .Sum(m => m.Bakiye);
+                                                        <td style="font-weight: bold; background-color: #001f3f; color: white;" class="para-birimi">@(toplam > 0 ? toplam.ToString("C") : "")</td>
+                                        }
+                                                </tr>
+                                    @foreach (var musteri in Model.ArtiBakiyeFaturaMusteri.Where(m => m.Bakiye > 0))
+                                    {
+                                                    <tr class="ArtıBakiye" style="display: none;">
+                                                        <td>@musteri.Unvan</td>
+                                                        <td>@musteri.FaturaNo</td>
+                                            @foreach (var day in bakiyeDays)
+                                            {
+                                                            <td>@(musteri.Vade.Date == day.Date ? musteri.Bakiye.ToString("C") : "")</td>
+                                            }
+                                                    </tr>
+                                    }
+                                                <tr style="font-weight: bold;">
+                                                    <td>Genel Toplam</td>
+                                                    <td>Tüm Faturalar</td>
+                                        @foreach (var day in bakiyeDays)
+                                        {
+                                            var genelToplam = Model.ArtiBakiyeFaturaMusteri
+                                            .Where(m => m.Vade.Date == day.Date && m.Bakiye > 0)
+                                            .Sum(m => m.Bakiye);
+                                                        <td style="font-weight: bold; background-color: #001f3f; color: white;" class="para-birimi">@(genelToplam > 0 ? genelToplam.ToString("C") : "")</td>
+                                        }
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                    }
+                            </div>
+
+                            <div class="monthlyTable" style="display: none;">
+                    @if (Model != null && Model.ArtiBakiyeFaturaMusteri != null)
+                    {
+                                    <h4 style="font-weight: bold; font-size: 1.5em; color: #333;">Açıkta Bekleyen Müşteri Faturaları - Aylık Görünüm</h4>
+
+                        var bakiyeMonths = Enumerable.Range(0, (Model.BitisTarihi.Year - Model.BaslamaTarihi.Year) * 12 + Model.BitisTarihi.Month - Model.BaslamaTarihi.Month + 1)
+                        .Select(offset => new DateTime(Model.BaslamaTarihi.Year, Model.BaslamaTarihi.Month, 1).AddMonths(offset))
+                        .Where(month => Model.ArtiBakiyeFaturaMusteri.Any(m => m.Vade.Year == month.Year && m.Vade.Month == month.Month && m.Bakiye > 0))
+                        .ToList();
+
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Unvan</th>
+                                        @foreach (var month in bakiyeMonths)
+                                        {
+                                                        <th>@month.ToString("MM/yyyy")</th>
+                                        }
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr style="font-weight: bold; background-color: #001f3f; color: white;" class="toggle-header" onclick="toggleRow('ArtıBakiyeAylik')" style="cursor: pointer;">
+                                                    <td>Artı Bakiye</td>
+                                        @foreach (var month in bakiyeMonths)
+                                        {
+                                            var toplam = Model.ArtiBakiyeFaturaMusteri
+                                            .Where(m => m.Vade.Year == month.Year && m.Vade.Month == month.Month && m.Bakiye > 0)
+                                            .Sum(m => m.Bakiye);
+                                                        <td style="font-weight: bold; background-color: #001f3f; color: white;" class="para-birimi">@(toplam > 0 ? toplam.ToString("C") : "")</td>
+                                        }
+                                                </tr>
+                                    @foreach (var musteri in Model.ArtiBakiyeFaturaMusteri.Where(m => m.Bakiye > 0))
+                                    {
+                                                    <tr class="ArtıBakiyeAylik" style="display: none;">
+                                                        <td>@musteri.Unvan</td>
+                                            @foreach (var month in bakiyeMonths)
+                                            {
+                                                var bakiye = (musteri.Vade.Year == month.Year && musteri.Vade.Month == month.Month) ? musteri.Bakiye : 0;
+                                                            <td class="para-birimi">@(bakiye > 0 ? bakiye.ToString("C") : "")</td>
+                                            }
+                                                    </tr>
+                                    }
+                                                <tr style="font-weight: bold;">
+                                                    <td>Genel Toplam</td>
+                                        @foreach (var month in bakiyeMonths)
+                                        {
+                                            var genelToplam = Model.ArtiBakiyeFaturaMusteri
+                                            .Where(m => m.Vade.Year == month.Year && m.Vade.Month == month.Month && m.Bakiye > 0)
+                                            .Sum(m => m.Bakiye);
+                                                        <td style="font-weight: bold; background-color: #001f3f; color: white;" class="para-birimi">@(genelToplam > 0 ? genelToplam.ToString("C") : "")</td>
+                                        }
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                    }
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Nakit Çıkışları Card (Firma ve Tedarikçi ile ilgili olanlar) -->
+                    <div class="container-fluid  py-0">
+                        <div class="card">
+                            <div class="card-header"></div>
+
+                            <!-- Firma Çekleri -->
+                            <!-- Firma Çekleri - Günlük Görünüm -->
+                            <div class="dailyTable" style="display: block;">
+                    @if (Model != null && Model.FirmaCekleri != null)
+                    {
+                                    <h4 style="font-weight: bold; font-size: 1.5em; color: #333;">Verdiğimiz Firma Çekleri</h4>
+                                    <button class="btn btn-primary" data-toggle="modal" data-target="#vadesiGecmisModal">
+                                        Vadesi Geçenler
+                                    </button>
+
+                        var days = Enumerable.Range(0, (Model.BitisTarihi - Model.BaslamaTarihi).Days + 1)
+                        .Select(offset => Model.BaslamaTarihi.AddDays(offset))
+                        .Where(day => Model.FirmaCekleri.Any(c => c.Vade.Date == day.Date && c.Kalan > 0))
+                        .ToList();
+
+                        var cekGruplari = new[] { "Ciro" };
+
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Sahip Cari Adı</th>
+                                        @foreach (var day in days)
+                                        {
+                                                        <th>@day.ToString("dd/MM/yyyy")</th>
+                                        }
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                    @foreach (var grup in cekGruplari)
+                                    {
+                                        var grupToplamlar = days.Select(day => Model.FirmaCekleri
+                                        .Where(c => c.Pozisyonu == grup && c.Vade.Date == day.Date && c.Kalan > 0)
+                                        .Sum(c => c.Kalan)).ToList();
+
+                                                    <tr class="toggle-header" onclick="toggleRow('@grup')" style="cursor: pointer; background-color: #0069d9; color: #ffffff;">
+                                                        <td>@grup Firma Çekleri</td>
+                                            @foreach (var toplam in grupToplamlar)
+                                            {
+                                                            <td class="para-birimi">@(toplam > 0 ? toplam.ToString("C") : "")</td>
+                                            }
+                                                    </tr>
+                                        @foreach (var cek in Model.FirmaCekleri.Where(c => c.Pozisyonu == grup && c.Kalan > 0))
+                                        {
+                                                        <tr class="@grup" style="display: none;">
+                                                            <td>@cek.SahipCariAdi</td>
+                                                @foreach (var day in days)
+                                                {
+                                                                <td class="para-birimi">@(cek.Vade.Date == day.Date ? cek.Kalan.ToString("C") : "")</td>
+                                                }
+                                                        </tr>
+                                        }
+                                    }
+                                                <tr style="font-weight: bold; background-color: #e6e6e6;">
+                                                    <td>Genel Toplam</td>
+                                        @foreach (var day in days)
+                                        {
+                                            var genelToplam = Model.FirmaCekleri
+                                            .Where(c => cekGruplari.Contains(c.Pozisyonu) && c.Vade.Date == day.Date && c.Kalan > 0)
+                                            .Sum(c => c.Kalan);
+                                                        <td class="para-birimi">@(genelToplam > 0 ? genelToplam.ToString("C") : "")</td>
+                                        }
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Vadesi Geçenler Butonu -->
+                    }
+                            </div>
+
+                            <!-- Firma Çekleri - Aylık Görünüm -->
+                            <div class="monthlyTable" style="display: none;">
+                                <h4 style="font-weight: bold; font-size: 1.5em; color: #333;">Verdiğimiz Firma Çekleri - Aylık Görünüm</h4>
+                    @if (Model != null && Model.FirmaCekleri != null)
+                    {
+                        var months = Enumerable.Range(0, (Model.BitisTarihi.Year - Model.BaslamaTarihi.Year) * 12 + Model.BitisTarihi.Month - Model.BaslamaTarihi.Month + 1)
+                        .Select(offset => new DateTime(Model.BaslamaTarihi.Year, Model.BaslamaTarihi.Month, 1).AddMonths(offset))
+                        .Where(month => Model.FirmaCekleri.Any(c => c.Vade.Year == month.Year && c.Vade.Month == month.Month && c.Kalan > 0))
+                        .ToList();
+
+                        var cekGruplari = new[] { "Ciro" };
+
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Sahip Cari Adı</th>
+                                        @foreach (var month in months)
+                                        {
+                                                        <th>@month.ToString("MM/yyyy")</th>
+                                        }
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                    @foreach (var grup in cekGruplari)
+                                    {
+                                        var grupToplamlar = months.Select(month => Model.FirmaCekleri
+                                        .Where(c => c.Pozisyonu == grup && c.Vade.Year == month.Year && c.Vade.Month == month.Month && c.Kalan > 0)
+                                        .Sum(c => c.Kalan)).ToList();
+
+                                                    <tr class="toggle-header" onclick="toggleRow('@grup')" style="cursor: pointer; background-color: #0069d9; color: #ffffff;">
+                                                        <td>@grup Firma Çekleri</td>
+                                            @foreach (var toplam in grupToplamlar)
+                                            {
+                                                            <td class="para-birimi">@(toplam > 0 ? toplam.ToString("C") : "")</td>
+                                            }
+                                                    </tr>
+                                        @foreach (var cek in Model.FirmaCekleri.Where(c => c.Pozisyonu == grup && c.Kalan > 0))
+                                        {
+                                                        <tr class="@grup" style="display: none;">
+                                                            <td>@cek.SahipCariAdi</td>
+                                                @foreach (var month in months)
+                                                {
+                                                    var bakiye = (cek.Vade.Year == month.Year && cek.Vade.Month == month.Month) ? cek.Kalan : 0;
+                                                                <td class="para-birimi">@(bakiye > 0 ? bakiye.ToString("C") : "")</td>
+                                                }
+                                                        </tr>
+                                        }
+                                    }
+                                                <tr style="font-weight: bold; background-color: #e6e6e6;">
+                                                    <td>Genel Toplam</td>
+                                        @foreach (var month in months)
+                                        {
+                                            var genelToplam = Model.FirmaCekleri
+                                            .Where(c => cekGruplari.Contains(c.Pozisyonu) && c.Vade.Year == month.Year && c.Vade.Month == month.Month && c.Kalan > 0)
+                                            .Sum(c => c.Kalan);
+                                                        <td class="para-birimi">@(genelToplam > 0 ? genelToplam.ToString("C") : "")</td>
+                                        }
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                    }
+                            </div>
+
+                    @* Vadesi Geçenler Modal -->*@
+                            <div class="modal fade" id="vadesiGecmisModal" tabindex="-1" role="dialog" aria-labelledby="vadesiGecmisModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="vadesiGecmisModalLabel">Vadesi Geçen Çekler</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Sahip Cari Adı</th>
+                                                            <th>Vadesi Geçen Tutar</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                    @if (Model != null && Model.VadesiGecmisFirmaCekleri != null)
+                    {
+                        @foreach (var cek in Model.VadesiGecmisFirmaCekleri)
+                        {
+                                                                <tr>
+                                                                    <td>@cek.SahipCariAdi</td>
+                                                                    <td class="para-birimi">@cek.KalanTutar</td>
+                                                                    <td>@cek.cekAdedi</td>
+                                                                </tr>
+                        }
+                    }
+                    else
+                    {
+                                                            <p>Veri mevcut değil.</p>
+                    }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+                            <!-- Firma Kredi Kartları -->
+                            <div class="dailyTable" style="display: block;">
+                    @if (Model != null && Model.FirmaKrediKartlari != null)
+                    {
+                                    <h4 style="font-weight: bold; font-size: 1.5em; color: #333;">Firma Kredi Kartları</h4>
+
+                        var krediKartDays = Enumerable.Range(0, (Model.BitisTarihi - Model.BaslamaTarihi).Days + 1)
+                        .Select(offset => Model.BaslamaTarihi.AddDays(offset))
+                        .Where(day => Model.FirmaKrediKartlari.Any(k => k.VadeTarihi.Date == day.Date && k.Kalan > 0))
+                        .ToList();
+
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Borçlu</th>
+                                        @foreach (var day in krediKartDays)
+                                        {
+                                                        <th>@day.ToString("dd/MM/yyyy")</th>
+                                        }
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="toggle-header" onclick="toggleRow('FirmaKrediKartlari')" style="cursor: pointer;">
+                                                    <td>Firma Kredi Kartları</td>
+                                        @foreach (var day in krediKartDays)
+                                        {
+                                            var toplam = Model.FirmaKrediKartlari
+                                            .Where(k => k.VadeTarihi.Date == day.Date && k.Kalan > 0)
+                                            .Sum(k => k.Kalan);
+                                                        <td class="para-birimi">@(toplam > 0 ? toplam.ToString("C") : "")</td>
+                                        }
+                                                </tr>
+                                    @foreach (var krediKart in Model.FirmaKrediKartlari.Where(k => k.Kalan > 0))
+                                    {
+                                                    <tr class="FirmaKrediKartlari" style="display: none;">
+                                                        <td>@krediKart.Borçlu</td>
+                                            @foreach (var day in krediKartDays)
+                                            {
+                                                            <td class="para-birimi">@(krediKart.VadeTarihi.Date == day.Date ? krediKart.Kalan.ToString("C") : "")</td>
+                                            }
+                                                    </tr>
+                                    }
+                                                <tr style="font-weight: bold;">
+                                                    <td>Genel Toplam</td>
+                                        @foreach (var day in krediKartDays)
+                                        {
+                                            var genelToplam = Model.FirmaKrediKartlari
+                                            .Where(k => k.VadeTarihi.Date == day.Date && k.Kalan > 0)
+                                            .Sum(k => k.Kalan);
+                                                        <td class="para-birimi">@(genelToplam > 0 ? genelToplam.ToString("C") : "")</td>
+                                        }
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                    }
+                            </div>
+
+                            <div class="monthlyTable" style="display: none;">
+                    @if (Model != null && Model.FirmaKrediKartlari != null)
+                    {
+                                    <h4 style="font-weight: bold; font-size: 1.5em; color: #333;">Firma Kredi Kartları - Aylık Görünüm</h4>
+
+                        var krediKartMonths = Enumerable.Range(0, (Model.BitisTarihi.Year - Model.BaslamaTarihi.Year) * 12 + Model.BitisTarihi.Month - Model.BaslamaTarihi.Month + 1)
+                        .Select(offset => new DateTime(Model.BaslamaTarihi.Year, Model.BaslamaTarihi.Month, 1).AddMonths(offset))
+                        .Where(month => Model.FirmaKrediKartlari.Any(k => k.VadeTarihi.Year == month.Year && k.VadeTarihi.Month == month.Month && k.Kalan > 0))
+                        .ToList();
+
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Borçlu</th>
+                                        @foreach (var month in krediKartMonths)
+                                        {
+                                                        <th>@month.ToString("MM/yyyy")</th>
+                                        }
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="toggle-header" onclick="toggleRow('FirmaKrediKartlariAylik')" style="cursor: pointer;">
+                                                    <td>Firma Kredi Kartları</td>
+                                        @foreach (var month in krediKartMonths)
+                                        {
+                                            var toplam = Model.FirmaKrediKartlari
+                                            .Where(k => k.VadeTarihi.Year == month.Year && k.VadeTarihi.Month == month.Month && k.Kalan > 0)
+                                            .Sum(k => k.Kalan);
+                                                        <td class="para-birimi">@(toplam > 0 ? toplam.ToString("C") : "")</td>
+                                        }
+                                                </tr>
+                                    @foreach (var krediKart in Model.FirmaKrediKartlari.Where(k => k.Kalan > 0))
+                                    {
+                                                    <tr class="FirmaKrediKartlariAylik" style="display: none;">
+                                                        <td>@krediKart.Borçlu</td>
+                                            @foreach (var month in krediKartMonths)
+                                            {
+                                                var bakiye = (krediKart.VadeTarihi.Year == month.Year && krediKart.VadeTarihi.Month == month.Month) ? krediKart.Kalan : 0;
+                                                            <td class="para-birimi">@(bakiye > 0 ? bakiye.ToString("C") : "")</td>
+                                            }
+                                                    </tr>
+                                    }
+                                                <tr style="font-weight: bold;">
+                                                    <td>Genel Toplam</td>
+                                        @foreach (var month in krediKartMonths)
+                                        {
+                                            var genelToplam = Model.FirmaKrediKartlari
+                                            .Where(k => k.VadeTarihi.Year == month.Year && k.VadeTarihi.Month == month.Month && k.Kalan > 0)
+                                            .Sum(k => k.Kalan);
+                                                        <td style="font-weight: bold; background-color: #001f3f; color: white;" class="para-birimi">@(genelToplam > 0 ? genelToplam.ToString("C") : "")</td>
+                                        }
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                    }
+                            </div>
+
+
+
+                            <!-- Artı Bakiye Fatura Tedarikçileri -->
+                            <div class="dailyTable" style="display: block;">
+                    @if (Model != null && Model.ArtiBakiyeFaturaTedarikci != null)
+                    {
+                                    <h4 style="font-weight: bold; font-size: 1.5em; color: #333;">Açıkta Bekleyen Tedarikçi Faturaları</h4>
+
+                        var bakiyeDays = Enumerable.Range(0, (Model.BitisTarihi - Model.BaslamaTarihi).Days + 1)
+                        .Select(offset => Model.BaslamaTarihi.AddDays(offset))
+                        .Where(day => Model.ArtiBakiyeFaturaTedarikci.Any(m => m.Vade.Date == day.Date))
+                        .ToList();
+
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Unvan</th>
+                                                    <th>Fatura No</th>
+                                        @foreach (var day in bakiyeDays)
+                                        {
+                                                        <th>@day.ToString("dd/MM/yyyy")</th>
+                                        }
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="toggle-header" onclick="toggleRow('ArtıBakiyeTedarikci')" style="cursor: pointer;">
+                                                    <td>Artı Bakiye Tedarikçiler</td>
+                                                    <th>Fatura</th>
+                                        @foreach (var day in bakiyeDays)
+                                        {
+                                            var toplam = Model.ArtiBakiyeFaturaTedarikci
+                                            .Where(m => m.Vade.Date == day.Date && m.Bakiye > 0)
+                                            .Sum(m => m.Bakiye);
+                                                        <td style="font-weight: bold; background-color: #001f3f; color: white;" class="para-birimi">@(toplam > 0 ? toplam.ToString("C") : "")</td>
+                                        }
+                                                </tr>
+                                    @foreach (var musteri in Model.ArtiBakiyeFaturaTedarikci.Where(m => m.Bakiye > 0))
+                                    {
+                                                    <tr class="ArtıBakiyeTedarikci" style="display: none;">
+                                                        <td>@musteri.Unvan</td>
+                                                        <td>@musteri.FaturaNo</td>
+                                            @foreach (var day in bakiyeDays)
+                                            {
+                                                            <td class="para-birimi">@(musteri.Vade.Date == day.Date ? musteri.Bakiye.ToString("C") : "")</td>
+                                            }
+                                                    </tr>
+                                    }
+                                                <tr style="font-weight: bold;">
+                                                    <td>Genel Toplam</td>
+                                                    <td>Tüm Faturalar</td>
+                                        @foreach (var day in bakiyeDays)
+                                        {
+                                            var genelToplam = Model.ArtiBakiyeFaturaTedarikci
+                                            .Where(m => m.Vade.Date == day.Date && m.Bakiye > 0)
+                                            .Sum(m => m.Bakiye);
+                                                        <td class="para-birimi">@(genelToplam > 0 ? genelToplam.ToString("C") : "")</td>
+                                        }
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                    }
+
+                            </div>
+
+                            <!-- Artı Bakiye Fatura Tedarikçileri - Aylık Görünüm -->
+                            <div class="monthlyTable" style="display: none;">
+                    @if (Model != null && Model.ArtiBakiyeFaturaTedarikci != null)
+                    {
+                                    <h4 style="font-weight: bold; font-size: 1.5em; color: #333;">Açıkta Bekleyen Tedarikçi Faturalları - Aylık Görünüm</h4>
+
+                        var bakiyeMonths = Enumerable.Range(0, (Model.BitisTarihi.Year - Model.BaslamaTarihi.Year) * 12 + Model.BitisTarihi.Month - Model.BaslamaTarihi.Month + 1)
+                        .Select(offset => new DateTime(Model.BaslamaTarihi.Year, Model.BaslamaTarihi.Month, 1).AddMonths(offset))
+                        .Where(month => Model.ArtiBakiyeFaturaTedarikci.Any(m => m.Vade.Year == month.Year && m.Vade.Month == month.Month && m.Bakiye > 0))
+                        .ToList();
+
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Unvan</th>
+                                        @foreach (var month in bakiyeMonths)
+                                        {
+                                                        <th>@month.ToString("MM/yyyy")</th>
+                                        }
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="toggle-header" onclick="toggleRow('ArtıBakiyeTedarikciAylik')" style="cursor: pointer;">
+                                                    <td>Artı Bakiye Tedarikçiler</td>
+                                        @foreach (var month in bakiyeMonths)
+                                        {
+                                            var toplam = Model.ArtiBakiyeFaturaTedarikci
+                                            .Where(m => m.Vade.Year == month.Year && m.Vade.Month == month.Month && m.Bakiye > 0)
+                                            .Sum(m => m.Bakiye);
+                                                        <td style="font-weight: bold; background-color: #001f3f; color: white;" class="para-birimi">@(toplam > 0 ? toplam.ToString("C") : "")</td>
+                                        }
+                                                </tr>
+                                    @foreach (var musteri in Model.ArtiBakiyeFaturaTedarikci.Where(m => m.Bakiye > 0))
+                                    {
+                                                    <tr class="ArtıBakiyeTedarikciAylik" style="display: none;">
+                                                        <td>@musteri.Unvan</td>
+                                            @foreach (var month in bakiyeMonths)
+                                            {
+                                                var bakiye = (musteri.Vade.Year == month.Year && musteri.Vade.Month == month.Month) ? musteri.Bakiye : 0;
+                                                            <td class="para-birimi">@(bakiye > 0 ? bakiye.ToString("C") : "")</td>
+                                            }
+                                                    </tr>
+                                    }
+                                                <tr style="font-weight: bold;">
+                                                    <td>Genel Toplam</td>
+                                        @foreach (var month in bakiyeMonths)
+                                        {
+                                            var genelToplam = Model.ArtiBakiyeFaturaTedarikci
+                                            .Where(m => m.Vade.Year == month.Year && m.Vade.Month == month.Month && m.Bakiye > 0)
+                                            .Sum(m => m.Bakiye);
+                                                        <td style="font-weight: bold; background-color: #001f3f; color: white;" class="para-birimi">@(genelToplam > 0 ? genelToplam.ToString("C") : "")</td>
+                                        }
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                    }
+                            </div>
+
+                            <div class="dailyTable" style="display: block;">
+                    @if (Model != null && Model.KrediDetaylari != null)
+                    {
+                                    <h4 style="font-weight: bold; font-size: 1.5em; color: #333;">Kredi Detayları - Günlük Görünüm</h4>
+
+                        var days = Enumerable.Range(0, (Model.BitisTarihi - Model.BaslamaTarihi).Days + 1)
+                        .Select(offset => Model.BaslamaTarihi.AddDays(offset))
+                        .Where(day => Model.KrediDetaylari.Any(k => k.krsoztaksit_vade.Date == day.Date && k.kalan > 0))
+                        .ToList();
+
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Banka Adı</th>
+                                        @foreach (var day in days)
+                                        {
+                                                        <th>@day.ToString("dd/MM/yyyy")</th>
+                                        }
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="toggle-header" onclick="toggleRow('KrediDetaylari')" style="cursor: pointer;">
+                                                    <td>Kredi Detayları</td>
+                                        @foreach (var day in days)
+                                        {
+                                            var toplam = Model.KrediDetaylari
+                                            .Where(k => k.krsoztaksit_vade.Date == day.Date && k.kalan > 0)
+                                            .Sum(k => k.kalan);
+                                                        <td style="font-weight: bold; background-color: #001f3f; color: white;" class="para-birimi">@(toplam > 0 ? toplam.ToString("C") : "")</td>
+                                        }
+                                                </tr>
+                                    @foreach (var kredi in Model.KrediDetaylari.Where(k => k.kalan > 0))
+                                    {
+                                                    <tr class="KrediDetaylari" style="display: none;">
+                                                        <td>@kredi.ban_ismi</td>
+                                            @foreach (var day in days)
+                                            {
+                                                            <td class="para-birimi">@(kredi.krsoztaksit_vade.Date == day.Date ? kredi.kalan.ToString("C") : "")</td>
+                                            }
+                                                    </tr>
+                                    }
+                                                <tr style="font-weight: bold;">
+                                                    <td>Genel Toplam</td>
+                                        @foreach (var day in days)
+                                        {
+                                            var genelToplam = Model.KrediDetaylari
+                                            .Where(k => k.krsoztaksit_vade.Date == day.Date && k.kalan > 0)
+                                            .Sum(k => k.kalan);
+                                                        <td style="font-weight: bold; background-color: #001f3f; color: white;" class="para-birimi">@(genelToplam > 0 ? genelToplam.ToString("C") : "")</td>
+                                        }
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                    }
+
+
+
+
+                            </div>
+                            <div class="monthlyTable" style="display: none;">
+                                <h4 style="font-weight: bold; font-size: 1.5em; color: #333;">Kredi Detayları - Aylık Görünüm</h4>
+                    @if (Model != null && Model.KrediDetaylari != null)
+                    {
+                        var months = Enumerable.Range(0, (Model.BitisTarihi.Year - Model.BaslamaTarihi.Year) * 12 + Model.BitisTarihi.Month - Model.BaslamaTarihi.Month + 1)
+                        .Select(offset => new DateTime(Model.BaslamaTarihi.Year, Model.BaslamaTarihi.Month, 1).AddMonths(offset))
+                        .Where(month => Model.KrediDetaylari.Any(k => k.krsoztaksit_vade.Year == month.Year && k.krsoztaksit_vade.Month == month.Month && k.kalan > 0))
+                        .ToList();
+
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Banka Adı</th>
+                                        @foreach (var month in months)
+                                        {
+                                                        <th>@month.ToString("MM/yyyy")</th>
+                                        }
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="toggle-header" onclick="toggleRow('KrediDetaylariAylik')" style="cursor: pointer;">
+                                                    <td>Kredi Detayları</td>
+                                        @foreach (var month in months)
+                                        {
+                                            var toplam = Model.KrediDetaylari
+                                            .Where(k => k.krsoztaksit_vade.Year == month.Year && k.krsoztaksit_vade.Month == month.Month && k.kalan > 0)
+                                            .Sum(k => k.kalan);
+                                                        <td class="para-birimi">@(toplam > 0 ? toplam.ToString("C") : "")</td>
+                                        }
+                                                </tr>
+                                    @foreach (var kredi in Model.KrediDetaylari.Where(k => k.kalan > 0))
+                                    {
+                                                    <tr class="KrediDetaylariAylik" style="display: none;">
+                                                        <td>@kredi.ban_ismi</td>
+                                            @foreach (var month in months)
+                                            {
+                                                var bakiye = (kredi.krsoztaksit_vade.Year == month.Year && kredi.krsoztaksit_vade.Month == month.Month) ? kredi.kalan : 0;
+                                                            <td class="para-birimi">@(bakiye > 0 ? bakiye.ToString("C") : "")</td>
+                                            }
+                                                    </tr>
+                                    }
+                                                <tr style="font-weight: bold;">
+                                                    <td>Genel Toplam</td>
+                                        @foreach (var month in months)
+                                        {
+                                            var genelToplam = Model.KrediDetaylari
+                                            .Where(k => k.krsoztaksit_vade.Year == month.Year && k.krsoztaksit_vade.Month == month.Month && k.kalan > 0)
+                                            .Sum(k => k.kalan);
+                                                        <td style="font-weight: bold; background-color: #001f3f; color: white;" class="para-birimi">@(genelToplam > 0 ? genelToplam.ToString("C") : "")</td>
+                                        }
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                    }
+
+
+
+
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <div class="bottom">
+                        <div class="dataTables_info" id="example_info"></div>
+                        <div class="dataTables_paginate" id="example_paginate"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
+<script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+
+<script>
+       document.addEventListener("DOMContentLoaded", function () {
+        const baslamaTarihiInput = document.getElementById('baslamaTarihi');
+        const bitisTarihiInput = document.getElementById('bitisTarihi');
+
+        // Bugünün tarihini al
+        const today = new Date();
+        // Bir ay sonrasını hesapla
+        const oneMonthLater = new Date();
+        oneMonthLater.setMonth(today.getMonth() + 1);
+
+        // Tarihleri YYYY-MM-DD formatına dönüştür
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Eğer daha önce arama yapılmamışsa varsayılan tarihleri kullan
+        if (!localStorage.getItem('searchPerformed')) {
+            baslamaTarihiInput.value = formatDate(today);
+            bitisTarihiInput.value = formatDate(oneMonthLater);
+        } else {
+            // Daha önce yapılan aramadaki tarihleri kullan
+            baslamaTarihiInput.value = localStorage.getItem('baslamaTarihi');
+            bitisTarihiInput.value = localStorage.getItem('bitisTarihi');
+        }
+
+        // Form gönderildiğinde tarihleri localStorage'a kaydet
+        const form = baslamaTarihiInput.closest('form');
+        form.addEventListener('submit', function() {
+            localStorage.setItem('baslamaTarihi', baslamaTarihiInput.value);
+            localStorage.setItem('bitisTarihi', bitisTarihiInput.value);
+            localStorage.setItem('searchPerformed', 'true');
+        });
+
+        // Sayfa yenilendiğinde 'searchPerformed' bayrağını kaldır
+        window.addEventListener('load', function() {
+            if (!form.submitted) {
+                localStorage.removeItem('searchPerformed');
+            }
+        });
+    });
+</script>
+
+<script>
+    $('#example').dataTable({
+        "dom": '<"row"<"col-sm-12"B>>' +
+            '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+            't' +
+            '<"row"<"col-sm-6"i><"col-sm-6"p>>',
+        "language": {
+            "url": "/Content/DataTables/turkish.json"
+        },
+        "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'], // Butonlar
+        "pageLength": 5000, // Varsayılan olarak 5000 gösterim
+        "lengthMenu": [[10, 25, 50, 100, 5000], [10, 25, 50, 100, "5000"]] // Kullanıcıya seçim için seçenekler
+    });
+</script>
+
+<script>
+    function showTable(tableClass) {
+        const dailyTables = document.getElementsByClassName('dailyTable');
+        const monthlyTables = document.getElementsByClassName('monthlyTable');
+
+        for (let i = 0; i < dailyTables.length; i++) {
+            dailyTables[i].style.display = tableClass === 'dailyTable' ? 'block' : 'none';
+        }
+        for (let i = 0; i < monthlyTables.length; i++) {
+            monthlyTables[i].style.display = tableClass === 'monthlyTable' ? 'block' : 'none';
+        }
+    }
+</script>
+
+<script>
+    function toggleRow(group) {
+        const rows = document.getElementsByClassName(group);
+        const isHidden = rows[0].style.display === "none";
+        for (let i = 0; i < rows.length; i++) {
+            rows[i].style.display = isHidden ? "table-row" : "none";
+        }
+    }
+</script>

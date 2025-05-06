@@ -1,0 +1,381 @@
+﻿@model IEnumerable<Deneme_proje.Models.Entities.SiparisYuklemeRampaViewModel>
+<style>
+	.table {
+		width: 100%;
+		max-width: 100%;
+		font-size: x-large;
+		white-space: nowrap;
+		margin-bottom: 0;
+	}
+
+		.table .miktar {
+			width: 33%;
+			max-width: 100%;
+			font-size: 60px;
+		}
+
+		.table .ad {
+			width: 30%;
+			max-width: 100%;
+			font-size: 30px;
+		}
+
+	.uretimbaslik th {
+		font-size: 20px;
+		color: white;
+		background-color: #162E54;
+	}
+
+	.uretimbaslik td {
+		font-size: 18px !important;
+	}
+
+	.main-header {
+		padding: 30px 0 10px 20px;
+	}
+
+	.rampa {
+		width: 100%;
+		height: auto;
+		object-fit: cover;
+		padding: 0 4rem;
+		margin: 0 auto;
+		display: flex;
+		justify-content: center;
+		top: 67%;
+		position: absolute;
+		z-index: 100;
+	}
+
+		.rampa p {
+			color: #162E54;
+			font-weight: bold;
+			font-size: 22px;
+		}
+
+		.rampa .gerisayim {
+			color: #162E54;
+			font-weight: normal;
+			background-color: white;
+			border-radius: 12px;
+			box-shadow: 0 0px 8px 0 rgba(0, 0, 0, 0.06), 0 1px 0px 0 rgba(0, 0, 0, 0.02);
+			font-size: 30px;
+			letter-spacing: 5px;
+		}
+
+			.rampa .gerisayim span {
+				color: #162E54;
+				font-weight: bold;
+				font-size: 35px;
+			}
+
+	.footer {
+		display: none;
+	}
+
+	.datetime-display {
+		font-size: 28px;
+		color: #162E54;
+		font-weight: bold;
+		background-color: rgba(255, 255, 255, 0.9);
+		padding: 10px 20px;
+		border-radius: 10px;
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+		letter-spacing: 1px;
+	}
+
+	/* Ana tablo konteyner stili */
+	.overlay-container {
+		position: relative;
+		width: 100%;
+		min-height: 600px;
+		overflow: hidden;
+	}
+
+	/* Arka plan görseli için stil */
+	.background-image {
+		position: absolute;
+		top: 100px;
+		left: 0;
+		width: 100%;
+		height: 76%;
+		z-index: 1;
+		object-fit: cover;
+		filter: brightness(0.4) contrast(1.3);
+	}
+
+	/* Tablo içeriğinin şeffaf container'ı */
+	.transparent-container {
+		position: relative;
+		z-index: 2; /* Arka plan görseli üzerinde */
+		background-color: rgba(255, 255, 255, 0.7);
+		border-radius: 8px;
+		padding: 1px; /* İç boşluk ekle */
+		margin: 0 auto;
+	}
+
+	/* Tablo hücrelerini belirginleştirme */
+	.table td {
+		background-color: rgba(255, 255, 255, 0.5);
+		color: #162E54;
+		font-weight: 500;
+	}
+
+	.table {
+		width: 100%;
+		height: 80%;
+		max-width: 100%;
+		font-size: x-large;
+		white-space: nowrap;
+		margin-bottom: 0;
+	}
+
+	/* Evrak bilgilerinin kutusu */
+	.evrak-bilgileri {
+		background-color: rgba(255, 255, 255, 0.9);
+		border-radius: 10px;
+		padding: 3px;
+		margin-top: 16px;
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+		border-left: 5px solid #162E54;
+		margin-right: 15px;
+	}
+
+		.evrak-bilgileri h3 {
+			color: #162E54;
+			font-size: 25px;
+			margin-bottom: 0px;
+			font-weight: bold;
+		}
+
+	.evrak-item {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 8px;
+		font-size: 16px;
+	}
+
+	.evrak-label {
+		font-weight: bold;
+		color: #162E54;
+		margin-right: 15px;
+	}
+
+	.evrak-value {
+		font-weight: 500;
+		color: #333;
+		font-size:25px;
+	}
+
+	.header-container {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 15px 20px;
+	}
+</style>
+
+<div class="main-content mt-2">
+	<div class="px-lg-3">
+		<!-- Üst bilgi satırı - Evrak bilgileri solda, datetime sağda -->
+		<div class="header-container">
+			<!-- Evrak Bilgileri (Sipariş No ve İrsaliye No) -->
+			<div class="evrak-bilgileri">
+				<h3>Evrak Bilgileri</h3>
+				<div class="evrak-item d-flex">
+					<div class="me-4">
+						<span class="evrak-label">Sipariş No:</span>
+						<span class="evrak-value" id="siparisNo">@(Model.FirstOrDefault()?.EvrakSira ?? "-")</span>
+					</div>
+					<div>
+						<span class="evrak-label">İrsaliye No:</span>
+						<span class="evrak-value" id="irsaliyeNo">@(Model.FirstOrDefault()?.IrsaliyeNo )</span>
+					</div>
+				</div>
+			</div>
+
+			<!-- Tarih ve Saat -->
+			<div id="datetime" class="datetime-display"></div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="card">
+					<div class="card-body p-0 position-relative">
+						<h2 style="color:#162E54; text-align:center; padding: 1rem 0; font-weight:bold" id="cariUnvan">
+							@(Model.FirstOrDefault()?.CariUnvan ?? "Cari Unvan Bulunamadı")
+						</h2>
+
+						<!-- YENİ OVERLAY YAPISI -->
+						<div class="overlay-container">
+
+							<!-- ARKA PLAN GÖRSELİ -->
+							<img src="~/rampa1.png" class="background-image" id="rampaImage" alt="Rampa 1 Görseli" />
+
+							<!-- ŞEFFAF TABLO KONTEYNER -->
+							<div class="transparent-container">
+								<table class="table table-borderless">
+									<thead>
+										<tr class="bg-primary text-white uretimbaslik">
+											<th class="text-center py-3 ad">Ürün Adı</th>
+											<th class="text-center py-3">Sipariş Mik.</th>
+											<th class="text-center py-3">Kalan Mik.</th>
+											<th class="text-center py-3">Yüklenen Mik.</th>
+										</tr>
+									</thead>
+									<tbody id="tableBody">
+										@foreach (var item in Model)
+										{
+											<tr>
+												<td class="text-left py-1 ad">@item.UrunAdi</td>
+												<td class="text-center py-1 miktar">@item.ToplamSiparisMiktari</td>
+												<td class="text-center py-1 miktar" style="font-weight:bold">@item.KalanMiktar</td>
+												<td class="text-center py-1 miktar">@item.YuklenenMiktar</td>
+											</tr>
+										}
+									</tbody>
+								</table>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
+		$(document).ready(function() {
+			// Resim yükleme hatası olursa konsola bildir ve alternatif resim yollarını dene
+			$('#rampaImage').on('error', function() {
+				console.error('Resim yüklenemedi: ~/rampa2.png');
+
+				// Alternatif yollar dene
+				var alternatifYollar = [
+					'/rampa2.png',          // kök dizinden
+					'../rampa2.png',        // bir üst dizinden
+					'../../rampa2.png',     // iki üst dizinden
+					'/Content/rampa2.png',  // content klasöründen
+					'/images/rampa2.png'    // images klasöründen
+				];
+
+				// Her alternatifi deneyerek çalışan yolu bul
+				function denemeYukle(index) {
+					if (index >= alternatifYollar.length) {
+						console.error('Hiçbir alternatif yol çalışmadı');
+						return;
+					}
+
+					var tempImg = new Image();
+					tempImg.onload = function() {
+						console.log('Çalışan yol bulundu: ' + alternatifYollar[index]);
+						$('#rampaImage').attr('src', alternatifYollar[index]);
+					};
+					tempImg.onerror = function() {
+						denemeYukle(index + 1);
+					};
+					tempImg.src = alternatifYollar[index];
+				}
+
+				denemeYukle(0);
+			});
+
+			// Tarih ve saati güncelleyen fonksiyon
+			function updateDateTime() {
+				const now = new Date();
+				const options = {
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric',
+					hour: '2-digit',
+					minute: '2-digit'
+				};
+				$('#datetime').text(now.toLocaleString('tr-TR', options));
+			}
+
+			// Her saniye güncelle
+			setInterval(updateDateTime, 1000);
+			updateDateTime(); // İlk yükleme
+
+			// Mevcut geri sayım ve veri güncelleme kodları (değişmeden kalıyor)
+			let countdown = 5;
+			let countdownInterval;
+
+			function updateData() {
+				$.ajax({
+					url: window.location.pathname,
+					type: 'GET',
+					headers: {
+						'X-Requested-With': 'XMLHttpRequest'
+					},
+					dataType: 'json',
+					success: function(data) {
+						console.log("AJAX başarılı, gelen veri:", data);
+						$('#tableBody').empty();
+
+						if (data.length === 0) {
+							$('#tableBody').html('<tr><td colspan="4" class="text-center">Henüz yükleme yapılmamış.</td></tr>');
+						} else {
+							$.each(data, function(index, item) {
+								let row = `<tr>
+									<td class="text-left py-1 ad">${item.urunAdi}</td>
+									<td class="text-center py-1 miktar">${item.toplamSiparisMiktari}</td>
+									<td class="text-center py-1 miktar" style="font-weight:bold">${item.kalanMiktar}</td>
+									<td class="text-center py-1 miktar">${item.yuklenenMiktar}</td>
+								</tr>`;
+								$('#tableBody').append(row);
+							});
+
+							// İlk kaydın cari unvanını başlığa yaz
+							if (data[0]) {
+								if (data[0].cariUnvan) {
+									$('#cariUnvan').text(data[0].cariUnvan);
+								}
+
+								// Sipariş numarası ve irsaliye numarası güncelleme
+								if (data[0].evrakSira) {
+									$('#siparisNo').text(data[0].evrakSira);
+								}
+
+								if (data[0].irsaliyeNo) {
+									$('#irsaliyeNo').text(data[0].irsaliyeNo);
+								}
+							}
+						}
+
+						startCountdown();
+					},
+					error: function(xhr, status, error) {
+						console.error("Veri güncellenirken hata oluştu:", status, error);
+						console.log("XHR durumu:", xhr.responseText);
+						$('#tableBody').html('<tr><td colspan="4" class="text-center">Veri yüklenirken hata oluştu.</td></tr>');
+						startCountdown();
+					}
+				});
+			}
+
+			function startCountdown() {
+				if (countdownInterval) {
+					clearInterval(countdownInterval);
+				}
+				countdown = 5;
+				countdownInterval = setInterval(function() {
+					//$('#countdownTimer').text(`${countdown} `);
+					if (countdown <= 0) {
+						clearInterval(countdownInterval);
+						updateData();
+						return;
+					}
+					countdown--;
+				}, 1000);
+			}
+
+			// Sayfa yüklendiğinde verileri hemen çek
+			updateData();
+		});
+	</script>
+}

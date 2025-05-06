@@ -1,0 +1,138 @@
+﻿@model IEnumerable<Deneme_proje.Models.Entities.SatilanMalinKarlilikveMaliyet>
+
+@{
+    ViewData["Title"] = "Satılan Malın Kârlılık ve Maliyet Raporu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+<style>
+    .footer{
+    position: relative;
+    }
+</style>
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <h4>Satılan Malın Kârlılık ve Maliyet Raporu</h4>
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+                    
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-lg-5 mb-1">
+            <div class="col-lg-4">
+                <form method="get" class="form-inline">
+                    <div class="form-group mx-2">
+                        <label for="baslamaTarihi">Başlama Tarihi:</label>
+                        <input type="date" name="baslamaTarihi" class="form-control" value="@ViewData["BaslamaTarihi"]" />
+                    </div>
+                    <div class="form-group mx-2">
+                        <label for="bitisTarihi">Bitiş Tarihi:</label>
+                        <input type="date" name="bitisTarihi" class="form-control" value="@ViewData["BitisTarihi"]" />
+                    </div>
+                    <div class="form-group mx-2">
+                        <label for="bitisTarihi">Bitiş Tarihi:</label>
+                        @Html.DropDownList("depoNo", ViewData["DepoList"] as List<SelectListItem>, "Depo Seçin", new { @class = "form-control", id = "depoNo" })
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-tumblr btn-shadow waves-effect waves-light">Ara</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">Satılan Malın Kârlılık ve Maliyet Raporu</h5>
+                    </div>
+
+                    <div class="card-block accordion-block">
+                        <div class="col-md-12">
+                            <div id="example_wrapper" class="dataTables_wrapper py-lg-3">
+                                @if (Model != null && Model.Any())
+                                {
+                                    <div class="table-wrapper">
+                                        <table id="example" class="display dataTable" style="width:100%">
+                                            <thead>
+                                                <tr class="tablo-icerik-yazi">
+                                                    <th>Stok Kodu</th>
+                                                    <th>Stok Adı</th>
+                                                    <th>Alış Fiyatı</th>
+                                                    <th>Satış Fiyatı</th>
+                                                    <th>Satış Birim Fiyatı</th>
+                                                    <th>Satış Miktarı</th>
+                                                    <th>Satış Tutarı</th>
+                                                    <th>Toplam Kâr</th>
+                                                    <th>Kâr Oranı (%)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var item in Model)
+                                                {
+                                                    <tr>
+                                                        <td>@item.StokKodu</td>
+                                                        <td>@item.StokAdı</td>
+                                                        <td>@item.AlışFiyatı.ToString("C")</td>
+                                                        <td>@item.SatışFiyatı.ToString("C")</td>
+                                                        <td>@item.SatışBirimFiyatı.ToString("C")</td>
+                                                        <td>@item.SatışMiktarı</td>
+                                                        <td>@item.SatışTutarı.ToString("C")</td>
+                                                        <td>@item.ToplamKar.ToString("C")</td>
+                                                        <td>@item.KarOranı.ToString("F2")</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-warning" role="alert">
+                                        Veri bulunamadı.
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
+        <script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let table = new DataTable('#example');
+            });
+
+            $('#example').DataTable({
+                "dom": '<"row"<"col-sm-12"B>>' +
+                    '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+                    't' +
+                    '<"row"<"col-sm-6"i><"col-sm-6"p>>',
+                "language": {
+                    "url": "/Content/DataTables/turkish.json"
+                },
+                "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'],
+                "columnDefs": [
+                    { "targets": "_all" }
+                ]
+            });
+        </script>
+    </div>
+</div>

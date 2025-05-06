@@ -1,0 +1,524 @@
+﻿@{
+    ViewData["Title"] = "Rapor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+
+
+<style>
+    .required::after {
+        content: " *";
+        color: red;
+    }
+
+    .form-control {
+        display: block;
+        width: 95%;
+        padding: .5rem .75rem;
+        font-size: 1rem;
+        line-height: 1.25;
+        color: #55595c;
+        background-color: #fff;
+        background-image: none;
+        -webkit-background-clip: padding-box;
+        background-clip: padding-box;
+        border: 1px solid rgba(0, 0, 0, .15);
+        border-radius: .25rem;
+        font-size: 12px;
+        margin: 0;
+        text-wrap: nowrap;
+        height: 32px;
+    }
+
+    .col-md-6 {
+        float: left;
+        width: 49%;
+    }
+ 
+      .modal {
+            z-index: 1055 !important; /* Modal için z-index */
+        }
+
+        /* Modal Arka Planının Z-Index Değerini Yüksek Ayarlayın */
+        .modal-backdrop {
+            z-index: 1050 !important; /* Arka plan için z-index */
+        }
+
+        /* Modal header, body ve footer için daha yüksek z-index */
+        .modal-content {
+            z-index: 1060 !important;
+        }
+   
+    .form-select {
+        display: block;
+        width: 95%;
+        padding: .5rem .75rem;
+        font-size: 1rem;
+        line-height: 1.25;
+        color: #55595c;
+        background-color: #fff;
+        background-image: none;
+        -webkit-background-clip: padding-box;
+        background-clip: padding-box;
+        border: 1px solid rgba(0, 0, 0, .15);
+        border-radius: .25rem;
+        font-size: 12px;
+        margin: 0;
+        text-wrap: nowrap;
+        height: 32px;
+    }
+</style>
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+
+                        <li class="breadcrumb-item">
+                            <a href="#">CRM</a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style=" background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;"
+                         ">
+                        <h5 class="card-header-text text-white">Teklif Ekle</h5>
+                    </div>
+
+
+
+                
+
+                    <!-- Tablo -->
+                    @{
+                        ViewData["Title"] = "Teklif Sayfası";
+                        Layout = "~/Views/Shared/_Layout.cshtml";
+                    }
+
+                    <link href="~/content/assets/css/custom-style.css" rel="stylesheet" />
+
+                    <div class="container-fluid mt-4">
+
+                       
+                        <!-- Ana Form -->
+                        <form>
+                            <div class="card">
+                                <div class="card-body">
+                                    <!-- İlk Form Alanları -->
+                                    <div class="row">
+                                        <!-- Sol Alan -->
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label required">Konu</label>
+                                                <input type="text" class="form-control">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label required">İlişki</label>
+                                                <select class="form-select">
+                                                    <option>Seçim yapılmadı</option>
+                                                </select>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label required">Tarih</label>
+                                                    <input type="date" class="form-control">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Geçerlilik Tarihi</label>
+                                                    <input type="date" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label required">Para Birimi</label>
+                                                    <select class="form-select">
+                                                        <option>TL</option>
+                                                        <option>USD</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">İndirim Türü</label>
+                                                    <select class="form-select">
+                                                        <option>İndirim Yok</option>
+                                                        <option>Vergi Öncesi</option>
+                                                        <option>Vergi Sonrası</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Teklif Konusu</label>
+                                                <input type="text" class="form-control">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">İhale Kayıt Numarası</label>
+                                                <input type="text" class="form-control">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Etiketler</label>
+                                                <select id="tagsSelect" class="form-select">
+                                                    <option value="Etiket 1">Etiket 1</option>
+                                                    <option value="Etiket 2">Etiket 2</option>
+                                                    <option value="Etiket 3">Etiket 3</option>
+                                                    <option value="Etiket 4">Etiket 4</option>
+                                                </select>
+                                                <div id="selectedTags" class="mt-2">
+                                                    <!-- Seçilen etiketler burada görünecek -->
+                                                </div>
+                                            </div>
+                                            <div class="mb-3 form-check">
+                                                <input type="checkbox" class="form-check-input" id="commentsEnabled">
+                                                <label class="form-check-label" for="commentsEnabled">Yorumlara İzin Ver</label>
+                                            </div>
+
+                                            <!-- Etiketler Alanı -->
+                                            
+                                        </div>
+                                        <!-- Sağ Alan -->
+                                        <div class="col-md-6">
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Durum</label>
+                                                    <select class="form-select">
+                                                        <option>Taslak</option>
+                                                       
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Atanan</label>
+                                                    <select class="form-select">
+                                                        <option>Seçim Yapılmadı</option>
+
+                                                    </select>
+                                                </div>
+                                            </div>
+                                         
+                                            <div class="mb-3">
+                                                <label class="form-label required">Kime</label>
+                                                <input type="text" class="form-control">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Adres</label>
+                                                <input type="text" class="form-control">
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Şehir</label>
+                                                    <input type="text" class="form-control">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">İlçe</label>
+                                                    <input type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Ülke</label>
+                                                    <select class="form-select">
+                                                        <option>Türkiye</option>
+
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Posta Kodu</label>
+                                                    <input type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label required">E-posta</label>
+                                                    <input type="text" class="form-control">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Telefon</label>
+                                                    <input type="text" class="form-control">
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Ürün/Hizmet Bölümü -->
+                            <div class="card mt-4">
+                                 <div class="d-flex align-items-center mb-3">
+                            <select class="form-select me-2" id="urunDropdown">
+                                <option selected disabled>Ürün/Hizmet Seç</option>
+                                <option>Ürün 1</option>
+                                <option>Ürün 2</option>
+                                <option>Ürün 3</option>
+                            </select>
+                            <button id="openModalButton" class="btn btn-primary">
+    +
+</button>
+                          
+                        </div>
+                                <div style="padding: 10px 20px;" class="card-header bg-primary text-white">Ürün/Hizmet Ekle</div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Ürün/Hizmet</th>
+                                                    <th>Açıklama</th>
+                                                    <th>Versiyon</th>
+                                                    <th>Adet</th>
+                                                    <th>Ücret</th>
+                                                    <th>Vergi</th>
+                                                    <th>İndirim (%)</th>
+                                                    <th>Fiyat Ayarlama (+/-)</th>
+                                                    <th>Tutar</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><input type="text" class="form-control"></td>
+                                                    <td><input type="text" class="form-control"></td>
+                                                    <td>
+                                                        <select class="form-select">
+                                                            <option>Seçim yapılmadı</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" class="form-control quantity" value="1" min="1" onchange="calculateRowTotal(this)">
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" class="form-control price" value="0" min="0" onchange="calculateRowTotal(this)">
+                                                    </td>
+                                                    <td>
+                                                        <select class="form-select tax" onchange="calculateRowTotal(this)">
+                                                            <option value="0.2">20%</option>
+                                                            <option value="0.1">10%</option>
+                                                            <option value="0">0%</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" class="form-control discount" value="0" min="0" max="100" onchange="calculateRowTotal(this)">
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" class="form-control adjustment" value="0" onchange="calculateRowTotal(this)">
+                                                    </td>
+                                                    <td class="total">0.00 TL</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="text-end mt-3">
+                                        <button class="btn btn-success">Kaydet & Gönder</button>
+                                        <button class="btn btn-secondary">Kaydet</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                        </div>
+</div>
+                <div class="modal fade" id="urunEkleModal" tabindex="-1" aria-labelledby="urunEkleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="urunEkleModalLabel">Yeni Ürün/Hizmet Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                <form id="urunEkleForm">
+                    <div class="mb-3">
+                        <label for="urunAciklama" class="form-label">Açıklama</label>
+                        <input type="text" class="form-control" id="urunAciklama" placeholder="Ürün Açıklaması">
+                    </div>
+                    <div class="mb-3">
+                        <label for="uzunAciklama" class="form-label">Uzun Açıklama</label>
+                        <textarea class="form-control" id="uzunAciklama" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="oranTL" class="form-label">Oran-TL</label>
+                        <input type="number" class="form-control" id="oranTL" placeholder="">
+                    </div>
+                         <div class="mb-3">
+                        <label for="oranUSD" class="form-label">Oran-USD</label>
+                        <input type="number" class="form-control" id="oranUSD" placeholder="">
+                    </div>
+                   <div class="row mb-3">
+   <div class="col-md-6">
+       <label class="form-label required">Vergi 1</label>
+       <select class="form-select" id="vergi1" onchange="toggleVergi2()">
+           <option value="" selected disabled>Seçiniz</option>
+           <option value="20">20.00% +</option>
+       
+       </select>
+   </div>
+   <div class="col-md-6">
+       <label class="form-label">Vergi 2</label>
+       <select class="form-select" id="vergi2" disabled>
+           <option value="" selected disabled>Seçiniz</option>
+           <option value="20">20.00% +</option>
+       
+       </select>
+   </div>
+</div>
+<div class="mb-3">
+                        <label for="urunHizmetGrubu" class="form-label">Ürün Hizmet Grubu</label>
+                          <select class="form-select" id="urunHizmetGrubu" disabled>
+           <option value="">Seçiniz</option>
+           <option>FLY</option>
+           <option>JUMP</option>
+       
+       </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" onclick="addProduct()">Ekle</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+   
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
+<script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let table = new DataTable('#example');
+    });
+</script>
+
+
+<script>
+    $('#example').DataTable({
+        "dom": '<"row"<"col-sm-12"B>>' +
+            '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+            't' +
+            '<"row"<"col-sm-6"i><"col-sm-6"p>>',
+        "language": {
+            "url": "/Content/DataTables/turkish.json"
+        },
+        "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'], // Butonlar
+        "columnDefs": [
+            { "targets": "_all" } // Kolon genişliklerini sabitleme
+        ]
+    });
+
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tagsSelect = document.getElementById('tagsSelect');
+        const selectedTags = document.getElementById('selectedTags');
+
+        tagsSelect.addEventListener('change', function () {
+            const selectedValue = tagsSelect.value;
+
+            // Eğer aynı etiket eklenmişse tekrar ekleme
+            if (document.querySelector(`#selectedTags span[data-value="${selectedValue}"]`)) {
+                return;
+            }
+
+            // Yeni etiket ekleme
+            const tagElement = document.createElement('span');
+            tagElement.className = 'badge bg-primary me-1';
+            tagElement.setAttribute('data-value', selectedValue);
+            tagElement.innerHTML = `${selectedValue} <button type="button" class="btn-close btn-close-white ms-1" aria-label="Remove"></button>`;
+
+            // Etiketi listeye ekle
+            selectedTags.appendChild(tagElement);
+
+            // Silme butonu için olay dinleyici
+            tagElement.querySelector('.btn-close').addEventListener('click', function () {
+                tagElement.remove();
+            });
+        });
+    });
+</script>
+
+<script>
+    function calculateRowTotal(element) {
+        // İlgili satırdaki alanları bul
+        const row = element.closest('tr');
+        const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
+        const price = parseFloat(row.querySelector('.price').value) || 0;
+        const taxRate = parseFloat(row.querySelector('.tax').value) || 0;
+        const discountPercent = parseFloat(row.querySelector('.discount').value) || 0;
+        const adjustment = parseFloat(row.querySelector('.adjustment').value) || 0;
+
+        // Ara toplam (Adet * Ücret)
+        let subtotal = quantity * price;
+
+        // İndirim uygula
+        let discountAmount = (subtotal * discountPercent) / 100;
+        let discountedTotal = subtotal - discountAmount;
+
+        // Vergi uygula
+        let totalWithTax = discountedTotal + (discountedTotal * taxRate);
+
+        // Fiyat ayarlamayı doğrudan uygula (KDV veya indirimden bağımsız)
+        let finalTotal = totalWithTax + adjustment;
+
+        // Sonuç
+        row.querySelector('.total').textContent = finalTotal.toFixed(2) + ' TL';
+    }
+</script>
+
+
+<script>
+ document.getElementById('openModalButton').addEventListener('click', function (event) {
+    event.preventDefault(); // Form gönderimini engeller
+    urunEkleModal.show();
+});
+</script>
+ <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Bootstrap Modal örneği oluşturuluyor
+            const urunEkleModal = new bootstrap.Modal(document.getElementById('urunEkleModal'));
+
+            // "+" butonuna tıklanınca modal açılıyor
+            document.getElementById('openModalButton').addEventListener('click', function () {
+                urunEkleModal.show();
+            });
+        });
+
+        // Ürün ekle butonuna tıklanınca çalışan örnek bir fonksiyon
+        function addProduct() {
+            alert('Ürün başarıyla eklendi!');
+        }
+    </script>
+
+    <script>
+   // Enable "Vergi 2" dropdown when "Vergi 1" is selected
+   function toggleVergi2() {
+       var vergi1Value = document.getElementById("vergi1").value;
+       var vergi2Dropdown = document.getElementById("vergi2");
+       
+       if (vergi1Value !== "") {
+           vergi2Dropdown.disabled = false;  // Enable Vergi 2
+       } else {
+           vergi2Dropdown.disabled = true;  // Disable Vergi 2 if no Vergi 1 is selected
+       }
+   }
+</script>

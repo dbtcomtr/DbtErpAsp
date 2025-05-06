@@ -1,0 +1,413 @@
+﻿@model IEnumerable<Deneme_proje.Models.Entities.StockMovement>
+
+@{
+    ViewData["Title"] = "Stok Hareketleri";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var stockCodesAndNames = ViewData["StockCodesAndNames"] as List<SelectListItem>;
+    var selectedStockCode = ViewData["SelectedStockCode"] as string;
+    var hasFilterApplied = !string.IsNullOrEmpty(selectedStockCode);
+
+    // Diğer değişkenler aynı şekilde kalıyor
+    double toplamGirenMiktar = 0;
+    double toplamGirenTarih = 0;
+    double toplamGirenBrutFiyat = 0;
+    double toplamGirenUsdBrutFiyat = 0;
+    var enSonGirenStok = Model.OrderByDescending(x => x.NumericDate).FirstOrDefault();
+    double enSonGirenStokBirimTutar = enSonGirenStok != null ? enSonGirenStok.StokTutar / enSonGirenStok.StokMiktar : 0;
+    DateTime excelStartDate = new DateTime(1900, 1, 1); // Excel's starting date
+}
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+<style>
+    table.dataTable tbody th, table.dataTable tbody td {
+        padding: 5px 21px !important;
+    }
+
+    @@media only screen and (max-width: 576px) {
+        .form-inline .btn {
+            margin-top: 0;
+        }
+    }
+
+    /* Stok arama için özel stil */
+    .stok-arama-container {
+        position: relative;
+        margin-right: 10px;
+        min-width: 300px;
+    }
+
+    #stokArama {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+
+    #stockCodeList {
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .hidden-select {
+        display: none;
+    }
+</style>
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <h4>Stok Yaşlandırma</h4>
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index"><i class="icofont icofont-home"></i></a>
+                        </li>
+                        <li class="breadcrumb-item"><a href="/Fatura/"></a></li>
+                        <li class="breadcrumb-item"><a href="/Fatura/">Stok Yaşlandırma</a></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-lg-5 mb-1">
+            <div class="col-lg-6">
+                <form method="get" action="/fatura/StokYaslandirma" class="form-inline">
+                    <!-- Stok kodu arama için yeni input ve datalist -->
+                    <div class="form-group stok-arama-container">
+                        <input type="text" id="stokArama" class="form-control"
+                               placeholder="Stok Kodu veya Adını Yazarak Arayın"
+                               list="stockCodeList"
+                               autocomplete="off"
+                               onchange="updateStockCodeSelect(this.value)">
+
+                        <datalist id="stockCodeList">
+                            @foreach (var item in stockCodesAndNames)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </datalist>
+
+                        <!-- Gerçek seçim kutusu (gizli) -->
+                        @Html.DropDownList("stockCode", stockCodesAndNames, "", new { @class = "hidden-select", id = "stockCodeSelect" })
+                    </div>
+
+                    <div class="form-group stok-selcted">
+                        @Html.DropDownList("depoNo", ViewData["DepoList"] as List<SelectListItem>, "Tüm Depolar", new { @class = "form-control", id = "depoNo" })
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-tumblr btn-shadow waves-effect waves-light">Ara</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Geri kalan tablo ve içerik aynı kalıyor -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">Stok Yaşlandırma</h5>
+                    </div>
+
+                    <div class="card-block accordion-block px-0">
+                        <div class="col-md-12">
+                            <div id="tablesContainer">
+                                @if (hasFilterApplied && Model != null && Model.Any())
+                                {
+                                    <div id="example_wrapper" class="dataTables_wrapper">
+                                        <table id="example" class="display dataTable" style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>Stok Kodu</th>
+                                                    <th>Adı</th>
+                                                    <th>Giren Miktar</th>
+                                                    <th>Birim</th>
+                                                    <th>Birim Fiyat (TL)</th>
+                                                    <th>Döviz Kuru</th>
+                                                    <th>USD Birim Fiyat</th>
+                                                    <th>Stok Tarihi</th>
+                                                    <th>Stok Yaş</th>
+                                                    <th>Bulunduğu Depo</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var item in Model)
+                                                {
+                                                    // Burada tam stok miktarını 'StokMiktar' olarak kullanıyoruz
+                                                    var brüt_birim = Math.Round(item.StokTutar, 4) / item.StokMiktar; // Tam miktarı kullanarak brüt birim hesaplama
+                                                    var usd_birim = @Math.Round((brüt_birim / item.AltDovizKuru), 4); // Döviz cinsinden birim fiyat hesaplama
+
+                                                    // Parçalanmış giren miktarı kullanarak giren tarih ve brüt fiyat hesaplama
+                                                    var giren_tarih = item.StoktaGirenMiktar * item.NumericDate;
+                                                    var giren_brütfiyat = item.StoktaGirenMiktar * brüt_birim; // Parçalanmış miktarı brüt birimle çarparak
+                                                    var giren_brütfiyat_usd = item.StoktaGirenMiktar * usd_birim; // Aynısını USD birimiyle yapıyoruz
+
+                                                    var bugunuNumericDate1 = (int)(DateTime.Now - excelStartDate.AddDays(-2)).TotalDays; // Excel formatı hesaplama
+
+                                                    // Stok yaşı hesaplama (bugünkü tarihe göre)
+                                                    var giren_yas = bugunuNumericDate1 - item.NumericDate;
+
+                                                    // Toplam hesaplamalar (parçalanmış giren miktar üzerinden yapılıyor)
+                                                    toplamGirenMiktar += item.StoktaGirenMiktar;
+                                                    toplamGirenTarih += giren_tarih;
+                                                    toplamGirenBrutFiyat += giren_brütfiyat;
+                                                    toplamGirenUsdBrutFiyat += giren_brütfiyat_usd;
+
+                                                    <tr>
+                                                        <td>@item.MsgS0078</td>
+                                                        <td>@item.MsgS0870</td>
+
+                                                        <!-- Burada tam stok miktarını gösteriyoruz, parçalanmış giren miktar yerine -->
+                                                        <td style="text-align: right;">@Math.Round(item.StoktaGirenMiktar).ToString("N0")</td> <!-- Tam miktarı kullanıyoruz -->
+                                                        <td>@item.BirimAdi</td>
+                                                        <!-- Birim fiyat hesaplama ve gösterim (TL ve USD) -->
+                                                        <td style="text-align: right;">@string.Format("{0:C5}", brüt_birim) </td> <!-- TL formatında birim fiyat -->
+                                                        <td style="text-align: right;">@item.AltDovizKuru.ToString("C")</td>
+                                                        <td style="text-align: right;">@string.Format("{0:C5}", usd_birim) </td> <!-- USD formatında birim fiyat -->
+
+                                                        <td>@item.StokTarih.ToString("dd/MM/yyyy")</td> <!-- Stok tarihi -->
+                                                        <!-- Stok yaşı -->
+                                                        <td style="text-align: right;">@giren_yas.ToString("N0")</td>
+
+                                                        <td>@item.DepoAdi</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                            <tfoot>
+                                                @* Tfoot'ta toplam hesaplamalar sonrası A.O.G. Tarihi, Stok Yaşı ve Stok Yaşlandırmalarını ekleme *@
+                                                @{
+                                                    // Ağırlıklı Ortalama Giriş Tarihi (A.O.G. Tarihi) ve stok yaşı hesaplamaları
+                                                    var aogt = toplamGirenMiktar > 0 ? toplamGirenTarih / toplamGirenMiktar : 0; // Bölme hatasını önlemek için kontrol ekledik.
+                                                    var finalAogtDate = toplamGirenMiktar > 0 ? excelStartDate.AddDays(aogt - 2) : excelStartDate; // Hata önlemek için koşul ekledik.
+                                                    var bugunuNumericDate = (int)(DateTime.Now - excelStartDate.AddDays(-2)).TotalDays;
+
+                                                    var stokyas = toplamGirenMiktar > 0 ? bugunuNumericDate - aogt : 0; // Stok yaşı hesaplaması
+                                                    var stoktutar_sonsatinalma = toplamGirenMiktar * enSonGirenStokBirimTutar;
+
+                                                    var aobm = toplamGirenMiktar > 0 ? toplamGirenBrutFiyat / toplamGirenMiktar : 0;
+
+                                                    var aobm_usd = toplamGirenMiktar > 0 ? toplamGirenUsdBrutFiyat / toplamGirenMiktar : 0;
+
+                                                    // Yaşlandırma hesaplamaları için değişkenler
+                                                    double yas0_30 = 0, yas31_60 = 0, yas61_90 = 0, yas90_plus = 0;
+
+                                                    foreach (var item in Model)
+                                                    {
+                                                        var bugunuNumericDate1 = (int)(DateTime.Now - excelStartDate).TotalDays;
+                                                        var giren_yas = bugunuNumericDate1 - item.NumericDate;
+
+                                                        if (giren_yas <= 30)
+                                                        {
+                                                            yas0_30 += item.StoktaGirenMiktar;
+                                                        }
+                                                        else if (giren_yas <= 60)
+                                                        {
+                                                            yas31_60 += item.StoktaGirenMiktar;
+                                                        }
+                                                        else if (giren_yas <= 90)
+                                                        {
+                                                            yas61_90 += item.StoktaGirenMiktar;
+                                                        }
+                                                        else
+                                                        {
+                                                            yas90_plus += item.StoktaGirenMiktar;
+                                                        }
+                                                    }
+                                                }
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered table-striped">
+                                                        <thead class="thead-dark">
+                                                            <tr>
+                                                                <th>Kalan Stok Miktarı</th>
+                                                                <th>A.O.G. Tarihi</th>
+                                                                <th>Stok Yaşı</th>
+                                                                <th>Ağırlıkl Ortalama Birim Maliyeti (TL)</th>
+                                                                <th>Ağırlıkl Ortalama Birim Maliyeti (USD)</th>
+                                                                <th>En Son Giren Stoğun Birim Tutarı</th>
+                                                                <th>Stok Tutarı (Son Satın Alma Fiyatı ile TL)</th>
+                                                                <th>StokTutarı Usd</th>
+                                                                <th>0-30 Gün</th>
+                                                                <th>31-60 Gün</th>
+                                                                <th>61-90 Gün</th>
+                                                                <th>90+ Gün</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td style="text-align: right;" id="toplamGirenMiktar">@Math.Round(toplamGirenMiktar, 2).ToString("N0")</td>
+                                                                <td>@finalAogtDate.ToString("dd/MM/yyyy")</td>
+                                                                <td style="text-align: right;">@Math.Round(stokyas).ToString("N2")</td>
+                                                                <td style="text-align: right;">@Math.Round(aobm, 5).ToString("N2")</td>
+                                                                <td style="text-align: right;" id="aobm_usd">@Math.Round(aobm_usd, 5).ToString("N2")</td>
+                                                                <td style="text-align: right;">@Math.Round(enSonGirenStokBirimTutar, 5).ToString("N2")</td>
+                                                                <td style="text-align: right;">@Math.Round(stoktutar_sonsatinalma, 5).ToString("N2")</td>
+                                                                <td style="text-align: right;" id="stok_tutari_usd">Hesaplanıyor...</td> <!-- Hesaplanan stok tutarı burada gösterilecek -->
+                                                                <td style="text-align: right;">@Math.Round(yas0_30, 2).ToString("N2")</td> <!-- 0-30 Günlük stok miktarı -->
+                                                                <td style="text-align: right;">@Math.Round(yas31_60, 2).ToString("N2")</td> <!-- 31-60 Günlük stok miktarı -->
+                                                                <td style="text-align: right;">@Math.Round(yas61_90, 2).ToString("N2")</td> <!-- 61-90 Günlük stok miktarı -->
+                                                                <td style="text-align: right;">@Math.Round(yas90_plus, 2).ToString("N2")</td> <!-- 90+ Günlük stok miktarı -->
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="12">Döviz Kuru (USD/TL): <span id="usd_exchange_rate">Yükleniyor...</span></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+
+<script>
+    // Arama inputundan seçilen değeri gerçek select'e aktarmak için
+    function updateStockCodeSelect(selectedValue) {
+        document.getElementById('stockCodeSelect').value = selectedValue;
+    }
+
+    $(document).ready(function() {
+        // Sayfa yüklenirken seçili stok kodunu inputa yerleştir
+        var selectedValue = $("#stockCodeSelect").val();
+        if (selectedValue) {
+            var selectedText = $("#stockCodeSelect option:selected").text();
+            $("#stokArama").val(selectedText);
+        }
+
+        // DataTable ve diğer kodlar aynı şekilde devam ediyor
+        if ($.fn.DataTable) {
+            if ($('#example').length) {
+                $('#example').DataTable({
+                    "dom": '<"row"<"col-sm-12"B>>' +
+                        '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+                        't' +
+                        '<"row"<"col-sm-6"i><"col-sm-6"p>>',
+                    "language": {
+                        "url": "/Content/DataTables/turkish.json"
+                    },
+                    "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'],
+                    "pageLength": 5000,
+                    "lengthMenu": [[10, 25, 50, 100, 5000], [10, 25, 50, 100, "5000"]]
+                });
+            }
+        }
+
+        // Döviz kuru kodları aynı şekilde devam ediyor
+        fetchExchangeRate();
+
+        function fetchExchangeRate() {
+            tryFrankfurterAPI();
+        }
+
+        function tryFrankfurterAPI() {
+            $.ajax({
+                url: "https://api.frankfurter.app/latest?from=USD&to=TRY",
+                type: "GET",
+                dataType: "json",
+                timeout: 5000,
+                success: function(data) {
+                    if (data && data.rates && data.rates.TRY) {
+                        updateExchangeRate(data.rates.TRY);
+                    } else {
+                        tryOpenExchangeAPI();
+                    }
+                },
+                error: function() {
+                    tryOpenExchangeAPI();
+                }
+            });
+        }
+
+        function tryOpenExchangeAPI() {
+            $.ajax({
+                url: "https://open.er-api.com/v6/latest/USD",
+                type: "GET",
+                dataType: "json",
+                timeout: 5000,
+                success: function(data) {
+                    if (data && data.rates && data.rates.TRY) {
+                        updateExchangeRate(data.rates.TRY);
+                    } else {
+                        tryExchangeRatesAPI();
+                    }
+                },
+                error: function() {
+                    tryExchangeRatesAPI();
+                }
+            });
+        }
+
+        function tryExchangeRatesAPI() {
+            $.ajax({
+                url: "https://api.exchangerate.host/latest?base=USD&symbols=TRY",
+                type: "GET",
+                dataType: "json",
+                timeout: 5000,
+                success: function(data) {
+                    if (data && data.rates && data.rates.TRY) {
+                        updateExchangeRate(data.rates.TRY);
+                    } else {
+                        useFallbackRate();
+                    }
+                },
+                error: function() {
+                    useFallbackRate();
+                }
+            });
+        }
+
+        function useFallbackRate() {
+            var fallbackRate = 32.50;
+            updateExchangeRate(fallbackRate, true);
+        }
+
+        function updateExchangeRate(rate, isFallback) {
+            var formattedRate = rate.toFixed(4);
+            if (isFallback) {
+                $("#usd_exchange_rate").text(formattedRate + " (Tahmini değer)");
+            } else {
+                $("#usd_exchange_rate").text(formattedRate);
+            }
+
+            var aobmUsd = parseFloat($("#aobm_usd").text().replace(/\./g, '').replace(',', '.'));
+            var toplamGirenMiktar = parseFloat($("#toplamGirenMiktar").text().replace(/\./g, '').replace(',', '.'));
+
+            console.log("AOBM USD:", aobmUsd);
+            console.log("Toplam Giren Miktar:", toplamGirenMiktar);
+            console.log("Döviz Kuru:", rate);
+
+            if (!isNaN(aobmUsd) && !isNaN(toplamGirenMiktar)) {
+                var stokTutariUsd = aobmUsd * toplamGirenMiktar;
+                var stokTutariTl = stokTutariUsd * rate;
+
+                $("#stok_tutari_usd").text(
+                    stokTutariUsd.toLocaleString('tr-TR', { maximumFractionDigits: 2 }) +
+                    " USD (" +
+                    stokTutariTl.toLocaleString('tr-TR', { maximumFractionDigits: 2 }) +
+                    " TL)"
+                );
+            } else {
+                $("#stok_tutari_usd").text("Hesaplanamadı");
+            }
+        }
+    });
+</script>

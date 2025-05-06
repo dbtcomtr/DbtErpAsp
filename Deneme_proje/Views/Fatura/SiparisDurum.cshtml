@@ -1,0 +1,446 @@
+﻿@model IEnumerable<Deneme_proje.Models.Entities.SiparisDetayViewModel>
+@{
+    ViewData["Title"] = "Rapor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+<style>
+    /* Button Group Styling */
+    .btn-group .btn {
+        padding: 10px 20px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+    .btn-group .btn-primary {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+
+    .btn-group .btn-outline-primary {
+        background-color: transparent;
+        color: #007bff;
+        border-color: #007bff;
+    }
+
+        .btn-group .btn-outline-primary:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+    /* Centered Action Buttons Styling */
+    td .btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto;
+        padding: 12px 24px;
+        font-size: 15px;
+        min-width: 60px;
+        min-height: 60px;
+    }
+
+    table.dataTable tbody td {
+        font-size: 20px;
+        word-wrap: break-word;
+        white-space: normal;
+    }
+    /* Ensure table cell centers the button */
+    table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .btn-group .btn {
+        padding: 10px 20px !important;
+        font-weight: bold;
+        transition: all 0.3sease;
+        color: white;
+    }
+
+    .btn-group > .btn:first-child {
+        margin-left: 0;
+        background-color: #707070;
+    }
+
+    .btn-group > .btn:last-child:not(:first-child), .btn-group > .dropdown-toggle:not(:first-child) {
+        background-color: green;
+        border-bottom-left-radius: 0;
+        border-top-left-radius: 0;
+    }
+
+    .stok-detay {
+        background-color: #f8f9fa;
+        padding: 15px;
+        margin-top: 10px;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
+    }
+
+    .stok-tablo {
+        width: 100%;
+        margin-top: 10px;
+        border-collapse: collapse;
+    }
+
+        .stok-tablo th,
+        .stok-tablo td {
+            padding: 8px;
+            border: 1px solid #dee2e6;
+            text-align: left;
+        }
+
+        .stok-tablo th {
+            background-color: #e9ecef;
+        }
+
+    .detail-row {
+        background-color: #f8f9fa;
+    }
+
+</style>
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+
+
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: linear-gradient(45deg, #162e54 0%, #0076a8 100%);">
+                        <h5 class="card-header-text text-white mb-0">Sipariş Durumu Yönetimi</h5>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- Filtre Butonları -->
+                        <div class="btn-group" role="group">
+                            <a href="@Url.Action("SiparisDurum", "Fatura", new { filter = "all" })"
+                               class="btn @(ViewData["CurrentFilter"]?.ToString() == "all" ? "btn-primary" : "btn-outline-primary")">
+                                Tüm Siparişler
+                            </a>
+                            <a href="@Url.Action("SiparisDurum", "Fatura", new { filter = "started" })"
+                               class="btn @(ViewData["CurrentFilter"]?.ToString() == "started" ? "btn-primary" : "btn-outline-primary")">
+                                Başlayan Siparişler
+                            </a>
+                        </div>
+
+                        @if (Model != null && Model.Any())
+                        {
+                            <div class="table-responsive">
+                                <table id="example" class="siparis-tablo table">
+                                    <thead>
+                                        <tr>
+                                            <th>Cari Adı</th>
+                                            <th>Evrak Sıra</th>
+                                            <th>Sipariş Tarihi</th>
+                                            <th>Rampa Bilgisi</th>
+                                            <th>İşlem Durumu</th>
+                                            <th>İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <td>@item.CariAdi</td>
+                                                <td>@item.EvrakSira</td>
+                                                <td>@item.SiparisTarihi.ToString("dd.MM.yyyy")</td>
+                                                <td>@item.RampaBilgisi</td>
+                                                <td>@item.IslemDurumu</td>
+                                                <td>
+                                                    <div class="d-flex gap-2">
+                                                        @if (string.IsNullOrEmpty(item.IslemDurumu))
+                                                        {
+                                                            <button class="btn btn-primary btn-sm" onclick="baslatIslem(@item.EvrakSira, '@item.SiparisGuid')">
+                                                                Başlat
+                                                            </button>
+                                                        }
+                                                        else if (item.IslemDurumu == "Basladi")
+                                                        {
+                                                            <button class="btn btn-success btn-sm" onclick="bitirIslem(@item.EvrakSira, '@item.SiparisGuid')">
+                                                                Bitir
+                                                            </button>
+                                                        }
+                                                        <button class="btn btn-info btn-sm" onclick="stokHareketleriniGoster(@item.EvrakSira, '@item.SiparisGuid')">
+                                                            <i class="fas fa-box-open me-1"></i> Stok Detay
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr id="stokDetayRow_@item.EvrakSira" style="display: none">
+                                                <td colspan="6" class="p-0">
+                                                    <div class="stok-detay p-3">
+                                                        <div id="stokHareketleri_@item.EvrakSira">
+                                                            <!-- Stok hareketleri buraya gelecek -->
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning mt-3" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Veri bulunamadı.
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .modal-backdrop {
+                z-index: 1050 !important;
+            }
+
+            #rampaModal {
+                z-index: 1055 !important;
+            }
+        </style>
+        <div class="modal fade" id="rampaModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Rampa Seçimi</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="currentEvrakSira" />
+                        <input type="hidden" id="currentSiparisGuid" />
+                        <input type="hidden" id="currentIslemTipi" />
+
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-lg btn-primary" onclick="selectRampa('Rampa1')">Rampa 1</button>
+                            <button class="btn btn-lg btn-primary" onclick="selectRampa('Rampa2')">Rampa 2</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
+        <script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+
+
+
+        <script>
+                function stokHareketleriniGoster(evrakSira, siparisGuid) {
+                console.log('Stok hareketleri isteniyor...', { evrakSira, siparisGuid });
+
+                const detayRow = $(`#stokDetayRow_${evrakSira}`);
+                const container = $(`#stokHareketleri_${evrakSira}`);
+
+                if (detayRow.is(':visible')) {
+                    detayRow.hide();
+                    return;
+                }
+
+                detayRow.show();
+
+                if (container.children().length === 0) {
+                    container.html('<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</div>');
+
+                    $.ajax({
+                        url: '@Url.Action("StokHareketleriniGetir", "Fatura")',
+                        type: 'GET',
+                        data: { siparisGuid: siparisGuid },
+                        success: function(response) {
+                            console.log('Sunucudan gelen yanıt:', response);
+
+                            if (!response.success) {
+                                container.html(`<div class="alert alert-danger">${response.error}</div>`);
+                                return;
+                            }
+
+                            let html = '<table class="stok-tablo">';
+                            html += '<thead><tr>';
+                            html += '<th>Cari Kodu</th>';
+                            html += '<th>Evrak Sıra (İrsaliye No)</th>';
+                            html += '<th>Stok Kodu</th>';
+                            html += '<th>Stok Adı</th>';
+                            html += '<th>Parti Kodu</th>';
+                            html += '<th>Miktar</th>';
+                            html += '</tr></thead><tbody>';
+
+                            if (response.data && response.data.length > 0) {
+                                response.data.forEach(function(item) {
+                                    console.log('İşlenen kayıt:', item);
+                                    html += '<tr>';
+                                    html += `<td>${item.cariKodu || ''}</td>`;
+                                    html += `<td>${item.evrakSira || ''}</td>`;
+                                    html += `<td>${item.stokKodu || ''}</td>`;
+                                    html += `<td>${item.stokAdi || ''}</td>`;
+                                    html += `<td>${item.partiKodu || ''}</td>`;
+                                    html += `<td>${item.miktar || 0}</td>`;
+                                    html += '</tr>';
+                                });
+                            } else {
+                                html += '<tr><td colspan="6" class="text-center">Stok hareketi bulunamadı</td></tr>';
+                            }
+
+                            html += '</tbody></table>';
+                            container.html(html);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Ajax hatası:', { status, error, xhr });
+                            container.html('<div class="alert alert-danger">Stok hareketleri yüklenirken bir hata oluştu.</div>');
+                        }
+                    });
+                }
+            }
+        </script>
+
+
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let table = new DataTable('#example');
+            });
+        </script>
+
+        <script>
+            function baslatIslem(evrakSira, siparisGuid) {
+                $('#currentEvrakSira').val(evrakSira);
+                $('#currentSiparisGuid').val(siparisGuid);
+                $('#currentIslemTipi').val('Basladi');
+                $('#rampaModal').modal('show');
+            }
+
+            function bitirIslem(evrakSira, siparisGuid) {
+                updateSiparisDurum(evrakSira, siparisGuid, null, 'Bitti');
+            }
+
+            function selectRampa(rampaBilgisi) {
+                const evrakSira = $('#currentEvrakSira').val();
+                const siparisGuid = $('#currentSiparisGuid').val();
+                const islemTipi = $('#currentIslemTipi').val();
+
+                $('#rampaModal').modal('hide');
+                updateSiparisDurum(evrakSira, siparisGuid, rampaBilgisi, islemTipi);
+            }
+
+            function updateSiparisDurum(evrakSira, siparisGuid, rampaBilgisi, islemDurumu) {
+                $.ajax({
+                    url: '@Url.Action("UpdateSiparisDurum", "Fatura")',
+                    type: 'POST',
+                    data: {
+                        evrakSira: evrakSira,
+                        siparisGuid: siparisGuid,
+                        rampaBilgisi: rampaBilgisi,
+                        islemDurumu: islemDurumu
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            alert('İşlem sırasında bir hata oluştu: ' + response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('İşlem sırasında bir hata oluştu.');
+                    }
+                });
+            }
+        </script>
+
+
+        <script>
+
+            $('#example').dataTable({
+                "dom": '<"row"<"col-sm-12"B>>' +
+                    '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+                    't' +
+                    '<"row"<"col-sm-6"i><"col-sm-6"p>>',
+                "language": {
+                    "url": "/Content/DataTables/turkish.json"
+                },
+                "buttons": [
+                    'copy',
+                    {
+                        extend: 'csv',
+                        exportOptions: {
+                            format: {
+                                body: function (data, row, column, node) {
+                                    // Check if the data contains currency symbol (₺)
+                                    if (typeof data === 'string' && data.includes('₺')) {
+                                        // Remove currency symbol and thousand separators, replace decimal comma with dot
+                                        return data.replace('₺', '')
+                                            .replace(/\./g, '')
+                                            .replace(',', '.');
+                                    }
+                                    // For other decimal numbers (like those with F2 or F4 format)
+                                    if (typeof data === 'string' && data.includes(',')) {
+                                        return data.replace(',', '.');
+                                    }
+                                    return data;
+                                }
+                            }
+                        }
+                    },
+                    {
+                        extend: 'excel',
+                        exportOptions: {
+                            format: {
+                                body: function (data, row, column, node) {
+                                    // Check if the data contains currency symbol (₺)
+                                    if (typeof data === 'string' && data.includes('₺')) {
+                                        // Remove currency symbol and thousand separators, replace decimal comma with dot
+                                        return data.replace('₺', '')
+                                            .replace(/\./g, '')
+                                            .replace(',', '.');
+                                    }
+                                    // For other decimal numbers (like those with F2 or F4 format)
+                                    if (typeof data === 'string' && data.includes(',')) {
+                                        return data.replace(',', '.');
+                                    }
+                                    return data;
+                                }
+                            }
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        exportOptions: {
+                            format: {
+                                body: function (data, row, column, node) {
+                                    return data;  // Keep original formatting for PDF
+                                }
+                            }
+                        }
+                    },
+                    'print'
+                ],
+                "pageLength": 5000,
+                "lengthMenu": [[10, 25, 50, 100, 5000], [10, 25, 50, 100, "5000"]]
+            });
+
+
+
+        </script>
+
+
+

@@ -1,0 +1,1037 @@
+﻿<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link href="c:\users\hp\source\repos\gozdecan22\dbt_erp_web_tasarim\deneme_proje\wwwroot\content\assets\css\site.css" rel="stylesheet" />
+<style>
+    /* Ana Konteyner */
+
+
+    .urun-container {
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+
+    .barkod-button-yeni {
+        padding: 8px 15px;
+        background-color: #28A745; /* Yeşil */
+        color: white;
+        font-weight: bold;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        text-align: center;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: background-color 0.3s;
+    }
+
+        .barkod-button-yeni:hover {
+            background-color: #218838; /* Daha koyu yeşil */
+        }
+
+    .barkod-button {
+        padding: 8px 15px;
+        background-color: #1E3559;
+        color: white;
+        font-weight: bold;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        text-align: center;
+        font-size: 14px;
+        margin-top: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .barkod-button:hover {
+            background-color: #003366;
+        }
+
+    .barkod-button-yazdir {
+        padding: 8px 15px;
+        background-color: #FFD700; /* Sarı */
+        color: white;
+        font-weight: bold;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        text-align: center;
+        font-size: 14px;
+        margin-top: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .barkod-button-yazdir-yellow:hover {
+        background-color: #FFC107; /* Daha koyu sarı */
+    }
+
+
+
+    /* Barkod Alanı */
+    .barcode-container {
+        background-color: #FFF;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        margin: 0 auto;
+        color: #333;
+        border-radius: 12px;
+        text-align: center;
+        font-size:25ppx;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Barkod başlık ve değer */
+    .barcode-item {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        margin: 5px 0;
+        padding: 5px 0;
+        color: #333;
+        font-weight: normal;
+        font-size:25px;
+        border-bottom: 1px solid #E0E0E0;
+        text-align: start;
+    }
+
+        .barcode-item span:first-child {
+            color: #8A8A8F;
+        }
+
+    #barcode {
+        display: flex;
+        justify-content: center;
+        margin: 0 auto;
+    }
+
+    .barkodlogo {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+
+        .barkodlogo img {
+            max-width: 60%;
+            height: auto;
+            ;
+        }
+
+    .barcode-number {
+        font-size: 20px;
+        margin-top: 5px;
+        font-weight: normal;
+        color: #333;
+    }
+
+    .bold-text {
+        font-weight: bold;
+    }
+
+    .barcode-summary {
+        font-size: 13px;
+        display: flex;
+        justify-content: space-between;
+        color: #333;
+        margin-top: 10px;
+        font-weight: bold;
+    }
+
+    /* Diğer stiller */
+    h2, h3 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    #miktarButtons,
+    #markaButtons,
+    #modelButtons,
+    #kisaIsimButtons,
+    #ambalajButtons {
+        display: flex !important;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    /* Buton tasarımı */
+    .product-button {
+        flex: 1 1 calc(33.33% - 20px);
+        padding: 20px;
+        background-color: transparent;
+        white-space: nowrap;
+        color: #333;
+        font-weight: bold;
+        margin: 5px;
+        border: 2px solid #1E3559;
+        border-radius: 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: flex-start;
+        transition: background-color 0.3s, color 0.3s;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        text-align: left;
+        box-sizing: border-box;
+    }
+
+        /* Buton üzerine gelindiğinde */
+        .product-button:hover {
+            background-color: #003366;
+            color: white;
+        }
+
+        /* Buton simgeleri için stil */
+        .product-button .icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #1E3559;
+            color: #ffffff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Buton hover durumunda simge rengi değişir */
+        .product-button:hover .icon {
+            background-color: white;
+            color: #003366;
+        }
+
+        .product-button.active {
+            background-color: #f4f4f4;
+            color: #003366;
+        }
+
+
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 16px;
+        color: #3498DB;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+
+        .back-button:hover {
+            color: #003366;
+        }
+
+        .back-button .icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #3498DB;
+            color: #ffffff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 14px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .back-button:hover .icon {
+            background-color: #003366;
+            color: white;
+        }
+
+    .input-field {
+        display: none;
+        margin: 10px 0;
+    }
+
+    .modal-backdrop {
+        z-index: 1050;
+    }
+
+</style>
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <h4></h4>
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                    
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style=" background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;"
+                         ">
+                        <h5 class="card-header-text text-white">Barkod Oluştur</h5>
+                    </div>
+
+                    <div class="card-block accordion-block">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-8 p-5 d-flex justify-content-center">
+                                    <!-- Ürün Menüleri -->
+                                    <div style="width: 80%">
+                                        <div id="mainMenu">
+                                            <h2>Üretilen Ürün</h2>
+                                            <div id="markaButtons"></div>
+                                        </div>
+                                        <div id="modelMenu" class="section">
+                                            <span class="back-button" onclick="goBack()">
+                                                <span class="icon"><i class="fas fa-arrow-left"></i></span> Geri
+                                            </span>
+                                            <h3>Model Kodları</h3>
+                                            <div id="modelButtons"></div>
+                                        </div>
+                                        <div id="ambalajMenu" class="section">
+                                            <span class="back-button" onclick="goBack()">
+                                                <span class="icon"><i class="fas fa-arrow-left"></i></span> Geri
+                                            </span>
+                                            <h3>Ambalaj Kodları</h3>
+                                            <div id="ambalajButtons"></div>
+                                        </div>
+                                        <div id="kisaIsimMenu" class="section">
+                                            <span class="back-button" onclick="goBack()">
+                                                <span class="icon"><i class="fas fa-arrow-left"></i></span> Geri
+                                            </span>
+                                            <h3>Kısa İsimler</h3>
+                                            <div id="kisaIsimButtons"></div>
+                                        </div>
+                                        <div id="miktarMenu" class="section">
+                                            <span class="back-button" onclick="goBack()">
+                                                <span class="icon"><i class="fas fa-arrow-left"></i></span> Geri
+                                            </span>
+                                            <h3>Miktar Seçimi</h3>
+                                            <div id="miktarButtons">
+                                                <button onclick="selectMiktar('1150')" class="product-button">
+                                                    <div class="icon"><i class="fas fa-box"></i></div> 1150 KG
+                                                </button>
+                                                <button onclick="selectMiktar('575')" class="product-button">
+                                                    <div class="icon"><i class="fas fa-ruler"></i></div> 575
+                                                </button>
+                                                <button onclick="selectMiktar('Serbest Elle Giriş')" class="product-button">
+                                                    <div class="icon"><i class="fas fa-pen"></i></div> Serbest Elle Giriş
+                                                </button>
+                                            </div>
+                                            <div id="miktarInput" class="input-field">
+                                                <label for="serbestMiktar">Miktar Giriniz:</label>
+                                                <input type="number" id="serbestMiktar" min="0" onchange="updateMiktar()">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 p-5" style="background-color: #EDEDED;">
+                                    <!-- Barkod Alanı -->
+
+                                    <div class="barcode-container">
+                                        <!-- Logo -->
+                                        <div class="barkodlogo">
+                                            <img src="/logo.png" alt="Dioki Logo" />
+
+                                        </div>
+                                        
+                                        <!-- Barkod ve Numarası -->
+                                        <svg id="barcode"></svg>
+
+
+                                        <!-- Bilgi Alanları -->
+                                        <div class="barcode-item" id="selectedMarka">Marka: -</div>
+                                        <div class="barcode-item" id="selectedModel">Model: -</div>
+                                        <div class="barcode-item" id="selectedKisaIsim">Kısa İsim: -</div>
+                                        <div class="barcode-item" id="selectedMiktar">Miktar: -</div>
+                                        <div class="barcode-item">
+                                            <label for="lotNo">Lot No:</label>
+                                            <input type="text" id="lotNo" onchange="updateLotNo()">
+                                        </div>
+
+                                        <!-- Üret Butonu -->
+                                        <!-- Üret Butonu ve Yazdır Butonu -->
+                                        <div style="display: flex; justify-content: center; gap: 10px;">
+                                            <button onclick="executeUret()" class="barkod-button">
+                                                <i class="fas fa-print"></i>
+                                                <span>ÜRET</span>
+                                            </button>
+                                            <button onclick="printModalBarkod()" id="printButton" class="barkod-button-yazdir barkod-button-yellow" style="display: none;">
+                                                <i class="fas fa-print"></i>
+                                                <span>YAZDIR</span>
+                                            </button>
+                                            <button onclick="resetPage()" id="resetButton" class="barkod-button" style="display: none;">
+                                                <i class="fas fa-redo"></i>
+                                                <span>Yeni Oluştur</span>
+                                            </button>
+
+                                        </div>
+
+
+                                        <div id="outputMessage"></div>
+
+
+                                    </div>
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="barkodModal" tabindex="-1" aria-labelledby="barkodModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" style="width: 10cm; height: 10cm; border: 1px solid #000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="barkodModalLabel">Barkod Detayları</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="barcode-container">
+                                                        <div class="barkodlogo">
+                                                            <img src="~/logo.png" alt="Dioki Logo" />
+                                                        </div>
+                                                        <!-- Barkod ve Numarası -->
+                                                        <svg id="modalBarcode"></svg>
+
+                                                        <!-- Bilgi Alanları -->
+                                                        <div class="barcode-item" id="modalSelectedMarka">Marka: -</div>
+                                                        <div class="barcode-item" id="modalSelectedModel">Model: -</div>
+                                                        <div class="barcode-item" id="modalSelectedKisaIsim">Kısa İsim: -</div>
+                                                        <div class="barcode-item" id="modalSelectedMiktar">Miktar: -</div>
+                                                        <div id="modalOutputMessage"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-primary" onclick="printModalBarkod()">Yazdır</button>
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal with inner tables -->
+    <div class="modal fade" id="krediDetayModal" tabindex="-1" role="dialog" aria-labelledby="krediDetayModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="krediDetayModalLabel">Kredi Detayları</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="krediDetayModalBody">
+                    <!-- Loan details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button id="modal-kapat" type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+   
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script>
+        // Diğer fonksiyonlar burada kalacak
+
+        function updateLotNo() {
+            const lotNo = $('#lotNo').val();
+            $('#selectedLotNo').text('Lot No: ' + lotNo);
+        }
+        function executeUret() {
+            const kisaIsim = $('#selectedKisaIsim').text().split(': ')[1];
+            const depo = 1; // Sabit veya kullanıcıdan alınabilir
+            const miktar = $('#selectedMiktar').text().split(': ')[1];
+            const lotNo = $('#lotNo').val();
+
+            if (!kisaIsim || kisaIsim === '-') {
+                const errorMessage = 'Kısa isim seçilmemiş.';
+                $('#outputMessage').text(errorMessage);
+                return;
+            }
+
+            if (!miktar || miktar === '-') {
+                const errorMessage = 'Miktar girilmedi.';
+                $('#outputMessage').text(errorMessage);
+                return;
+            }
+
+            if (!lotNo) {
+                const errorMessage = 'Lot numarası girilmemiş.';
+                $('#outputMessage').text(errorMessage);
+                return;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '/Dioki/ExecuteVideojet2Micro',
+                data: { kisaIsim, depo, miktar, lotNo },
+                success: function (response) {
+                    if (response.success) {
+                        const now = new Date();
+                        const tarihSaat = now.toLocaleString("tr-TR", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit"
+                        });
+
+                        const successMessage =
+                            //`<strong>Barkod:</strong> ${response.barkod}<br>` +
+                            `<strong>Makine:</strong> ${response.makine}<br>`;
+                          //  `<strong class='no-print'>Üretim Tarihi ve Saati:</strong> <span class='no-print'>${tarihSaat}</span>`;
+
+                        // Sayfa üzerindeki mesajı güncelle
+                        $('#outputMessage').html(successMessage);
+
+                        // Modal içindeki mesajı güncelle
+                        $('#modalOutputMessage').html(successMessage);
+
+                        // Sayfa üzerindeki barkodu güncelle
+                        $('#barcode').html('');
+                        JsBarcode("#barcode", response.barkod, {
+                            format: "CODE128",
+                            lineColor: "#000",
+                            width: 2,
+                            height: 40,
+                            displayValue: true
+                        });
+
+                        // Modal içindeki barkodu güncelle
+                        $('#modalBarcode').html('');
+                        JsBarcode("#modalBarcode", response.barkod, {
+                            format: "CODE128",
+                            lineColor: "#000",
+                            width: 2,
+                            height: 40,
+                            displayValue: true
+                        });
+
+                        // Modal içeriğini güncelle
+                        $('#modalSelectedMarka').text($('#selectedMarka').text());
+                        $('#modalSelectedModel').text($('#selectedModel').text());
+                        $('#modalSelectedKisaIsim').text($('#selectedKisaIsim').text());
+                        $('#modalSelectedMiktar').text($('#selectedMiktar').text());
+
+                        // Yazdır butonunu görünür yap
+                        $('#printButton').show();
+                        $('#resetButton').show();
+                    } else {
+                        const errorMessage = 'Üretim sırasında bir hata oluştu: ' + response.message;
+                        $('#outputMessage').text(errorMessage);
+                    }
+                },
+                error: function () {
+                    const errorMessage = 'Sunucuya bağlanırken bir hata oluştu.';
+                    $('#outputMessage').text(errorMessage);
+                }
+            });
+        }
+
+
+
+
+    </script>
+    <script>
+        function resetPage() {
+            // Tüm seçimleri sıfırla
+            $('#selectedMarka').html('<span style="color: #8A8A8F;">Marka:</span> <span class="bold-text" style="font-weight: bold;">-</span>');
+            $('#selectedModel').html('<span style="color: #8A8A8F;">Model:</span> <span class="bold-text" style="font-weight: bold;">-</span>');
+            $('#selectedKisaIsim').html('<span style="color: #8A8A8F;">Kısa İsim:</span> <span class="bold-text" style="font-weight: bold;">-</span>');
+            $('#selectedMiktar').html('<span style="color: #8A8A8F;">Miktar:</span> <span class="bold-text" style="font-weight: bold;">-</span>');
+            $('#outputMessage').text('');
+            $('#lotNo').val('');
+
+            // Barkodu temizle
+            $('#barcode').html('');
+
+            // Menüleri sıfırla
+            $('#mainMenu').show();
+            $('#modelMenu, #kisaIsimMenu, #miktarMenu').hide();
+
+            // Yazdır ve Yeni Oluştur butonlarını gizle
+            $('#printButton').hide();
+            $('#resetButton').hide();
+
+            // History stack'i sıfırla
+            historyStack = ['mainMenu'];
+        }
+
+    </script>
+
+
+    <script>
+        $(document).ready(function () {
+            // Mevcut kodlar
+            $(document).ready(function () {
+                // Sadece ana menüyü göster, diğer bölümleri gizle
+                $('#mainMenu').show();
+                $('#modelMenu, #ambalajMenu, #kisaIsimMenu, #miktarMenu').hide();
+
+                // Marka butonlarını yükle
+                $.getJSON('/Dioki/GetMarkalar', function (data) {
+                    if (data.length > 0) {
+                        data.forEach(function (marka) {
+                            $('#markaButtons').append(
+                                `<button onclick="selectMarka('${marka}')" class="product-button">
+                                            <i class="fas fa-tag icon"></i> ${marka}
+                                        </button>`
+                            );
+                        });
+                    } else {
+                        $('#mainMenu').html('<p>Marka bulunamadı.</p>');
+                    }
+                });
+            });
+
+            $('.back-button').on('click', goBack);
+
+            // Modal overlay temizliği burada
+            $(document).on('hidden.bs.modal', '.modal', function () {
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open');
+            });
+        });
+
+        let historyStack = ['mainMenu'];
+
+        function selectMarka(markaKodu) {
+            $('#selectedMarka').html(`<span style="color: #8A8A8F;">Marka:</span> <span class="bold-text" style="font-weight: bold;">${markaKodu}</span>`);
+            $.getJSON('/Dioki/GetModeller?markaKodu=' + markaKodu, function (data) {
+                $('#modelButtons').empty();
+                if (data.length > 0) {
+                    data.forEach(function (model) {
+                        $('#modelButtons').append(
+                            `<button onclick="selectModel('${markaKodu}', '${model}')" class="product-button" style="background-color: #1E3559; color: white; font-weight: bold;">
+                                            <i class="fas fa-file icon"></i> ${model}
+                                        </button>`
+                        );
+                    });
+                    showSection('modelMenu');
+                } else {
+                    $('#modelButtons').html('<p>Model bulunamadı.</p>');
+                }
+            });
+        }
+
+
+        function selectModel(markaKodu, modelKodu) {
+            $('#selectedModel').html(`<span style="color: #8A8A8F;">Model:</span> <span class="bold-text" style="font-weight: bold;">${modelKodu}</span>`);
+            $.getJSON('/Dioki/GetAmbalajKodlari?markaKodu=' + markaKodu + '&modelKodu=' + modelKodu, function (data) {
+                $('#ambalajButtons').empty();
+                if (data.length > 0) {
+                    data.forEach(function (ambalajKodu) {
+                        $('#ambalajButtons').append(
+                            `<button onclick="selectAmbalaj('${markaKodu}', '${modelKodu}', '${ambalajKodu}')" class="product-button">
+                                        <i class="fas fa-box icon"></i> ${ambalajKodu}
+                                    </button>`
+                        );
+                    });
+                    showSection('ambalajMenu');
+                } else {
+                    $('#ambalajButtons').html('<p>Ambalaj kodu bulunamadı.</p>');
+                }
+            }).fail(function () {
+                $('#ambalajButtons').html('<p>Ambalaj kodları yüklenirken bir hata oluştu.</p>');
+            });
+        }
+
+         // Modified code for miktar buttons in miktarMenu div
+    function selectAmbalaj(markaKodu, modelKodu, ambalajKodu) {
+        $('#selectedAmbalaj').html(`<span style="color: #8A8A8F;">Ambalaj:</span> <span class="bold-text" style="font-weight: bold;">${ambalajKodu}</span>`);
+        $.getJSON('/Dioki/GetKisaIsimler?markaKodu=' + markaKodu + '&modelKodu=' + modelKodu + '&ambalajKodu=' + ambalajKodu, function (data) {
+            console.log('Kısa İsimler API Yanıtı:', data); // Yanıtı konsola yazdırır
+            $('#kisaIsimButtons').empty();
+            if (data.length > 0) {
+                data.forEach(function (kisaIsim) {
+                    $('#kisaIsimButtons').append(
+                        `<button onclick="selectKisaIsim('${markaKodu}', '${modelKodu}', '${ambalajKodu}', '${kisaIsim}')" class="product-button">
+                            <i class="fas fa-tag icon"></i> ${kisaIsim}
+                        </button>`
+                    );
+                });
+                showSection('kisaIsimMenu');
+            } else {
+                $('#kisaIsimButtons').html('<p>Kısa isim bulunamadı.</p>');
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            console.error('Kısa İsimler API Çağrısı Başarısız:', textStatus, errorThrown);
+            $('#kisaIsimButtons').html('<p>Kısa isimler yüklenirken bir hata oluştu.</p>');
+        });
+
+        // Marka ve Ambalaja göre miktar seçeneklerini belirle
+        let miktarButtons = '';
+        if (['HIPS', 'GPPS'].includes(markaKodu) && ambalajKodu === 'BİGBAG') {
+            miktarButtons = `
+                <button onclick="selectMiktar('1250')" class="product-button">
+                    <div class="icon"><i class="fas fa-box"></i></div> 1250 KG
+                </button>`;
+        } else if (markaKodu === 'EPS') {
+            miktarButtons = `
+                <button onclick="selectMiktar('1150')" class="product-button">
+                    <div class="icon"><i class="fas fa-box"></i></div> 1150 KG
+                </button>
+                <button onclick="selectMiktar('575')" class="product-button">
+                    <div class="icon"><i class="fas fa-ruler"></i></div> 575 KG
+                </button>`;
+        } else if (ambalajKodu === 'TORBA') {
+            miktarButtons = `
+                <button onclick="selectMiktar('1375')" class="product-button">
+                    <div class="icon"><i class="fas fa-box"></i></div> 1375 KG
+                </button>`;
+        } else {
+            miktarButtons = '<p>Miktar seçenekleri bulunamadı.</p>';
+        }
+
+        $('#miktarButtons').html(miktarButtons);
+        showSection('miktarMenu');
+    }
+
+    // Also modify the miktarMenu div
+    $(document).ready(function() {
+        // Modified miktarButtons in the miktarMenu div (removing the free entry option)
+        $('#miktarButtons').html(`
+            <button onclick="selectMiktar('1150')" class="product-button">
+                <div class="icon"><i class="fas fa-box"></i></div> 1150 KG
+            </button>
+            <button onclick="selectMiktar('575')" class="product-button">
+                <div class="icon"><i class="fas fa-ruler"></i></div> 575 KG
+            </button>
+        `);
+
+        // Hide the input field for manual entry since we no longer need it
+        $('#miktarInput').hide();
+    });
+
+    // Modified selectMiktar function (removed manual entry logic)
+    function selectMiktar(miktar) {
+        $('#miktarInput').hide(); // Always hide the manual input field
+        $('#selectedMiktar').html(`<span style="color: #8A8A8F;">Miktar:</span> <span class="bold-text" style="font-weight: bold;">${miktar}</span>`);
+    }
+
+
+        function selectKisaIsim(markaKodu, modelKodu, ambalajKodu, kisaIsim) {
+            $('#selectedKisaIsim').html(`<span style="color: #8A8A8F;">Kısa İsim:</span> <span class="bold-text" style="font-weight: bold;">${kisaIsim}</span>`);
+            showSection('miktarMenu');
+        }
+
+        function selectMiktar(miktar) {
+            if (miktar === 'Serbest Elle Giriş') {
+                $('#miktarInput').show();
+                $('#selectedMiktar').html(`<span style="color: #8A8A8F;">Miktar:</span> <span class="bold-text" style="font-weight: bold;">-</span>`);
+            } else {
+                $('#miktarInput').hide();
+                $('#selectedMiktar').html(`<span style="color: #8A8A8F;">Miktar:</span> <span class="bold-text" style="font-weight: bold;">${miktar}</span>`);
+            }
+        }
+
+
+        function showSection(showId) {
+            const currentSection = historyStack[historyStack.length - 1];
+            $('#' + currentSection).hide();
+            $('#' + showId).show();
+            historyStack.push(showId);
+        }
+        function goBack() {
+            if (historyStack.length > 1) {
+                const currentSection = historyStack.pop(); // Şu anki bölümü yığından çıkar
+                const previousSection = historyStack[historyStack.length - 1]; // Bir önceki bölümü al
+
+                // Şu anki bölümü gizle
+                $('#' + currentSection).hide();
+
+                // Bir önceki bölümü göster
+                $('#' + previousSection).show();
+
+                // Geri gidilen adımın bilgisini temizle
+                clearSelectedData(currentSection);
+            } else {
+                console.error("Geri gitmek için yeterli geçmiş yok.");
+            }
+        }
+
+        function clearSelectedData(section) {
+            // Hangi bölümden geri dönüldüğünü kontrol ederek ilgili seçimi temizler
+            if (section === 'modelMenu') {
+                $('#selectedModel').html('<span style="color: #8A8A8F;">Model:</span> <span class="bold-text" style="font-weight: bold;">-</span>');
+            } else if (section === 'ambalajMenu') {
+                $('#selectedAmbalaj').html('<span style="color: #8A8A8F;">Ambalaj:</span> <span class="bold-text" style="font-weight: bold;">-</span>');
+            } else if (section === 'kisaIsimMenu') {
+                $('#selectedKisaIsim').html('<span style="color: #8A8A8F;">Kısa İsim:</span> <span class="bold-text" style="font-weight: bold;">-</span>');
+            } else if (section === 'miktarMenu') {
+                $('#selectedMiktar').html('<span style="color: #8A8A8F;">Miktar:</span> <span class="bold-text" style="font-weight: bold;">-</span>');
+            }
+        }
+
+
+
+
+
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            // Herhangi bir product-button sınıfına sahip butona tıklanıldığında çalışır
+            $(document).on('click', '.product-button', function () {
+                // Tüm butonlardan "active" sınıfını kaldır
+                $('.product-button').removeClass('active');
+
+                // Tıklanan butona "active" sınıfını ekle
+                $(this).addClass('active');
+            });
+        });
+    </script>
+    <script>
+        function printModalBarkod() {
+            // Sayfa üzerindeki form verilerini al
+            const lotNo = $('#lotNo').val();
+            const marka = $('#selectedMarka').text();
+            const model = $('#selectedModel').text();
+            const kisaIsim = $('#selectedKisaIsim').text();
+            const miktar = $('#selectedMiktar').text();
+
+            // Modal içeriğini alın
+            const modalBody = document.querySelector("#barkodModal .modal-body").cloneNode(true);
+
+            // Geçici yazdırma alanı oluştur
+            const printArea = document.createElement("div");
+            printArea.id = "printArea";
+            document.body.appendChild(printArea);
+
+            // Modal içeriğini yazdırma alanına ekle
+            printArea.appendChild(modalBody);
+
+            // Yazdırma için stilleri tanımla
+            const printStyles = `
+                        <style>
+                            body {
+                                font-family: Arial, sans-serif;
+                                margin: 0 auto;
+                                display:flex;
+                                justify-content: center;
+                                padding: 20px;
+                                text-align: start;
+                            }
+                            .barcode-container {
+                                display: flex;
+                                justify-content:center;
+                                flex-direction:column;
+                                text-align: start;
+                                margin: 0 auto;
+                                align-items: center;
+                            }
+                            .barkodlogo img {
+                                max-width: 200px;
+                                height: auto;
+                                margin-bottom: 20px;
+                                    margin: 0 auto;
+                                    display:flex;
+                                    justify-content: center;
+
+                            }
+                            svg {
+                                margin-top: 10px;
+                            }
+                            .barcode-item {
+                                margin: 5px 0;
+                                font-size: 14px;
+                                color: #333;
+                                    margin: 0 auto;
+                                    display:flex;
+                                    justify-content: center;
+                                    text-align: start;
+                            }
+                        </style>`;
+
+            // Geçici içerik ve stilleri ekleyerek yazdırma işlemi başlat
+            const originalContent = document.body.innerHTML;
+            document.body.innerHTML = `
+                        ${printStyles}
+                        ${printArea.innerHTML}
+                    `;
+
+            // Yazdırma işlemini başlat
+            window.print();
+
+            // Yazdırma işlemi sonrası sayfa içeriğini eski haline döndür
+            document.body.innerHTML = originalContent;
+
+            // Sayfa üzerindeki form verilerini geri yükle
+            $('#lotNo').val(lotNo);
+            $('#selectedMarka').text(marka);
+            $('#selectedModel').text(model);
+            $('#selectedKisaIsim').text(kisaIsim);
+            $('#selectedMiktar').text(miktar);
+
+            // Geçici yazdırma alanını kaldır
+            document.body.removeChild(printArea);
+        }
+
+    </script>
+
+<!-- Onay modalını güncelle - şifre alanını kaldır, barkod bilgilerini ekle -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true" style="z-index: 1060;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Onay</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Üretmek istediğinize emin misiniz?</p>
+
+                <div class="barkod-bilgileri">
+                    <div class="barcode-item" id="confirmMarka"></div>
+                    <div class="barcode-item" id="confirmModel"></div>
+                    <div class="barcode-item" id="confirmKisaIsim"></div>
+                    <div class="barcode-item" id="confirmMiktar"></div>
+                    <div class="barcode-item" id="confirmLotNo"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="confirmUretButton">Onayla</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- executeUret ve ilgili fonksiyonların güncellenmesi -->
+<script>
+    // Üretim fonksiyonunu güncelle
+    function executeUret() {
+        const kisaIsim = $('#selectedKisaIsim').text().split(': ')[1];
+        const miktar = $('#selectedMiktar').text().split(': ')[1];
+        const lotNo = $('#lotNo').val();
+        const marka = $('#selectedMarka').text().split(': ')[1];
+        const model = $('#selectedModel').text().split(': ')[1];
+
+        // Validation checks
+        if (!kisaIsim || kisaIsim === '-') {
+            $('#outputMessage').text('Kısa isim seçilmemiş.');
+            return;
+        }
+
+        if (!miktar || miktar === '-') {
+            $('#outputMessage').text('Miktar girilmedi.');
+            return;
+        }
+
+        if (!lotNo) {
+            $('#outputMessage').text('Lot numarası girilmemiş.');
+            return;
+        }
+
+        // Onay modalında barkod bilgilerini güncelle
+        $('#confirmMarka').html(`<span style="color: #8A8A8F;">Marka:</span> <span class="bold-text" style="font-weight: bold;">${marka}</span>`);
+        $('#confirmModel').html(`<span style="color: #8A8A8F;">Model:</span> <span class="bold-text" style="font-weight: bold;">${model}</span>`);
+        $('#confirmKisaIsim').html(`<span style="color: #8A8A8F;">Kısa İsim:</span> <span class="bold-text" style="font-weight: bold;">${kisaIsim}</span>`);
+        $('#confirmMiktar').html(`<span style="color: #8A8A8F;">Miktar:</span> <span class="bold-text" style="font-weight: bold;">${miktar}</span>`);
+        $('#confirmLotNo').html(`<span style="color: #8A8A8F;">Lot No:</span> <span class="bold-text" style="font-weight: bold;">${lotNo}</span>`);
+
+        // Show the confirmation modal
+        $('#confirmModal').modal('show');
+    }
+
+    // Add this to your document ready function or at the end of your script
+    $(document).ready(function() {
+        // Add event listener for the confirm button in the modal
+        $('#confirmUretButton').on('click', function() {
+            // Directly process production without password check
+            $('#confirmModal').modal('hide');
+            processProduction();
+        });
+    });
+
+    // Function that actually performs the production process
+    function processProduction() {
+        const kisaIsim = $('#selectedKisaIsim').text().split(': ')[1];
+        const depo = 1; // Sabit veya kullanıcıdan alınabilir
+        const miktar = $('#selectedMiktar').text().split(': ')[1];
+        const lotNo = $('#lotNo').val();
+
+        $.ajax({
+            type: 'POST',
+            url: '/Dioki/ExecuteVideojet2Micro',
+            data: { kisaIsim, depo, miktar, lotNo },
+            success: function (response) {
+                if (response.success) {
+                    const now = new Date();
+                    const tarihSaat = now.toLocaleString("tr-TR", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit"
+                    });
+
+                    const successMessage = `<strong>Makine:</strong> ${response.makine}<br>`;
+
+                    // Sayfa üzerindeki mesajı güncelle
+                    $('#outputMessage').html(successMessage);
+
+                    // Modal içindeki mesajı güncelle
+                    $('#modalOutputMessage').html(successMessage);
+
+                    // Sayfa üzerindeki barkodu güncelle
+                    $('#barcode').html('');
+                    JsBarcode("#barcode", response.barkod, {
+                        format: "CODE128",
+                        lineColor: "#000",
+                        width: 2,
+                        height: 40,
+                        displayValue: true
+                    });
+
+                    // Modal içindeki barkodu güncelle
+                    $('#modalBarcode').html('');
+                    JsBarcode("#modalBarcode", response.barkod, {
+                        format: "CODE128",
+                        lineColor: "#000",
+                        width: 2,
+                        height: 40,
+                        displayValue: true
+                    });
+
+                    // Modal içeriğini güncelle
+                    $('#modalSelectedMarka').text($('#selectedMarka').text());
+                    $('#modalSelectedModel').text($('#selectedModel').text());
+                    $('#modalSelectedKisaIsim').text($('#selectedKisaIsim').text());
+                    $('#modalSelectedMiktar').text($('#selectedMiktar').text());
+
+                    // Yazdır butonunu görünür yap
+                    $('#printButton').show();
+                    $('#resetButton').show();
+                } else {
+                    const errorMessage = 'Üretim sırasında bir hata oluştu: ' + response.message;
+                    $('#outputMessage').text(errorMessage);
+                }
+            },
+            error: function () {
+                const errorMessage = 'Sunucuya bağlanırken bir hata oluştu.';
+                $('#outputMessage').text(errorMessage);
+            }
+        });
+    }
+</script>
+
+

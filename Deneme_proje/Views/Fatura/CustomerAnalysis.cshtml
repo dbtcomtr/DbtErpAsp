@@ -1,0 +1,207 @@
+﻿@model IEnumerable<Deneme_proje.Models.Entities.FaturaViewModel>
+
+@{
+    ViewData["Title"] = "Fatura Raporu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <h4>Kapalı Müşteri Fatura Analizi Cari</h4>
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+                     
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-lg-5 mb-1">
+            <div class="col-lg-4">
+                <form action="@Url.Action("CustomerAnalysis", "Fatura")" method="get" class="form-inline">
+                    <div class="form-group">
+                        <label for="cariKodu" style="font-size: 12px;">Cari Kodu:</label>
+                        <input type="text" id="cariKodu" name="cariKodu" class="form-control" placeholder="Cari Kodu:" required />
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-tumblr btn-shadow waves-effect waves-light">Sorgula</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style=" background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;"
+                         ">
+                        <h5 class="card-header-text text-white">Kapalı Müşteri Fatura Analizi Cari</h5>
+                    </div>
+
+                    <div class="card-block accordion-block">
+                        <div class="col-md-12">
+
+                            <div id="example_wrapper" class="dataTables_wrapper py-lg-3">
+                                <div class="dataTables_length" id="example_length"></div>
+                                <div class="dataTables_filter" id="example_filter"></div>
+                    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+                    {
+                                    <div class="alert alert-danger">
+                            @ViewBag.ErrorMessage
+                                    </div>
+                    }
+
+                    @if (Model != null && Model.Any())
+                    {
+                                    <div id="example_wrapper" class="table-wrapper">
+                                        <table id="example" class="display dataTable" style="width:100%">
+                                            <thead>
+                                                <tr class="tablo-icerik-yazi">
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Cari Unvanı<span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Toplam Ödeme Tutarı</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Ortalama Vade</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Ortalama Tahsilat Süresi (Gün)</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Vadeden Sapma (Gün)</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Fonlama Maaliyeti</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Faiz Gideri Geliri</span>
+                                                        </div>
+                                                    </th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                    @foreach (var cariGroup in Model.GroupBy(x => x.CariKodu))
+                                    {
+                                        var cariUnvani = cariGroup.First().CariUnvani;
+                                        var toplamOdemeler = cariGroup.Sum(x => x.TaksitTutar);
+                                        var toplamVadeliTutar = cariGroup.Sum(x => Math.Round(x.TaksitTutar * x.FaturaVadesi, 4));
+                                        var toplamBorctahsilat = cariGroup.Sum(x => Math.Round(x.TaksitTutar * (x.AlacakVadeTarihiSayi - x.FaturaTarihiSayi), 2));
+
+                                        var agirlikliortalamavade = Math.Round((toplamVadeliTutar / toplamOdemeler), 2);
+                                        var ortalamatahsilat = -(Math.Round((toplamBorctahsilat / toplamOdemeler), 2));
+
+                                        var vadedensapma = Math.Round((agirlikliortalamavade + ortalamatahsilat), 2);
+                                        var fonlama = (decimal)(66.24 / 360) * vadedensapma;
+                                        var gelirgider = Math.Round(((fonlama * toplamOdemeler) / 100), 2);
+
+                                                    <tr>
+                                                        <td class="cari-unvani-cell" data-bs-toggle="tooltip" title="@cariUnvani">@cariUnvani</td>
+                                                        <td class="text-right">@toplamOdemeler.ToString("C")</td>
+                                                        <td class="text-right">@agirlikliortalamavade</td>
+                                                        <td class="text-right">@ortalamatahsilat</td>
+                                                        <td class="text-right">@vadedensapma</td>
+                                                        <td class="text-right">@fonlama</td>
+                                                        <td class="text-right">@gelirgider</td>
+                                                    </tr>
+                                    }
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th class="resizeable-col">Cari Unvanı</th>
+                                                    <th class="resizeable-col">Toplam Ödeme Tutarı</th>
+                                                    <th class="resizeable-col">Ortalama Vade</th>
+                                                    <th class="resizeable-col">Ortalama Tahsilat Süresi (Gün)</th>
+                                                    <th class="resizeable-col">Vadeden Sapma (Gün)</th>
+                                                    <th class="resizeable-col">Fonlama Maaliyeti</th>
+                                                    <th class="resizeable-col">Faiz Gideri Geliri</th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                    }
+                    else
+                    {
+                                    <div class="alert alert-warning" role="alert">
+                                        Veri bulunamadı.
+                                    </div>
+                    }
+                                <div class="bottom">
+                                    <div class="dataTables_info" id="example_info"></div>
+                                    <div class="dataTables_paginate" id="example_paginate"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
+        <script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let table = new DataTable('#example');
+            });
+        </script>
+
+
+        <script>
+            $('#example').DataTable({
+                "dom": '<"row"<"col-sm-12"B>>' +
+                    '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+                    't' +
+                    '<"row"<"col-sm-6"i><"col-sm-6"p>>',
+                "language": {
+                    "url": "/Content/DataTables/turkish.json"
+                },
+                "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'], // Butonlar
+                "columnDefs": [
+                    { "targets": "_all" } // Kolon genişliklerini sabitleme
+                ]
+            });
+
+             document.addEventListener('DOMContentLoaded', function () {
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+
+                 $('#datatable').DataTable();
+             });
+        </script>
+
+
+
+
+
+

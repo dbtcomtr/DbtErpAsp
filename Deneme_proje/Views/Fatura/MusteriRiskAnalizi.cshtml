@@ -1,0 +1,185 @@
+﻿@model IEnumerable<Deneme_proje.Models.Entities.MusteriRiskAnalizi>
+@{
+    ViewData["Title"] = "Rapor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // Toplam değerleri hesapla
+    decimal toplamTicariAlacak = Model?.Sum(x => x.TicariAlacakBakiyesi) ?? 0;
+    decimal toplamVadesiGecmisPortfoy = Model?.Sum(x => x.VadesiGecmisPortfoyCekler) ?? 0;
+    decimal toplamVadesiGecmisCiro = Model?.Sum(x => x.VadesiGecmisCiroluCekler) ?? 0;
+    decimal toplamVadesiGelmemisPortfoy = Model?.Sum(x => x.VadesiGelmemisPortfoyCekler) ?? 0;
+    decimal toplamVadesiGelmemisCiro = Model?.Sum(x => x.VadesiGelmemisCiroluCekler) ?? 0;
+    decimal toplamTeminat = Model?.Sum(x => x.TeminatTutari) ?? 0;
+    decimal toplamRisk = Model?.Sum(x => x.MusteriRiski) ?? 0;
+}
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <h4>Müşteri Risk Raporu</h4>
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style=" background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;"
+                         ">
+                        <h5 class="card-header-text text-white">Müşteri Risk Analizi</h5>
+                    </div>
+
+                    <div class="card-block accordion-block">
+                        <div class="col-md-12">
+
+                            <div id="example_wrapper" class="dataTables_wrapper py-lg-3">
+                                <div class="dataTables_length" id="example_length"></div>
+                                <div class="dataTables_filter" id="example_filter"></div>
+                    @if (Model != null && Model.Any())
+                    {
+                                    <div id="example_wrapper" class="table-wrapper">
+                                        <table id="example" class="display dataTable" style="width:100%">
+                                            <thead>
+                                                <tr class="tablo-icerik-yazi">
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Müşteri Kodu<span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Unvan</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Ticari Alacak Bakiyesi</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Vadesi Geçmiş Şahsi Çekler</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Vadesi Geçmiş Cirolu Çekler</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Vadesi Gelmemiş Şahsi Çekler</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Vadesi Gelmemiş Cirolu Çekler</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Teminat Tutarı</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                        <div class="th-content">
+                                                            <span>Müşteri Riski</span>
+                                                        </div>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                                    <tr>
+                                                        <td>@item.MusteriKodu</td>
+                                                        <td>@item.MusteriAdi</td>
+                                                        <td class="text-right">@item.TicariAlacakBakiyesi.ToString("N2")</td>
+                                                        <td class="text-right">@item.VadesiGecmisPortfoyCekler.ToString("N2")</td>
+                                                        <td class="text-right">@item.VadesiGecmisCiroluCekler.ToString("N2")</td>
+                                                        <td class="text-right">@item.VadesiGelmemisPortfoyCekler.ToString("N2")</td>
+                                                        <td class="text-right">@item.VadesiGelmemisCiroluCekler.ToString("N2")</td>
+                                                        <td class="text-right">@item.TeminatTutari.ToString("N2")</td>
+                                                        <td class="text-right font-weight-bold">@item.MusteriRiski.ToString("N2")</td>
+                                                    </tr>
+                                    }
+                                            </tbody>
+                                            <tfoot>
+                                                <tr class="bg-light font-weight-bold">
+                                                    <td colspan="2" class="text-right">TOPLAM</td>
+                                                    <td class="text-right">@toplamTicariAlacak.ToString("N2")</td>
+                                                    <td class="text-right">@toplamVadesiGecmisPortfoy.ToString("N2")</td>
+                                                    <td class="text-right">@toplamVadesiGecmisCiro.ToString("N2")</td>
+                                                    <td class="text-right">@toplamVadesiGelmemisPortfoy.ToString("N2")</td>
+                                                    <td class="text-right">@toplamVadesiGelmemisCiro.ToString("N2")</td>
+                                                    <td class="text-right">@toplamTeminat.ToString("N2")</td>
+                                                    <td class="text-right">@toplamRisk.ToString("N2")</td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                    }
+
+                    else
+                    {
+                                    <div class="alert alert-warning" role="alert">
+                                        Veri bulunamadı.
+                                    </div>
+                    }
+                                <div class="bottom">
+                                    <div class="dataTables_info" id="example_info"></div>
+                                    <div class="dataTables_paginate" id="example_paginate"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
+        <script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let table = new DataTable('#example');
+            });
+        </script>
+
+
+        <script>
+            $('#example').DataTable({
+                "dom": '<"row"<"col-sm-12"B>>' +
+                    '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+                    't' +
+                    '<"row"<"col-sm-6"i><"col-sm-6"p>>',
+                "language": {
+                    "url": "/Content/DataTables/turkish.json"
+                },
+                "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'], // Butonlar
+                "columnDefs": [
+                    { "targets": "_all" } // Kolon genişliklerini sabitleme
+                ],
+                "footerCallback": function (row, data, start, end, display) {
+                    // Bu kısmı kaldırabiliriz çünkü toplam satırını tabloya doğrudan ekledik
+                }
+            });
+        </script>

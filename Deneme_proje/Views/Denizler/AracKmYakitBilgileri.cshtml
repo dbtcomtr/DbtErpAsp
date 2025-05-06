@@ -1,0 +1,141 @@
+﻿@model IEnumerable<Deneme_proje.Models.DenizlerEntities.AracKmYakit>
+
+@{
+    ViewData["Title"] = "Satılan Malın Kârlılık ve Maliyet Raporu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+<style>
+    .footer{
+    position:relative;
+    }
+</style>
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                 
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+                      
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-lg-5 mb-1">
+            <div class="col-lg-4">
+                <form method="get" class="form-inline">
+                    <div class="form-group mx-2">
+                        <label for="baslamaTarihi">Başlama Tarihi:</label>
+                        <input type="date" id="baslamaTarihi" name="baslamaTarihi" class="form-control" required value="@ViewBag.BaslamaTarihi" />
+                    </div>
+                    <div class="form-group mx-2">
+                        <label for="bitisTarihi">Bitiş Tarihi:</label>
+                        <input type="date" id="bitisTarihi" name="bitisTarihi" class="form-control" required value="@ViewBag.BitisTarihi" />
+                    </div>
+                   
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-tumblr btn-shadow waves-effect waves-light">Ara</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">Km Başına Araç Yakıt Bilgileri</h5>
+                    </div>
+
+                    <div class="card-block accordion-block">
+                        <div class="col-md-12">
+                            <div id="example_wrapper" class="dataTables_wrapper py-lg-3">
+                                @if (Model != null && Model.Any())
+                                {
+                                    <div class="table-wrapper">
+                                        <table id="example" class="display dataTable" style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    <th class="resizeable-col">Cari Kodu</th>
+                                                    <th class="resizeable-col">Cari Adı</th>
+                                                    <th class="resizeable-col">Saatte Yakılan Litre Miktarı</th>
+                                                    <th class="resizeable-col">Saatte Yakılan Litre Tutarı</th>
+                                                    <th class="resizeable-col">Yapılan Km/Saat</th>
+                                                    <th class="resizeable-col">Sefer Sayısı</th>
+                                                    <th class="resizeable-col">Sefer Başı Ortalama KM</th>
+                                                    <th class="resizeable-col">Sefer Başı Ortalama Tonaj</th>
+                                                    <th class="resizeable-col">Toplam Tonaj</th>
+                                                    <th class="resizeable-col">Kullanılan Yakıt Litre</th>
+                                                    <th class="resizeable-col">Kullanılan Yakıt Tutarı</th>
+                                                    <th class="resizeable-col">Bakım Toplamı</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var araç in Model)
+                                                {
+                                                    <tr>
+                                                        <td>@araç.CariKodu</td>
+                                                        <td>@araç.CariAdı</td>
+                                                        <td>@araç.SaatteYakılanLitreMiktar</td>
+                                                        <td>@araç.SaatteYakılanLitreTutar</td>
+                                                        <td>@araç.YapılanKmSaat</td>
+                                                        <td>@araç.SeferSayısı</td>
+                                                        <td>@araç.SeferBaşıOrtalamaKM</td>
+                                                        <td>@araç.SeferBaşıOrtalamaTonaj</td>
+                                                        <td>@araç.ToplamTonaj</td>
+                                                        <td>@araç.KullanılanYakıtLitre</td>
+                                                        <td>@araç.KullanılanYakıtTutar</td>
+                                                        <td>@araç.BakımToplamı</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-warning" role="alert">
+                                        Veri bulunamadı.
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
+        <script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let table = new DataTable('#example');
+            });
+
+            $('#example').DataTable({
+                "dom": '<"row"<"col-sm-12"B>>' +
+                    '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+                    't' +
+                    '<"row"<"col-sm-6"i><"col-sm-6"p>>',
+                "language": {
+                    "url": "/Content/DataTables/turkish.json"
+                },
+                "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'],
+                "columnDefs": [
+                    { "targets": "_all" }
+                ]
+            });
+        </script>
+    </div>
+</div>

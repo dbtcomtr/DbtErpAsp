@@ -1,0 +1,247 @@
+﻿@model IEnumerable<Deneme_proje.Models.Entities.IsEmriModel>
+@{
+    ViewData["Title"] = "İş Emirleri";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div class="main-content mt-5">
+
+                <div class="card">
+                  
+                    <div class="cards">
+                        @foreach (var isEmri in Model)
+                        {
+                            <div class="card product-card">
+                                <div class="info">
+                                    <p><span>İş Emri Kodu:</span> @isEmri.is_Kod</p>
+                        <strong>Ürün Kodu: @isEmri.UrunKodu </strong>
+                            
+                                    <strong>
+                                        @isEmri.UrunAdi
+                                    </strong>
+                                </div>
+                                <div class="button-container">
+                                    @{
+                                        var hasProductionPermission = ViewBag.HasProductionPermission ?? false;
+                                    }
+
+                                    @if (hasProductionPermission)
+                                    {
+                                        <button onclick="uretIsEmri('@isEmri.is_Kod', '@isEmri.UrunKodu', 3)"
+                                                class="btn uret @(isEmri.is_EmriDurumu == 1 ? "" : "darker")">
+                                            Üret
+                                        </button>
+                                    }
+                                </div>
+                               
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+
+@section Scripts {
+    <script>
+           function uretIsEmri(isEmriKodu, urunKodu, depoNo) {
+            $.ajax({
+                url: '@Url.Action("UretIsEmri", "Fatura")',
+                type: 'POST',
+                data: {
+                    isEmriKodu: isEmriKodu,
+                    urunKodu: urunKodu,
+                    depoNo: depoNo
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Sunucudan dönen barkod değerini çıkaralım
+                        var barkodMatch = response.message.match(/Barkod: ([^,]+)/);
+                        var barkod = barkodMatch ? barkodMatch[1].trim() : isEmriKodu;
+
+                        console.log("Üretilen barkod:", barkod);
+
+                        // Yazdırma ekranını barkod ile birlikte aç
+                        yazdirmaEkraniAc(isEmriKodu, urunKodu, barkod);
+                    } else {
+                        // Hata varsa sadece hata mesajı gösterelim
+                        Swal.fire({
+                            title: 'Hata!',
+                            text: 'Üretim yetkiniz bulunmamaktadır.',
+                            icon: 'error',
+                            confirmButtonText: 'Tamam'
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        title: 'Hata!',
+                        text: 'İşlem sırasında bir hata oluştu.',
+                        icon: 'error',
+                        confirmButtonText: 'Tamam'
+                    });
+                }
+            });
+        }
+
+        // Yazdırma ekranını açan fonksiyon (barkod parametresi eklendi)
+        function yazdirmaEkraniAc(isEmriKodu, urunKodu, barkod) {
+            // İş emri yazdırma sayfasına yönlendirme (barkod parametresi ile)
+            var yazdirmaURL = '@Url.Action("YazdirIsEmri", "Fatura")' +
+                              '?isEmriKodu=' + encodeURIComponent(isEmriKodu) +
+                              '&urunKodu=' + encodeURIComponent(urunKodu) +
+                              '&barkod=' + encodeURIComponent(barkod);
+
+            // Yazdırma sayfasını yeni pencerede aç
+            var yazdirmaPenceresi = window.open(yazdirmaURL, '_blank', 'width=800,height=600');
+
+            // Sayfa yüklendiğinde otomatik yazdırma diyaloğunu başlat
+            yazdirmaPenceresi.onload = function() {
+                yazdirmaPenceresi.print();
+            };
+        }
+
+        function updateIsEmirleri() {
+            $.ajax({
+                url: '@Url.Action("GetIsEmirleri", "Fatura")',
+                type: 'GET',
+                success: function(response) {
+                    if (response.success && response.isEmirleri.length > 0) {
+                        var cardsContainer = $(".cards");
+                        cardsContainer.empty(); // Eski verileri temizle
+
+                        // Debug - check what properties are actually in the response
+                        console.log("First item properties:", response.isEmirleri[0]);
+
+                        response.isEmirleri.forEach(function(isEmri) {
+                            var durumBadge = isEmri.is_EmriDurumu == 1
+                                ? '<span class="badge badge-success">Aktif</span>'
+                                : '<span class="badge badge-warning">Pasif</span>';
+
+                            var uretButtonClass = isEmri.is_EmriDurumu == 1 ? '' : 'darker';
+
+                            var uretButton = response.hasProductionPermission
+                                ? `<button onclick="uretIsEmri('${isEmri.is_Kod}', '${isEmri.urunKodu || isEmri.UrunKodu}', 3)"
+                                        class="btn uret ${uretButtonClass}">Üret</button>`
+                                : '';
+
+                            var updateButton = '';
+
+                            // Try both camelCase and PascalCase property names
+                            var urunKodu = isEmri.urunKodu || isEmri.UrunKodu || '';
+                            var urunAdi = isEmri.urunAdi || isEmri.UrunAdi || '';
+                            var miktar = isEmri.miktar || isEmri.Miktar || '';
+                            var isMerkezi = isEmri.isMerkezi || isEmri.IsMerkezi || '';
+                            var baslangicTarihi = isEmri.is_BaslangicTarihi ? new Date(isEmri.is_BaslangicTarihi).toLocaleDateString() : '';
+
+                            var card = `
+                                <div class="card product-card">
+                                    <div class="info">
+                                        <p><span>İş Emri Kodu:</span> ${isEmri.is_Kod}</p>
+                                          <strong>Ürün Kodu:</span>${urunKodu}</strong>
+                                        
+                                        <strong>${urunAdi}</strong>
+                                    </div>
+                                    <div class="button-container">
+                                        ${uretButton}
+                                    </div>
+
+                                </div>`;
+
+                            cardsContainer.append(card);
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("İş emirleri güncellenirken hata oluştu:", error);
+                    console.log("XHR:", xhr.responseText);
+                }
+            });
+        }
+
+        // // 5 saniyede bir verileri yenile
+        // setInterval(updateIsEmirleri, 5000);
+
+        // Sayfa yüklendiğinde ilk veriyi al
+        $(document).ready(function() {
+            updateIsEmirleri();
+        });
+    </script>
+}
+
+<style>
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .card {
+        background-color: white;
+        border: 5px solid #1f2f4a;
+        padding: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+        .card .info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+
+            .card .info p {
+                margin: 5px 0;
+                color: #555;
+                font-size: 16px;
+            }
+
+            .card .info strong {
+                font-size: 20px;
+                font-weight: 700;
+                line-height: 1.5;
+                white-space: normal;
+                display: block;
+            }
+
+    .button-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 15px;
+    }
+
+    .uret {
+        background-color: #6cc24a;
+        color: white;
+        font-weight: 900;
+        font-size: 20px;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        width: 170px;
+        height: 70px;
+    }
+
+        .uret.darker {
+            background-color: #f57c00;
+        }
+
+    @@media (max-width: 1200px) {
+        .cards {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .cards {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

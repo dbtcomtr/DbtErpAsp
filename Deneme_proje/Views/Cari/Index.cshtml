@@ -1,0 +1,105 @@
+﻿@model Deneme_proje.Models.Entities.CariViewModel
+
+<h2>Cari Alacaklar</h2>
+
+<form method="get" action="@Url.Action("Index")">
+    <div class="form-group">
+        <label for="sektorKodu">Sektör Kodu</label>
+        <input type="text" id="sektorKodu" name="sektorKodu" value="@Model.SektorKodu" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="bolgeKodu">Bölge Kodu</label>
+        <input type="text" id="bolgeKodu" name="bolgeKodu" value="@Model.BolgeKodu" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="grupKodu">Grup Kodu</label>
+        <input type="text" id="grupKodu" name="grupKodu" value="@Model.GrupKodu" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="temsilciKodu">Temsilci Kodu</label>
+        <input type="text" id="temsilciKodu" name="temsilciKodu" value="@Model.TemsilciKodu" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="upbPb">UPB/PB</label>
+        @Html.DropDownListFor(model => model.UPB_PB, Model.UPBOptions, new { @class = "form-control", id = "upbPb" })
+    </div>
+    <button type="submit" class="btn btn-primary">Filtrele</button>
+</form>
+
+<h2>Cari Alacaklar</h2>
+<table class="table mt-3">
+    <thead>
+        <tr>
+            <th>Cari Kodu</th>
+            <th>Cari Unvanı</th>
+            <th>TL</th>
+            <th>USD</th>
+            <th>EUR</th>
+            <th>GBP</th>
+            <th>UPB</th>
+            <th>PB</th>
+            <th>TL_UPB</th>
+            <th>USD_UPB</th>
+            <th>EUR_UPB</th>
+            <th>GBP_UPB</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.CariAlacaklar)
+        {
+            <tr>
+                <td>@item.CariKodu</td>
+                <td>@item.CariUnvani</td>
+                <td>@item.TL</td>
+                <td>@item.USD</td>
+                <td>@item.EUR</td>
+                <td>@item.GBP</td>
+                <td>@item.UPB</td>
+                <td>@item.PB</td>
+                <td>@item.TL_UPB</td>
+                <td>@item.USD_UPB</td>
+                <td>@item.EUR_UPB</td>
+                <td>@item.GBP_UPB</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h2>Cari Verecekler</h2>
+<table class="table mt-3">
+    <thead>
+        <tr>
+            <th>Cari Kodu</th>
+            <th>Cari Unvanı</th>
+            <th>TL</th>
+            <th>USD</th>
+            <th>EUR</th>
+            <th>GBP</th>
+            <th>UPB</th>
+            <th>PB</th>
+            <th>TL_UPB</th>
+            <th>USD_UPB</th>
+            <th>EUR_UPB</th>
+            <th>GBP_UPB</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.CariVerecekler)
+        {
+            <tr>
+                <td>@item.CariKodu</td>
+                <td>@item.CariUnvani</td>
+                <td>@item.TL</td>
+                <td>@item.USD</td>
+                <td>@item.EUR</td>
+                <td>@item.GBP</td>
+                <td>@item.UPB</td>
+                <td>@item.PB</td>
+                <td>@item.TL_UPB</td>
+                <td>@item.USD_UPB</td>
+                <td>@item.EUR_UPB</td>
+                <td>@item.GBP_UPB</td>
+            </tr>
+        }
+    </tbody>
+</table>

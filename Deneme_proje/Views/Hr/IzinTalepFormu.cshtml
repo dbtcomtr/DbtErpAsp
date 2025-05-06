@@ -1,0 +1,789 @@
+﻿@{
+	ViewData["Title"] = "İzin Talep Formu";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+	/* Temel Renkler ve Değişkenler */
+	:root {
+		--primary-color: #1e3a6c;
+		--secondary-color: #2d8dcc;
+		--form-bg: #ffffff;
+		--input-bg: #ffffff;
+		--label-color: #666666;
+		--border-color: #d2d2d2;
+		--section-header: #235a98;
+		--required-color: #ff4d4f;
+	}
+
+	body {
+		background-color: #f5f7fa;
+		font-family: 'Segoe UI', Arial, sans-serif;
+		color: #333;
+		margin: 0;
+		padding: 0;
+	}
+
+	/* Ana container */
+	.container-fluid {
+		padding: 0;
+	}
+
+	/* Breadcrumb */
+	.breadcrumb {
+		background: transparent;
+		padding: 10px 20px;
+		margin-bottom: 0;
+	}
+
+	.breadcrumb-item a {
+		color: var(--primary-color);
+		text-decoration: none;
+	}
+
+	.breadcrumb-item.active {
+		color: #777;
+	}
+
+	/* Form kartı */
+	.card {
+		border: none;
+		border-radius: 0;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+		margin-bottom: 30px;
+	}
+
+	.card-header {
+		background-color: var(--section-header);
+		color: white;
+		border-radius: 0;
+		padding: 12px 20px;
+		font-size: 16px;
+		font-weight: 500;
+		border: none;
+	}
+
+	.card-body {
+		padding: 20px;
+		background-color: var(--form-bg);
+	}
+
+	/* Form bölümleri */
+	.form-section {
+		margin-bottom: 20px;
+		padding-bottom: 15px;
+	}
+
+	.section-title {
+		font-weight: 600;
+		color: var(--primary-color);
+		margin-bottom: 15px;
+		padding-bottom: 8px;
+		border-bottom: 1px solid var(--border-color);
+		font-size: 16px;
+	}
+
+	/* Form elemanları */
+	.form-label {
+		display: block;
+		font-size: 14px;
+		color: var(--label-color);
+		margin-bottom: 6px;
+		font-weight: 500;
+	}
+
+	.required-field::after {
+		content: " *";
+		color: var(--required-color);
+	}
+
+	.form-control, .form-select {
+		height: 36px;
+		padding: 6px 12px;
+		font-size: 14px;
+		border: 1px solid var(--border-color);
+		border-radius: 3px;
+		background-color: var(--input-bg);
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+		.form-control:focus, .form-select:focus {
+			border-color: var(--secondary-color);
+			box-shadow: 0 0 0 2px rgba(45, 141, 204, 0.2);
+			outline: none;
+		}
+
+		.form-control:read-only, .form-control[readonly] {
+			background-color: #f5f7fa;
+			border-color: #e8e8e8;
+		}
+
+	textarea.form-control {
+		min-height: 80px;
+		resize: vertical;
+	}
+
+	/* Butonlar */
+	.button-container {
+		display: flex;
+		justify-content: flex-end;
+		gap: 10px;
+		margin-top: 20px;
+		padding: 15px 20px;
+		background-color: #f9f9f9;
+		border-top: 1px solid #eee;
+	}
+
+	.btn {
+		padding: 8px 16px;
+		font-size: 14px;
+		font-weight: 500;
+		border-radius: 3px;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.btn-primary {
+		background-color: var(--secondary-color);
+		border: none;
+		color: white;
+	}
+
+		.btn-primary:hover {
+			background-color: #247ab2;
+		}
+
+	.btn-secondary {
+		background-color: #f0f0f0;
+		border: 1px solid #d9d9d9;
+		color: #666;
+	}
+
+		.btn-secondary:hover {
+			background-color: #e6e6e6;
+		}
+
+	/* Loading overlay */
+	.loading-overlay {
+		display: none;
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(255, 255, 255, 0.7);
+		z-index: 9999;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.spinner {
+		width: 40px;
+		height: 40px;
+		border: 4px solid #f3f3f3;
+		border-top: 4px solid var(--secondary-color);
+		border-radius: 50%;
+		animation: spin 1s linear infinite;
+	}
+
+	@@keyframes spin {
+		0% {
+			transform: rotate(0deg);
+		}
+
+		100% {
+			transform: rotate(360deg);
+		}
+	}
+
+	/* Responsive düzenlemeler */
+	@@media (max-width: 768px) {
+		.card-body {
+			padding: 15px;
+		}
+
+		.form-row {
+			margin-bottom: 15px;
+		}
+
+		.button-container {
+			padding: 10px 15px;
+		}
+	}
+
+	/* Bilgi metni için stil */
+	.info-text {
+		color: #777;
+		font-size: 12px;
+		margin-top: 4px;
+		font-style: italic;
+	}
+
+	.date-info {
+		background-color: #f3f9ff;
+		border-left: 3px solid #2d8dcc;
+		padding: 10px;
+		margin-bottom: 15px;
+		font-size: 13px;
+	}
+
+	/* HAK EDİŞ BİLGİLERİ BÖLÜMÜ İÇİN YENİ STILLER */
+	.hakediş-info {
+		background-color: #f3f9ff;
+		border-left: 3px solid #2d8dcc;
+		padding: 15px;
+		margin-bottom: 20px;
+		border-radius: 3px;
+	}
+
+	.hakediş-title {
+		font-weight: 600;
+		color: var(--primary-color);
+		margin-bottom: 10px;
+		font-size: 15px;
+	}
+
+	.hakediş-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 15px;
+	}
+
+	.hakediş-item {
+		padding: 10px;
+		background-color: #fff;
+		border-radius: 3px;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+	}
+
+	.hakediş-label {
+		font-size: 12px;
+		color: #666;
+		margin-bottom: 3px;
+	}
+
+	.hakediş-value {
+		font-size: 16px;
+		font-weight: 600;
+		color: var(--primary-color);
+	}
+
+	.value-positive {
+		color: #52c41a;
+	}
+
+	.value-negative {
+		color: #ff4d4f;
+	}
+
+	.hakediş-note {
+		font-size: 12px;
+		color: #777;
+		margin-top: 10px;
+		font-style: italic;
+	}
+
+	@@media (max-width: 768px) {
+		.hakediş-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@@media (max-width: 576px) {
+		.hakediş-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay">
+	<div class="spinner"></div>
+</div>
+
+<div class="main-content">
+	<div class="container-fluid">
+		<!-- Breadcrumb -->
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="/Home/Index"><i class="fa fa-home"></i> Ana Sayfa</a></li>
+				<li class="breadcrumb-item"><a href="#">İnsan Kaynakları</a></li>
+				<li class="breadcrumb-item active">İzin Talep</li>
+			</ol>
+		</nav>
+
+		<div class="row">
+			<div class="col-12">
+				<div class="card">
+					<div class="card-header">
+						<i class="fa fa-calendar mr-2"></i> İzin Talep Formu
+					</div>
+					<div class="card-body">
+						<form id="izinTalepForm" novalidate>
+							<!-- Personel Bilgileri -->
+							<div class="form-section">
+								<div class="section-title">Personel Bilgileri</div>
+								<div class="row">
+									<div class="col-md-4 mb-3">
+										<label for="personnelCode" class="form-label required-field">Personel Kodu</label>
+										<input type="text" class="form-control" id="personnelCode" value="@ViewBag.PersonnelCode" readonly>
+									</div>
+									<div class="col-md-4 mb-3">
+										<label for="personnelName" class="form-label">Adı</label>
+										<input type="text" class="form-control" id="personnelName" value="@ViewBag.PersonnelName" readonly>
+									</div>
+									<div class="col-md-4 mb-3">
+										<label for="personnelSurname" class="form-label">Soyadı</label>
+										<input type="text" class="form-control" id="personnelSurname" value="@ViewBag.PersonnelSurname" readonly>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-6 mb-3">
+										<label for="department" class="form-label">Departman</label>
+										<input type="text" class="form-control" id="department" value="@ViewBag.Department" readonly>
+									</div>
+									<div class="col-md-6 mb-3">
+										<label for="tcNo" class="form-label">TC Kimlik No</label>
+										<input type="text" class="form-control" id="tcNo" value="@ViewBag.TcNo" readonly>
+									</div>
+								</div>
+							</div>
+
+							<!-- İzin Hak Ediş Bilgileri -->
+							<div class="form-section">
+								<div class="section-title">İzin Hak Ediş Bilgileri</div>
+
+								<div class="hakediş-info">
+									<div class="hakediş-grid">
+										<div class="hakediş-item">
+											<div class="hakediş-label">Geçen Yıldan Devir (Gün)</div>
+											<div class="hakediş-value" id="previousYearDays">0.0</div>
+										</div>
+										<div class="hakediş-item">
+											<div class="hakediş-label">Yıllık İzin Hakkı (Gün)</div>
+											<div class="hakediş-value" id="yearlyEntitlement">0</div>
+										</div>
+										<div class="hakediş-item">
+											<div class="hakediş-label">Toplam İzin Hakkı (Gün)</div>
+											<div class="hakediş-value" id="totalEntitlement">0.0</div>
+										</div>
+										<div class="hakediş-item">
+											<div class="hakediş-label">Kullanılan İzin (Gün)</div>
+											<div class="hakediş-value" id="usedDays">0.0</div>
+										</div>
+										<div class="hakediş-item">
+											<div class="hakediş-label">Kalan İzin (Gün)</div>
+											<div class="hakediş-value" id="remainingDays">0.0</div>
+										</div>
+										<div class="hakediş-item">
+											<div class="hakediş-label">Geçen Yıldan Devir (Saat)</div>
+											<div class="hakediş-value" id="previousYearHours">0.0</div>
+										</div>
+									</div>
+									<div class="hakediş-note">
+										* Bu veriler sadece bilgi amaçlıdır ve işe giriş tarihinize göre hesaplanmıştır.
+									</div>
+								</div>
+							</div>
+
+							<!-- İzin Detayları -->
+							<div class="form-section">
+								<div class="section-title">İzin Detayları</div>
+
+								<div class="row">
+									<div class="col-md-6 mb-3">
+										<label for="talepTarihi" class="form-label required-field">Talep Tarihi</label>
+										<input type="date" id="talepTarihi" name="talepTarihi" class="form-control" required>
+									</div>
+									<div class="col-md-6 mb-3">
+										<label for="izinTipi" class="form-label required-field">İzin Tipi</label>
+										<select id="izinTipi" name="izinTipi" class="form-select" required>
+											<option value="">Seçiniz</option>
+											<option value="0">Yıllık İzin</option>
+											
+										
+											<option value="3">Askerlik</option>
+											
+											<option value="5">Devamsızlık</option>
+											
+											<option value="7">Diğer</option>
+											<option value="8">Ücretsiz</option>
+											
+											<option value="10">Evlilik</option>
+											<option value="11">Doğum</option>
+											<option value="12">Babalık</option>
+											<option value="13">Süt</option>
+											<option value="14">Ölüm</option>
+											<option value="15">İş Arama</option>
+										</select>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col-md-6 mb-3">
+										<label for="izinGun" class="form-label required-field">İzin Günü</label>
+										<input type="number" id="izinGun" name="izinGun" class="form-control" value="0" min="0" required>
+										@*  <div class="info-text">İzin günü değiştirildiğinde bitiş tarihi otomatik hesaplanır.</div> *@
+									</div>
+									<div class="col-md-6 mb-3">
+										<label for="izinSaat" class="form-label required-field">İzin Saati (Yarım Günlük İzinler)</label>
+										<input type="number" id="izinSaat" name="izinSaat" class="form-control" value="0" min="0" required>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col-md-4 mb-3">
+										<label for="baslangicTarihi" class="form-label required-field">Başlangıç Tarihi</label>
+										<input type="date" id="baslangicTarihi" name="baslangicTarihi" class="form-control" required>
+									</div>
+									<div class="col-md-4 mb-3">
+										<label for="bitisTarihi" class="form-label required-field">Bitiş Tarihi</label>
+										<input type="date" id="bitisTarihi" name="bitisTarihi" class="form-control" required>
+										@*  <div class="info-text">Manuel değiştirildiğinde izin günü değişmez.</div> *@
+									</div>
+									<div class="col-md-4 mb-3">
+										<label for="iseBaslamaTarihi" class="form-label required-field">İşe Başlama Tarihi</label>
+										<input type="date" id="iseBaslamaTarihi" name="iseBaslamaTarihi" class="form-control" required readonly>
+										@*  <div class="info-text">İzin bitiş tarihinden bir sonraki iş günü.</div> *@
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col-12 mb-3">
+										<label for="izinAmaci" class="form-label">İzin Amacı</label>
+										<textarea id="izinAmaci" name="izinAmaci" class="form-control" rows="3"></textarea>
+									</div>
+								</div>
+							</div>
+
+							<!-- Butonlar -->
+							<div class="button-container">
+								<button type="button" class="btn btn-secondary" onclick="history.back()">İPTAL</button>
+								<button type="submit" class="btn btn-primary">KAYDET</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+@section Scripts {
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script>
+		$(document).ready(function () {
+			const form = $('#izinTalepForm');
+			const loadingOverlay = $('#loadingOverlay');
+			let manualEndDateChange = false;
+
+			// Sayfa yüklendiğinde hak ediş bilgilerini getir
+			loadLeaveEntitlement();
+
+			// Hak ediş bilgilerini getir
+			function loadLeaveEntitlement() {
+				const personnelCode = $('#personnelCode').val();
+				if (!personnelCode) {
+					return;
+				}
+
+				loadingOverlay.css('display', 'flex');
+
+				$.ajax({
+					url: '/Hr/GetLeaveEntitlementInfo',
+					type: 'GET',
+					data: {
+						personnelCode: personnelCode,
+						year: new Date().getFullYear()
+					},
+					success: function(response) {
+						if (response && response.success) {
+							// Hak ediş bilgilerini doldur
+							$('#previousYearDays').text(response.previousYearDays.toFixed(1));
+							$('#previousYearHours').text(response.previousYearHours.toFixed(1));
+							$('#yearlyEntitlement').text(response.yearlyEntitlement);
+							$('#usedDays').text(response.usedDays.toFixed(1));
+
+							// Toplam izin hakkı
+							const totalEntitlement = response.previousYearDays + response.yearlyEntitlement;
+							$('#totalEntitlement').text(totalEntitlement.toFixed(1));
+
+							// Kalan izin günleri - pozitif/negatif renklendirme
+							const remainingDays = totalEntitlement - response.usedDays;
+							$('#remainingDays').text(remainingDays.toFixed(1));
+
+							if (remainingDays < 0) {
+								$('#remainingDays').removeClass('value-positive').addClass('value-negative');
+							} else {
+								$('#remainingDays').removeClass('value-negative').addClass('value-positive');
+							}
+						}
+
+						loadingOverlay.hide();
+					},
+					error: function(xhr, status, error) {
+						console.error('Hak ediş bilgileri yüklenirken hata:', error);
+						loadingOverlay.hide();
+					}
+				});
+			}
+
+			// Input validasyonları
+			function setupInputValidations() {
+				// Sayısal alanlar için negatif değer kontrolü
+				$('input[type="number"]').on('input', function() {
+					if ($(this).val() < 0) {
+						$(this).val(0);
+					}
+				});
+
+				// Tarih alanları için minimum tarih kontrolü
+				const today = new Date().toISOString().split('T')[0];
+				$('input[type="date"]').attr('min', today);
+
+				// Bugünün tarihini talep tarihi olarak ata
+				$('#talepTarihi').val(today);
+			}
+
+			// Tarih işlemleri için yardımcı fonksiyonlar
+			function addDaysToDate(date, days) {
+				const result = new Date(date);
+				result.setDate(result.getDate() + days - 1); // Gün sayısı -1 (başlangıç günü dahil)
+				return result;
+			}
+
+			function formatDate(date) {
+				const year = date.getFullYear();
+				const month = String(date.getMonth() + 1).padStart(2, '0');
+				const day = String(date.getDate()).padStart(2, '0');
+				return `${year}-${month}-${day}`;
+			}
+
+			// İşe başlama tarihini hesaplama (bitiş tarihinden sonraki gün)
+			function calculateReturnDate(endDate) {
+				const nextDay = new Date(endDate);
+				nextDay.setDate(nextDay.getDate() + 1);
+				return formatDate(nextDay);
+			}
+
+			// Dinamik hesaplamalar
+			function setupDynamicCalculations() {
+				// Başlangıç tarihi değiştiğinde bitiş tarihini güncelle (eğer manuel değiştirilmediyse)
+				$('input[name="baslangicTarihi"]').on('change', function() {
+					const baslangicTarihi = $(this).val();
+					const gunSayisi = parseInt($('input[name="izinGun"]').val()) || 0;
+
+					// Manuel değişiklik olmadıysa veya ilk kez başlangıç tarihi seçildiyse
+					if (!manualEndDateChange && baslangicTarihi) {
+						if (gunSayisi > 0) {
+							// Bitiş tarihi = başlangıç tarihi + gün sayısı - 1
+							const baslangic = new Date(baslangicTarihi);
+							const bitis = addDaysToDate(baslangic, gunSayisi);
+							$('input[name="bitisTarihi"]').val(formatDate(bitis));
+
+							// İşe başlama tarihini güncelle
+							$('input[name="iseBaslamaTarihi"]').val(calculateReturnDate(bitis));
+						} else {
+							// Gün sayısı 0 ise bitiş tarihi = başlangıç tarihi
+							$('input[name="bitisTarihi"]').val(baslangicTarihi);
+
+							// İşe başlama tarihini güncelle
+							const baslangic = new Date(baslangicTarihi);
+							$('input[name="iseBaslamaTarihi"]').val(calculateReturnDate(baslangic));
+						}
+					}
+				});
+
+				// İzin günü değiştiğinde bitiş tarihini hesapla (eğer manuel değiştirilmediyse)
+				$('input[name="izinGun"]').on('input', function() {
+					const gunSayisi = parseInt($(this).val()) || 0;
+					const baslangicTarihi = $('input[name="baslangicTarihi"]').val();
+
+					// Manuel değişiklik olmadıysa veya izin günü değiştirildiyse
+					if (!manualEndDateChange && baslangicTarihi) {
+						if (gunSayisi > 0) {
+							// Başlangıç tarihine göre bitiş tarihini hesapla
+							const baslangic = new Date(baslangicTarihi);
+							const bitis = addDaysToDate(baslangic, gunSayisi);
+							$('input[name="bitisTarihi"]').val(formatDate(bitis));
+
+							// İşe başlama tarihini güncelle
+							$('input[name="iseBaslamaTarihi"]').val(calculateReturnDate(bitis));
+						} else {
+							// Gün sayısı 0 ise bitiş tarihi = başlangıç tarihi
+							$('input[name="bitisTarihi"]').val(baslangicTarihi);
+
+							// İşe başlama tarihini güncelle
+							const baslangic = new Date(baslangicTarihi);
+							$('input[name="iseBaslamaTarihi"]').val(calculateReturnDate(baslangic));
+						}
+					}
+
+					// İzin günü değiştiğinde kalan izin kontrolü yap
+					validateLeaveRequest();
+				});
+
+				// Bitiş tarihi manuel değiştirildiğinde işe başlama tarihini güncelle
+				// ama izin günlerini değiştirme
+				$('input[name="bitisTarihi"]').on('change', function() {
+					const bitisTarihi = $(this).val();
+					const baslangicTarihi = $('input[name="baslangicTarihi"]').val();
+
+					if (bitisTarihi && baslangicTarihi) {
+						const baslangic = new Date(baslangicTarihi);
+						const bitis = new Date(bitisTarihi);
+
+						// Bitiş tarihi başlangıç tarihinden önce olamaz
+						if (bitis < baslangic) {
+							alert("Bitiş tarihi başlangıç tarihinden önce olamaz.");
+							$(this).val(baslangicTarihi);
+
+							// İşe başlama tarihini güncelle
+							$('input[name="iseBaslamaTarihi"]').val(calculateReturnDate(new Date(baslangicTarihi)));
+							return;
+						}
+
+						// Manuel değişiklik olduğunu işaretle
+						manualEndDateChange = true;
+
+						// İşe başlama tarihini güncelle
+						$('input[name="iseBaslamaTarihi"]').val(calculateReturnDate(bitis));
+					}
+				});
+
+				// İzin tipi değiştiğinde kalan izin kontrolü yap
+				$('select[name="izinTipi"]').on('change', function() {
+					validateLeaveRequest();
+				});
+			}
+
+			// Kalan izin kontrolü
+			function validateLeaveRequest() {
+				const izinTipi = $('#izinTipi').val();
+				const gunSayisi = parseInt($('#izinGun').val()) || 0;
+
+				// Sadece yıllık izin tipi (0) için kontrol yap
+				if (izinTipi === "0" && gunSayisi > 0) {
+					const remainingDays = parseFloat($('#remainingDays').text());
+
+					if (gunSayisi > remainingDays) {
+						// Kalan izin yetersiz uyarısı
+						alert(`Dikkat: Talep ettiğiniz ${gunSayisi} gün izin, kalan izin hakkınız olan ${remainingDays.toFixed(1)} günden fazladır!`);
+					}
+				}
+			}
+
+			// Mobil görünüm için düzenlemeler
+			function setupMobileView() {
+				if (window.innerWidth < 768) {
+					$('.form-row').addClass('mb-3');
+					$('.button-container').addClass('fixed-bottom');
+				}
+			}
+
+			// Sayfayı başlat
+			setupInputValidations();
+			setupDynamicCalculations();
+			setupMobileView();
+
+			// Pencere boyutu değiştiğinde
+			$(window).on('resize', function() {
+				setupMobileView();
+			});
+
+			// Form gönderimi
+			form.on('submit', function (e) {
+				e.preventDefault();
+
+				if (!form[0].checkValidity()) {
+					e.stopPropagation();
+					form.addClass('was-validated');
+					alert('Lütfen tüm zorunlu alanları doldurunuz.');
+					return;
+				}
+
+				// Form verilerini topla
+				const formData = {
+					talepTarihi: $('input[name="talepTarihi"]').val(),
+					izinTipi: $('select[name="izinTipi"]').val(),
+					eksikNedeni: $('select[name="eksikNedeni"]').val() || "0",
+					izinGun: parseInt($('input[name="izinGun"]').val()) || 0,
+					izinSaat: parseInt($('input[name="izinSaat"]').val()) || 0,
+					baslangicTarihi: $('input[name="baslangicTarihi"]').val(),
+					bitisTarihi: $('input[name="bitisTarihi"]').val(),
+					iseBaslamaTarihi: $('input[name="iseBaslamaTarihi"]').val(),
+					baslamaSaat: $('input[name="baslamaSaat"]').val() || '00:00',
+					izinAmaci: $('textarea[name="izinAmaci"]').val(),
+					personnelCode: $('#personnelCode').val(),
+					personnelName: $('#personnelName').val(),
+					personnelSurname: $('#personnelSurname').val()
+				};
+
+				// İzin kontrolü: Gün veya saat toplamının 0 olmaması gerekir
+				if (formData.izinGun === 0 && formData.izinSaat === 0) {
+					alert('İzin günü veya saati 0 olamaz. Lütfen en az birini giriniz.');
+					return;
+				}
+
+				// Yıllık izin için kalan gün kontrolü
+				if (formData.izinTipi === "0" && formData.izinGun > 0) {
+					const remainingDays = parseFloat($('#remainingDays').text());
+
+					if (formData.izinGun > remainingDays) {
+						if (!confirm(`Dikkat: Talep ettiğiniz ${formData.izinGun} gün izin, kalan izin hakkınız olan ${remainingDays.toFixed(1)} günden fazladır! Devam etmek istiyor musunuz?`)) {
+							return;
+						}
+					}
+				}
+
+				// Loading overlay'i göster
+				loadingOverlay.css('display', 'flex');
+
+				// AJAX isteği
+					$.ajax({
+			url: '/Hr/IzinTalepKaydet',
+			type: 'POST',
+			data: formData,
+			success: function (response) {
+				if (response.success) {
+					// Loading overlay'i gizle
+					loadingOverlay.hide();
+
+					// Başarı mesajı göster
+					alert('İzin talebiniz başarıyla kaydedildi. PDF indiriliyor...');
+
+					// PDF URL'sini oluştur
+					var pdfUrl = '/Hr/IzinTalepPdfIndir?izinGuid=' + response.izinGuid;
+
+					// Yeni bir pencerede PDF'i aç - bu tarayıcının PDF indirme davranışını tetikleyecektir
+					window.open(pdfUrl, '_blank');
+
+					// Kullanıcıya pdf indirme için biraz zaman tanı, sonra izinler sayfasına yönlendir
+					setTimeout(function() {
+						window.location.href = '/Hr/Izinlerim';
+					}, 2000); // 2 saniye bekletme
+				} else {
+					// Loading overlay'i gizle
+					loadingOverlay.hide();
+
+					// Hata mesajı göster
+					alert(response.message || 'İşlem başarısız. Lütfen tekrar deneyiniz.');
+				}
+			},
+			error: function (xhr, status, error) {
+				// Loading overlay'i gizle
+				loadingOverlay.hide();
+
+				console.error('Hata:', error);
+				alert('İşlem sırasında bir hata oluştu. Lütfen tekrar deneyiniz.');
+			}
+		});
+			});
+		});
+	</script>
+}
+	<!-- Elfsight Popup | Untitled Popup -->
+@* 	<script src="https://static.elfsight.com/platform/platform.js" async></script>
+	
+
+<div class="elfsight-app-1f332d7b-77a9-4681-8f0c-5103f685e717" data-elfsight-app-lazy></div> *@

@@ -1,0 +1,243 @@
+﻿@model IEnumerable<Deneme_proje.Models.GunayEntities.WebAyarlarPrim>
+
+
+
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+<style>
+    table.dataTable tbody th, table.dataTable tbody td {
+        padding: 5px 21px !important;
+    }
+
+    @@media only screen and (max-width: 576px) {
+        .form-inline .btn {
+            margin-top: 0;
+        }
+    }
+</style>
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <h4>Filo Kiralama</h4>
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index"><i class="icofont icofont-home"></i></a>
+                        </li>
+                        <li class="breadcrumb-item"><a href="/Gunay/Tanimlar">Günay</a></li>
+                        <li class="breadcrumb-item"><a href="/Gunay/Tanimlar">Tanımlar</a></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-lg-5 mb-1">
+         
+         
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                            <h5 class="card-header-text text-white"></h5>
+                        </div>
+
+                        <div class="card-block accordion-block px-0">
+                            <div class="col-md-12">
+
+                                <h3></h3>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>1 Günlük</th>
+                                            <th>2-7 Günlük</th>
+                                            <th>7-15 Günlük</th>
+                                            <th>15+ Günlük</th>
+                                            <th>Ek Sigorta Kapsamı Ekstra (Aylık)</th>
+                                            <th>Ek Sürücü (Günlük)</th>
+                                            <th>Ek Sürücü</th>
+                                            <th>Bebek Koltuğu Ekstrası (Aylık)</th>
+                                            <th>Güncelle</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <form method="post" action="/Gunay/Tanimlar">
+                                                <td><input type="text" name="BirGunluk" value="@item.BirGunluk" class="form-control" /></td>
+                                                <td><input type="text" name="IkiYediGunluk" value="@item.IkiYediGunluk" class="form-control" /></td>
+                                                <td><input type="text" name="YediOnbesGunluk" value="@item.YediOnbesGunluk" class="form-control" /></td>
+                                                <td><input type="text" name="OnbesPlusGunluk" value="@item.OnbesPlusGunluk" class="form-control" /></td>
+                                                <td><input type="text" name="EkSigortaKapsamiEkstraAylik" value="@item.EkSigortaKapsamiEkstraAylik" class="form-control" /></td>
+                                                <td><input type="text" name="EkSurucuGunluk" value="@item.EkSurucuGunluk" class="form-control" /></td>
+                                                <td><input type="text" name="EkSurucu" value="@item.EkSurucu" class="form-control" /></td>
+                                                <td><input type="text" name="BebekKoltuguEkstrasiAylik" value="@item.BebekKoltuguEkstrasiAylik" class="form-control" /></td>
+                                                <td><button type="submit" name="Id" value="@item.Id" class="btn btn-primary">Güncelle</button></td>
+                                                </form>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+
+                                <!-- İkinci Tablo: Servis Prim -->
+                                <h3>Servis Prim</h3>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Servis 250 Altı</th>
+                                            <th>Servis 250-2500</th>
+                                            <th>Servis 2500-5000</th>
+                                            <th>Servis 5000 Üzeri</th>
+                                            <th>Servis Ekstra Montaj</th>
+                                            <th>Servis Yeni Motor Montaj</th>
+                                            <th>Güncelle</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <form method="post" action="/Gunay/TanimlarServis">
+                                                <td><input type="text" name="Servis250Alti" value="@item.Servis250Alti" class="form-control" /></td>
+                                                <td><input type="text" name="Servis250_2500" value="@item.Servis250_2500" class="form-control" /></td>
+                                                <td><input type="text" name="Servis2500_5000" value="@item.Servis2500_5000" class="form-control" /></td>
+                                                <td><input type="text" name="Servis5000Uzeri" value="@item.Servis5000Uzeri" class="form-control" /></td>
+                                                <td><input type="text" name="ServisEkstraMontaj" value="@item.ServisEkstraMontaj" class="form-control" /></td>
+                                                <td><input type="text" name="ServisYeniMotorMontaj" value="@item.ServisYeniMotorMontaj" class="form-control" /></td>
+                                                <td><button type="submit" name="Id" value="@item.Id" class="btn btn-primary">Güncelle</button></td>
+                                                </form>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+
+                                <!-- Üçüncü Tablo: Satış Prim -->
+                                <h3>Satış Prim</h3>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>SKO FP60</th>
+                                            <th>SCS</th>
+                                            <th>SCU FP45 FPK DD</th>
+                                            <th>Rayiç 0-250</th>
+                                            <th>Rayiç 250-500</th>
+                                            <th>Rayiç 500 Üzeri</th>
+                                            <th>Thermoking</th>
+                                            <th>Valohr</th>
+                                            <th>Güncelle</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <form method="post" action="/Gunay/TanimlarSatis">
+                                                <td><input type="text" name="SKO_FP60" value="@item.SKO_FP60" class="form-control" /></td>
+                                                <td><input type="text" name="SCS" value="@item.SCS" class="form-control" /></td>
+                                                <td><input type="text" name="SCU_FP45_FPK_DD" value="@item.SCU_FP45_FPK_DD" class="form-control" /></td>
+                                                <td><input type="text" name="Rayic0_250" value="@item.Rayic0_250" class="form-control" /></td>
+                                                <td><input type="text" name="Rayic250_500" value="@item.Rayic250_500" class="form-control" /></td>
+                                                <td><input type="text" name="Rayic500Uzeri" value="@item.Rayic500Uzeri" class="form-control" /></td>
+                                                <td><input type="text" name="Thermoking" value="@item.Thermoking" class="form-control" /></td>
+                                                <td><input type="text" name="valohr" value="@item.valohr" class="form-control" /></td>
+                                                <td><button type="submit" name="Id" value="@item.Id" class="btn btn-primary">Güncelle</button></td>
+                                                </form>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+
+                                <h3>Satış Prim</h3>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>SKO FP60</th>
+                                            <th>SCS</th>
+                                            <th>SCU FP45 FPK DD</th>
+                                            <th>Rayiç 0-250</th>
+                                            <th>Rayiç 250-500</th>
+                                            <th>Rayiç 500 Üzeri</th>
+                                            <th>Thermoking</th>
+                                            <th>Valohr</th>
+                                            <th>Güncelle</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <form method="post" action="/Gunay/TanimlarSatis">
+                                                <td><input type="text" name="SKO_FP60" value="@item.SKO_FP60" class="form-control" /></td>
+                                                <td><input type="text" name="SCS" value="@item.SCS" class="form-control" /></td>
+                                                <td><input type="text" name="SCU_FP45_FPK_DD" value="@item.SCU_FP45_FPK_DD" class="form-control" /></td>
+                                                <td><input type="text" name="Rayic0_250" value="@item.Rayic0_250" class="form-control" /></td>
+                                                <td><input type="text" name="Rayic250_500" value="@item.Rayic250_500" class="form-control" /></td>
+                                                <td><input type="text" name="Rayic500Uzeri" value="@item.Rayic500Uzeri" class="form-control" /></td>
+                                                <td><input type="text" name="Thermoking" value="@item.Thermoking" class="form-control" /></td>
+                                                <td><input type="text" name="valohr" value="@item.valohr" class="form-control" /></td>
+                                                <td><button type="submit" name="Id" value="@item.Id" class="btn btn-primary">Güncelle</button></td>
+                                                </form>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+
+                                <h3>Otokoç Prim</h3>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Günay Grup satışı</th>
+                                            <th>Şirket dışı satış (peşin)</th>
+                                            <th>Şirket dışı satış (1-30 gün)</th>
+                                            <th>Şirket dışı satış (31-60 gün)</th>
+                                          
+                                      
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <form method="post" action="/Gunay/TanimlarOtokoc">
+                                                <td><input type="text" name="gunay_grup_satis" value="@item.gunay_grup_satis" class="form-control" /></td>
+                                                <td><input type="text" name="sirket_disi_pesin" value="@item.sirket_disi_pesin" class="form-control" /></td>
+                                                <td><input type="text" name="sirket_disi_otuz_gun" value="@item.sirket_disi_otuz_gun" class="form-control" /></td>
+                                                <td><input type="text" name="sirket_disi_altmis_gun" value="@item.sirket_disi_altmis_gun" class="form-control" /></td>
+                                                
+                                                <td><button type="submit" name="Id" value="@item.Id" class="btn btn-primary">Güncelle</button></td>
+                                                </form>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+
+    <script>
+        // Initialize DataTables for the example table
+        document.addEventListener('DOMContentLoaded', function () {
+            new DataTable('#example');
+        });
+
+        // Initialize DataTables for the digerdepolar table
+        document.addEventListener('DOMContentLoaded', function () {
+            new DataTable('#digerdepolar');
+        });
+    </script>
+
+
+
+

@@ -1,0 +1,768 @@
+﻿@model Deneme_proje.Models.DenizlerEntities.RaportViewModel
+
+@{
+	ViewData["Title"] = "Araç Masrafı Raporu";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+
+	// Gelir ve gider hesaplamaları
+	double gelir = (double)Model.Denizler1Data.Sum(x => x.NakliyeCiroBedeli);
+	double gider = (double)Model.Denizler2Data.Sum(x => x.Tutar) + (double)Model.Denizler3Data.Sum(x => x.Tutar);
+	double sonuc = gelir - gider;
+
+}
+<link href="~/content/assets/css/site.css" rel="stylesheet" />
+<style>
+	html, body {
+		height: 100%;
+		margin: 0;
+		overflow: auto;
+	}
+
+
+	.table {
+		margin-bottom: 0rem;
+	}
+
+	.content-inner {
+		padding: 0px !important;
+	}
+
+	/* Genel düzenleme */
+	.column-width {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: wrap;
+		padding: 5px;
+		max-width: 100%;
+		width: 100%;
+	}
+
+	.table-responsive th, .table-responsive td {
+		padding: 2px 10px;
+	}
+
+
+
+	.tablo-th-baslik th {
+		color: black;
+		font-weight: bold;
+	}
+
+	.table-striped > tbody > tr:nth-of-type(even) > th {
+		font-weight: bold;
+		color: black !important;
+	}
+
+	form {
+		box-shadow: 0 8px 8px rgba(0, 0, 0, 0.3);
+	}
+
+	.table-container {
+		width: 100%;
+	}
+
+	.table-responsive table {
+		font-size: 9px;
+		table-layout: fixed;
+	}
+
+	.table-container .table .masraf-adı-cell {
+		max-width: 100px;
+		font-size: 0.75em;
+	}
+
+	.table-container td, .table-container th {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		padding: 5px;
+		max-width: 100px;
+	}
+
+	.container-fluid {
+		padding: 0 15px;
+	}
+
+	.row {
+		margin: 0;
+	}
+
+	.col-md-3, .col-md-6, .col-md-12 {
+		padding: 0 5px;
+	}
+
+	.form-group {
+		margin-bottom: 10px;
+	}
+
+	.btn {
+		font-size: 0.75em;
+		padding: 5px 8px;
+	}
+
+	.card-header, .card-body {
+		padding: 10px;
+	}
+
+	.header-title h4 {
+		font-size: 1.2em;
+	}
+</style>
+
+<div class="container-fluid content-inner mt-n5 py-0">
+	<div class="row">
+		<h4 class="print-only" id="printSrmKodu"> </h4>
+		<div class="col-sm-12">
+			<div class="card">
+				<div class="card-header d-flex justify-content-between">
+					<!-- Header içeriği buraya gelecek -->
+				</div>
+				<div class="row d-flex justify-content-center">
+					<div class="col-md-4 d-flex flex-column justify-content-center">
+						<form id="veri" method="get" class="mb-4 px-5 pt-5">
+							<div class="header-title">
+								<h4 class="card-title px-4">Araç Masrafı Raporu</h4>
+							</div>
+							<div class="row d-flex flex-column mb-3">
+								<div class="form-group col">
+									<label for="baslamaTarihi">Başlama Tarihi:</label>
+									<input type="date" id="baslamaTarihi" name="baslamaTarihi" class="form-control form-control-sm" required value="@Model.BaslamaTarihi.ToString("yyyy-MM-dd")" />
+								</div>
+								<div class="form-group col">
+									<label for="bitisTarihi">Bitiş Tarihi:</label>
+									<input type="date" id="bitisTarihi" name="bitisTarihi" class="form-control form-control-sm" required value="@Model.BitisTarihi.ToString("yyyy-MM-dd")" />
+								</div>
+								<!-- Proje Kodu Input ve Datalist -->
+								<div class="form-group col">
+									<label for="projeKoduInput">Proje Kodu:</label>
+									<input type="text" id="projeKoduInput" name="projeKodu" class="form-control form-control-sm" list="projeKoduList" placeholder="Proje Kodu / Adı Ara..." />
+									<datalist id="projeKoduList">
+										@foreach (var item in Model.ProjeKodlari)
+										{
+											<option value="@item.Value">@item.Text</option>
+										}
+									</datalist>
+								</div>
+
+								<!-- Sorumlu Kodu Input ve Datalist -->
+								<div class="form-group col">
+									<label for="srmKoduInput">Sorumlu Kodu:</label>
+									<input type="text" id="srmKoduInput" name="srmKodu" class="form-control form-control-sm" list="srmKoduList" placeholder="Sorumlu Kodu Ara..." />
+									<datalist id="srmKoduList">
+										@foreach (var item in Model.SorumluKodlari)
+										{
+											<option value="@item.Value">@item.Text</option>
+										}
+									</datalist>
+								</div>
+
+
+								<div class="form-group col-md-12 text-right mt-3">
+									<button type="submit" class="btn btn-primary btn-sm">Verileri Getir</button>
+									<button type="button" id="resetButton" class="btn btn-secondary btn-sm ml-2">Seçimleri Sıfırla</button>
+									<div class="text-right no-print">
+										<button class="btn btn-success" onclick="window.print()">Yazdır</button>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="col-md-8">
+						@if (Model.Denizler1Data != null || Model.Denizler2Data != null || Model.Denizler3Data != null || Model.Denizler4Data != null)
+						{
+
+							<div class="table-container d-flex justify-content-center">
+
+								<div class="table-responsive me-3">
+									<h5>Detay Rapor</h5>
+									<table id="denizler1tablo" class="table table-bordered table-striped tablo-th-baslik">
+										<tbody>
+											@foreach (var item in Model.Denizler1Data)
+											{
+												<tr>
+													<th>Gidilen Sefer Sayısı</th>
+													<td class="tooltip-cell" style="text-align: right" title="@item.GidilenSeferSayısı">@item.GidilenSeferSayısı.ToString("N2", new System.Globalization.CultureInfo("tr-TR"))</td>
+												</tr>
+												<tr>
+													<th>Taşınan Tonaj</th>
+													<td class="tooltip-cell" style="text-align: right" title="@item.TaşınanTonaj">@item.TaşınanTonaj.ToString("N2", new System.Globalization.CultureInfo("tr-TR"))</td>
+												</tr>
+												<tr>
+													<th>Kullanılan Yakıt Litre</th>
+													<td class="tooltip-cell" style="text-align: right" title="@item.KullanılanYakıtLitre">@item.KullanılanYakıtLitre.ToString("N2", new System.Globalization.CultureInfo("tr-TR"))</td>
+												</tr>
+												<tr>
+													<th>Depo Mazot Gideri</th>
+													<td class="tooltip-cell" style="text-align: right" title="@item.KullanılanYakıtTutarı">@string.Format("{0:N2}₺", item.KullanılanYakıtTutarı)</td>
+												</tr>
+												<tr>
+													<th>Depo Yedek Parça + Mazot Gider Toplamı</th>
+													<td class="tooltip-cell" style="text-align: right" title="@item.StoktaKullanılan">@string.Format("{0:N2}₺", item.StoktaKullanılan)</td>
+												</tr>
+												<tr>
+													<th>Sanayi Yedek Parça Gideri</th>
+													<td class="tooltip-cell" style="text-align: right" title="@item.SanayideYapilan">@string.Format("{0:N2}₺", item.SanayideYapilan)</td>
+												</tr>
+												<tr>
+													<th>Depo Yedek Parça Gideri</th>
+													<td class="tooltip-cell" style="text-align: right" title="@item.MazotHariçStoktaKullanılan">@string.Format("{0:N2}₺", item.MazotHariçStoktaKullanılan)</td>
+												</tr>
+												<tr>
+													<th>Tüm Giderler Toplamı</th>
+													<td class="tooltip-cell" style="text-align: right" title="@item.TümGiderler">@string.Format("{0:N2}₺", item.TümGiderler)</td>
+												</tr>
+												<tr>
+													<th>Nakliye Ciro Bedeli</th>
+													<td class="tooltip-cell" style="text-align: right" title="@item.NakliyeCiroBedeli">@string.Format("{0:N2}₺", item.NakliyeCiroBedeli)</td>
+												</tr>
+												<tr>
+													<th>Bir Saat Km'de Yakıt Litre Tutarı</th>
+													<td class="tooltip-cell" style="text-align: right" title="@item.BirSaatKmYapılanYakıtLitresiTutar">@string.Format("{0:N2}₺", item.BirSaatKmYapılanYakıtLitresiTutar)</td>
+												</tr>
+												<tr>
+													<th>Çalışma Saati Yapılan KM</th>
+													<td class="tooltip-cell" style="text-align: right" title="@item.ÇalışmaSaatiYapılanKM">@item.ÇalışmaSaatiYapılanKM.ToString("N2", new System.Globalization.CultureInfo("tr-TR"))</td>
+												</tr>
+												<tr>
+													<th>Km'de yakılan Yakıt  Oranı</th>
+													<td class="tooltip-cell" style="text-align: right" title="@item.BirSaatKMYapılanYakıtLitresi">@item.BirSaatKMYapılanYakıtLitresi.ToString("N2", new System.Globalization.CultureInfo("tr-TR"))</td>
+												</tr>
+												<tr>
+													<th>Bir Saatte Yakılan Yakıt </th>
+													<td class="tooltip-cell" style="text-align: right" title="@item.BirSaatKMYakılanYakıtLitreOran">@item.BirSaatKMYakılanYakıtLitreOran.ToString("N2", new System.Globalization.CultureInfo("tr-TR"))</td>
+												</tr>
+											}
+										</tbody>
+									</table>
+								</div>
+
+								@if (Model.SorumlulukUserData != null && Model.SorumlulukUserData.Any())
+								{
+									<div class="table-responsive">
+										<h5>Araç Bilgileri</h5>
+										<table id="denizler_srm_tablo" class="table table-bordered table-striped tablo-th-baslik">
+											<tbody>
+												@foreach (var item in Model.SorumlulukUserData)
+												{
+													<tr>
+														<th>Firma Adı</th>
+														<td class="tooltip-cell" title="@item.Firma_Adi">@item.Firma_Adi</td>
+													</tr>
+													<tr>
+														<th>Araç Marka</th>
+														<td class="tooltip-cell" title="@item.Arac_Marka">@item.Arac_Marka</td>
+													</tr>
+													<tr>
+														<th>Araç Modeli</th>
+														<td class="tooltip-cell" title="@item.Arac_Modeli">@item.Arac_Modeli</td>
+													</tr>
+													<tr>
+														<th>Araç Model Yılı</th>
+														<td class="tooltip-cell" title="@item.Arac_Model_Yili">@item.Arac_Model_Yili</td>
+													</tr>
+													<tr>
+														<th>Ruhsat Seri No</th>
+														<td class="tooltip-cell" title="@item.Ruhsat_Seri_No">@item.Ruhsat_Seri_No</td>
+													</tr>
+													<tr>
+														<th>Şase No</th>
+														<td class="tooltip-cell" title="@item.Sase_No">@item.Sase_No</td>
+													</tr>
+													<tr>
+														<th>Muayene Bitiş Tarihi</th>
+														<td class="tooltip-cell" title="@item.Muayene_Bitis_Tarihi">@item.Muayene_Bitis_Tarihi</td>
+													</tr>
+													<tr>
+														<th>Kullanıcı Adı</th>
+														<td class="tooltip-cell" title="@item.Kullanici_Adi">@item.Kullanici_Adi</td>
+													</tr>
+													<tr>
+														<th>Kullanıcı Adı (İkinci)</th>
+														<td class="tooltip-cell" title="@item.Kullanici_Adi__2__">@item.Kullanici_Adi__2__</td>
+													</tr>
+												}
+											</tbody>
+										</table>
+										<div class="col">
+											<div class="table-container">
+												<div class="table-responsive" style="margin: 0; padding: 0;">
+													<h5>Kar-Zarar</h5>
+													<table id="denizlertablo" class="table table-bordered table-striped table-sm">
+														<tbody>
+															<tr>
+																<td><strong>Gelir Toplamı:</strong></td>
+																<td class="tooltip-cell" style="text-align: right" title="@gelir">@string.Format("{0:N2}₺", gelir)</td>
+															</tr>
+															<tr>
+																<td><strong>Gider Toplamı:</strong></td>
+																<td class="tooltip-cell" style="text-align: right" title="@gider">@string.Format("{0:N2}₺", gider)</td>
+															</tr>
+
+															<tr>
+																<td><strong>Sonuç:</strong></td>
+																<td class="tooltip-cell" style="text-align: right" title="@sonuc">@string.Format("{0:N2}₺", sonuc)</td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+											</div>
+										</div>
+									</div>
+
+								}
+
+							</div>
+
+						}
+					</div>
+				</div>
+				@if (Model.Denizler1Data != null || Model.Denizler2Data != null || Model.Denizler3Data != null || Model.Denizler4Data != null)
+				{
+					<div class="card-body px-5">
+						<!-- Denizler 2 Data -->
+						<div class="row">
+							<div class="col-md-6 mb-4">
+								<h5>Sanayide Yapılan</h5>
+								<div class="table-responsive">
+									<table id="denizler2tablo" class="table table-bordered table-striped">
+										<thead>
+											<tr>
+												<th>Tarih</th>
+												<th>Açıklama</th>
+												<th>Masraf Adı</th>
+												<th>Miktar</th>
+												<th>Tutar</th>
+											</tr>
+											<tr>
+												<th><input type="text" class="form-control form-control-sm" placeholder="Tarih Ara" onkeyup="filterTable(0, 'denizler2tablo')"></th>
+												<th><input type="text" class="form-control form-control-sm" placeholder="Açıklama Ara" onkeyup="filterTable(1, 'denizler2tablo')"></th>
+												<th><input type="text" class="form-control form-control-sm" placeholder="Masraf Adı Ara" onkeyup="filterTable(2, 'denizler2tablo')"></th>
+												<th><input type="text" class="form-control form-control-sm" placeholder="Miktar Ara" onkeyup="filterTable(3, 'denizler2tablo')"></th>
+												<th><input type="text" class="form-control form-control-sm" placeholder="Tutar Ara" onkeyup="filterTable(4, 'denizler2tablo')"></th>
+											</tr>
+										</thead>
+										<tbody>
+											@foreach (var item in Model.Denizler2Data)
+											{
+												<tr>
+													<td>@item.Tarih.ToShortDateString()</td>
+													<td class="column-width tooltip-cell" title="@item.Açıklama">@item.Açıklama</td>
+													<td class="column-width tooltip-cell" title="@item.MasrafAdı">@item.MasrafAdı</td>
+													<td class="column-width tooltip-cell" style="text-align: right" title="@item.Miktar">@item.Miktar.ToString("N2", new System.Globalization.CultureInfo("tr-TR"))</td>
+													<td class="column-width tooltip-cell" style="text-align: right" title="@item.Tutar">@string.Format("{0:N2}₺", item.Tutar)</td>
+												</tr>
+											}
+											<!-- Toplam Satırı -->
+											<tr>
+												<td colspan="3" style="text-align: right;"><strong>Toplam:</strong></td>
+												<td style="text-align: right;">
+													<strong>
+														@Model.Denizler2Data.Sum(x => x.Miktar).ToString("N2", new System.Globalization.CultureInfo("tr-TR"))
+													</strong>
+												</td>
+												<td style="text-align: right;">
+													<strong>
+														@string.Format("{0:N2}₺", Model.Denizler2Data.Sum(x => x.Tutar))
+													</strong>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+
+							<!-- Denizler 3 Data -->
+							<div class="col-md-6 mb-4">
+								<h5>Stokta Kullanılan</h5>
+								<div class="table-responsive">
+									<table id="denizler3tablo" class="table table-bordered table-striped">
+										<thead>
+											<tr>
+												<th>Tarih</th>
+												<th>Açıklama</th>
+												<th>Stok Adı</th>
+												<th>Miktar</th>
+												<th>Tutar</th>
+											</tr>
+											<tr>
+												<th><input type="text" class="form-control form-control-sm" placeholder="Tarih Ara" onkeyup="filterTable(0, 'denizler3tablo')"></th>
+												<th><input type="text" class="form-control form-control-sm" placeholder="Açıklama Ara" onkeyup="filterTable(1, 'denizler3tablo')"></th>
+												<th><input type="text" class="form-control form-control-sm" placeholder="Stok Adı Ara" onkeyup="filterTable(2, 'denizler3tablo')"></th>
+												<th><input type="text" class="form-control form-control-sm" placeholder="Miktar Ara" onkeyup="filterTable(3, 'denizler3tablo')"></th>
+												<th><input type="text" class="form-control form-control-sm" placeholder="Tutar Ara" onkeyup="filterTable(4, 'denizler3tablo')"></th>
+											</tr>
+										</thead>
+										<tbody>
+											@foreach (var item in Model.Denizler3Data)
+											{
+												<tr>
+													<td>@item.Tarih.ToShortDateString()</td>
+													<td class="column-width tooltip-cell" title="@item.Açıklama">@item.Açıklama</td>
+													<td class="column-width stok-adi-column tooltip-cell" title="@item.StokAdı">@item.StokAdı</td>
+													<td class="column-width tooltip-cell" style="text-align: right" title="@item.Miktar">@item.Miktar.ToString("N2", new System.Globalization.CultureInfo("tr-TR"))</td>
+													<td class="column-width tooltip-cell" style="text-align: right" title="@item.Tutar">@string.Format("{0:N2}₺", item.Tutar)</td>
+												</tr>
+											}
+											<tr>
+												<td colspan="3" style="text-align: right;"><strong>Toplam:</strong></td>
+												<td style="text-align: right;">
+													<strong>
+														@Model.Denizler3Data.Sum(x => x.Miktar).ToString("N2", new System.Globalization.CultureInfo("tr-TR"))
+													</strong>
+												</td>
+												<td style="text-align: right;">
+													<strong>
+														@string.Format("{0:N2}₺", Model.Denizler3Data.Sum(x => x.Tutar))
+													</strong>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				}
+				else
+				{
+					<div class="alert alert-warning" role="alert">
+						Veri bulunamadı. Lütfen tarih aralığını girip tekrar deneyin.
+					</div>
+				}
+
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+ 
+<script>
+	function filterTable(columnIndex, tableId) {
+		var input, filter, table, tr, td, i, txtValue;
+		input = document.querySelectorAll("#" + tableId + " thead tr:nth-child(2) th input")[columnIndex];
+		filter = input.value.toUpperCase();
+		table = document.getElementById(tableId);
+		tr = table.getElementsByTagName("tr");
+
+		// Tablo satırlarını filtreleme işlemi
+		for (i = 2; i < tr.length; i++) { // İlk iki satır başlık ve arama kutuları
+			td = tr[i].getElementsByTagName("td")[columnIndex];
+			if (td) {
+				txtValue = td.textContent || td.innerText;
+				if (txtValue.toUpperCase().indexOf(filter) > -1) {
+					tr[i].style.display = ""; // Eşleşen satırları gösteriyoruz
+				} else {
+					tr[i].style.display = "none"; // Eşleşmeyen satırları gizliyoruz
+				}
+			}
+		}
+	}
+</script>
+
+ <script>
+	document.addEventListener("DOMContentLoaded", function () {
+		// URL parametrelerinden seçimleri geri yükle
+		const urlParams = new URLSearchParams(window.location.search);
+		const projeKodu = urlParams.get('projeKodu');
+		const srmKodu = urlParams.get('srmKodu');
+
+		// Seçimleri URL parametrelerinden al ve formda ayarla
+		if (projeKodu) {
+			document.getElementById('projeKodu').value = projeKodu;
+		}
+
+		if (srmKodu) {
+			document.getElementById('srmKodu').value = srmKodu;
+		}
+
+		// `localStorage`'dan seçimleri geri yükle
+		restoreSelections();
+
+		// Seçimleri sıfırlama butonuna işlev ekle
+		document.getElementById('resetButton').addEventListener('click', function () {
+			document.querySelector('#veri').reset();
+			const url = new URL(window.location.href);
+			url.searchParams.delete('projeKodu');
+			url.searchParams.delete('srmKodu');
+			window.history.replaceState({}, '', url);
+			localStorage.removeItem('projeKodu');
+			localStorage.removeItem('srmKodu');
+		});
+
+
+
+		function restoreSelections() {
+			// LocalStorage'daki seçimleri geri yükle
+			const savedProjeKodu = localStorage.getItem('projeKodu');
+			const savedSrmKodu = localStorage.getItem('srmKodu');
+
+			if (savedProjeKodu) {
+				document.getElementById('projeKodu').value = savedProjeKodu;
+			}
+
+			if (savedSrmKodu) {
+				document.getElementById('srmKodu').value = savedSrmKodu;
+			}
+		}
+
+</script>
+ <script>
+	document.addEventListener("DOMContentLoaded", function () {
+		// URL parametrelerinden seçimleri geri yükle
+		const urlParams = new URLSearchParams(window.location.search);
+		const projeKodu = urlParams.get('projeKodu');
+		const srmKodu = urlParams.get('srmKodu');
+
+		// Seçimleri URL parametrelerinden al ve formda ayarla
+		if (projeKodu) {
+			document.getElementById('projeKodu').value = projeKodu;
+		}
+
+		if (srmKodu) {
+			document.getElementById('srmKodu').value = srmKodu;
+		}
+
+		// `localStorage`'dan seçimleri geri yükle
+		restoreSelections();
+
+		// Seçimleri sıfırlama butonuna işlev ekle
+		document.getElementById('resetButton').addEventListener('click', function () {
+			document.querySelector('#veri').reset();
+			const url = new URL(window.location.href);
+			url.searchParams.delete('projeKodu');
+			url.searchParams.delete('srmKodu');
+			window.history.replaceState({}, '', url);
+			localStorage.removeItem('projeKodu');
+			localStorage.removeItem('srmKodu');
+		});
+
+		// Yazdırma butonuna işlev ekle
+		document.getElementById('printButton').addEventListener('click', function (e) {
+			e.preventDefault(); // Sayfanın yenilenmesini engelle
+			saveSelections(); // Seçimleri `localStorage`'a kaydet
+			printPage(); // Yazdırma işlemini başlat
+		});
+	});
+
+	function saveSelections() {
+		const projeKodu = document.getElementById('projeKodu').value;
+		const srmKodu = document.getElementById('srmKodu').value;
+
+		// Seçimleri localStorage'a kaydet
+		localStorage.setItem('projeKodu', projeKodu);
+		localStorage.setItem('srmKodu', srmKodu);
+	}
+
+	function restoreSelections() {
+		// LocalStorage'daki seçimleri geri yükle
+		const savedProjeKodu = localStorage.getItem('projeKodu');
+		const savedSrmKodu = localStorage.getItem('srmKodu');
+
+		if (savedProjeKodu) {
+			document.getElementById('projeKodu').value = savedProjeKodu;
+		}
+
+		if (savedSrmKodu) {
+			document.getElementById('srmKodu').value = savedSrmKodu;
+		}
+	}
+
+	function printPage() {
+		// Yazdırma içeriğini toplayın
+		var printContents = '';
+
+		// Tabloları sınıf adı ile seçme
+		var denizlerTablo = document.getElementById('denizlertablo');
+		var denizler1Tablolar = document.querySelectorAll('#denizler1tablo'); // Sınıf adıyla tüm tabloları al
+		var denizler2Tablo = document.getElementById('denizler2tablo');
+		var denizler3Tablo = document.getElementById('denizler3tablo');
+		var denizlerSrmTablo = document.getElementById('denizler_srm_tablo');
+
+		// Başlama Tarihi, Bitiş Tarihi, Sorumlu Kodu, Proje Kodu değerlerini al
+		var baslamaTarihi = document.getElementById('baslamaTarihi').value;
+		var bitisTarihi = document.getElementById('bitisTarihi').value;
+		var projeKodu = document.getElementById('projeKodu').selectedOptions[0].text;
+		var srmKodu = document.getElementById('srmKodu').selectedOptions[0].text;
+
+		// Yazdırma için başlık ve içerik oluşturun
+		printContents += '<h4>' + document.getElementById('srmKodu').selectedOptions[0].text + '</h4>';
+
+		printContents += '<p><strong>Rapor Başlangıç- Bitiş Tarihi:</strong> ' + baslamaTarihi + " / " + bitisTarihi + '</p>';
+
+		printContents += '<p><strong>Proje Kodu:</strong> ' + projeKodu + '</p>';
+
+		printContents += `<style>
+			table {
+				width: 100%;
+				font-size: 8pt; /* Küçük yazı boyutu */
+				line-height: 1.2; /* Satır yüksekliği */
+				table-layout: fixed;
+			}
+			td, th {
+				padding: 2px; /* Küçük padding */
+				line-height: 1.2; /* Satır aralığını küçült */
+			}
+		</style>`;
+		// Gelir Gider Tablosu
+		if (denizlerTablo) {
+			printContents += '<h5 style="color: red">Gelir Gider Tabloları</h5>' + denizlerTablo.outerHTML;
+		}
+		if (denizlerSrmTablo) {
+			printContents += '<h5 style="color: red">Sorumluluk Merkezi Verileri</h5>' + denizlerSrmTablo.outerHTML;
+		}
+
+		// Denizler1 Tablosu
+		denizler1Tablolar.forEach(function (tablo) {
+			printContents += '<h5 style="color: red">Araç Özeti</h5>' + tablo.outerHTML;
+		});
+
+		// Denizler2 Tablosu
+		if (denizler2Tablo) {
+			printContents += '<h3>Sanayide Yapılan</h3>' + denizler2Tablo.outerHTML;
+		}
+
+		// Denizler3 Tablosu
+		if (denizler3Tablo) {
+			printContents += '<h3>Stokta Kullanılan</h3>' + denizler3Tablo.outerHTML;
+		}
+
+		// Sayfanın mevcut içeriğini değiştirin ve yazdırma işlemini başlatın
+		var originalContents = document.body.innerHTML;
+		document.body.innerHTML = printContents;
+		window.print();
+		document.body.innerHTML = originalContents;
+
+		// Seçimleri geri yükleme işlemi
+		restoreSelections();
+	}
+</script>
+
+ <script>
+	document.addEventListener("DOMContentLoaded", function () {
+		var srmKoduSelect = document.getElementById('srmKodu');
+		var printSrmKodu = document.getElementById('printSrmKodu');
+
+		// Sayfa yüklendiğinde başlığı güncelle
+		updateSrmKodu();
+
+		// Sorumluluk kodu değiştiğinde başlığı güncelle
+		srmKoduSelect.addEventListener('change', updateSrmKodu);
+
+		function updateSrmKodu() {
+			var selectedOption = srmKoduSelect.options[srmKoduSelect.selectedIndex];
+			if (selectedOption && selectedOption.value) {
+				// Eğer sorumluluk kodu seçilmişse başlığı günceller
+				if (selectedOption.value !== "") {
+					printSrmKodu.innerText = selectedOption.text + ' MASRAF RAPORU';
+				} else {
+					printSrmKodu.innerText = ''; // "Seçiniz" veya boş olduğunda başlık yazdırılmaz
+				}
+			} else {
+				printSrmKodu.innerText = 'Araç Masraf Raporu'; // Default başlık
+			}
+		}
+	});
+
+</script>
+
+<script>
+	$(document).ready(function () {
+		// Proje kodu ve sorumlu kodu select'lerine Select2 uygulama
+		$('#projeKodu').select2({
+			placeholder: "Proje kodu ara...",
+			allowClear: true
+		});
+
+		$('#srmKodu').select2({
+			placeholder: "Sorumlu kodu ara...",
+			allowClear: true
+		});
+	});
+</script>
+
+<script>
+	// Filtreleme fonksiyonu
+	document.getElementById('srmKoduFilter').addEventListener('keyup', function () {
+		var filterValue = this.value.toLowerCase();
+		var select = document.getElementById('srmKodu');
+		var options = select.getElementsByTagName('option');
+
+		// Her bir option üzerinde arama yap
+		for (var i = 1; i < options.length; i++) { // İlk option "Seçiniz" olduğu için 1'den başlıyoruz
+			var optionText = options[i].textContent.toLowerCase();
+			if (optionText.includes(filterValue)) {
+				options[i].style.display = ''; // Göster
+			} else {
+				options[i].style.display = 'none'; // Gizle
+			}
+		}
+	});
+</script>
+
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		var projeInput = document.getElementById('projeKoduInput');
+		var projeDatalist = document.getElementById('projeKoduList');
+
+		var srmInput = document.getElementById('srmKoduInput');
+		var srmDatalist = document.getElementById('srmKoduList');
+
+		// Seçimleri geri yükleme
+		restoreSelections();
+
+		// Proje Kodu için filtreleme fonksiyonu
+		projeInput.addEventListener('input', function () {
+			filterOptions(projeInput.value, projeDatalist);
+			saveSelections();
+		});
+
+		// Sorumlu Kodu için filtreleme fonksiyonu
+		srmInput.addEventListener('input', function () {
+			filterOptions(srmInput.value, srmDatalist);
+			saveSelections();
+		});
+
+		// Seçimleri kaydetme
+		function saveSelections() {
+			localStorage.setItem('projeKodu', projeInput.value);
+			localStorage.setItem('srmKodu', srmInput.value);
+		}
+
+		// Seçimleri geri yükleme
+		function restoreSelections() {
+			var savedProjeKodu = localStorage.getItem('projeKodu');
+			var savedSrmKodu = localStorage.getItem('srmKodu');
+
+			if (savedProjeKodu) {
+				projeInput.value = savedProjeKodu;
+			}
+
+			if (savedSrmKodu) {
+				srmInput.value = savedSrmKodu;
+			}
+		}
+
+		// Seçimleri sıfırlama
+		document.getElementById('resetButton').addEventListener('click', function () {
+			localStorage.removeItem('projeKodu');
+			localStorage.removeItem('srmKodu');
+			projeInput.value = '';
+			srmInput.value = '';
+		});
+
+		// Filtreleme fonksiyonu
+		function filterOptions(searchText, datalist) {
+			var options = datalist.options;
+			for (var i = 0; i < options.length; i++) {
+				var option = options[i];
+				if (option.value.toLowerCase().includes(searchText.toLowerCase()) || option.text.toLowerCase().includes(searchText.toLowerCase())) {
+					option.style.display = '';
+				} else {
+					option.style.display = 'none';
+				}
+			}
+		}
+	});
+</script>

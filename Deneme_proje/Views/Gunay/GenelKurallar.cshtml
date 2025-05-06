@@ -1,0 +1,235 @@
+﻿@model IEnumerable<Deneme_proje.Models.GunayEntities.FiloKiralamaViewModel>
+
+@{
+    ViewData["Title"] = "Ağır Vasıta Servis";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // Tarih parametrelerini kontrol edelim ve ViewBag'den değerleri alalım
+    var startDate = ViewBag.SelectedStartDate != null ? ((DateTime)ViewBag.SelectedStartDate).ToString("yyyy-MM-dd") : null;
+    var endDate = ViewBag.SelectedEndDate != null ? ((DateTime)ViewBag.SelectedEndDate).ToString("yyyy-MM-dd") : null;
+}
+
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+<style>
+    table.dataTable tbody th, table.dataTable tbody td {
+        padding: 5px 21px !important;
+    }
+
+    @@media only screen and (max-width: 576px) {
+        .form-inline .btn {
+            margin-top: 0;
+        }
+    }
+</style>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f4f7f6;
+        color: #2d3e50;
+        line-height: 1.6;
+    }
+
+    .header {
+        background-color: #2c3e50;
+        color: white;
+        padding: 20px 0;
+        text-align: center;
+        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+    }
+
+        .header h1 {
+            font-size: 30px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+    .content {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 25px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+        .content:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+    .rule {
+        margin-bottom: 35px;
+    }
+
+        .rule h2 {
+            font-size: 22px;
+            color: #2980b9;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #dcdcdc;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+            .rule h2::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 50px;
+                height: 3px;
+                background-color: #2980b9;
+                transition: width 0.4s ease;
+            }
+
+        .rule:hover h2::after {
+            width: 90px;
+        }
+
+        .rule p {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.8;
+            transition: color 0.3s ease;
+        }
+
+        .rule:hover h2 {
+            color: #16a085;
+        }
+
+        .rule:hover p {
+            color: #333;
+        }
+
+    h4.card-title {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #34495e;
+        transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+        h4.card-title:hover {
+            color: #1abc9c;
+            transform: scale(1.02);
+        }
+
+    /* Extra styling for a more elegant card layout */
+    .card {
+        border: none;
+        border-radius: 12px;
+        background-color: #fff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-header {
+        border-bottom: 1px solid #e0e0e0;
+        background-color: transparent;
+        padding: 20px 30px;
+    }
+
+    .card-body {
+        padding: 30px;
+    }
+
+    /* Responsive improvements */
+
+</style>
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <h4>Filo Kiralama</h4>
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index"><i class="icofont icofont-home"></i></a>
+                        </li>
+                        <li class="breadcrumb-item"><a href="/Gunay/AgirVasitaServis">Günay</a></li>
+                        <li class="breadcrumb-item"><a href="/Gunay/AgirVasitaSatiss">Ağır Vasıta Satış</a></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-lg-5 mb-1">
+
+            <div class="card-body">
+                <div class="rule">
+                    <h2>1. Aylık Prim Tutarı Limiti</h2>
+                    <p>Bir çalışanın alabileceği aylık prim tutarı, kesinlikle o çalışanın aylık brüt maaşını geçemez. Maksimum prim tutarı, çalışanın bir aylık brüt maaşına eşittir.</p>
+                </div>
+
+                <div class="rule">
+                    <h2>2. Prim Dağıtımının Raporlanması</h2>
+                    <p>Birimlerin toplam prim kazanma hakları, aylık kazanılan tutar üzerinden %80 dağıtılacak ve %20 ayrılacaktır. Bu kural tüm birimler için geçerlidir.</p>
+                    <p>Ay sonu itibarıyla, toplam kazanılan prim %80 olarak hesaplanır ve birimdeki çalışanlara dağıtılır. Kalan %20 ise ayrılarak ayrıca raporlanır.</p>
+                </div>
+
+                <div class="rule">
+                    <h2>3. Prim Dağılımı Kişi Bazında</h2>
+                    <p>Birimin o ay için toplamda 10.000 TL prim kazanması durumunda; %80’i 8.000 TL, %20’si 2.000 TL olarak ayrılır. Kişi bazında prim hesaplaması, her iki sütunun altındaki oranlara göre yapılır.</p>
+                </div>
+
+                <div class="rule">
+                    <h2>4. Fatura Kapatma ve Tahsilat</h2>
+                    <p>Ürün veya hizmet faturasının çek, senet, ödeme ya da başka bir yöntemle sistemde kapatılmamış olması durumunda, tahsilatı tamamlanmayan hiçbir ürün veya hizmet adet olarak sayılmaz.</p>
+                </div>
+
+                <div class="rule">
+                    <h2>5. Dip Fiyat ve Rayiç Fiyat Belirleme</h2>
+                    <p>Ürün bazında dip fiyat yazma sekmesi bulunacak ve bu bölümde, satılan hizmet veya ürünlerin yüzdelik ulaşım adedi ve baremi ile havuza aktarılacak para miktarı belirlenebilecektir.</p>
+                </div>
+
+                <div class="rule">
+                    <h2>6. Satıcı Bazında Prim Dağılımı</h2>
+                    <p>Satıcı bazında verilecek primlerde, satıcının kazandığı toplam tutar %80 kendisine, %20 ise ayrı raporlanacak şekilde düzenlenir.</p>
+                </div>
+
+                <div class="rule">
+                    <h2>7. Raporlama</h2>
+                    <p>Ay sonunda sistem, her birim için prim raporunu hazırlar. Birim veya kişi prim almaya hak kazanmasa bile, neden kazanamadığı veya neden o tutarda prim aldığı sistem tarafından raporlanmalıdır.</p>
+                </div>
+
+                <div class="rule">
+                    <h2>8. Kâr/Zarar Hesaplaması</h2>
+                    <p>Birim kâr-zarar bazında değerlendirilirken, birim giderleri personel maaşları, araç yakıt giderleri, ofis giderleri ve sigortalar olarak ayrılacaktır.</p>
+                </div>
+
+                <div class="rule">
+                    <h2>9. İş Emri Sekmeleri</h2>
+                    <p>Antakya servisi için iş emirleri; Standart İş Emri, FRC, AKM, Proje ve Üst Yapı olarak beş ayrı kategoriye ayrılacaktır. Avis için ise Standart İş Emri ve Ek Ürün İş Emri olarak iki kategori olacaktır.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+
+    <script>
+        // Initialize DataTables for the example table
+        document.addEventListener('DOMContentLoaded', function () {
+            new DataTable('#example');
+        });
+
+        // Initialize DataTables for the digerdepolar table
+        document.addEventListener('DOMContentLoaded', function () {
+            new DataTable('#digerdepolar');
+        });
+    </script>
+
+
+
+

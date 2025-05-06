@@ -1,0 +1,208 @@
+﻿@model List<Deneme_proje.Models.HrEntities.IzinTalepModel>
+
+@{
+    ViewData["Title"] = "İzinlerim";
+}
+
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">İzin Taleplerim</h5>
+                    </div>
+                    <div class="card-block px-0 py-0">
+                        @if (!Model.Any())
+                        {
+                            <div class="alert alert-info m-3">
+                                Görüntülenecek izin talebiniz bulunmamaktadır.
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="table-mobile-container">
+                                <table class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th class="min-tablet">Talep Tarihi</th>
+                                            <th class="min-tablet">İzin Tipi</th>
+                                            <th class="min-tablet">Gün</th>
+                                            <th class="min-tablet">Saat</th>
+                                            <th class="min-tablet">Başlangıç</th>
+                                            <th class="min-tablet">Bitiş</th>
+                                            <th class="min-tablet">İşe Başlama</th>
+                                            <th class="min-tablet">Amaç</th>
+                                            <th class="all">Durum</th>
+                                            <th class="min-tablet">Onaylayan</th>
+                                            <th class="all">İşlem</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var izin in Model)
+                                        {
+                                            <tr>
+                                                <td>@izin.TalepTarihi.ToShortDateString()</td>
+                                                <td>
+                                                    @{
+                                                        string izinTipi = izin.IzinTipi switch
+                                                        {
+                                                            0 => "Yıllık İzin",
+                                                            3 => "Askerlik",
+                                                            5 => "Devamsızlık",
+                                                            7 => "Diğer",
+                                                            8 => "Ücretsiz",
+                                                            10 => "Evlilik",
+                                                            11 => "Doğum",
+                                                            12 => "Babalık",
+                                                            13 => "Süt",
+                                                            14 => "Ölüm",
+                                                            15 => "İş Arama",
+                                                            _ => "Diğer"
+                                                        };
+                                                    }
+                                                    @izinTipi
+                                                </td>
+                                                <td>@izin.GunSayisi</td>
+                                                <td>@izin.IzinSaat</td>
+                                                <td>@izin.BaslangicTarihi.ToShortDateString()</td>
+                                                <td>@izin.BitisTarihi.ToShortDateString()</td>
+                                                <td>@izin.IseBaslamaTarihi.ToShortDateString()</td>
+                                                
+                                                <td>@izin.Amac</td>
+                                                <td>
+                                                    <span class="badge @(izin.IzinDurumu == 1 ? "bg-success" :
+                                                        izin.IzinDurumu == 2 ? "bg-danger" : "bg-warning")">
+                                                        @(izin.IzinDurumu == 1 ? "Onaylandı" :
+                                                            izin.IzinDurumu == 2 ? "Reddedildi" : "Beklemede")
+                                                    </span>
+                                                </td>
+                                                <td>@(izin.IzinDurumu == 0 ? "" : (string.IsNullOrEmpty(izin.OnaylayanKullanici) ? "-" : izin.OnaylayanKullanici))</td>
+                                                <td>
+                                                    <a href="/Hr/IzinTalepPdfIndir?izinGuid=@izin.Guid" class="btn btn-sm btn-primary" title="PDF İndir">
+                                                        <i class="fa fa-file-pdf-o"></i> PDF
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Yatay kaydırma için */
+    .table {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* iOS için daha iyi scroll */
+        scrollbar-width: thin;
+        scrollbar-color: #1D3A67 #f0f0f0;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+
+        .table::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .table::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .table::-webkit-scrollbar-thumb {
+            background: #1D3A67;
+            border-radius: 4px;
+        }
+
+    @@media screen and (max-width: 768px) {
+        .table {
+            position: relative !important;
+            display: block !important;
+            width: 100% !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+
+        .table-mobile-container {
+            overflow-x: auto !important;
+            max-width: 100% !important;
+            position: relative !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+
+        .table thead th {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 10 !important;
+            background-color: #f8f9fa !important;
+            white-space: nowrap !important;
+            min-width: 120px !important;
+            padding: 10px !important;
+            font-size: 14px !important;
+            box-shadow: inset 0 1px 0 #dee2e6, inset 0 -1px 0 #dee2e6 !important;
+        }
+
+        .table tbody td {
+            white-space: nowrap !important;
+            min-width: 120px !important;
+            padding: 10px !important;
+            font-size: 14px !important;
+            vertical-align: middle !important;
+        }
+
+        .badge {
+            white-space: nowrap !important;
+            font-size: 12px !important;
+            padding: 5px 8px !important;
+        }
+
+        .card {
+            margin: 0 -15px !important;
+            border-radius: 0 !important;
+        }
+
+        .px-lg-5 {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+    }
+
+    /* Scrollbar stilleri her ekran boyutu için */
+    .table-mobile-container::-webkit-scrollbar {
+        width: 8px !important;
+        height: 8px !important;
+    }
+
+    .table-mobile-container::-webkit-scrollbar-track {
+        background: #f0f0f0 !important;
+        border-radius: 4px !important;
+    }
+
+    .table-mobile-container::-webkit-scrollbar-thumb {
+        background: #1D3A67 !important;
+        border-radius: 4px !important;
+    }
+</style>

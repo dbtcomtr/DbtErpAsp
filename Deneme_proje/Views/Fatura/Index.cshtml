@@ -1,0 +1,305 @@
+﻿@model IEnumerable<Deneme_proje.Models.Entities.FaturaViewModel>
+
+@{
+    ViewData["Title"] = "Fatura Raporu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <h4>Kapalı Müşteri Fatura Analizi</h4>
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+                        
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-lg-5 mb-1">
+            <div class="col-lg-4">
+                <form action="@Url.Action("Index", "Bahcepinar")" method="get" class="form-inline">
+                    <div class="form-group">
+                        <label for="cariKodu" style="font-size: 12px;">Cari Unvanı:</label>
+                        <input type="text" id="cariKodu" name="cariKodu" class="form-control" placeholder="Cari Unvanı" required />
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-tumblr btn-shadow waves-effect waves-light">Sorgula</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style=" background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;"
+                         ">
+                        <h5 class="card-header-text text-white">Kapalı Müşteri Fatura Analizi</h5>
+                    </div>
+
+                    <div class="card-block accordion-block">
+                        <div class="col-md-12">
+
+                            <div id="example_wrapper" class="dataTables_wrapper py-lg-3">
+                                <div class="dataTables_length" id="example_length"></div>
+                                <div class="dataTables_filter" id="example_filter"></div>
+                                <div id="example_wrapper" class="table-wrapper">
+                                    <table id="example" class="display dataTable" style="width:100%">
+                                        <thead>
+                                            <tr class="tablo-icerik-yazi">
+                                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                    <div class="th-content">
+                                                        <span>Evrak No<span>
+                                                    </div>
+                                                </th>
+                                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                    <div class="th-content">
+                                                        <span>Cari Unvanı</span>
+                                                    </div>
+                                                </th>
+                                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                    <div class="th-content">
+                                                        <span>Fatura Tarihi</span>
+                                                    </div>
+                                                </th>
+                                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                    <div class="th-content">
+                                                        <span>Fatura Vade Tarihi</span>
+                                                    </div>
+                                                </th>
+                                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                    <div class="th-content">
+                                                        <span>Vade (Gün)</span>
+                                                    </div>
+                                                </th>
+                                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                    <div class="th-content">
+                                                        <span>Borç Tutarı</span>
+                                                    </div>
+                                                </th>
+                                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                    <div class="th-content">
+                                                        <span>Fatura A. O. Ths. Tarih</span>
+                                                    </div>
+                                                </th>
+                                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                    <div class="th-content">
+                                                        <span>Fatura A. O. Ths. Süresi (Gün)</span>
+                                                    </div>
+                                                </th>
+
+                                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                    <div class="th-content">
+                                                        <span>Vadeden sapma (Gün)</span>
+                                                    </div>
+                                                </th>
+
+                                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                    <div class="th-content">
+                                                        <span>Fonlama Amaliyeti (Günlük %)</span>
+                                                    </div>
+                                                </th>
+
+                                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                    <div class="th-content">
+                                                        <span>Faiz Gider Geliri (TL)</span>
+                                                    </div>
+                                                </th>
+
+
+                                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                    <div class="th-content">
+                                                        <span>Ticari Kredi Faiz Oranı (Yıllık)</span>
+                                                    </div>
+                                                </th>
+
+                                                <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+                                                    <div class="th-content">
+                                                        <span>İşlemler</span>
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                    @foreach (var group in Model.GroupBy(x => new { x.EvrakNo, x.CariKodu }))
+                    {
+                        var firstItem = group.First();
+                        var totalPayment = group.Sum(x => x.TaksitTutar);
+                        var sonuc1 = group.Sum(x => x.AlacakVadeTarihiSayi * Math.Round(x.TaksitTutar, 4));
+                        var faott1 = Math.Round((sonuc1 / group.Sum(x => x.TaksitTutar)), 4);
+
+                        var baseDate1 = new DateTime(1899, 12, 30);
+                        var daysToAdd1 = (int)faott1;
+                        var resultDate1 = baseDate1.AddDays(daysToAdd1);
+                        var faotsayi1 = faott1 - firstItem.FaturaTarihiSayi;
+                        var sapma1 = faotsayi1 - firstItem.FaturaVadesi;
+                        var fm1 = ((decimal)66.24 / 360) * sapma1;
+                        var fgg1 = Math.Round((totalPayment * fm1) / 100, 4);
+
+                                                <tr>
+                                                    <td>@firstItem.EvrakNo</td>
+                                                    <td class="cari-unvani-cell" data-bs-toggle="tooltip" title="@firstItem.CariUnvani">
+                                @firstItem.CariUnvani
+                                                    </td>
+                                                    <td>@firstItem.FaturaTarihi.ToString("dd.MM.yyyy")</td>
+                                                    <td>@firstItem.FaturaVadeTarihi.ToString("dd.MM.yyyy")</td>
+                                                    <td>@firstItem.FaturaVadesi</td>
+                                                    <td>@totalPayment.ToString("₺#,##0.00")</td>
+                                                    <td>@resultDate1.ToString("dd.MM.yyyy")</td>
+                                                    <td>@faotsayi1.ToString("0.00")</td>
+                                                    <td>@sapma1.ToString("0.00")</td>
+                                                    <td>@fm1.ToString("0.0000")</td>
+                                                    <td>@fgg1.ToString("0.00")</td>
+                                                    <td>@firstItem.FaizOrani.ToString("0.00")</td>
+                                                    <td>
+                                                        <!-- Detay butonu -->
+                                                      
+                                                        <button class="btn btn-tumblr btn-sm git-btn" type="button" data-bs-toggle="modal" data-bs-target="#detayModal" onclick="loadModalContent('@firstItem.EvrakNo-@firstItem.CariKodu')">
+                                                            Detay
+                                                        </button>
+
+                                                        <!-- Modal içeriği için gizli div -->
+                                                        <div id="content-@firstItem.EvrakNo-@firstItem.CariKodu" style="display:none;">
+                                                            <h6>@firstItem.CariUnvani - Detaylar</h6>
+
+                                                            <h6>Ödeme Detayları:</h6>
+                                                            <table class="table table-striped table-bordered">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Alacak Vade</th>
+                                                                        <th>Tutar (TL)</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                            @foreach (var item in group)
+                                            {
+                                                                        <tr>
+                                                                            <td>@item.AlacakVade.ToShortDateString()</td>
+                                                                            <td>@Math.Round(item.TaksitTutar, 4).ToString("F2")</td>
+                                                                        </tr>
+                                            }
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                    }
+                                        </tbody>
+
+                                    </table>
+                                </div>
+                                <div class="bottom">
+                                    <div class="dataTables_info" id="example_info"></div>
+                                    <div class="dataTables_paginate" id="example_paginate"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="detayModal" tabindex="-1" aria-labelledby="detayModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="detayModalLabel">Detaylar</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Modal içeriği buraya yüklenecek -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <script src="/Content/assets/plugins/jquery/dist/jquery.min.js"></script>
+        <script src="/Content/assets/plugins/jquery-ui/jquery-ui.min.js"></script>
+        <script src="/Content/assets/plugins/tether/dist/js/tether.min.js"></script>
+
+        <!-- Required Fremwork -->
+        <script src="/Content/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+        <!-- waves effects.js -->
+        <script src="/Content/assets/plugins/Waves/waves.min.js"></script>
+
+        <!-- Scrollbar JS-->
+        <script src="/Content/assets/plugins/jquery-slimscroll/jquery.slimscroll.js"></script>
+        <script src="/Content/assets/plugins/jquery.nicescroll/jquery.nicescroll.min.js"></script>
+
+        <!--classic JS-->
+        <script src="/Content/assets/plugins/classie/classie.js"></script>
+
+        <!-- notification -->
+        <script src="/Content/assets/plugins/notification/js/bootstrap-growl.min.js"></script>
+
+        <!-- custom js -->
+        <script type="text/javascript" src="/Content/assets/js/main.min.js"></script>
+        <script type="text/javascript" src="/Content/assets/pages/elements.js"></script>
+        <script src="/Content/assets/js/menu.min.js"></script>
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
+        <script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let table = new DataTable('#example');
+            });
+        </script>
+
+
+        <script>
+            $('#example').DataTable({
+                "dom": '<"row"<"col-sm-12"B>>' +
+                    '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+                    't' +
+                    '<"row"<"col-sm-6"i><"col-sm-6"p>>',
+                "language": {
+                    "url": "/Content/DataTables/turkish.json"
+                },
+                "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'], // Butonlar
+                "columnDefs": [
+                    { "targets": "_all" } // Kolon genişliklerini sabitleme
+                ]
+            });
+            function loadModalContent(id) {
+                let content = document.getElementById('content-' + id).innerHTML;
+                document.querySelector('#detayModal .modal-body').innerHTML = content;
+
+                var myModal = new bootstrap.Modal(document.getElementById('detayModal'), {
+                    keyboard: true
+                });
+                myModal.show();
+            }
+
+            document.getElementById('detayModal').addEventListener('hidden.bs.modal', function () {
+                document.querySelector('.modal-backdrop').remove();
+            });
+
+
+
+        </script>
+
+
+
+
+
+
