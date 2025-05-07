@@ -21,7 +21,7 @@ namespace Deneme_proje.Controllers
         }
         [AllowAnonymous]
         public async Task<IActionResult> Index()
-        {
+        {//
             try
             {
                 // Giriş yapmış kullanıcının bilgilerini al
