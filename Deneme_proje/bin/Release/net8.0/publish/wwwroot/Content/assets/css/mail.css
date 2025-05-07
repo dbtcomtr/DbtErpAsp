@@ -1,0 +1,744 @@
+﻿
+
+@media only screen and (max-width: 2600px) and (min-width: 1900px) {
+    .mail-baslik {
+        margin-left: 15%;
+        width: 70%
+    }
+
+    .body {
+        width: 80%;
+    }
+
+    .sayin {
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        margin-left: 23%;
+        color: #414141;
+    }
+
+    .name {
+        margin-left: 23%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+    }
+
+    .aciklama1 {
+        margin-left: 23%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+    }
+
+    .table {
+        margin-left: 23%;
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        border-collapse: collapse;
+        width: 78%;
+    }
+
+    .tr {
+        background-color: #FFFFFF;
+        color: #000000;
+    }
+
+    .ilkSutun {
+        width: 275px;
+        border: solid 1px #BFBFBF;
+        padding: 10px;
+        color: #cc0000;
+        background-color: #D4D4D4;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .sutunlar {
+        border: solid 1px #BFBFBF;
+        padding: 10px;
+        color: #cc0000;
+        background-color: #D4D4D4;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .altSatir {
+        background-color: #FFFFFF;
+        color: #000000;
+    }
+
+    .ikinciSatirIlkSutun {
+        border: solid 1px #C9C9C9;
+        padding: 10px;
+        font-size: 14px;
+        text-align: left;
+    }
+
+    .digerSutunlar {
+        border: solid 1px #C9C9C9;
+        padding: 10px;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .aciklama2 {
+        margin-left: 24%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+    }
+
+    .aydinlatma {
+        margin-left: 24%;
+        margin-bottom: -18px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 600;
+    }
+
+    .aydinlatmaMetni {
+        margin-left: 24%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+    }
+
+    .uyari {
+        margin-left: 24%;
+        margin-bottom: -18px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 600;
+    }
+
+    .uyariMetin {
+        margin-left: 24%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+    }
+
+    .alt1 {
+        margin-left: 15%;
+        background-color: #e9f1fd;
+        width: 70%;
+    }
+
+    .cozum {
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 800;
+        color: #183663;
+        margin-left: 43%;
+    }
+
+    .turkiye {
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+        color: #183663;
+        margin-left: 37%;
+        margin-top: -10px;
+    }
+
+    .telefon {
+        margin-left: 32%;
+        margin-bottom: 25px;
+    }
+
+    .mail {
+        margin-left: 8%;
+        margin-bottom: 25px;
+    }
+
+    .ticket {
+        margin-left: 8%;
+        margin-bottom: 25px;
+    }
+
+    .alt2 {
+        margin-left: 15%;
+        background-color: #183663;
+        width: 70%;
+        height: 230px;
+    }
+
+    .adam {
+        margin-left: 35%;
+        margin-top: 60px;
+    }
+
+    .facebook {
+        width: 70px;
+        margin-bottom: 15px;
+        margin-left: 25px;
+    }
+
+    .instagram {
+        width: 70px;
+        margin-bottom: 15px;
+    }
+
+    .twitter {
+        width: 70px;
+        margin-bottom: 15px;
+    }
+
+    .alt3 {
+        margin-left: 15%;
+        width: 70%;
+        height: 230px;
+    }
+
+    .mikro {
+        width: 100%;
+    }
+
+
+}
+
+
+@media only screen and (max-width: 1899px) and (min-width: 1400px) {
+    .mail-baslik {
+        margin-left: 15%;
+        width: 70%
+    }
+
+    .body {
+        width: 80%;
+    }
+
+    .sayin {
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        margin-left: 23%;
+        color: #414141;
+    }
+
+    .name {
+        margin-left: 23%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+    }
+
+    .aciklama1 {
+        margin-left: 23%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+    }
+
+    .table {
+        margin-left: 23%;
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        border-collapse: collapse;
+        width: 78%;
+    }
+
+    .tr {
+        background-color: #FFFFFF;
+        color: #000000;
+    }
+
+    .ilkSutun {
+        width: 275px;
+        border: solid 1px #BFBFBF;
+        padding: 10px;
+        color: #cc0000;
+        background-color: #D4D4D4;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .sutunlar {
+        border: solid 1px #BFBFBF;
+        padding: 10px;
+        color: #cc0000;
+        background-color: #D4D4D4;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .altSatir {
+        background-color: #FFFFFF;
+        color: #000000;
+    }
+
+    .ikinciSatirIlkSutun {
+        border: solid 1px #C9C9C9;
+        padding: 10px;
+        font-size: 14px;
+        text-align: left;
+    }
+
+    .digerSutunlar {
+        border: solid 1px #C9C9C9;
+        padding: 10px;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .aciklama2 {
+        margin-left: 24%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+    }
+
+    .aydinlatma {
+        margin-left: 24%;
+        margin-bottom: -18px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 600;
+    }
+
+    .aydinlatmaMetni {
+        margin-left: 24%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+    }
+
+    .uyari {
+        margin-left: 24%;
+        margin-bottom: -18px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 600;
+    }
+
+    .uyariMetin {
+        margin-left: 24%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+    }
+
+    .alt1 {
+        margin-left: 15%;
+        background-color: #e9f1fd;
+        width: 70%;
+    }
+
+    .cozum {
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 800;
+        color: #183663;
+        margin-left: 40%;
+    }
+
+    .turkiye {
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+        color: #183663;
+        margin-left: 32%;
+        margin-top: -10px;
+    }
+
+    .telefon {
+        margin-left: 28%;
+        margin-bottom: 20px;
+    }
+
+    .mail {
+        margin-left: 8%;
+        margin-bottom: 25px;
+    }
+
+    .ticket {
+        margin-left: 8%;
+        margin-bottom: 25px;
+    }
+
+    .alt2 {
+        margin-left: 15%;
+        background-color: #183663;
+        width: 70%;
+        height: 230px;
+    }
+
+    .adam {
+        margin-left: 30%;
+        margin-top: 60px;
+    }
+
+    .facebook {
+        width: 70px;
+        margin-bottom: 15px;
+        margin-left: 25px;
+    }
+
+    .instagram {
+        width: 70px;
+        margin-bottom: 15px;
+    }
+
+    .twitter {
+        width: 70px;
+        margin-bottom: 15px;
+    }
+
+    .alt3 {
+        margin-left: 15%;
+        width: 70%;
+        height: 230px;
+    }
+
+    .mikro {
+        width: 100%;
+    }
+}
+
+@media only screen and (max-width: 1399px) and (min-width: 1100px) {
+    .mail-baslik {
+        margin-left: 15%;
+        width: 70%
+    }
+
+    .body {
+        width: 80%;
+    }
+
+    .sayin {
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        margin-left: 23%;
+        color: #414141;
+    }
+
+    .name {
+        margin-left: 23%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+    }
+
+    .aciklama1 {
+        margin-left: 23%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+    }
+
+    .table {
+        margin-left: 23%;
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        border-collapse: collapse;
+        width: 78%;
+    }
+
+    .tr {
+        background-color: #FFFFFF;
+        color: #000000;
+    }
+
+    .ilkSutun {
+        width: 275px;
+        border: solid 1px #BFBFBF;
+        padding: 10px;
+        color: #cc0000;
+        background-color: #D4D4D4;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .sutunlar {
+        border: solid 1px #BFBFBF;
+        padding: 10px;
+        color: #cc0000;
+        background-color: #D4D4D4;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .altSatir {
+        background-color: #FFFFFF;
+        color: #000000;
+    }
+
+    .ikinciSatirIlkSutun {
+        border: solid 1px #C9C9C9;
+        padding: 10px;
+        font-size: 14px;
+        text-align: left;
+    }
+
+    .digerSutunlar {
+        border: solid 1px #C9C9C9;
+        padding: 10px;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .aciklama2 {
+        margin-left: 24%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+    }
+
+    .aydinlatma {
+        margin-left: 24%;
+        margin-bottom: -18px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 600;
+    }
+
+    .aydinlatmaMetni {
+        margin-left: 24%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+    }
+
+    .uyari {
+        margin-left: 24%;
+        margin-bottom: -18px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 600;
+    }
+
+    .uyariMetin {
+        margin-left: 24%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+    }
+
+    .alt1 {
+        margin-left: 15%;
+        background-color: #e9f1fd;
+        width: 70%;
+    }
+
+    .cozum {
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 800;
+        color: #183663;
+        margin-left: 37%;
+    }
+
+    .turkiye {
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+        color: #183663;
+        margin-left: 28%;
+        margin-top: -10px;
+    }
+
+    .telefon {
+        margin-left: 23%;
+        margin-bottom: 20px;
+    }
+
+    .mail {
+        margin-left: 8%;
+        margin-bottom: 25px;
+    }
+
+    .ticket {
+        margin-left: 8%;
+        margin-bottom: 25px;
+    }
+
+    .alt2 {
+        margin-left: 15%;
+        background-color: #183663;
+        width: 70%;
+        height: 230px;
+    }
+
+    .adam {
+        margin-left: 25%;
+        margin-top: 60px;
+    }
+
+    .facebook {
+        width: 70px;
+        margin-bottom: 15px;
+        margin-left: 25px;
+    }
+
+    .instagram {
+        width: 70px;
+        margin-bottom: 15px;
+    }
+
+    .twitter {
+        width: 70px;
+        margin-bottom: 15px;
+    }
+
+    .alt3 {
+        margin-left: 15%;
+        width: 70%;
+        height: 230px;
+    }
+
+    .mikro {
+        width: 100%;
+    }
+}
+
+@media only screen and (max-width: 1099px) and (min-width: 800px) {
+    .mail-baslik {
+        margin-left: 15%;
+        width: 70%
+    }
+
+    .body {
+        width: 80%;
+    }
+
+    .sayin {
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        margin-left: 23%;
+        color: #414141;
+    }
+
+    .name {
+        margin-left: 23%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+    }
+
+    .aciklama1 {
+        margin-left: 23%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+    }
+
+    .table {
+        margin-left: 23%;
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        border-collapse: collapse;
+        width: 78%;
+    }
+
+    .tr {
+        background-color: #FFFFFF;
+        color: #000000;
+    }
+
+    .ilkSutun {
+        width: 275px;
+        border: solid 1px #BFBFBF;
+        padding: 10px;
+        color: #cc0000;
+        background-color: #D4D4D4;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .sutunlar {
+        border: solid 1px #BFBFBF;
+        padding: 10px;
+        color: #cc0000;
+        background-color: #D4D4D4;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .altSatir {
+        background-color: #FFFFFF;
+        color: #000000;
+    }
+
+    .ikinciSatirIlkSutun {
+        border: solid 1px #C9C9C9;
+        padding: 10px;
+        font-size: 14px;
+        text-align: left;
+    }
+
+    .digerSutunlar {
+        border: solid 1px #C9C9C9;
+        padding: 10px;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .aciklama2 {
+        margin-left: 24%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+    }
+
+    .aydinlatma {
+        margin-left: 24%;
+        margin-bottom: -18px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 600;
+    }
+
+    .aydinlatmaMetni {
+        margin-left: 24%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+    }
+
+    .uyari {
+        margin-left: 24%;
+        margin-bottom: -18px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 600;
+    }
+
+    .uyariMetin {
+        margin-left: 24%;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+    }
+
+    .alt1 {
+        margin-left: 15%;
+        background-color: #e9f1fd;
+        width: 70%;
+    }
+
+    .cozum {
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 800;
+        color: #183663;
+        margin-left: 33%;
+    }
+
+    .turkiye {
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 500;
+        color: #183663;
+        margin-left: 21%;
+        margin-top: -10px;
+    }
+
+    .telefon {
+        margin-left: 18%;
+        margin-bottom: 20px;
+    }
+
+    .mail {
+        margin-left: 8%;
+        margin-bottom: 25px;
+    }
+
+    .ticket {
+        margin-left: 8%;
+        margin-bottom: 25px;
+    }
+
+    .alt2 {
+        margin-left: 15%;
+        background-color: #183663;
+        width: 70%;
+        height: 230px;
+    }
+
+    .adam {
+        margin-left: 17%;
+        margin-top: 60px;
+    }
+
+    .facebook {
+        width: 70px;
+        margin-bottom: 15px;
+        margin-left: 25px;
+    }
+
+    .instagram {
+        width: 70px;
+        margin-bottom: 15px;
+    }
+
+    .twitter {
+        width: 70px;
+        margin-bottom: 15px;
+    }
+
+    .alt3 {
+        margin-left: 15%;
+        width: 70%;
+        height: 230px;
+    }
+
+    .mikro {
+        width: 100%;
+    }
+}

@@ -1,0 +1,283 @@
+﻿.table-responsive table {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.table-responsive th, .table-responsive td {
+    padding: 7px 20px;
+}
+
+    .table-responsive td.meblag-cell {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+.cari-adi-cell {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.right-align {
+    text-align: right;
+}
+
+.table-bordered>:not(caption)>*>* {
+    border-width: 0px 1px;
+}
+
+/*@media print {*/
+    /* Sayfa düzenini ayarlayın */
+    /*body {
+        font-size: 6pt;*/ /* Yazı tipi boyutunu küçültüyoruz */
+        /*margin: 0;
+        padding: 0;
+    }*/
+
+    /* Gereksiz öğeleri gizleyin */
+    /*.card-header, .form-group, #resetButton, #printButton {
+        display: none;
+    }*/
+
+    /* Tabloların taşmasını ve kesilmesini engelleyin */
+    /*.table-container {
+        display: block;
+        page-break-inside: avoid;
+    }*/
+
+    /* Tablo genişliğini sabit tutun ve font büyümesini engelleyin */
+    /*.table {
+        width: 100%;*/ /* Genişliği her zaman %100 olarak sabitleyin */
+
+        /*table-layout: fixed;*/ /* Sabit tablo düzeni kullanarak genişliği kontrol edin */
+        /*font-size: 6pt;*/ /* Yazı tipi boyutunu daha da küçültüyoruz */
+    /*}*/
+
+    /* Hücrelerde taşma olmasını engelleyin ve içeriği kısaltın */
+    /*td, th {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 30px;*/ /* Hücre genişliklerini daha da küçültüyoruz */
+        /*@media print {*/
+    /* Sayfa düzenini ayarlayın */
+    /*body {
+        font-size: 6pt;*/ /* Yazı tipi boyutunu küçültüyoruz */
+        /*margin: 0;
+        padding: 0;
+    }*/
+
+    /* Gereksiz öğeleri gizleyin */
+    /*.card-header, .form-group, #resetButton, #printButton {
+        display: none;
+    }*/
+
+    /* Tabloların taşmasını ve kesilmesini engelleyin */
+    /*.table-container {
+        display: block;
+        page-break-inside: avoid;
+    }*/
+
+    /* Tablo genişliğini sabit tutun ve font büyümesini engelleyin */
+    /*.table {
+        width: 100%;*/ /* Genişliği her zaman %100 olarak sabitleyin */
+        /*table-layout: fixed;*/ /* Sabit tablo düzeni kullanarak genişliği kontrol edin */
+        /*font-size: 6pt;*/ /* Yazı tipi boyutunu daha da küçültüyoruz */
+    /*}*/
+
+    /* Hücrelerde taşma olmasını engelleyin ve içeriği kısaltın */
+            /*td, th {
+                overflow: hidden;
+                height: 3px;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                max-width: 30px;*/ /* Hücre genişliklerini daha da küçültüyoruz */
+                /*padding: 2px;*/ /* Hücrelerde daha küçük padding kullanıyoruz */
+                /*vertical-align: middle;*/ /* Hücre içeriğinin hizalanmasını sağlıyoruz */
+            /*}*/
+
+    /* Tablo satırlarının sabit boyutta kalmasını sağlayın */
+    /*tr {
+        height: 3px;*/ /* Satır yüksekliğini küçültüyoruz */
+    /*}*/
+
+    /* İçerik taşmasını engelleyin ve tablo boyutunu sabitleyin */
+    /*.table-responsive {
+        overflow: visible !important;
+        max-height: none;
+    }*/
+
+    /* Sayfa kırılmalarını engellemek için */
+    /*tr, td, th {
+        page-break-inside: avoid;
+    }*/
+
+    /* Satır ve kolonlarda kırılmaları önleyin */
+    /*.row, .col-md-6 {
+        page-break-inside: avoid;
+    }
+}
+
+        padding: 2px;*/ /* Hücrelerde daha küçük padding kullanıyoruz */
+        /*vertical-align: middle;*/ /* Hücre içeriğinin hizalanmasını sağlıyoruz */
+    /*}*/
+
+    /* Tablo satırlarının sabit boyutta kalmasını sağlayın */
+    /*tr {
+        height: 8px;*/ /* Satır yüksekliğini küçültüyoruz */
+    /*}*/
+
+    /* İçerik taşmasını engelleyin ve tablo boyutunu sabitleyin */
+    /*.table-responsive {
+        overflow: visible !important;
+        max-height: none;
+    }*/
+
+    /* Sayfa kırılmalarını engellemek için */
+    /*tr, td, th {
+        page-break-inside: avoid;
+    }*/
+
+    /* Satır ve kolonlarda kırılmaları önleyin */
+    /*.row, .col-md-6 {
+        page-break-inside: avoid;
+    }
+}*/
+
+.print-only {
+    display: none;
+}
+
+@media print {
+    .print-only {
+        display: block !important;
+        font-size: 18px;
+        margin-bottom: 20px;
+    }
+    /* Tabloları yazdırma sırasında tam genişlikte göster */
+    table {
+        margin-top: 50px;
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .page-break {
+        page-break-before: always; /* Yeni sayfa başlangıcı */
+    }
+
+        /* Tabloların hücrelerini daha dar göstermek için padding azaltma */
+        th, td {
+        padding: 4px;
+    }
+
+    td, th {
+        white-space: normal; /* Hücre içindeki metnin normal şekilde satır atlamasını sağla */
+        overflow: visible; /* Yazdırma sırasında overflow'u kapat */
+        word-wrap: break-word; /* Çok uzun kelimelerin satır atlamasını sağla */
+        text-overflow: clip; /* Metin kesilmesin, tamamı görünsün */
+        max-width: none; /* Hücre genişliği kısıtlamasını kaldır */
+    }
+
+    /* İçeriklerin kağıda sığması için font boyutunu küçültme */
+    body {
+        font-size: 12px;
+        line-height: 1.2;
+        margin: 0; /* Kenar boşluklarını kaldırma */
+        padding: 0;
+    }
+
+    /* Tüm sayfayı yazdırabilmek için overflow ayarlarını kaldırma */
+    html, body {
+        overflow: visible !important;
+        height: auto !important;
+    }
+
+    /* Scroll barları gizle */
+    ::-webkit-scrollbar {
+        display: none;
+    }
+    .yazici_baslik {
+        margin: 3rem 0 !important;
+    }
+    /* Yazdırma sırasında ekran öğelerini gizleme */
+    .no-print, .btn, .card-header, .header-title {
+        display: none !important;
+    }
+
+    /* Sayfa düzenini yazdırma için optimize etme */
+    .container-fluid, .row {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Tabloların tam genişlikte görünmesi */
+    .table-responsive {
+        margin-top: 50px;
+        overflow: visible !important;
+        margin: 0; /* Tablonun etrafındaki boşlukları kaldırma */
+        padding: 0;
+    }
+
+    /* Başlık ile tablo arasındaki boşluğu minimumda tutma */
+    h5 {
+        margin: 0;
+        padding: 0;
+        page-break-after: avoid; /* Başlığın tablo ile aynı sayfada olmasını sağla */
+    }
+
+        /* Tablo ve başlıklar sıkı hizalanacak */
+        h5 + .table-responsive {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+    /* Tablo, satır aralıklarını daralt */
+    th, td {
+        page-break-inside: avoid; /* Hücreler bölünmesin */
+        padding: 4px;
+    }
+
+    /* Sayfa kenar boşluklarını kaldırma */
+    @page {
+        margin: 0; /* Baskı sayfasındaki kenar boşluklarını küçültme */
+    }
+}
+
+
+
+
+@media (max-width: 768px) {
+    .table {
+        table-layout: fixed; /* Sabit tablo düzeni */
+    }
+
+        .table thead th, .table tbody td {
+            font-size: 12px; /* Mobilde font boyutlarını küçültüyoruz */
+            padding: 6px;
+            white-space: normal; /* Satır başlıklarının iki satıra kadar sarılmasına izin ver */
+        }
+
+        .table thead th {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-wrap: break-word; /* Uzun başlıkların iki satıra bölünmesine izin ver */
+        }
+
+    /* Mobilde input alanlarını büyütüyoruz */
+    .form-control-sm {
+        font-size: 16px; /* Font boyutunu artırdık */
+        padding: 10px; /* Daha geniş padding ile input alanını büyüttük */
+    }
+
+    .btn-sm {
+        font-size: 12px; /* Butonları biraz daha büyük yapıyoruz */
+        padding: 6px 12px;
+    }
+}
+
+
+
+
+}

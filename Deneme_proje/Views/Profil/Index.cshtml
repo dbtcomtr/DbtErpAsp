@@ -1,0 +1,267 @@
+﻿@model Deneme_proje.Controllers.ProfilViewModel
+@{
+    ViewBag.Title = "Profilim";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .profile-container {
+        font-size: 24px;
+        max-width: 1200px;
+        margin: auto;
+        padding: 60px 20px;
+    }
+
+    .profile-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 30px; /* Adds space between cards */
+    }
+
+    .profile-card {
+        font-size: 24px;
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        padding: 2.5rem;
+        transition: 0.3s;
+        height: 100%; /* Makes cards the same height */
+    }
+
+        .profile-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+    .user-icon {
+        font-size: 100px;
+        color: #4e73df;
+    }
+
+    .form-default label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+    }
+
+    .btn-round {
+        border-radius: 25px;
+        padding: 12px 35px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+        .btn-round:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78, 115, 223, 0.3);
+        }
+
+    .alert {
+        border-radius: 12px;
+        font-weight: 500;
+        margin-bottom: 25px;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        box-shadow: none;
+        padding: 12px 15px;
+        margin-bottom: 15px;
+    }
+
+    /* Added for responsive behavior */
+    @@media (max-width: 992px) {
+        .profile-row
+
+    {
+        flex-direction: column;
+    }
+
+    .profile-card {
+        margin-bottom: 30px;
+    }
+
+    }
+</style>
+
+<div class="main-content mt-5 profile-container">
+    <!-- Alert Messages -->
+    <div id="successMessage" class="alert alert-success" style="display: none;">
+        <i class="fa fa-check-circle mr-2"></i>
+        <span id="successMessageText"></span>
+    </div>
+
+    <div id="errorMessage" class="alert alert-danger" style="display: none;">
+        <i class="fa fa-exclamation-circle mr-2"></i>
+        <span id="errorMessageText"></span>
+    </div>
+
+    <div class="profile-row">
+        <!-- Kullanıcı Kartı -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="profile-card text-center">
+                <i class="fa fa-user-circle user-icon mb-4"></i>
+                <h4 class="mb-3">@Model.Username</h4>
+                <p class="text-muted mb-2">Kullanıcı No: @Model.UserNo</p>
+                <p class="text-muted mb-4">Son Giriş: @DateTime.Now.ToString("dd.MM.yyyy HH:mm")</p>
+                <hr class="my-4" />
+                <div class="d-flex justify-content-center mt-4">
+                    <div>
+                        <i class="fa fa-envelope text-primary"></i>
+                        <p class="mt-2">@Model.Email</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Şifre Değiştir -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="profile-card">
+                <h4 class="mb-4"><i class="fa fa-key mr-2 text-success"></i>Şifre Değiştir</h4>
+                <form id="sifreDegistirForm" method="post" action="javascript:void(0);">
+                    @Html.AntiForgeryToken()
+                    <div class="form-group form-default">
+                        <label>Mevcut Şifre</label>
+                        <input type="password" id="mevcutSifre" name="mevcutSifre" class="form-control" required>
+                    </div>
+                    <div class="form-group form-default">
+                        <label>Yeni Şifre</label>
+                        <input type="password" id="yeniSifre" name="yeniSifre" class="form-control" required>
+                        <small class="text-muted">En az 6 karakter</small>
+                    </div>
+                    <div class="form-group form-default">
+                        <label>Şifre Tekrarı</label>
+                        <input type="password" id="sifreTekrari" name="sifreTekrari" class="form-control" required>
+                        <div id="sifreUyusmazlik" class="text-danger mt-1" style="display: none;">Şifreler eşleşmiyor!</div>
+                    </div>
+                    <div class="text-center mt-5">
+                        <button type="button" id="sifreGuncelleBtn" class="btn btn-primary btn-round" onclick="sifreDegistir()">
+                            <i class="fa fa-refresh mr-2"></i>Şifreyi Güncelle
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Sayfa yüklendiğinde çalışacak işlemler
+        $(document).ready(function() {
+            // Şifre eşleşme kontrolü
+            $('#sifreTekrari').on('input', function() {
+                if ($('#yeniSifre').val() !== $(this).val()) {
+                    $('#sifreUyusmazlik').show();
+                    $(this).addClass('is-invalid');
+                } else {
+                    $('#sifreUyusmazlik').hide();
+                    $(this).removeClass('is-invalid');
+                }
+            });
+        });
+
+        // Global değişkenler
+        var isSubmitting = false;
+
+        // Şifre değiştirme fonksiyonu - doğrudan bu fonksiyon çağrılacak
+        function sifreDegistir() {
+            // Çift tıklama önleme
+            if (isSubmitting) return;
+            isSubmitting = true;
+
+            // Şifre geçerliliği kontrolü
+            const mevcutSifre = $('#mevcutSifre').val();
+            const yeniSifre = $('#yeniSifre').val();
+            const sifreTekrari = $('#sifreTekrari').val();
+
+            if (!mevcutSifre || !yeniSifre || !sifreTekrari) {
+                showMessage('error', 'Lütfen tüm alanları doldurun.');
+                isSubmitting = false;
+                return;
+            }
+
+            if (yeniSifre.length < 6) {
+                showMessage('error', 'Yeni şifre en az 6 karakter olmalıdır.');
+                isSubmitting = false;
+                return;
+            }
+
+            if (yeniSifre !== sifreTekrari) {
+                showMessage('error', 'Şifreler eşleşmiyor.');
+                isSubmitting = false;
+                return;
+            }
+
+            // Buton yükleniyor animasyonu
+            var btnText = $('#sifreGuncelleBtn').html();
+            $('#sifreGuncelleBtn').html('<i class="fa fa-spinner fa-spin mr-2"></i>İşleniyor...');
+            $('#sifreGuncelleBtn').prop('disabled', true);
+
+            // CSRF token al
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            // AJAX ile POST isteği
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("SifreDegistir", "Profil")',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    MevcutSifre: mevcutSifre,
+                    YeniSifre: yeniSifre,
+                    SifreTekrari: sifreTekrari
+                }),
+                headers: {
+                    'RequestVerificationToken': token
+                },
+                success: function(response) {
+                    if (response && response.success) {
+                        showMessage('success', response.message || 'Şifreniz başarıyla değiştirildi.');
+                        // Form alanlarını temizle
+                        $('#mevcutSifre').val('');
+                        $('#yeniSifre').val('');
+                        $('#sifreTekrari').val('');
+                    } else {
+                        showMessage('error', (response && response.message) || 'Şifre değiştirme işlemi başarısız oldu.');
+                    }
+                },
+                error: function(xhr) {
+                    console.log("Hata:", xhr);
+                    var errorMsg = 'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    showMessage('error', errorMsg);
+                },
+                complete: function() {
+                    // İşlem tamamlandığında butonu normal haline getir
+                    $('#sifreGuncelleBtn').html(btnText);
+                    $('#sifreGuncelleBtn').prop('disabled', false);
+                    isSubmitting = false;
+                }
+            });
+        }
+
+        // Mesaj gösterme fonksiyonu
+        function showMessage(type, message) {
+            if (type === 'success') {
+                $('#successMessageText').text(message);
+                $('#successMessage').fadeIn();
+                $('#errorMessage').hide();
+            } else {
+                $('#errorMessageText').text(message);
+                $('#errorMessage').fadeIn();
+                $('#successMessage').hide();
+            }
+
+            // 5 saniye sonra mesajı gizle
+            setTimeout(function() {
+                $('#successMessage').fadeOut();
+                $('#errorMessage').fadeOut();
+            }, 5000);
+
+            // Sayfanın üst kısmına scroll yap
+            $('html, body').animate({ scrollTop: 0 }, 'smooth');
+        }
+    </script>
+}

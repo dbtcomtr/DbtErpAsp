@@ -10,364 +10,411 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="description" content="codedthemes">
-    <meta name="keywords" content=", Responsive, Landing, Bootstrap, App, Template, Mobile, iOS, Android, apple, creative app">
-    <meta name="author" content="codedthemes">
+    <meta name="description" content="Modern and secure login interface for DBT Partner">
+    <meta name="keywords" content="login, responsive, secure, modern, app">
+    <meta name="author" content="DBT Partner">
 
-    <!-- Favicon icon -->
+    <!-- Favicon -->
     <link rel="shortcut icon" href="/Content/assets/images/favicon.png" type="image/x-icon">
     <link rel="icon" href="~/favicon.ico" type="image/x-icon">
 
-    <!-- Google font-->
-    <link href="https://fonts.googleapis.com/css?family=Ubuntu:400,500,700" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
     <link href="~/Content/assets/css/font-awesome.min.css" rel="stylesheet" />
 
-    <!--ico Fonts-->
-    <link href="~/Content/assets/icon/icofont/css/icofont.css" rel="stylesheet" />
-
-    <!-- Required Fremwork -->
+    <!-- Bootstrap -->
     <link href="~/Content/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 
-    <!-- waves css -->
-    <link href="~/Content/assets/plugins/Waves/waves.min.css" rel="stylesheet" />
-
-    <!-- Style.css -->
-    <link href="~/Content/assets/css/main.css" rel="stylesheet" />
-
-    <!-- Responsive.css-->
-    <link href="~/Content/assets/css/responsive.css" rel="stylesheet" />
-
-    <!--color css-->
-    <link href="~/Content/assets/css/color/color-1.min.css" rel="stylesheet" id="color" />
-
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.10/dist/sweetalert2.all.min.js"></script>
+
     <style>
-        /* Background styling */
-        .login {
-            background: radial-gradient(circle, rgba(0, 149, 212, 1) 0%, rgba(23, 96, 150, 1) 63%);
+        :root {
+            --primary-color: #1e3a8a;
+            --accent-color: #3b82f6;
+            --bg-gradient: linear-gradient(135deg, #1e3a8a, #4f46e5);
+            --text-color: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            padding: 20px;
+            overflow: hidden;
+            position: relative;
         }
 
-        /* Card styling */
-        .login-card {
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-            max-width: 420px;
+        /* Particle Background */
+        #particles-js {
+            position: absolute;
             width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Login Container */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        /* Login Card */
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeIn 1s ease-in-out;
         }
 
             .login-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+                transform: translateY(-10px);
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
             }
 
-        /* Input wrapper with floating label */
-        .md-input-wrapper {
-            position: relative;
-            margin-bottom: 30px;
-            padding-top: 10px;
+        @@keyframes fadeIn {
+            from
+
+        {
+            opacity: 0;
+            transform: scale(0.9);
         }
 
-            .md-input-wrapper input {
-                width: 100%;
-                padding: 14px 12px;
-                font-size: 16px;
-                border: 1px solid rgba(23, 96, 150, 0.4);
-                border-radius: 6px;
-                transition: border-color 0.3s, box-shadow 0.3s;
-                background-color: rgba(255, 255, 255, 0.9);
-                z-index: 1;
-                color: #707070;
-            }
-
-                .md-input-wrapper input:focus {
-                    border-color: rgba(0, 149, 212, 0.8);
-                    box-shadow: 0 0 8px rgba(0, 149, 212, 0.3);
-                    outline: none;
-                }
-
-            .md-input-wrapper label {
-                position: absolute;
-                top: 16px;
-                left: 14px;
-                font-size: 14px !important;
-                color: #176096 !important;
-                transition: all 0.3s ease;
-                pointer-events: none;
-                background-color: rgba(255, 255, 255, 0.9);
-                padding: 0 4px;
-                transform-origin: left;
-            }
-
-            .md-input-wrapper input:focus + label,
-            .md-input-wrapper input:not(:placeholder-shown) + label {
-                top: -10px;
-                left: 0;
-                font-size: 12px;
-                color: rgba(0, 149, 212, 0.9);
-                background: #ffffff;
-                padding: 0 5px;
-                border-radius: 4px;
-            }
-
-        /* Button styling */
-        .btn-primary {
-            background: linear-gradient(45deg, #007bff, #0056b3);
-            border: none;
-            padding: 12px;
-            font-size: 17px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            color: white;
-            width: auto;
-            margin: 0 auto;
-            display: flex;
-            justify-content: center;
+        to {
+            opacity: 1;
+            transform: scale(1);
         }
 
-            .btn-primary:hover {
-                background: linear-gradient(45deg, #0056b3, #003b75);
-            }
-        /* Basit Checkbox Stili /*/
-        .rkmd-checkbox {
-            display: flex;
-            align-items: center; /* Elemanların dikey olarak hizalanmasını sağlar */
-            margin-top: 10px;
         }
 
-        .input-checkbox {
-            -webkit-appearance: none; /* Safari ve eski tarayıcılar için /*/
-            -moz-appearance: none; /* Firefox için */
-            appearance: none; /* Diğer tarayıcılar için */
-            width: 20px !important;
-            height: 20px !important;
-            border: 2px solid rgba(23, 96, 150, 0.8);
-            border-radius: 4px;
-            margin-right: 10px; /* Checkbox ile yazı arasındaki boşluk */
-            cursor: pointer;
-            outline: none;
-            background-color: transparent;
-            position: relative !important;
-            display: inline-block; /* Elemanların yatayda hizalanması */
-        }
-
-            .input-checkbox:checked {
-                background-color: rgba(0, 149, 212, 0.9);
-                border-color: rgba(0, 149, 212, 0.9);
-            }
-
-            .input-checkbox::after {
-                content: '';
-                position: absolute;
-                top: 2px; /* Tik işaretinin konumunu ayarlayın */
-                left: 6px; /*Tik işaretinin konumunu ayarlayın*/
-                width: 6px;
-                height: 12px;
-                border: solid white;
-                border-width: 0 2px 2px 0;
-                transform: rotate(45deg);
-                display: none; /*Varsayılan olarak tik işaretini gizle */
-            }
-
-            .input-checkbox:checked::after {
-                display: block; /* Tik işaretini göster */
-            }
-
-        .captions {
-            font-size: 14px;
-            color: #333;
-            user-select: none;
-            cursor: pointer;
-            padding: 0 !important;
-        }
-
-        /* Image styling */
-        .text-center img {
-            width: 130px;
-            margin-bottom: 25px;
+        /* Logo */
+        .login-card img {
+            width: 120px;
+            margin-bottom: 20px;
             transition: transform 0.3s ease;
         }
 
-            .text-center img:hover {
-                transform: scale(1.05);
+            .login-card img:hover {
+                transform: scale(1.1);
             }
 
-        /* Responsive adjustments */
-        @@media (max-width: 768px) {
-            .login-card {
-                padding: 30px 20px;
-            }
-
-            .btn-primary {
-                font-size: 15px;
-                padding: 10px;
-            }
+        /* Title */
+        .login-card h4 {
+            color: var(--text-color);
+            font-weight: 700;
+            font-size: 24px;
+            margin-bottom: 30px;
+            text-align: center;
+            letter-spacing: 1px;
+            animation: slideIn 0.5s ease;
         }
+
+        @@keyframes slideIn {
+            from
+
+        {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        }
+
+        /* Form Inputs */
+        .form-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+            .form-group input {
+                width: 100%;
+                padding: 12px 15px;
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 8px;
+                color: var(--text-color);
+                font-size: 16px;
+                transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            }
+
+                .form-group input:focus {
+                    border-color: var(--accent-color);
+                    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+                    outline: none;
+                }
+
+            .form-group label {
+                position: absolute;
+                top: 50%;
+                left: 15px;
+                transform: translateY(-50%);
+                color: rgba(255, 255, 255, 0.7);
+                font-size: 14px;
+                pointer-events: none;
+                transition: all 0.3s ease;
+            }
+
+            .form-group input:focus + label,
+            .form-group input:not(:placeholder-shown) + label {
+                top: -10px;
+                left: 10px;
+                font-size: 12px;
+                color: var(--accent-color);
+                background: var(--glass-bg);
+                padding: 0 5px;
+            }
+
+        /* Checkbox */
+        .rkmd-checkbox {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .input-checkbox {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent-color);
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.3s ease;
+        }
+
+            .input-checkbox:checked {
+                background-color: var(--accent-color);
+            }
+
+                .input-checkbox:checked::after {
+                    content: '\f00c';
+                    font-family: 'FontAwesome';
+                    color: var(--text-color);
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    font-size: 12px;
+                }
+
+        .captions {
+            color: var(--text-color);
+            font-size: 14px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        /* Button */
+        .btn-primary {
+            background: var(--bg-gradient);
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            color: var(--text-color);
+            width: 100%;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+            .btn-primary::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                transition: left 0.5s ease;
+            }
+
+            .btn-primary:hover::before {
+                left: 100%;
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-3px);
+            }
+
+        /* Forgot Password Link */
+        .forgot-password {
+            color: var(--accent-color);
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 15px 0;
+            transition: color 0.3s ease;
+        }
+
+            .forgot-password:hover {
+                color: #93c5fd;
+            }
 
         /* Modal Styling */
-        .modal-backdrop {
-            position: fixed;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            z-index: 1040 !important;
-            background-color: #000;
-        }
-
         .modal {
-            z-index: 1050 !important;
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
+            z-index: 1050;
+            background: rgba(0, 0, 0, 0.7);
         }
 
         .modal-dialog {
             max-width: 500px;
-            width: 90%;
             margin: 30px auto;
-            position: relative;
-            top: 50%;
-            transform: translateY(-50%) !important;
+            animation: scaleIn 0.3s ease;
+        }
+
+        @@keyframes scaleIn {
+            from
+
+        {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+
         }
 
         .modal-content {
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            border: none;
-            background-color: #f8f9fa;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
         }
 
         .modal-header {
-            background-color: rgba(22, 46, 84, 1);
+            background: var(--bg-gradient);
             border-bottom: none;
-            color: white;
             padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
         }
 
         .modal-title {
-            font-size: 1.25rem;
-            font-weight: 500;
+            font-size: 20px;
+            font-weight: 600;
         }
 
         .modal-body {
             padding: 20px;
-            max-height: 500px;
-            overflow-y: auto;
         }
 
-        .modal-footer {
-            border-top: none;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: flex-end;
+        .modal-footer .btn {
+            background: var(--accent-color);
+            border-radius: 8px;
+            padding: 10px 20px;
         }
 
-            .modal-footer .btn {
-                background-color: rgba(0, 118, 168, 1);
-                color: white;
-                border-radius: 5px;
-                padding: 8px 15px;
-                border: none;
-                transition: background-color 0.3s ease;
+            .modal-footer .btn:hover {
+                background: #2563eb;
             }
 
-                .modal-footer .btn:hover {
-                    background-color: rgba(0, 90, 120, 1);
-                }
-
         .close {
-            color: white;
+            color: var(--text-color);
             opacity: 0.8;
-            font-size: 28px;
-            font-weight: bold;
-            background: none;
-            border: none;
-            padding: 0;
-            cursor: pointer;
+            font-size: 24px;
         }
 
             .close:hover {
                 opacity: 1;
             }
 
+        /* Validation Message */
         .validation-message {
-            color: #dc3545;
+            color: #f87171;
             font-size: 14px;
             margin-top: 5px;
         }
-    </style>
 
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .login-card
+
+        {
+            padding: 30px 20px;
+        }
+
+        .btn-primary {
+            font-size: 14px;
+            padding: 10px 20px;
+        }
+
+        }
+    </style>
 </head>
 <body>
-    <section class="login p-fixed d-flex text-center bg-primary2 ">
-        <!--common-img-bg-->
-        <!-- Container-fluid starts -->
-        <div class="container-fluid">
-            <div class="row">
+    <!-- Particle Background -->
+    <div id="particles-js"></div>
 
-                <div class="col-sm-12">
-                    <div class="login-card card-block">
-                        <form method="post" id="loginForm" asp-controller="Login" asp-action="LoginKullanici">
-                            @Html.AntiForgeryToken()
-                            <h4 style="text-align:center">Mikro Kullanıcı Girişi</h4>
-                            <div class="form-group mb-3">
-                                <label for="KullaniciAd">Kullanıcı Adı:</label>
-                                <input type="text" class="form-control" id="KullaniciAd" name="username" required>
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="Sifre">Şifre:</label>
-                                <input type="password" class="form-control" id="Sifre" name="password" required>
-                            </div>
-
-                            @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
-                            {
-                                <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
-                            }
-
-                            @Html.ValidationSummary(false, "", new { @class = "text-danger" })
-
-                            <!-- Beni Hatırla Checkbox'ı -->
-                            <div class="rkmd-checkbox mb-3">
-                                <input type="checkbox" id="checkbox" class="input-checkbox" onchange="tik()">
-                                <label for="checkbox" class="captions">Beni Hatırla</label>
-                            </div>
-                            <div class="text-center">
-                                <button type="submit" class="btn btn-primary">Giriş Yap</button>
-                            </div>
-                        </form>
-                        <!-- end of form -->
-                    </div>
-                    <!-- end of login-card -->
+    <section class="login-container">
+        <div class="login-card">
+            <img src="/Content/assets/images/logo.png" alt="DBT Partner Logo" class="text-center">
+            <h4>Mikro Kullanıcı Girişi</h4>
+            <form method="post" id="loginForm" asp-controller="Login" asp-action="LoginKullanici">
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <input type="text" id="KullaniciAd" name="username" required placeholder=" ">
+                    <label for="KullaniciAd">Kullanıcı Adı</label>
                 </div>
-                <!-- end of col-sm-12 -->
-            </div>
-            <!-- end of row -->
+                <div class="form-group">
+                    <input type="password" id="Sifre" name="password" required placeholder=" ">
+                    <label for="Sifre">Şifre</label>
+                </div>
+
+                @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+                {
+                    <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+                }
+
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+                <div class="rkmd-checkbox">
+                    <input type="checkbox" id="checkbox" class="input-checkbox" onchange="tik()">
+                    <label for="checkbox" class="captions">Beni Hatırla</label>
+                </div>
+
+                <div class="text-center">
+                    <a href="#" class="forgot-password" id="forgotPasswordLink">Şifremi Unuttum</a>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Giriş Yap</button>
+                </div>
+            </form>
         </div>
-        <!-- end of container-fluid -->
     </section>
 
-    <!-- Şifre Belirleme Modal -->
+    <!-- Password Setup Modal -->
     <div class="modal fade" id="setPasswordModal" tabindex="-1" role="dialog" aria-labelledby="passwordModalTitle" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -380,12 +427,12 @@
                 <div class="modal-body">
                     <form id="passwordForm">
                         <div class="form-group">
-                            <label for="newPassword">Yeni Şifre:</label>
-                            <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                            <input type="password" id="newPassword" name="newPassword" required placeholder=" ">
+                            <label for="newPassword">Yeni Şifre</label>
                         </div>
                         <div class="form-group">
-                            <label for="confirmPassword">Şifre Tekrar:</label>
-                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                            <input type="password" id="confirmPassword" name="confirmPassword" required placeholder=" ">
+                            <label for="confirmPassword">Şifre Tekrar</label>
                             <div id="passwordMatchError" class="validation-message" style="display: none;">Şifreler eşleşmiyor!</div>
                         </div>
                     </form>
@@ -398,57 +445,82 @@
         </div>
     </div>
 
-    <!-- Önce jQuery yükle -->
+    <!-- Forgot Password Modal -->
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1" role="dialog" aria-labelledby="forgotPasswordModalTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="forgotPasswordModalTitle">Şifremi Unuttum</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        Şifre sıfırlama bağlantısını e-posta adresinize göndereceğiz.
+                    </div>
+                    <form id="forgotPasswordForm">
+                        <div class="form-group">
+                            <input type="text" id="forgotPasswordUsername" name="username" required placeholder=" ">
+                            <label for="forgotPasswordUsername">Kullanıcı Adı</label>
+                        </div>
+                    </form>
+                    <div id="forgotPasswordMessage" class="mt-3" style="display: none;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-primary" id="sendResetLinkBtn">Şifre Sıfırlama Bağlantısı Gönder</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
     <script src="~/Content/assets/plugins/Jquery/dist/jquery.min.js"></script>
     <script src="~/Content/assets/plugins/jquery-ui/jquery-ui.min.js"></script>
-
-    <!-- Sonra Tether (Bootstrap için gerekli) -->
     <script src="~/Content/assets/plugins/tether/dist/js/tether.min.js"></script>
-
-    <!-- Bootstrap JS -->
     <script src="~/Content/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-
-    <!-- Diğer JS dosyaları -->
-    <script src="~/Content/assets/plugins/Waves/waves.min.js"></script>
-    <script src="~/Content/assets/pages/elements.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
 
     <script>
-        $(document).ready(function() {
-            // Giriş formu işleyicisi
-            $('#loginForm').submit(function(e) {
-                e.preventDefault();
+        // Particles.js Configuration
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: '#ffffff' },
+                shape: { type: 'circle' },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: { enable: true, distance: 150, color: '#ffffff', opacity: 0.4, width: 1 },
+                move: { enable: true, speed: 2, direction: 'none', random: false }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: { onhover: { enable: true, mode: 'repulse' }, onclick: { enable: true, mode: 'push' } },
+                modes: { repulse: { distance: 100 }, push: { particles_nb: 4 } }
+            }
+        });
 
+        $(document).ready(function () {
+            // Login Form Submission
+            $('#loginForm').submit(function (e) {
+                e.preventDefault();
                 const username = $('#KullaniciAd').val();
                 const password = $('#Sifre').val();
 
-                // AJAX isteği ile giriş yap
                 $.ajax({
                     type: 'POST',
                     url: '/Login/LoginKullanici',
-                    data: {
-                        username: username,
-                        password: password
-                    },
-                    success: function(data, textStatus, xhr) {
-                        // Şifre belirleme gerekip gerekmediğini kontrol et
+                    data: { username, password },
+                    success: function (data, textStatus, xhr) {
                         if (xhr.getResponseHeader('X-Require-Password-Setup') === 'true') {
-                            // Şifre belirleme modalını göster
-                            $('#setPasswordModal').modal({
-                                backdrop: 'static',
-                                keyboard: false
-                            });
-
-                            // Kapatma butonlarını gizle
-                            $('#setPasswordModal .close').hide();
-                            $('#setPasswordModal .btn-secondary').hide();
-
+                            $('#setPasswordModal').modal({ backdrop: 'static', keyboard: false });
+                            $('#setPasswordModal .close, #setPasswordModal .btn-secondary').hide();
                             return;
                         }
-
-                        // Yönlendirme
                         window.location.href = '/Home/Index';
                     },
-                    error: function(xhr) {
+                    error: function () {
                         Swal.fire({
                             icon: 'error',
                             title: 'Giriş Hatası',
@@ -458,8 +530,8 @@
                 });
             });
 
-            // Şifre kaydetme butonu
-            $('#savePasswordBtn').click(function() {
+            // Save Password
+            $('#savePasswordBtn').click(function () {
                 const newPassword = $('#newPassword').val();
                 const confirmPassword = $('#confirmPassword').val();
 
@@ -468,28 +540,21 @@
                     return;
                 }
 
-                // AJAX ile şifre kaydet
                 $.ajax({
                     type: 'POST',
                     url: '/Login/SavePassword',
                     contentType: 'application/json',
-                    data: JSON.stringify({
-                        newPassword: newPassword,
-                        confirmPassword: confirmPassword
-                    }),
-                    success: function(response) {
+                    data: JSON.stringify({ newPassword, confirmPassword }),
+                    success: function (response) {
                         if (response.success) {
                             $('#setPasswordModal').modal('hide');
-
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Başarılı!',
                                 text: 'Şifreniz başarıyla kaydedildi.',
                                 timer: 2000,
                                 showConfirmButton: false
-                            }).then(function() {
-                                window.location.href = '/Home/Index';
-                            });
+                            }).then(() => window.location.href = '/Home/Index');
                         } else {
                             Swal.fire({
                                 icon: 'error',
@@ -498,7 +563,7 @@
                             });
                         }
                     },
-                    error: function(xhr) {
+                    error: function () {
                         Swal.fire({
                             icon: 'error',
                             title: 'Hata!',
@@ -508,47 +573,79 @@
                 });
             });
 
-            // Şifre eşleştirme kontrolü
-            $('#confirmPassword').on('input', function() {
-                if ($('#newPassword').val() !== $(this).val()) {
-                    $('#passwordMatchError').show();
-                } else {
-                    $('#passwordMatchError').hide();
-                }
+            // Password Match Validation
+            $('#confirmPassword').on('input', function () {
+                $('#passwordMatchError').toggle($('#newPassword').val() !== $(this).val());
             });
 
-            // ViewBag'den gelen bilgiye göre modal göster
+            // Forgot Password Modal
+            $('#forgotPasswordLink').click(function (e) {
+                e.preventDefault();
+                $('#forgotPasswordModal').modal('show');
+            });
+
+            // Send Reset Link
+            $('#sendResetLinkBtn').click(function () {
+                const username = $('#forgotPasswordUsername').val();
+                if (!username) {
+                    showForgotPasswordMessage('error', 'Lütfen kullanıcı adınızı giriniz.');
+                    return;
+                }
+
+                $('#sendResetLinkBtn').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Gönderiliyor...');
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Login/ForgotPassword',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ username }),
+                    success: function (response) {
+                        if (response.success) {
+                            showForgotPasswordMessage('success', response.message);
+                            $('#forgotPasswordUsername').val('');
+                            setTimeout(() => $('#forgotPasswordModal').modal('hide'), 3000);
+                        } else {
+                            showForgotPasswordMessage('error', response.message);
+                        }
+                    },
+                    error: function (xhr) {
+                        showForgotPasswordMessage('error', xhr.responseJSON?.message || 'Şifre sıfırlama işlemi sırasında bir hata oluştu.');
+                    },
+                    complete: function () {
+                        $('#sendResetLinkBtn').prop('disabled', false).html('Şifre Sıfırlama Bağlantısı Gönder');
+                    }
+                });
+            });
+
+            function showForgotPasswordMessage(type, message) {
+                const messageDiv = $('#forgotPasswordMessage');
+                messageDiv.removeClass('alert-success alert-danger')
+                    .addClass(`alert alert-${type}`)
+                    .html(message)
+                    .show();
+            }
+
+            // Show Password Modal if Required
         @if (ViewBag.RequirePasswordSetup != null && ViewBag.RequirePasswordSetup == true)
         {
             <text>
-                    $('#setPasswordModal').modal({
-                        backdrop: 'static',
-                        keyboard: false
-                    });
-                    $('#setPasswordModal .close').hide();
-                    $('#setPasswordModal .btn-secondary').hide();
+                        $('#setPasswordModal').modal({ backdrop: 'static', keyboard: false });
+                        $('#setPasswordModal .close, #setPasswordModal .btn-secondary').hide();
             </text>
         }
         });
 
-        // Beni hatırla fonksiyonu
+        // Remember Me Functionality
         function tik() {
-            const checkbox = document.querySelector('input[type=checkbox][id=checkbox]');
-            if (!checkbox) {
-                console.log('Checkbox elementi bulunamadı');
-                return;
-            }
-
+            const checkbox = $('#checkbox')[0];
             if (checkbox.checked) {
-                const kullaniciAd = document.getElementById('KullaniciAd').value;
-                const sifre = document.getElementById('Sifre').value;
+                const kullaniciAd = $('#KullaniciAd').val();
+                const sifre = $('#Sifre').val();
 
                 if (kullaniciAd && sifre) {
                     localStorage.setItem('KullaniciAd', kullaniciAd);
                     localStorage.setItem('Sifre', sifre);
-                    console.log('Kullanıcı bilgileri localStorage\'a kaydedildi');
                 } else {
-                    console.log('Kullanıcı adı veya şifre boş');
                     Swal.fire({
                         icon: 'error',
                         title: 'Hata!',
@@ -557,21 +654,19 @@
                     checkbox.checked = false;
                 }
             } else {
-                console.log('Beni hatırla deaktif, localStorage temizleniyor');
                 localStorage.removeItem('KullaniciAd');
                 localStorage.removeItem('Sifre');
             }
         }
 
-        // Sayfa yüklendiğinde localStorage'dan bilgileri al
-        document.addEventListener('DOMContentLoaded', function() {
+        // Load Saved Credentials
+        $(document).ready(function () {
             const savedUsername = localStorage.getItem('KullaniciAd');
             const savedPassword = localStorage.getItem('Sifre');
-
             if (savedUsername && savedPassword) {
-                document.getElementById('KullaniciAd').value = savedUsername;
-                document.getElementById('Sifre').value = savedPassword;
-                document.getElementById('checkbox').checked = true;
+                $('#KullaniciAd').val(savedUsername);
+                $('#Sifre').val(savedPassword);
+                $('#checkbox').prop('checked', true);
             }
         });
     </script>
