@@ -15,18 +15,28 @@ namespace Deneme_proje.Controllers
 {
     public class LoginController : Controller
     {
-        private readonly IConfiguration _configuration;
-        private readonly DatabaseSelectorService _dbSelectorService;
-        private readonly string encryptionKey = "YourSecretKey123!"; // Güvenli bir key kullanın
-
+        private readonly IConfiguration _configuration; private readonly DatabaseSelectorService _dbSelectorService; private readonly byte[] encryptionKey; // Derived from configuration
         public LoginController(IConfiguration configuration, DatabaseSelectorService dbSelectorService)
         {
             _configuration = configuration;
             _dbSelectorService = dbSelectorService;
+            // Derive encryption key using PBKDF2
+            string keyString = _configuration["EncryptionSettings:Key"] ?? "YourSecretKey123!"; // Ensure this is set securely in appsettings.json
+            encryptionKey = DeriveKey(keyString, 32); // 32 bytes for AES-256
+        }
+
+        // Derive a secure key using PBKDF2
+        private byte[] DeriveKey(string password, int keySize)
+        {
+            byte[] salt = Encoding.UTF8.GetBytes("FixedSalt12345678"); // In production, use a unique, random salt per user and store it
+            using (var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100000, HashAlgorithmName.SHA256))
+            {
+                return pbkdf2.GetBytes(keySize);
+            }
         }
 
         // Şifre encryption metodu
-        private string EncryptPassword(string password)
+        public string EncryptPassword(string password)
         {
             if (string.IsNullOrEmpty(password)) return null;
 
@@ -34,51 +44,57 @@ namespace Deneme_proje.Controllers
             {
                 using (var aes = Aes.Create())
                 {
-                    using (var md5 = MD5.Create())
-                    {
-                        aes.Key = md5.ComputeHash(Encoding.UTF8.GetBytes(encryptionKey));
-                        aes.IV = new byte[16];
-                    }
+                    aes.Key = encryptionKey;
+                    aes.GenerateIV(); // Generate a random IV for each encryption
 
-                    using (var encryptor = aes.CreateEncryptor())
+                    using (var encryptor = aes.CreateEncryptor(aes.Key, aes.IV))
                     {
                         byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
                         byte[] encryptedBytes = encryptor.TransformFinalBlock(passwordBytes, 0, passwordBytes.Length);
-                        return Convert.ToBase64String(encryptedBytes);
+                        // Prepend IV to the encrypted data
+                        byte[] result = new byte[aes.IV.Length + encryptedBytes.Length];
+                        Buffer.BlockCopy(aes.IV, 0, result, 0, aes.IV.Length);
+                        Buffer.BlockCopy(encryptedBytes, 0, result, aes.IV.Length, encryptedBytes.Length);
+                        return Convert.ToBase64String(result);
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Şifreleme hatası: {ex.Message}");
                 return null;
             }
         }
 
         // Şifre decryption metodu
-        private string DecryptPassword(string encryptedPassword)
+        public string DecryptPassword(string encryptedPassword)
         {
             if (string.IsNullOrEmpty(encryptedPassword)) return null;
 
             try
             {
+                byte[] fullCipher = Convert.FromBase64String(encryptedPassword);
                 using (var aes = Aes.Create())
                 {
-                    using (var md5 = MD5.Create())
-                    {
-                        aes.Key = md5.ComputeHash(Encoding.UTF8.GetBytes(encryptionKey));
-                        aes.IV = new byte[16];
-                    }
+                    // Extract IV (first 16 bytes)
+                    byte[] iv = new byte[16];
+                    byte[] cipher = new byte[fullCipher.Length - 16];
+                    Buffer.BlockCopy(fullCipher, 0, iv, 0, 16);
+                    Buffer.BlockCopy(fullCipher, 16, cipher, 0, fullCipher.Length - 16);
 
-                    using (var decryptor = aes.CreateDecryptor())
+                    aes.Key = encryptionKey;
+                    aes.IV = iv;
+
+                    using (var decryptor = aes.CreateDecryptor(aes.Key, aes.IV))
                     {
-                        byte[] encryptedBytes = Convert.FromBase64String(encryptedPassword);
-                        byte[] decryptedBytes = decryptor.TransformFinalBlock(encryptedBytes, 0, encryptedBytes.Length);
+                        byte[] decryptedBytes = decryptor.TransformFinalBlock(cipher, 0, cipher.Length);
                         return Encoding.UTF8.GetString(decryptedBytes);
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Şifre çözme hatası: {ex.Message}");
                 return null;
             }
         }
@@ -89,12 +105,11 @@ namespace Deneme_proje.Controllers
             {
                 string connectionString = _configuration.GetConnectionString("ERPDatabase");
 
-                // Admin kullanıcı bağlantı bilgilerini kontrol et
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     string query = @"SELECT versiyon, ip_adresi, db_kullaniciadi, db_sifre 
-                    FROM Web_Kullanici 
-                    WHERE kullanici_adi = 'admin'";
+                                FROM Web_Kullanici 
+                                WHERE kullanici_adi = 'admin'";
 
                     SqlCommand command = new SqlCommand(query, connection);
                     connection.Open();
@@ -111,7 +126,6 @@ namespace Deneme_proje.Controllers
 
                             if (hasConnectionInfo)
                             {
-                                // Bağlantı bilgileri doluysa direkt LoginKullanici'ya yönlendir
                                 HttpContext.Session.SetString("Version", reader["versiyon"].ToString());
                                 return RedirectToAction("LoginKullanici");
                             }
@@ -119,16 +133,13 @@ namespace Deneme_proje.Controllers
                     }
                 }
 
-                // Bağlantı bilgileri eksikse normal Index sayfasını göster
                 return View();
             }
             catch (Exception ex)
             {
-                // Log the error
                 System.Diagnostics.Debug.WriteLine("Login Controller Index'te hata oluştu.");
                 System.Diagnostics.Debug.WriteLine(ex.ToString());
 
-                // Store the error message in ViewData
                 ViewData["ErrorMessage"] = ex.Message;
                 ViewData["StackTrace"] = ex.StackTrace;
 
@@ -143,12 +154,11 @@ namespace Deneme_proje.Controllers
             {
                 string connectionString = _configuration.GetConnectionString("ERPDatabase");
 
-                // Admin kullanıcı kontrolü ve yetkilendirme
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     string query = @"SELECT versiyon, ip_adresi, db_kullaniciadi, db_sifre, db_varsayilan 
-            FROM Web_Kullanici 
-            WHERE kullanici_adi = 'admin'";
+                                FROM Web_Kullanici 
+                                WHERE kullanici_adi = 'admin'";
 
                     SqlCommand command = new SqlCommand(query, connection);
                     await connection.OpenAsync();
@@ -172,47 +182,49 @@ namespace Deneme_proje.Controllers
                     }
                 }
 
-                // Normal kullanıcı girişi
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    string query = "SELECT * FROM Web_Kullanici WHERE kullanici_adi = @username AND sifre = @password";
+                    string query = "SELECT * FROM Web_Kullanici WHERE kullanici_adi = @username";
                     SqlCommand command = new SqlCommand(query, connection);
                     command.Parameters.AddWithValue("@username", username);
-                    command.Parameters.AddWithValue("@password", password);
 
                     await connection.OpenAsync();
                     using (SqlDataReader reader = await command.ExecuteReaderAsync())
                     {
                         if (await reader.ReadAsync())
                         {
-                            // Kullanıcı doğrulandı, dinamik veritabanı bağlantısını güncelle
-                            string selectedVersion = reader["versiyon"]?.ToString() ?? "V16"; // Varsayılan versiyon
+                            string storedEncryptedPassword = reader["sifre"]?.ToString();
+                            string storedPassword = DecryptPassword(storedEncryptedPassword);
+
+                            if (storedPassword != password)
+                            {
+                                ViewBag.Message = "Geçersiz kullanıcı adı veya şifre";
+                                return View();
+                            }
+
+                            string selectedVersion = reader["versiyon"]?.ToString() ?? "V16";
                             string ipAddress = reader["ip_adresi"]?.ToString();
                             string dbUsername = reader["db_kullaniciadi"]?.ToString();
                             string dbPassword = DecryptPassword(reader["db_sifre"]?.ToString());
                             string defaultDatabase = reader["db_varsayilan"]?.ToString();
 
-                            // Dinamik bağlantı stringini oluştur
                             string dynamicConnectionString = selectedVersion == "V16"
                                 ? $"Server={ipAddress};Database=MikroDB_V16;User Id={dbUsername};Password={dbPassword};Encrypt=True;TrustServerCertificate=True;"
                                 : $"Server={ipAddress};Database=MikroDesktop;User Id={dbUsername};Password={dbPassword};Encrypt=True;TrustServerCertificate=True;";
 
-                            // Bağlantı dizesini appsettings.json'da güncelle
                             UpdateAppSettings(
                                 selectedVersion == "V16" ? "MikroDB_V16" : "MikroDesktop",
                                 dynamicConnectionString
                             );
 
-                            // Session'a gerekli bilgileri kaydet
                             HttpContext.Session.SetString("Username", username);
                             HttpContext.Session.SetString("IsAuthenticated", "true");
 
-                            // Cookie Authentication ekleyin
                             var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Name, username),
-                        new Claim("SelectedVersion", selectedVersion)
-                    };
+                        {
+                            new Claim(ClaimTypes.Name, username),
+                            new Claim("SelectedVersion", selectedVersion)
+                        };
 
                             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                             var authProperties = new AuthenticationProperties
@@ -237,11 +249,9 @@ namespace Deneme_proje.Controllers
             }
             catch (Exception ex)
             {
-                // Log the error
                 System.Diagnostics.Debug.WriteLine("Login Controller Post Index'te hata oluştu.");
                 System.Diagnostics.Debug.WriteLine(ex.ToString());
 
-                // Store the error message in ViewData
                 ViewData["ErrorMessage"] = ex.Message;
                 ViewData["StackTrace"] = ex.StackTrace;
 
@@ -249,29 +259,22 @@ namespace Deneme_proje.Controllers
             }
         }
 
-
         [HttpPost]
         public async Task<IActionResult> LoginKullanici(string username, string password)
         {
             try
             {
-                // Version bilgisini kontrol et
                 string version = HttpContext.Session.GetString("Version");
                 if (string.IsNullOrEmpty(version))
                 {
                     return RedirectToAction("Index");
                 }
 
-                // Version bilgisini SelectedVersion olarak da kaydet
                 HttpContext.Session.SetString("SelectedVersion", version);
 
-                // Admin kullanıcının varsayılan veritabanını bul
                 string defaultDatabase = await GetAdminDefaultDatabase();
-
-                // Varsayılan veritabanını session'a kaydet
                 HttpContext.Session.SetString("SelectedDatabase", defaultDatabase);
 
-                // Connection string'i seç
                 string baseConnectionString = version == "V16"
                     ? _configuration.GetConnectionString("MikroDB_V16")
                     : _configuration.GetConnectionString("MikroDesktop");
@@ -280,7 +283,6 @@ namespace Deneme_proje.Controllers
                 {
                     await connection.OpenAsync();
 
-                    // Önce kullanıcının User_no'sunu al
                     string userNoQuery = "SELECT User_no FROM KULLANICILAR WHERE User_name = @username";
                     string userNo = null;
 
@@ -299,7 +301,6 @@ namespace Deneme_proje.Controllers
                         }
                     }
 
-                    // Kullanıcının giriş yetkisini ve şifre bilgisini kontrol et
                     string erpConnectionString = _configuration.GetConnectionString("ERPDatabase");
                     using (SqlConnection erpConnection = new SqlConnection(erpConnectionString))
                     {
@@ -319,41 +320,33 @@ namespace Deneme_proje.Controllers
                                 }
 
                                 bool girisYetkisi = reader["GirisYetkisi"] != DBNull.Value && (bool)reader["GirisYetkisi"];
-                                string storedPassword = reader["Sifre"] != DBNull.Value ? reader["Sifre"].ToString() : null;
+                                string storedEncryptedPassword = reader["Sifre"] != DBNull.Value ? reader["Sifre"].ToString() : null;
 
-                                // Giriş yetkisi kontrolü
                                 if (!girisYetkisi)
                                 {
                                     ModelState.AddModelError("", "Sisteme giriş yetkiniz bulunmamaktadır.");
                                     return View();
                                 }
 
-                                // Şifre kontrolü
-                                if (string.IsNullOrEmpty(storedPassword))
+                                if (string.IsNullOrEmpty(storedEncryptedPassword))
                                 {
-                                    // Şifre belirlenmemiş, kullanıcının şifre belirlemesi gerekiyor
-                                    // ViewBag ile bilgi gönder
                                     ViewBag.RequirePasswordSetup = true;
                                     ViewBag.TempUsername = username;
                                     HttpContext.Session.SetString("TempUserNo", userNo);
-
-                                    // Özel header ile bilgi gönder (JavaScript tarafında kullanabilmek için)
                                     Response.Headers.Add("X-Require-Password-Setup", "true");
-
                                     return View();
                                 }
-                                else if (storedPassword != password)
+
+                                string storedPassword = DecryptPassword(storedEncryptedPassword);
+                                if (storedPassword != password)
                                 {
-                                    // Şifre yanlış
                                     ModelState.AddModelError("", "Geçersiz şifre");
                                     return View();
                                 }
-                                // Şifre doğru, devam et
                             }
                         }
                     }
 
-                    // Kullanıcı girişi için ana sorgu - MikroDB bağlantısı
                     string tableName = "KULLANICILAR";
                     string query = $"SELECT * FROM {tableName} WHERE User_name = @username";
 
@@ -365,19 +358,17 @@ namespace Deneme_proje.Controllers
                         {
                             if (await reader.ReadAsync())
                             {
-                                // Kullanıcı doğrulandı
                                 HttpContext.Session.SetString("Username", username);
                                 HttpContext.Session.SetString("IsAuthenticated", "true");
                                 HttpContext.Session.SetString("UserNo", userNo);
 
-                                // Cookie Authentication ekleme
                                 var claims = new List<Claim>
-                        {
-                            new Claim(ClaimTypes.Name, username),
-                            new Claim("UserNo", userNo),
-                            new Claim("SelectedVersion", HttpContext.Session.GetString("SelectedVersion")),
-                            new Claim("SelectedDatabase", HttpContext.Session.GetString("SelectedDatabase"))
-                        };
+                            {
+                                new Claim(ClaimTypes.Name, username),
+                                new Claim("UserNo", userNo),
+                                new Claim("SelectedVersion", HttpContext.Session.GetString("SelectedVersion")),
+                                new Claim("SelectedDatabase", HttpContext.Session.GetString("SelectedDatabase"))
+                            };
 
                                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                                 var authProperties = new AuthenticationProperties
@@ -398,7 +389,7 @@ namespace Deneme_proje.Controllers
                                 }
                                 catch (Exception dbEx)
                                 {
-                                    System.Diagnostics.Debug.WriteLine($"Database connection error: {dbEx.Message}");
+                                    System.Diagnostics.Debug.WriteLine($"Veritabanı bağlantı hatası: {dbEx.Message}");
                                     ModelState.AddModelError("", $"Veritabanı bağlantı hatası: {dbEx.Message}");
                                     return View();
                                 }
@@ -414,12 +405,11 @@ namespace Deneme_proje.Controllers
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Login error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Giriş hatası: {ex.Message}");
                 ModelState.AddModelError("", $"Bağlantı hatası oluştu: {ex.Message}");
                 return View();
             }
         }
-
 
         [HttpPost]
         public async Task<IActionResult> SavePassword([FromBody] PasswordModel model)
@@ -431,11 +421,16 @@ namespace Deneme_proje.Controllers
                     return Json(new { success = false, message = "Şifreler eşleşmiyor veya boş" });
                 }
 
-                // Geçici olarak saklanan kullanıcı numarasını al
                 string userNo = HttpContext.Session.GetString("TempUserNo");
                 if (string.IsNullOrEmpty(userNo))
                 {
                     return Json(new { success = false, message = "Kullanıcı oturumu bulunamadı. Lütfen tekrar giriş yapın." });
+                }
+
+                string encryptedPassword = EncryptPassword(model.NewPassword);
+                if (string.IsNullOrEmpty(encryptedPassword))
+                {
+                    return Json(new { success = false, message = "Şifre şifreleme işlemi başarısız." });
                 }
 
                 // Şifreyi veritabanına kaydet
@@ -444,14 +439,11 @@ namespace Deneme_proje.Controllers
                 {
                     await connection.OpenAsync();
                     string updateQuery = "UPDATE KullaniciYonetimi SET Sifre = @Sifre WHERE User_no = @User_no";
-
                     using (SqlCommand command = new SqlCommand(updateQuery, connection))
                     {
-                        command.Parameters.AddWithValue("@Sifre", model.NewPassword);
+                        command.Parameters.AddWithValue("@Sifre", encryptedPassword);
                         command.Parameters.AddWithValue("@User_no", userNo);
-
                         int result = await command.ExecuteNonQueryAsync();
-
                         if (result <= 0)
                         {
                             return Json(new { success = false, message = "Şifre kaydedilemedi. Kullanıcı bulunamadı." });
@@ -459,9 +451,34 @@ namespace Deneme_proje.Controllers
                     }
                 }
 
-                // Kullanıcı bilgilerini session'a kaydet
+                // LoginKullanici'deki kullanıcı adını al
                 string username = HttpContext.Session.GetString("TempUsername");
-                if (!string.IsNullOrEmpty(username))
+
+                // Eğer TempUsername boşsa, userNo kullanarak veritabanından kullanıcı adını almaya çalış
+                if (string.IsNullOrEmpty(username))
+                {
+                    string baseConnectionString = _configuration.GetConnectionString("MikroDB_V16");
+                    using (SqlConnection connection = new SqlConnection(baseConnectionString))
+                    {
+                        await connection.OpenAsync();
+                        string userQuery = "SELECT User_name FROM KULLANICILAR WHERE User_no = @userNo";
+                        using (SqlCommand command = new SqlCommand(userQuery, connection))
+                        {
+                            command.Parameters.AddWithValue("@userNo", userNo);
+                            var result = await command.ExecuteScalarAsync();
+                            if (result != null)
+                            {
+                                username = result.ToString();
+                            }
+                            else
+                            {
+                                // Hala bulunamadıysa, default bir değer kullan
+                                username = "Kullanici_" + userNo;
+                            }
+                        }
+                    }
+                }
+                else
                 {
                     HttpContext.Session.Remove("TempUsername");
                     HttpContext.Session.SetString("Username", username);
@@ -474,7 +491,7 @@ namespace Deneme_proje.Controllers
                 // Cookie Authentication ekleme
                 var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, username),
+            new Claim(ClaimTypes.Name, username), // Artık username null olmayacak
             new Claim("UserNo", userNo),
             new Claim("SelectedVersion", HttpContext.Session.GetString("SelectedVersion") ?? "V16"),
             new Claim("SelectedDatabase", HttpContext.Session.GetString("SelectedDatabase") ?? "")
@@ -500,9 +517,6 @@ namespace Deneme_proje.Controllers
                 return Json(new { success = false, message = $"Şifre kaydedilirken bir hata oluştu: {ex.Message}" });
             }
         }
-
-
-        // Yeni eklenen metot
         private async Task<string> GetAdminDefaultDatabase()
         {
             try
@@ -518,10 +532,8 @@ namespace Deneme_proje.Controllers
                     {
                         var defaultDatabase = await command.ExecuteScalarAsync();
 
-                        // Null kontrolü ve ToString() çevirimi
                         if (defaultDatabase == null)
                         {
-                            // Eğer varsayılan veritabanı yoksa, ilk veritabanını bul
                             string version = HttpContext.Session.GetString("SelectedVersion") ?? "V16";
                             return GetFirstAvailableDatabase(version);
                         }
@@ -532,15 +544,12 @@ namespace Deneme_proje.Controllers
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Admin default database error: {ex.Message}");
-
-                // Hata durumunda varsayılan versiyon için ilk veritabanını bul
+                System.Diagnostics.Debug.WriteLine($"Admin varsayılan veritabanı hatası: {ex.Message}");
                 string version = HttpContext.Session.GetString("SelectedVersion") ?? "V16";
                 return GetFirstAvailableDatabase(version);
             }
         }
 
-        // Yardımcı metot
         private string GetFirstAvailableDatabase(string version)
         {
             try
@@ -569,7 +578,7 @@ namespace Deneme_proje.Controllers
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"First available database error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"İlk kullanılabilir veritabanı hatası: {ex.Message}");
                 throw;
             }
         }
@@ -582,6 +591,7 @@ namespace Deneme_proje.Controllers
             }
             return View();
         }
+
         [HttpPost]
         public async Task<IActionResult> UpdateConnectionInfo([FromBody] ConnectionInfo model)
         {
@@ -590,7 +600,6 @@ namespace Deneme_proje.Controllers
                 string connectionString = _configuration.GetConnectionString("ERPDatabase");
                 string username = HttpContext.Session.GetString("Username");
 
-                // Şifreyi encrypt et
                 string encryptedPassword = model.DbPassword != null
                     ? EncryptPassword(model.DbPassword)
                     : null;
@@ -598,12 +607,12 @@ namespace Deneme_proje.Controllers
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     string query = @"UPDATE Web_Kullanici 
-           SET versiyon = @version,
-               ip_adresi = @ipAddress,
-               db_kullaniciadi = @dbUsername,
-               db_sifre = @dbPassword,
-               db_varsayilan = @defaultDb
-           WHERE kullanici_adi = @username";
+                                SET versiyon = @version,
+                                    ip_adresi = @ipAddress,
+                                    db_kullaniciadi = @dbUsername,
+                                    db_sifre = @dbPassword,
+                                    db_varsayilan = @defaultDb
+                                WHERE kullanici_adi = @username";
 
                     SqlCommand command = new SqlCommand(query, connection);
                     command.Parameters.AddWithValue("@version", model.Version ?? (object)DBNull.Value);
@@ -626,15 +635,14 @@ namespace Deneme_proje.Controllers
                         HttpContext.Session.SetString("SelectedDatabase", model.DefaultDatabase);
                     }
 
-                    // Kullanıcı yeni veritabanı bilgilerini güncellediyse Claims'i güncelle
                     if (!string.IsNullOrEmpty(username))
                     {
                         var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, username),
-                    new Claim("SelectedVersion", model.Version ?? HttpContext.Session.GetString("SelectedVersion") ?? "V16"),
-                    new Claim("SelectedDatabase", model.DefaultDatabase ?? HttpContext.Session.GetString("SelectedDatabase") ?? "")
-                };
+                    {
+                        new Claim(ClaimTypes.Name, username),
+                        new Claim("SelectedVersion", model.Version ?? HttpContext.Session.GetString("SelectedVersion") ?? "V16"),
+                        new Claim("SelectedDatabase", model.DefaultDatabase ?? HttpContext.Session.GetString("SelectedDatabase") ?? "")
+                    };
 
                         var userNoClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserNo");
                         if (userNoClaim != null)
@@ -666,7 +674,6 @@ namespace Deneme_proje.Controllers
 
         public async Task<IActionResult> Logout()
         {
-            // Oturumu ve Cookie kimlik doğrulamayı temizle
             HttpContext.Session.Clear();
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Login");
@@ -687,17 +694,14 @@ namespace Deneme_proje.Controllers
         {
             try
             {
-                // Get current user's username from claims
                 var username = User.Identity.Name;
                 if (string.IsNullOrEmpty(username))
                 {
                     return Json(new { success = false, message = "Kullanıcı oturumu bulunamadı." });
                 }
 
-                // Check if the user is admin
                 if (username.ToLower() == "admin")
                 {
-                    // For admin, verify against Web_Kullanici table
                     string connectionString = _configuration.GetConnectionString("ERPDatabase");
                     using (SqlConnection connection = new SqlConnection(connectionString))
                     {
@@ -706,9 +710,15 @@ namespace Deneme_proje.Controllers
                         command.Parameters.AddWithValue("@username", username);
 
                         await connection.OpenAsync();
-                        var storedPassword = await command.ExecuteScalarAsync();
+                        var storedEncryptedPassword = await command.ExecuteScalarAsync();
 
-                        if (storedPassword == null || storedPassword.ToString() != password)
+                        if (storedEncryptedPassword == null)
+                        {
+                            return Json(new { success = false, message = "Şifre bulunamadı." });
+                        }
+
+                        string storedPassword = DecryptPassword(storedEncryptedPassword.ToString());
+                        if (storedPassword != password)
                         {
                             return Json(new { success = false, message = "Geçersiz şifre." });
                         }
@@ -716,7 +726,6 @@ namespace Deneme_proje.Controllers
                 }
                 else
                 {
-                    // For regular users, verify against KullaniciYonetimi table
                     string userNo = User.Claims.FirstOrDefault(c => c.Type == "UserNo")?.Value;
                     if (string.IsNullOrEmpty(userNo))
                     {
@@ -731,9 +740,15 @@ namespace Deneme_proje.Controllers
                         command.Parameters.AddWithValue("@User_no", userNo);
 
                         await connection.OpenAsync();
-                        var storedPassword = await command.ExecuteScalarAsync();
+                        var storedEncryptedPassword = await command.ExecuteScalarAsync();
 
-                        if (storedPassword == null || storedPassword.ToString() != password)
+                        if (storedEncryptedPassword == null)
+                        {
+                            return Json(new { success = false, message = "Şifre bulunamadı." });
+                        }
+
+                        string storedPassword = DecryptPassword(storedEncryptedPassword.ToString());
+                        if (storedPassword != password)
                         {
                             return Json(new { success = false, message = "Geçersiz şifre." });
                         }
@@ -744,11 +759,11 @@ namespace Deneme_proje.Controllers
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Password verification error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Şifre doğrulama hatası: {ex.Message}");
                 return Json(new { success = false, message = $"Doğrulama hatası: {ex.Message}" });
             }
         }
-        // Şifre sıfırlama bağlantısı gönderme işlemi
+
         [HttpPost]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordModel model)
         {
@@ -759,9 +774,7 @@ namespace Deneme_proje.Controllers
                     return BadRequest(new { success = false, message = "Kullanıcı adı boş olamaz." });
                 }
 
-                // Admin kullanıcı için versiyon bilgisini almaya çalış
-                string selectedVersion = "V16"; // Varsayılan olarak V16
-
+                string selectedVersion = "V16";
                 string erpConnectionString = _configuration.GetConnectionString("ERPDatabase");
                 using (SqlConnection connection = new SqlConnection(erpConnectionString))
                 {
@@ -782,20 +795,14 @@ namespace Deneme_proje.Controllers
                     catch (Exception ex)
                     {
                         System.Diagnostics.Debug.WriteLine($"Versiyon bilgisi alınamadı: {ex.Message}");
-                        // Varsayılan V16 kullanılacak
                     }
                 }
 
-                // Kullanıcılar tablosundan userNo'yu alabilmek için MikroDB_V16 bağlantısı kullan
                 string mikroDbConnectionString = _configuration.GetConnectionString("MikroDB_V16");
-
-                // KULLANICILAR tablosundan User_no'yu bul
                 string userNo = null;
                 using (SqlConnection connection = new SqlConnection(mikroDbConnectionString))
                 {
                     await connection.OpenAsync();
-
-                    // Kullanıcı numarasını bul
                     string findUserQuery = "SELECT User_no FROM KULLANICILAR WHERE user_name = @username";
 
                     using (SqlCommand command = new SqlCommand(findUserQuery, connection))
@@ -812,7 +819,6 @@ namespace Deneme_proje.Controllers
                     }
                 }
 
-                // KullaniciYonetimi tablosunda kullanıcının varlığını kontrol et
                 bool userExists = false;
                 using (SqlConnection connection = new SqlConnection(erpConnectionString))
                 {
@@ -826,7 +832,6 @@ namespace Deneme_proje.Controllers
                         userExists = result != null;
                     }
 
-                    // Kullanıcı KullaniciYonetimi tablosunda yoksa ekle
                     if (!userExists)
                     {
                         string insertQuery = "INSERT INTO KullaniciYonetimi (User_no, GirisYetkisi) VALUES (@userNo, 1)";
@@ -839,16 +844,11 @@ namespace Deneme_proje.Controllers
                     }
                 }
 
-                // Dinamik bağlantı bilgisini direkt olarak al, veritabanı seçimini atlayarak
                 string dynamicConnectionString = _configuration.GetConnectionString("DynamicDatabase");
-
-                // Şimdi dinamik veritabanında kullanıcının e-posta adresini bul
                 string email = null;
                 using (SqlConnection connection = new SqlConnection(dynamicConnectionString))
                 {
                     await connection.OpenAsync();
-
-                    // E-posta adresini al
                     string query = "SELECT Per_PersMailAddress FROM PERSONELLER WHERE Per_UserNo = @userNo";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
@@ -865,23 +865,21 @@ namespace Deneme_proje.Controllers
                     }
                 }
 
-                // PasswordResetTokens tablosunu kontrol et ve gerekirse oluştur
                 using (SqlConnection connection = new SqlConnection(erpConnectionString))
                 {
                     await connection.OpenAsync();
-
                     string checkTableQuery = @"
-                IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'PasswordResetTokens')
-                BEGIN
-                    CREATE TABLE PasswordResetTokens (
-                        Id INT IDENTITY(1,1) PRIMARY KEY,
-                        User_no VARCHAR(50) NOT NULL,
-                        Token VARCHAR(100) NOT NULL,
-                        ExpiryDate DATETIME NOT NULL,
-                        IsUsed BIT NOT NULL DEFAULT 0,
-                        CreatedAt DATETIME NOT NULL DEFAULT GETDATE()
-                    );
-                END";
+                    IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'PasswordResetTokens')
+                    BEGIN
+                        CREATE TABLE PasswordResetTokens (
+                            Id INT IDENTITY(1,1) PRIMARY KEY,
+                            User_no VARCHAR(50) NOT NULL,
+                            Token VARCHAR(100) NOT NULL,
+                            ExpiryDate DATETIME NOT NULL,
+                            IsUsed BIT NOT NULL DEFAULT 0,
+                            CreatedAt DATETIME NOT NULL DEFAULT GETDATE()
+                        );
+                    END";
 
                     using (SqlCommand command = new SqlCommand(checkTableQuery, connection))
                     {
@@ -889,21 +887,19 @@ namespace Deneme_proje.Controllers
                     }
                 }
 
-                // Şifre sıfırlama tokenı oluştur
                 string token = GenerateResetToken();
-                DateTime expiry = DateTime.UtcNow.AddHours(24); // 24 saat geçerli
+                DateTime expiry = DateTime.UtcNow.AddHours(24);
 
-                // Token'ı veritabanına kaydet
                 using (SqlConnection connection = new SqlConnection(erpConnectionString))
                 {
                     await connection.OpenAsync();
                     string query = @"
-                IF EXISTS (SELECT 1 FROM PasswordResetTokens WHERE User_no = @userNo)
-                    UPDATE PasswordResetTokens SET Token = @token, ExpiryDate = @expiry, IsUsed = 0
-                    WHERE User_no = @userNo
-                ELSE
-                    INSERT INTO PasswordResetTokens (User_no, Token, ExpiryDate, IsUsed)
-                    VALUES (@userNo, @token, @expiry, 0)";
+                    IF EXISTS (SELECT 1 FROM PasswordResetTokens WHERE User_no = @userNo)
+                        UPDATE PasswordResetTokens SET Token = @token, ExpiryDate = @expiry, IsUsed = 0
+                        WHERE User_no = @userNo
+                    ELSE
+                        INSERT INTO PasswordResetTokens (User_no, Token, ExpiryDate, IsUsed)
+                        VALUES (@userNo, @token, @expiry, 0)";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
@@ -914,23 +910,18 @@ namespace Deneme_proje.Controllers
                     }
                 }
 
-                // E-posta gönderme işlemini özel bir try-catch ile sarmalayın
                 try
                 {
-                    // Şifre sıfırlama bağlantısını e-posta ile gönder
                     await SendPasswordResetEmail(email, token, model.Username);
                 }
                 catch (Exception mailEx)
                 {
                     System.Diagnostics.Debug.WriteLine($"E-POSTA_HATASI: {mailEx.Message}");
-
                     if (mailEx.InnerException != null)
                     {
                         System.Diagnostics.Debug.WriteLine($"E-POSTA_IC_HATA: {mailEx.InnerException.Message}");
                     }
-
                     System.Diagnostics.Debug.WriteLine($"E-POSTA_STACK_TRACE: {mailEx.StackTrace}");
-
                     return StatusCode(500, new
                     {
                         success = false,
@@ -947,12 +938,10 @@ namespace Deneme_proje.Controllers
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Şifre sıfırlama hatası: {ex.Message}");
-
                 if (ex.InnerException != null)
                 {
                     System.Diagnostics.Debug.WriteLine($"İç hata: {ex.InnerException.Message}");
                 }
-
                 return StatusCode(500, new
                 {
                     success = false,
@@ -961,7 +950,6 @@ namespace Deneme_proje.Controllers
             }
         }
 
-        // Benzersiz bir şifre sıfırlama tokenı oluştur
         private string GenerateResetToken()
         {
             byte[] tokenData = new byte[32];
@@ -976,7 +964,6 @@ namespace Deneme_proje.Controllers
         {
             try
             {
-                // SMTP ayarlarını konfigürasyondan al
                 var smtpServer = _configuration["EmailSettings:SmtpServer"];
                 var smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"]);
                 var senderEmail = _configuration["EmailSettings:SenderEmail"];
@@ -984,79 +971,46 @@ namespace Deneme_proje.Controllers
                 var senderDisplayName = _configuration["EmailSettings:SenderDisplayName"];
                 var appUrl = _configuration["AppSettings:BaseUrl"] ?? $"{Request.Scheme}://{Request.Host}";
 
-                // Resetleme URL'ini oluştur
                 string resetUrl = $"{appUrl}/Login/ResetPassword?token={token}&username={Uri.EscapeDataString(username)}";
 
-                // SSL güvenlik protokolünü ayarla
                 System.Net.ServicePointManager.SecurityProtocol =
                     System.Net.SecurityProtocolType.Tls12 |
                     System.Net.SecurityProtocolType.Tls11 |
                     System.Net.SecurityProtocolType.Tls;
 
-                // ÖNEMLİ: Sertifika doğrulamasını geçici olarak atla (EmailNotificationService'ten alındı)
                 System.Net.ServicePointManager.ServerCertificateValidationCallback =
                     delegate { return true; };
 
-                // E-posta başlığı
                 string subject = "Şifre Sıfırlama Talebi";
 
-                // E-posta içeriği
-                string body = $@"
-<!DOCTYPE html>
-<html lang=""tr"">
-<head>
-    <meta charset=""UTF-8"">
-    <style>
-        body {{ font-family: Arial, sans-serif; margin: 0; padding: 0; }}
-        .container {{ width: 100%; max-width: 650px; margin: 0 auto; padding: 20px; }}
-        .header {{ background-color: #f8f9fa; padding: 15px; border-bottom: 3px solid #007bff; }}
-        .header h1 {{ color: #007bff; margin: 0; }}
-        .content {{ padding: 20px 0; }}
-        .button {{ display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; }}
-        .button:hover {{ background-color: #0056b3; }}
-        .note {{ color: #6c757d; font-size: 12px; margin-top: 20px; }}
-        .footer {{ font-size: 12px; color: #6c757d; margin-top: 30px; border-top: 1px solid #e9ecef; padding-top: 10px; }}
-    </style>
-</head>
-<body>
-    <div class=""container"">
-        <div class=""header"">
-            <h1>Şifre Sıfırlama</h1>
-        </div>
-        <div class=""content"">
-            <p>Sayın Kullanıcı,</p>
-            
-            <p>Hesabınız için bir şifre sıfırlama talebinde bulundunuz. Şifrenizi sıfırlamak için aşağıdaki bağlantıya tıklayınız:</p>
-            
-            <p style=""text-align: center; margin: 30px 0;"">
-                <a href=""{resetUrl}"" class=""button"">Şifrenizi Sıfırlayın</a>
-            </p>
-            
-            <p>Ayrıca, aşağıdaki bağlantıyı tarayıcınıza kopyalayıp yapıştırabilirsiniz:</p>
-            <p style=""word-break: break-all;"">{resetUrl}</p>
-            
-            <p class=""note"">Bu bağlantı 24 saat boyunca geçerlidir. Eğer bu şifre sıfırlama talebini siz yapmadıysanız, lütfen bu e-postayı dikkate almayınız.</p>
-        </div>
-        <div class=""footer"">
-            <p>Bu otomatik bir e-postadır, lütfen yanıtlamayınız.</p>
-        </div>
-    </div>
-</body>
-</html>";
+                string body = $@"Şifre Sıfırlama
 
+Sayın Kullanıcı,
+
+Hesabınız için bir şifre sıfırlama talebinde bulundunuz. Şifrenizi sıfırlamak için aşağıdaki bağlantıya tıklayınız:
+
+Şifrenizi Sıfırlayın
+
+Ayrıca, aşağıdaki bağlantıyı tarayıcınıza kopyalayıp yapıştırabilirsiniz:
+
+{resetUrl}
+
+Bu bağlantı 24 saat boyunca geçerlidir. Eğer bu şifre sıfırlama talebini siz yapmadıysanız, lütfen bu e-postayı dikkate almayınız.
+
+Bu otomatik bir e-postadır, lütfen yanıtlamayınız.
+
+ ";
                 try
                 {
-                    // SMTP istemcisini oluştur
                     using (var client = new SmtpClient(smtpServer)
                     {
                         Port = smtpPort,
                         Credentials = new NetworkCredential(senderEmail, senderPassword),
                         EnableSsl = true,
                         DeliveryMethod = SmtpDeliveryMethod.Network,
-                        Timeout = 30000 // 30 saniye timeout (arttırıldı)
+                        Timeout = 30000
                     })
                     {
-                        // E-posta mesajını oluştur
                         using (var mailMessage = new MailMessage
                         {
                             From = new MailAddress(senderEmail, senderDisplayName),
@@ -1065,10 +1019,7 @@ namespace Deneme_proje.Controllers
                             IsBodyHtml = true
                         })
                         {
-                            // Alıcı e-posta adresini ekle
                             mailMessage.To.Add(email);
-
-                            // E-postayı gönder
                             await client.SendMailAsync(mailMessage);
                             System.Diagnostics.Debug.WriteLine($"Şifre sıfırlama e-postası gönderildi: {email}");
                         }
@@ -1076,38 +1027,29 @@ namespace Deneme_proje.Controllers
                 }
                 catch (Exception sendEx)
                 {
-                    // Gönderim sırasındaki hatayı detaylı logla
                     System.Diagnostics.Debug.WriteLine($"E-posta gönderme hatası: {sendEx.Message}");
-
-                    // İç içe hata varsa onu da logla
                     if (sendEx.InnerException != null)
                     {
                         System.Diagnostics.Debug.WriteLine($"İç Hata: {sendEx.InnerException.Message}");
                     }
-
-                    // Hatayı yeniden fırlat
                     throw;
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"E-posta gönderme hatası: {ex.Message}");
-
                 if (ex.InnerException != null)
                 {
                     System.Diagnostics.Debug.WriteLine($"İç hata: {ex.InnerException.Message}");
                 }
-
                 throw;
             }
             finally
             {
-                // Güvenlik için sertifika doğrulamasını geri yükle
                 System.Net.ServicePointManager.ServerCertificateValidationCallback = null;
             }
         }
 
-        // Şifre sıfırlama sayfası
         [HttpGet]
         public IActionResult ResetPassword(string token, string username)
         {
@@ -1122,7 +1064,6 @@ namespace Deneme_proje.Controllers
             return View();
         }
 
-        // Şifre sıfırlama işlemi
         [HttpPost]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
         {
@@ -1138,16 +1079,19 @@ namespace Deneme_proje.Controllers
                     return BadRequest(new { success = false, message = "Şifreler eşleşmiyor veya boş." });
                 }
 
-                // Token'ın geçerliliğini kontrol et
+                string encryptedPassword = EncryptPassword(model.NewPassword);
+                if (string.IsNullOrEmpty(encryptedPassword))
+                {
+                    return BadRequest(new { success = false, message = "Şifre şifreleme işlemi başarısız." });
+                }
+
                 string erpConnectionString = _configuration.GetConnectionString("ERPDatabase");
                 string userNo = null;
 
-                // KULLANICILAR tablosundan User_no'yu bul
                 string mikroDbConnectionString = _configuration.GetConnectionString("MikroDB_V16");
                 using (SqlConnection mikroDbConnection = new SqlConnection(mikroDbConnectionString))
                 {
                     await mikroDbConnection.OpenAsync();
-
                     string findUserQuery = "SELECT User_no FROM KULLANICILAR WHERE user_name = @username";
 
                     using (SqlCommand command = new SqlCommand(findUserQuery, mikroDbConnection))
@@ -1167,14 +1111,12 @@ namespace Deneme_proje.Controllers
                 using (SqlConnection connection = new SqlConnection(erpConnectionString))
                 {
                     await connection.OpenAsync();
-
-                    // Token'ın geçerliliğini kontrol et
                     string tokenQuery = @"
-                SELECT 1 FROM PasswordResetTokens 
-                WHERE User_no = @userNo 
-                AND Token = @token 
-                AND ExpiryDate > @now
-                AND IsUsed = 0";
+                    SELECT 1 FROM PasswordResetTokens 
+                    WHERE User_no = @userNo 
+                    AND Token = @token 
+                    AND ExpiryDate > @now
+                    AND IsUsed = 0";
 
                     using (SqlCommand command = new SqlCommand(tokenQuery, connection))
                     {
@@ -1194,11 +1136,10 @@ namespace Deneme_proje.Controllers
                         }
                     }
 
-                    // Token'ı kullanıldı olarak işaretle
                     string updateTokenQuery = @"
-                UPDATE PasswordResetTokens 
-                SET IsUsed = 1
-                WHERE User_no = @userNo AND Token = @token";
+                    UPDATE PasswordResetTokens 
+                    SET IsUsed = 1
+                    WHERE User_no = @userNo AND Token = @token";
 
                     using (SqlCommand command = new SqlCommand(updateTokenQuery, connection))
                     {
@@ -1207,7 +1148,6 @@ namespace Deneme_proje.Controllers
                         await command.ExecuteNonQueryAsync();
                     }
 
-                    // KullaniciYonetimi tablosunda kullanıcı kaydının varlığını kontrol et
                     bool userExists = false;
                     string checkUserQuery = "SELECT 1 FROM KullaniciYonetimi WHERE User_no = @userNo";
 
@@ -1218,29 +1158,27 @@ namespace Deneme_proje.Controllers
                         userExists = result != null;
                     }
 
-                    // Kullanıcı yoksa ekle, varsa güncelle
                     if (!userExists)
                     {
                         string insertUserQuery = "INSERT INTO KullaniciYonetimi (User_no, Sifre, GirisYetkisi) VALUES (@userNo, @newPassword, 1)";
                         using (SqlCommand command = new SqlCommand(insertUserQuery, connection))
                         {
                             command.Parameters.AddWithValue("@userNo", userNo);
-                            command.Parameters.AddWithValue("@newPassword", model.NewPassword);
+                            command.Parameters.AddWithValue("@newPassword", encryptedPassword);
                             await command.ExecuteNonQueryAsync();
                         }
                     }
                     else
                     {
-                        // Şifreyi güncelle
                         string updatePasswordQuery = @"
-                    UPDATE KullaniciYonetimi 
-                    SET Sifre = @newPassword
-                    WHERE User_no = @userNo";
+                        UPDATE KullaniciYonetimi 
+                        SET Sifre = @newPassword
+                        WHERE User_no = @userNo";
 
                         using (SqlCommand command = new SqlCommand(updatePasswordQuery, connection))
                         {
                             command.Parameters.AddWithValue("@userNo", userNo);
-                            command.Parameters.AddWithValue("@newPassword", model.NewPassword);
+                            command.Parameters.AddWithValue("@newPassword", encryptedPassword);
                             await command.ExecuteNonQueryAsync();
                         }
                     }
@@ -1255,12 +1193,10 @@ namespace Deneme_proje.Controllers
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Şifre sıfırlama hatası: {ex.Message}");
-
                 if (ex.InnerException != null)
                 {
                     System.Diagnostics.Debug.WriteLine($"İç hata: {ex.InnerException.Message}");
                 }
-
                 return StatusCode(500, new
                 {
                     success = false,
@@ -1268,8 +1204,8 @@ namespace Deneme_proje.Controllers
                 });
             }
         }
-
     }
+
     public class ForgotPasswordModel
     {
         public string Username { get; set; }
@@ -1282,6 +1218,7 @@ namespace Deneme_proje.Controllers
         public string NewPassword { get; set; }
         public string ConfirmPassword { get; set; }
     }
+
     public class UserConnectionInfo
     {
         public string Version { get; set; }

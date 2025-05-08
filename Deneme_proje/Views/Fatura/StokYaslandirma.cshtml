@@ -7,7 +7,7 @@
     var selectedStockCode = ViewData["SelectedStockCode"] as string;
     var hasFilterApplied = !string.IsNullOrEmpty(selectedStockCode);
 
-    // Diğer değişkenler aynı şekilde kalıyor
+    // Değişkenler yuvarlama olmadan kullanılacak
     double toplamGirenMiktar = 0;
     double toplamGirenTarih = 0;
     double toplamGirenBrutFiyat = 0;
@@ -104,7 +104,7 @@
             </div>
         </div>
 
-        <!-- Geri kalan tablo ve içerik aynı kalıyor -->
+        <!-- Tablo ve içerik -->
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">
@@ -136,21 +136,21 @@
                                             <tbody>
                                                 @foreach (var item in Model)
                                                 {
-                                                    // Burada tam stok miktarını 'StokMiktar' olarak kullanıyoruz
-                                                    var brüt_birim = Math.Round(item.StokTutar, 4) / item.StokMiktar; // Tam miktarı kullanarak brüt birim hesaplama
-                                                    var usd_birim = @Math.Round((brüt_birim / item.AltDovizKuru), 4); // Döviz cinsinden birim fiyat hesaplama
+                                                    // Birim hesaplamaları (yuvarlama yapılmadan)
+                                                    var brüt_birim = item.StokTutar / item.StokMiktar;
+                                                    var usd_birim = brüt_birim / item.AltDovizKuru;
 
                                                     // Parçalanmış giren miktarı kullanarak giren tarih ve brüt fiyat hesaplama
                                                     var giren_tarih = item.StoktaGirenMiktar * item.NumericDate;
-                                                    var giren_brütfiyat = item.StoktaGirenMiktar * brüt_birim; // Parçalanmış miktarı brüt birimle çarparak
-                                                    var giren_brütfiyat_usd = item.StoktaGirenMiktar * usd_birim; // Aynısını USD birimiyle yapıyoruz
+                                                    var giren_brütfiyat = item.StoktaGirenMiktar * brüt_birim;
+                                                    var giren_brütfiyat_usd = item.StoktaGirenMiktar * usd_birim;
 
-                                                    var bugunuNumericDate1 = (int)(DateTime.Now - excelStartDate.AddDays(-2)).TotalDays; // Excel formatı hesaplama
+                                                    var bugunuNumericDate1 = (int)(DateTime.Now - excelStartDate.AddDays(-2)).TotalDays;
 
                                                     // Stok yaşı hesaplama (bugünkü tarihe göre)
                                                     var giren_yas = bugunuNumericDate1 - item.NumericDate;
 
-                                                    // Toplam hesaplamalar (parçalanmış giren miktar üzerinden yapılıyor)
+                                                    // Toplam hesaplamalar
                                                     toplamGirenMiktar += item.StoktaGirenMiktar;
                                                     toplamGirenTarih += giren_tarih;
                                                     toplamGirenBrutFiyat += giren_brütfiyat;
@@ -159,36 +159,28 @@
                                                     <tr>
                                                         <td>@item.MsgS0078</td>
                                                         <td>@item.MsgS0870</td>
-
-                                                        <!-- Burada tam stok miktarını gösteriyoruz, parçalanmış giren miktar yerine -->
-                                                        <td style="text-align: right;">@Math.Round(item.StoktaGirenMiktar).ToString("N0")</td> <!-- Tam miktarı kullanıyoruz -->
+                                                        <td style="text-align: right;">@item.StoktaGirenMiktar.ToString("N0")</td>
                                                         <td>@item.BirimAdi</td>
-                                                        <!-- Birim fiyat hesaplama ve gösterim (TL ve USD) -->
-                                                        <td style="text-align: right;">@string.Format("{0:C5}", brüt_birim) </td> <!-- TL formatında birim fiyat -->
-                                                        <td style="text-align: right;">@item.AltDovizKuru.ToString("C")</td>
-                                                        <td style="text-align: right;">@string.Format("{0:C5}", usd_birim) </td> <!-- USD formatında birim fiyat -->
-
-                                                        <td>@item.StokTarih.ToString("dd/MM/yyyy")</td> <!-- Stok tarihi -->
-                                                        <!-- Stok yaşı -->
+                                                        <td style="text-align: right;">@brüt_birim.ToString("N5")</td>
+                                                        <td style="text-align: right;">@item.AltDovizKuru.ToString("N5")</td>
+                                                        <td style="text-align: right;">@usd_birim.ToString("N5")</td>
+                                                        <td>@item.StokTarih.ToString("dd/MM/yyyy")</td>
                                                         <td style="text-align: right;">@giren_yas.ToString("N0")</td>
-
                                                         <td>@item.DepoAdi</td>
                                                     </tr>
                                                 }
                                             </tbody>
                                             <tfoot>
-                                                @* Tfoot'ta toplam hesaplamalar sonrası A.O.G. Tarihi, Stok Yaşı ve Stok Yaşlandırmalarını ekleme *@
                                                 @{
                                                     // Ağırlıklı Ortalama Giriş Tarihi (A.O.G. Tarihi) ve stok yaşı hesaplamaları
-                                                    var aogt = toplamGirenMiktar > 0 ? toplamGirenTarih / toplamGirenMiktar : 0; // Bölme hatasını önlemek için kontrol ekledik.
-                                                    var finalAogtDate = toplamGirenMiktar > 0 ? excelStartDate.AddDays(aogt - 2) : excelStartDate; // Hata önlemek için koşul ekledik.
+                                                    var aogt = toplamGirenMiktar > 0 ? toplamGirenTarih / toplamGirenMiktar : 0;
+                                                    var finalAogtDate = toplamGirenMiktar > 0 ? excelStartDate.AddDays(aogt - 2) : excelStartDate;
                                                     var bugunuNumericDate = (int)(DateTime.Now - excelStartDate.AddDays(-2)).TotalDays;
 
-                                                    var stokyas = toplamGirenMiktar > 0 ? bugunuNumericDate - aogt : 0; // Stok yaşı hesaplaması
+                                                    var stokyas = toplamGirenMiktar > 0 ? bugunuNumericDate - aogt : 0;
                                                     var stoktutar_sonsatinalma = toplamGirenMiktar * enSonGirenStokBirimTutar;
 
                                                     var aobm = toplamGirenMiktar > 0 ? toplamGirenBrutFiyat / toplamGirenMiktar : 0;
-
                                                     var aobm_usd = toplamGirenMiktar > 0 ? toplamGirenUsdBrutFiyat / toplamGirenMiktar : 0;
 
                                                     // Yaşlandırma hesaplamaları için değişkenler
@@ -237,18 +229,18 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr>
-                                                                <td style="text-align: right;" id="toplamGirenMiktar">@Math.Round(toplamGirenMiktar, 2).ToString("N0")</td>
+                                                                <td style="text-align: right;" id="toplamGirenMiktar">@toplamGirenMiktar.ToString("N0")</td>
                                                                 <td>@finalAogtDate.ToString("dd/MM/yyyy")</td>
-                                                                <td style="text-align: right;">@Math.Round(stokyas).ToString("N2")</td>
-                                                                <td style="text-align: right;">@Math.Round(aobm, 5).ToString("N2")</td>
-                                                                <td style="text-align: right;" id="aobm_usd">@Math.Round(aobm_usd, 5).ToString("N2")</td>
-                                                                <td style="text-align: right;">@Math.Round(enSonGirenStokBirimTutar, 5).ToString("N2")</td>
-                                                                <td style="text-align: right;">@Math.Round(stoktutar_sonsatinalma, 5).ToString("N2")</td>
-                                                                <td style="text-align: right;" id="stok_tutari_usd">Hesaplanıyor...</td> <!-- Hesaplanan stok tutarı burada gösterilecek -->
-                                                                <td style="text-align: right;">@Math.Round(yas0_30, 2).ToString("N2")</td> <!-- 0-30 Günlük stok miktarı -->
-                                                                <td style="text-align: right;">@Math.Round(yas31_60, 2).ToString("N2")</td> <!-- 31-60 Günlük stok miktarı -->
-                                                                <td style="text-align: right;">@Math.Round(yas61_90, 2).ToString("N2")</td> <!-- 61-90 Günlük stok miktarı -->
-                                                                <td style="text-align: right;">@Math.Round(yas90_plus, 2).ToString("N2")</td> <!-- 90+ Günlük stok miktarı -->
+                                                                <td style="text-align: right;">@stokyas.ToString("N0")</td>
+                                                                <td style="text-align: right;">@aobm.ToString("N5")</td>
+                                                                <td style="text-align: right;" id="aobm_usd">@aobm_usd.ToString("N5")</td>
+                                                                <td style="text-align: right;">@enSonGirenStokBirimTutar.ToString("N5")</td>
+                                                                <td style="text-align: right;">@stoktutar_sonsatinalma.ToString("N5")</td>
+                                                                <td style="text-align: right;" id="stok_tutari_usd">Hesaplanıyor...</td>
+                                                                <td style="text-align: right;">@yas0_30.ToString("N0")</td>
+                                                                <td style="text-align: right;">@yas31_60.ToString("N0")</td>
+                                                                <td style="text-align: right;">@yas61_90.ToString("N0")</td>
+                                                                <td style="text-align: right;">@yas90_plus.ToString("N0")</td>
                                                             </tr>
                                                             <tr>
                                                                 <td colspan="12">Döviz Kuru (USD/TL): <span id="usd_exchange_rate">Yükleniyor...</span></td>
@@ -293,7 +285,7 @@
             $("#stokArama").val(selectedText);
         }
 
-        // DataTable ve diğer kodlar aynı şekilde devam ediyor
+        // DataTable ve diğer kodlar
         if ($.fn.DataTable) {
             if ($('#example').length) {
                 $('#example').DataTable({
@@ -311,7 +303,7 @@
             }
         }
 
-        // Döviz kuru kodları aynı şekilde devam ediyor
+        // Döviz kuru kodları
         fetchExchangeRate();
 
         function fetchExchangeRate() {
@@ -381,15 +373,20 @@
         }
 
         function updateExchangeRate(rate, isFallback) {
-            var formattedRate = rate.toFixed(4);
+            // Döviz kurunu 5 basamaklı göster
+            var formattedRate = rate.toFixed(5);
             if (isFallback) {
                 $("#usd_exchange_rate").text(formattedRate + " (Tahmini değer)");
             } else {
                 $("#usd_exchange_rate").text(formattedRate);
             }
 
-            var aobmUsd = parseFloat($("#aobm_usd").text().replace(/\./g, '').replace(',', '.'));
-            var toplamGirenMiktar = parseFloat($("#toplamGirenMiktar").text().replace(/\./g, '').replace(',', '.'));
+            // Virgülle ayrılmış değerleri doğru şekilde al
+            var aobmUsdText = $("#aobm_usd").text();
+            var toplamGirenMiktarText = $("#toplamGirenMiktar").text();
+
+            var aobmUsd = parseFloat(aobmUsdText.replace(/\./g, '').replace(',', '.'));
+            var toplamGirenMiktar = parseFloat(toplamGirenMiktarText.replace(/\./g, '').replace(',', '.'));
 
             console.log("AOBM USD:", aobmUsd);
             console.log("Toplam Giren Miktar:", toplamGirenMiktar);
@@ -399,10 +396,11 @@
                 var stokTutariUsd = aobmUsd * toplamGirenMiktar;
                 var stokTutariTl = stokTutariUsd * rate;
 
+                // Yuvarlamasız, 5 basamaklı gösterim
                 $("#stok_tutari_usd").text(
-                    stokTutariUsd.toLocaleString('tr-TR', { maximumFractionDigits: 2 }) +
+                    stokTutariUsd.toLocaleString('tr-TR', { minimumFractionDigits: 5, maximumFractionDigits: 5 }) +
                     " USD (" +
-                    stokTutariTl.toLocaleString('tr-TR', { maximumFractionDigits: 2 }) +
+                    stokTutariTl.toLocaleString('tr-TR', { minimumFractionDigits: 5, maximumFractionDigits: 5 }) +
                     " TL)"
                 );
             } else {

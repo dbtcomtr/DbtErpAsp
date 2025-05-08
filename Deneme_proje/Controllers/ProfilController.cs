@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -71,7 +72,7 @@ namespace Deneme_proje.Controllers
                 return View("Error");
             }
         }
-        [AllowAnonymous]
+        [AllowAnonymous] // Güvenlik için AllowAnonymous yerine Authorize kullanıyoruz
         [HttpPost]
         public async Task<IActionResult> SifreDegistir([FromBody] SifreDegistirModel model)
         {
@@ -90,35 +91,45 @@ namespace Deneme_proje.Controllers
                     return BadRequest(new { success = false, message = "Kullanıcı bilgisi bulunamadı." });
                 }
 
-                // Mevcut şifreyi kontrol et
-                string erpConnectionString = _configuration.GetConnectionString("ERPDatabase");
-                bool sifreDogruMu = false;
+                // Mevcut şifreyi doğrula
+                var sifreDogrulaModel = new SifreDogrulaModel { Sifre = model.MevcutSifre };
+                var sifreDogrulaResult = await SifreDogrula(sifreDogrulaModel);
 
+                // IActionResult'ı OkObjectResult olarak cast et
+                if (sifreDogrulaResult is OkObjectResult okResult)
+                {
+                    var response = okResult.Value as dynamic; // Veya bir anonim tip/dictionary olarak işleyebilirsiniz
+                    if (response == null || !(bool)response.success)
+                    {
+                        return BadRequest(new { success = false, message = response?.message?.ToString() ?? "Şifre doğrulama başarısız." });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new { success = false, message = "Şifre doğrulama işlemi başarısız." });
+                }
+
+                // LoginController'dan şifre şifreleme metoduna erişmek için instance oluştur
+                var loginController = new LoginController(_configuration, _dbSelectorService);
+
+                // Yeni şifreyi şifrele
+                string encryptedYeniSifre = loginController.EncryptPassword(model.YeniSifre);
+                if (string.IsNullOrEmpty(encryptedYeniSifre))
+                {
+                    return BadRequest(new { success = false, message = "Yeni şifre şifreleme işlemi başarısız." });
+                }
+
+                // Şifreyi güncelle
+                string erpConnectionString = _configuration.GetConnectionString("ERPDatabase");
                 using (SqlConnection connection = new SqlConnection(erpConnectionString))
                 {
                     await connection.OpenAsync();
-                    string query = "SELECT 1 FROM KullaniciYonetimi WHERE User_no = @userNo AND Sifre = @mevcutSifre";
-
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@userNo", userNo);
-                        command.Parameters.AddWithValue("@mevcutSifre", model.MevcutSifre);
-                        var result = await command.ExecuteScalarAsync();
-                        sifreDogruMu = result != null;
-                    }
-
-                    if (!sifreDogruMu)
-                    {
-                        return BadRequest(new { success = false, message = "Mevcut şifre yanlış." });
-                    }
-
-                    // Şifreyi güncelle
                     string updateQuery = "UPDATE KullaniciYonetimi SET Sifre = @yeniSifre WHERE User_no = @userNo";
 
                     using (SqlCommand command = new SqlCommand(updateQuery, connection))
                     {
                         command.Parameters.AddWithValue("@userNo", userNo);
-                        command.Parameters.AddWithValue("@yeniSifre", model.YeniSifre);
+                        command.Parameters.AddWithValue("@yeniSifre", encryptedYeniSifre);
                         await command.ExecuteNonQueryAsync();
                     }
                 }
@@ -131,6 +142,7 @@ namespace Deneme_proje.Controllers
                 return StatusCode(500, new { success = false, message = "Şifre değiştirme işlemi sırasında bir hata oluştu." });
             }
         }
+
         [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> SifreDogrula([FromBody] SifreDogrulaModel model)
@@ -145,25 +157,41 @@ namespace Deneme_proje.Controllers
                     return BadRequest(new { success = false, message = "Kullanıcı bilgisi bulunamadı." });
                 }
 
-                // Şifreyi doğrula
+                // LoginController'dan şifre çözme metoduna erişmek için instance oluştur
+                var loginController = new LoginController(_configuration, _dbSelectorService);
+
+                // Veritabanındaki şifreyi al ve çöz
                 string erpConnectionString = _configuration.GetConnectionString("ERPDatabase");
-                bool sifreDogruMu = false;
+                string storedEncryptedPassword = null;
 
                 using (SqlConnection connection = new SqlConnection(erpConnectionString))
                 {
                     await connection.OpenAsync();
-                    string query = "SELECT 1 FROM KullaniciYonetimi WHERE User_no = @userNo AND Sifre = @sifre";
+                    string query = "SELECT Sifre FROM KullaniciYonetimi WHERE User_no = @userNo";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@userNo", userNo);
-                        command.Parameters.AddWithValue("@sifre", model.Sifre);
                         var result = await command.ExecuteScalarAsync();
-                        sifreDogruMu = result != null;
+                        storedEncryptedPassword = result?.ToString();
                     }
-                }
 
-                return Ok(new { success = sifreDogruMu });
+                    if (string.IsNullOrEmpty(storedEncryptedPassword))
+                    {
+                        return BadRequest(new { success = false, message = "Kullanıcı şifresi bulunamadı." });
+                    }
+
+                    // Şifreyi çöz
+                    string storedPassword = loginController.DecryptPassword(storedEncryptedPassword);
+                    if (storedPassword == null)
+                    {
+                        return BadRequest(new { success = false, message = "Şifre çözme işlemi başarısız." });
+                    }
+
+                    // Şifreyi plain text olarak karşılaştır
+                    bool sifreDogruMu = storedPassword == model.Sifre;
+                    return Ok(new { success = sifreDogruMu });
+                }
             }
             catch (Exception ex)
             {
