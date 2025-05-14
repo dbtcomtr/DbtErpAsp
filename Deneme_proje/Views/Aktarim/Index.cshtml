@@ -1,0 +1,262 @@
+﻿@model List<Deneme_proje.Models.AktarimEntities.StockMovement>
+
+<!-- CSS Bağlantıları -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+
+<style>
+
+
+
+
+
+
+	.main-header {
+		background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+		padding: 20px;
+		border-radius: 12px;
+		color: #fff;
+		margin-bottom: 30px;
+		box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		flex-wrap: wrap;
+	}
+
+		.main-header h4 {
+			font-size: 24px;
+			font-weight: 600;
+		}
+
+	.breadcrumb {
+		list-style: none;
+		display: flex;
+		gap: 10px;
+		font-size: 14px;
+	}
+
+	.breadcrumb-item a {
+		color: #fff;
+		text-decoration: none;
+	}
+
+	.card {
+		background: #fff;
+		border-radius: 12px;
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+		margin-bottom: 20px;
+		overflow: hidden;
+	}
+
+	.card-header {
+		background: #1e40af;
+		color: #fff;
+		padding: 15px 20px;
+		font-size: 18px;
+		font-weight: 500;
+	}
+
+	.form-section {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+		gap: 20px;
+		padding: 20px;
+	}
+
+	.form-group {
+		display: flex;
+		flex-direction: column;
+	}
+
+	label {
+		font-size: 14px;
+		margin-bottom: 6px;
+		font-weight: 500;
+	}
+
+	input,
+	select {
+		padding: 10px;
+		border-radius: 8px;
+		border: 1px solid #d1d5db;
+		font-size: 14px;
+	}
+
+	.buttons-section {
+		padding: 0 20px 20px;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+	}
+
+	.aktarimbtn {
+		background: #3b82f6;
+		color: #fff;
+		border: none;
+		padding: 10px 20px;
+		border-radius: 8px;
+		cursor: pointer;
+		transition: background 0.3s;
+	}
+
+		.aktarimbtn:hover {
+			background: #2563eb;
+		}
+
+	.grid-container {
+		overflow-x: auto;
+		padding: 20px;
+	}
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+
+	thead {
+		background: #1e3a8a;
+		color: white;
+	}
+
+	th, td {
+		padding: 12px;
+		text-align: left;
+		border-bottom: 1px solid #e5e7eb;
+		font-size: 14px;
+	}
+
+	tbody tr:nth-child(even) {
+		background-color: #f9fafb;
+	}
+
+	tbody tr:hover {
+		background-color: #e0f2fe;
+	}
+</style>
+
+
+<div class="main-content mt-5" style="padding: 20px;">
+	<div class="px-lg-5 px-3">
+		<div class="card">
+			<div class="card-header">Filtreleme</div>
+			<div class="form-section">
+    <!-- Mevcut form elemanları -->
+    <div class="form-group">
+        <label for="urun-kodu">Ürün Kodu</label>
+        <input type="text" id="urun-kodu" value="SP-5521344" />
+    </div>
+    <div class="form-group">
+        <label for="depo">Ürün Giriş Depo </label>
+        <select id="depo">
+            <option>MAMUL DEPO</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="depo">Hammadde Çıkış Depo</label>
+        <select id="depo">
+            <option>MAMUL DEPO</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="miktar">Miktar</label>
+        <input type="text" id="miktar" value="14" />
+    </div>
+    <div class="form-group">
+        <label for="depo">Srm Merkezi</label>
+        <select id="depo">
+            <option>Seçiniz</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="tarih">Tarih</label>
+        <input type="date" id="tarih" value="2025-05-14" />
+    </div>
+    <!-- Yeni parametre dropdown'ı ekleyin -->
+    <div class="form-group">
+        <label for="selectedParametre">Parametre</label>
+        <select id="selectedParametre" name="selectedParametre">
+            <option value="">Parametre Seçiniz</option>
+            @foreach (var param in ViewBag.Parametreler)
+            {
+                <option value="@param.ParametreAdi" @@(ViewBag.SelectedParametre == param.ParametreAdi ? "selected" : "")>@param.ParametreAdi</option>
+            }
+        </select>
+    </div>
+</div>
+
+			<form asp-controller="Aktarim" asp-action="Index" method="post" enctype="multipart/form-data" style="padding: 20px;">
+				<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+					<input type="file" name="excelFile" class="form-control" />
+					<input type="hidden" name="selectedParametre" id="hiddenSelectedParametre" />
+					<button type="submit" class="aktarimbtn" onclick="setSelectedParametre()">Listele</button>
+				</div>
+			</form>
+
+			<div class="buttons-section">
+				<button class="aktarimbtn">Dosya Seç</button>
+				<button class="aktarimbtn">Aktar</button>
+				<button class="aktarimbtn">Filtreleyerek Aktar Aktar</button>
+			</div>
+		</div>
+
+		<!-- ✅ GRUPLANMIŞ TABLO ALANI -->
+		@foreach (var group in Model.GroupBy(x => x.Grup))
+		{
+			<div class="card">
+				<div class="card-header">@group.Key</div>
+				<div class="grid-container">
+					<table>
+						<thead>
+							<tr>
+								<th>Aktarılsın</th>
+								<th>Stok Kodu</th>
+								<th>Açıklama</th>
+								<th>Birim</th>
+								<th>Fiyat</th>
+								<th>Net</th>
+								<th>Brüt</th>
+								<th>Ağırlık</th>
+								<th>Net Tutar</th>
+								<th>Brüt Tutar</th>
+								<th>Para</th>
+								<th>Kur</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var item in group)
+							{
+								bool isChecked = true;
+								// Eğer parametre seçildiyse ve bu stok seçilen parametredeki stoklardan biriyse, checkbox işaretsiz olacak
+								if (ViewBag.SecilenStokKodlari != null && ViewBag.SecilenStokKodlari.Contains(item.StokKodu))
+								{
+									isChecked = false;
+								}
+								<tr>
+									<td><input type="checkbox" @(isChecked ? "checked" : "") /></td>
+									<td>@item.StokKodu</td>
+									<td>@item.Aciklama</td>
+									<td>@item.Birim</td>
+									<td class="num-cell">@item.Fiyat</td>
+									<td class="num-cell">@item.Net</td>
+									<td class="num-cell">@item.Brut</td>
+									<td class="num-cell">@item.Agirlik</td>
+									<td class="num-cell">@item.NetTutar</td>
+									<td class="num-cell">@item.BrutTutar</td>
+									<td>@item.Para</td>
+									<td class="num-cell">@item.Kur</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		}
+	</div>
+</div>
+<script>
+	function setSelectedParametre() {
+		var selectedParametre = document.getElementById('selectedParametre').value;
+		document.getElementById('hiddenSelectedParametre').value = selectedParametre;
+	}
+</script>

@@ -851,20 +851,41 @@
 										</tr>
 
 										<!-- Level 3: STOKLAR -->
+										<!-- Level 3: STOKLAR -->
 										<tr class="level-3">
 											<td class="item-name-A">STOKLAR</td>
-											<td class="item-amount"></td>
+											<td class="item-amount">
+												@{
+													decimal toplamStokMaliyeti = 0;
+													if (Model.StokMaliyeti != null && Model.StokMaliyeti.Any())
+													{
+														toplamStokMaliyeti = Model.StokMaliyeti.Sum(s => s.DepoMaliyeti);
+													}
+												}
+												@toplamStokMaliyeti.ToString("N2") ₺
+											</td>
 										</tr>
 
 										<!-- Level 4: İlk Madde Malzeme -->
 										<tr class="level-4">
 											<td class="item-name-A">İlk Madde Malzeme</td>
-											<td class="item-amount"></td>
+											<td class="item-amount">
+												@{
+													decimal ilkMaddeMaliyeti = 0;
+													if (Model.StokMaliyeti != null && Model.StokMaliyeti.Any())
+													{
+														ilkMaddeMaliyeti = Model.StokMaliyeti
+														.Where(s => s.DepoNo == 1)
+														.Sum(s => s.DepoMaliyeti);
+													}
+												}
+												@ilkMaddeMaliyeti.ToString("N2") ₺
+											</td>
 										</tr>
 
-										@if (Model.StokDepoDagilimi != null && Model.StokDepoDagilimi.Any())
+										@if (Model.StokMaliyeti != null && Model.StokMaliyeti.Any())
 										{
-											var ilkMaddeMalzemeler = Model.StokDepoDagilimi
+											var ilkMaddeMalzemeler = Model.StokMaliyeti
 											.Where(s => s.DepoNo == 1)
 											.GroupBy(s => new { s.StokKodu, s.StokAdi })
 											.Select(g => new
@@ -872,78 +893,78 @@
 												g.Key.StokKodu,
 												g.Key.StokAdi,
 												ToplamMiktar = g.Sum(s => s.DepoMiktari),
+												ToplamMaliyet = g.Sum(s => s.DepoMaliyeti),
 												BirimAdi = g.First().BirimAdi,
-												Depolar = g.Where(d => d.DepoNo == 1).Select(d => new { d.DepoNo, d.DepoAdi, d.DepoMiktari }).ToList()
+												BirimMaliyet = g.Sum(s => s.DepoMaliyeti) / Convert.ToDecimal(g.Sum(s => s.DepoMiktari))
 											})
-											.OrderByDescending(s => s.ToplamMiktar);
+											.OrderByDescending(s => s.ToplamMaliyet);
 
 											foreach (var stok in ilkMaddeMalzemeler)
 											{
 												<tr class="detail-row">
 													<td class="item-name-A">@stok.StokAdi (@stok.StokKodu)</td>
-													<td class="item-amount">@stok.ToplamMiktar.ToString("N2") @stok.BirimAdi</td>
+													<td class="item-amount">@stok.ToplamMaliyet.ToString("N2") ₺</td>
 												</tr>
-
-												foreach (var depo in stok.Depolar)
-												{
-													<tr class="sub-detail-row">
-														<td class="item-name-A">@depo.DepoAdi (Depo: @depo.DepoNo)</td>
-														<td class="item-amount">@depo.DepoMiktari.ToString("N2") @stok.BirimAdi</td>
-													</tr>
-												}
 											}
 										}
-
-
-									
-
 
 										<!-- Level 4: Ticari Mallar -->
 										<tr class="level-4 can-toggle">
 											<td class="item-name-A">Ticari Mallar</td>
-											<td class="item-amount"></td>
+											<td class="item-amount">
+												@{
+													decimal ticariMalMaliyeti = 0;
+													if (Model.StokMaliyeti != null && Model.StokMaliyeti.Any())
+													{
+														ticariMalMaliyeti = Model.StokMaliyeti
+														.Where(s => s.DepoNo != 1 && s.DepoNo != 7 && s.DepoNo != 8)
+														.Sum(s => s.DepoMaliyeti);
+													}
+												}
+												@ticariMalMaliyeti.ToString("N2") ₺
+											</td>
 										</tr>
 
-										@if (Model.StokDepoDagilimi != null && Model.StokDepoDagilimi.Any())
+										@if (Model.StokMaliyeti != null && Model.StokMaliyeti.Any())
 										{
-											var digerStoklar = Model.StokDepoDagilimi
+											var digerStoklar = Model.StokMaliyeti
 											.Where(s => s.DepoNo != 1 && s.DepoNo != 7 && s.DepoNo != 8)
 											.GroupBy(s => new { s.StokKodu, s.StokAdi })
 											.Select(g => new
 											{
 												g.Key.StokKodu,
 												g.Key.StokAdi,
-												ToplamMiktar = g.Sum(s => s.DepoMiktari),
-												BirimAdi = g.First().BirimAdi,
+												ToplamMaliyet = g.Sum(s => s.DepoMaliyeti),
 												Depolar = g.GroupBy(x => new { x.DepoNo, x.DepoAdi }).Select(grp => new
 												{
 													grp.Key.DepoNo,
 													grp.Key.DepoAdi,
-													Miktar = grp.Sum(x => x.DepoMiktari)
+													Maliyet = grp.Sum(x => x.DepoMaliyeti)
 												}).ToList()
 											})
-											.OrderByDescending(s => s.ToplamMiktar);
+											.OrderByDescending(s => s.ToplamMaliyet);
 
 											foreach (var stok in digerStoklar)
 											{
 												string rowId = "stok_" + stok.StokKodu.Replace(" ", "").Replace("-", "").Replace("/", "");
 
-												<!-- Stok Ana Satır (Tıklanabilir) -->
 												<tr class="detail-row can-toggle" data-toggle-id="@rowId">
 													<td class="item-name-A">@stok.StokAdi (@stok.StokKodu)</td>
-													<td class="item-amount">@stok.ToplamMiktar.ToString("N2") @stok.BirimAdi</td>
+													<td class="item-amount">@stok.ToplamMaliyet.ToString("N2") ₺</td>
 												</tr>
 
 												foreach (var depo in stok.Depolar)
 												{
-													<!-- Alt depo detayları (başta gizli) -->
 													<tr class="sub-detail-row hidden-row" data-parent-id="@rowId">
 														<td class="item-name-A">@depo.DepoAdi (Depo: @depo.DepoNo)</td>
-														<td class="item-amount">@depo.Miktar.ToString("N2") @stok.BirimAdi</td>
+														<td class="item-amount">@depo.Maliyet.ToString("N2") ₺</td>
 													</tr>
 												}
 											}
 										}
+
+										<!-- Level 4: Diğer Stoklar -->
+										<!-- Burada Model.DigerStoklar.ToplamBakiye olduğu gibi kalabilir -->
 
 
 

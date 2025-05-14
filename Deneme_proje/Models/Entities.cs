@@ -4,6 +4,18 @@ namespace Deneme_proje.Models
 {
     public class Entities
     {
+        public class StokMaliyetViewModel
+        {
+            public string StokKodu { get; set; }
+            public string StokAdi { get; set; }
+            public int DepoNo { get; set; }
+            public string DepoAdi { get; set; }
+            public double DepoMiktari { get; set; }
+            public decimal DepoMaliyeti { get; set; }
+            public string BirimAdi { get; set; }
+            public DateTime StokTarihi { get; set; }
+            public int StokYasi { get; set; }
+        }
         public class StokDetayModel
         {
             public string StokKodu { get; set; }
@@ -123,6 +135,8 @@ namespace Deneme_proje.Models
             public BilançoViewModel SayimveTesellumNoksanlari { get; set; }
             public BilançoViewModel OdenecekDigerYumunlulukler { get; set; }
             public List<ArtiBakiyeliMusteriViewModel> ArtiBakiyeliMusteriler { get; set; }
+            public List<StokMaliyetViewModel> StokMaliyeti
+            { get; set; }
             public List<EksiBakiyeliMusteriViewModel> EksiBakiyeliMusteriler { get; set; }
             public List<ArtiBakiyeliTedarikciViewModel> ArtiBakiyeliTedarikciler { get; set; }
             public List<EksiBakiyeliTedarikciViewModel> EksiBakiyeliTedarikciler { get; set; }

@@ -11,6 +11,7 @@ using NuGet.Protocol.Core.Types;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using DocumentFormat.OpenXml.ExtendedProperties;
 using System.Diagnostics;
+using System.Data;
 namespace Deneme_proje.Controllers
 {
     [AuthFilter]
@@ -600,8 +601,9 @@ namespace Deneme_proje.Controllers
             var eksiBakiyeliFaturalar = _faturaRepository.GetEksiBakiyeliFaturalar();
             var eksiBakiyeliTedarikciler = _faturaRepository.GetEksiBakiyeliTedarikciFaturalari();
             var krediDetaylari = _faturaRepository.GetKrediDetayList().ToList();
-
+            var stokMaliyetBilgileri = _faturaRepository.GetStokMaliyetBilgileri();
             // View model oluştur ve verileri ata
+
             var viewModel = new CanliBilancoViewModel
             {
                 // Temel bilanço verileri
@@ -653,7 +655,8 @@ namespace Deneme_proje.Controllers
                 FirmaCekleri = firmaCekleri,
                 BaslamaTarihi = baslamaTarihi,
                 BitisTarihi = bitisTarihi,
-                KrediDetaylari = krediDetaylari
+                KrediDetaylari = krediDetaylari,
+                StokMaliyeti= stokMaliyetBilgileri
             };
 
             return View(viewModel);
@@ -897,6 +900,8 @@ namespace Deneme_proje.Controllers
                 return View("Error");
             }
         }
+
+       
     }
 }
 

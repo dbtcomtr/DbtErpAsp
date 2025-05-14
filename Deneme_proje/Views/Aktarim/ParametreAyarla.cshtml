@@ -1,0 +1,120 @@
+﻿@model List<Deneme_proje.Controllers.StokModel>
+@{
+    ViewBag.Title = "Parametre Ayarla";
+    var parametreler = ViewBag.Parametreler as List<Deneme_proje.Controllers.ParametreModel> ?? new();
+}
+
+<h2>Parametre Ayarla</h2>
+
+@if (ViewBag.Mesaj != null)
+{
+    <div style="color: green; font-weight: bold;">@ViewBag.Mesaj</div>
+}
+
+<div class="main-content mt-5" style="padding: 20px;">
+    <div class="px-lg-5 px-3">
+
+
+        <h2>Parametre Ayarla</h2>
+
+        @if (ViewBag.Mesaj != null)
+        {
+            <div style="color: green; font-weight: bold;">@ViewBag.Mesaj</div>
+        }
+
+        <form method="post" asp-action="ParametreAyarla">
+            <div style="margin-bottom: 20px;">
+                <label>Parametre Adı:</label>
+                <input type="text" name="parametreAdi" id="parametreAdi" class="form-control" required style="width: 300px; display: inline-block;" />
+                <button type="button" class="btn btn-secondary" onclick="toggleStokList()">Parametre Ekle</button>
+            </div>
+
+            <div id="stokListSection" style="display: none;">
+                <div style="margin-bottom: 10px;">
+                    <input type="text" id="stokArama" class="form-control" placeholder="Stok ara..." onkeyup="filtreleStok()" style="width: 300px;" />
+                </div>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Seç</th>
+                            <th>Stok Kodu</th>
+                            <th>Stok Adı</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="secilenStoklar" value="@Model[i].StokKodu" />
+                                </td>
+                                <td>@Model[i].StokKodu</td>
+                                <td>@Model[i].StokAdi</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+            </div>
+        </form>
+
+        <hr />
+
+        <h3>Tanımlı Parametreler</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Parametre Adı</th>
+                    <th>Stok Kodları</th>
+                    <th>İşlem</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var prm in parametreler)
+                {
+                    <tr>
+                        <td>@prm.ParametreAdi</td>
+                        <td>@prm.StokKodu</td>
+                        <td>
+                            <form method="post" asp-action="ParametreSil">
+                                <input type="hidden" name="parametreAdi" value="@prm.ParametreAdi" />
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Silmek istediğinize emin misiniz?')">Sil</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    function toggleStokList() {
+        const section = document.getElementById("stokListSection");
+        section.style.display = section.style.display === "none" ? "block" : "none";
+    }
+</script>
+<script>
+    function toggleStokList() {
+        const section = document.getElementById("stokListSection");
+        section.style.display = section.style.display === "none" ? "block" : "none";
+    }
+
+    function filtreleStok() {
+        var input = document.getElementById("stokArama");
+        var filter = input.value.toUpperCase();
+        var table = document.querySelector("#stokListSection table");
+        var trs = table.getElementsByTagName("tr");
+
+        for (var i = 1; i < trs.length; i++) {
+            var stokKodu = trs[i].cells[1].textContent || trs[i].cells[1].innerText;
+            var stokAdi = trs[i].cells[2].textContent || trs[i].cells[2].innerText;
+
+            if (stokKodu.toUpperCase().indexOf(filter) > -1 || stokAdi.toUpperCase().indexOf(filter) > -1) {
+                trs[i].style.display = "";
+            } else {
+                trs[i].style.display = "none";
+            }
+        }
+    }
+</script>

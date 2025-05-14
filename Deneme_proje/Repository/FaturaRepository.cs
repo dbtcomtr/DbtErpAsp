@@ -3030,6 +3030,41 @@ ORDER BY sb.cari_unvan1, sb.sip_evrakno_sira, sb.sip_stok_kod;";
 
             return input.Length <= maxLength ? input : input.Substring(0, maxLength);
         }
+        public List<StokMaliyetViewModel> GetStokMaliyetBilgileri()
+        {
+            var connectionString = _dbSelectorService.GetConnectionString();
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                // Stok miktarı yerine sadece maliyet bilgilerini getiren sorgu
+                var query = @"
+        SELECT 
+            s.sto_kod AS StokKodu,
+            s.sto_isim AS StokAdi,
+            sh.sth_giris_depo_no AS DepoNo,
+            d.dep_adi AS DepoAdi,
+            SUM(CASE WHEN sh.sth_tip = 0 THEN sh.sth_miktar ELSE -sh.sth_miktar END) AS DepoMiktari,
+            SUM(CASE WHEN sh.sth_tip = 0 THEN sh.sth_tutar ELSE -sh.sth_tutar END) AS DepoMaliyeti,
+            s.sto_birim1_ad AS BirimAdi
+        FROM 
+            STOKLAR s
+        JOIN 
+            STOK_HAREKETLERI sh ON s.sto_kod = sh.sth_stok_kod
+        LEFT JOIN 
+            DEPOLAR d ON sh.sth_giris_depo_no = d.dep_no
+        GROUP BY 
+            s.sto_kod, s.sto_isim, sh.sth_giris_depo_no, d.dep_adi, s.sto_birim1_ad
+        HAVING 
+            SUM(CASE WHEN sh.sth_tip = 0 THEN sh.sth_miktar ELSE -sh.sth_miktar END) > 0
+        ORDER BY 
+            s.sto_kod, sh.sth_giris_depo_no";
+
+                var stokMaliyetData = connection.Query<StokMaliyetViewModel>(query).ToList();
+                return stokMaliyetData;
+            }
+        }
 
     }
 }
