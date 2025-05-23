@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System;
 using Deneme_proje;
+using Deneme_proje.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,7 +76,7 @@ builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 // Oturum verilerinin disk üzerinde saklanması için distributed cache ekleyin
 // Uygulama yeniden başlatılsa bile oturumların korunmasını sağlar
 builder.Services.AddDistributedMemoryCache();
-
+ConnectionHelper.Initialize(builder.Configuration);
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())

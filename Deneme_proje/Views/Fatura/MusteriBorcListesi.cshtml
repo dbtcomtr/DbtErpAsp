@@ -1,0 +1,328 @@
+﻿@{
+    ViewData["Title"] = "Müşteri Borç Takip Raporu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4">
+    <h2 class="mb-4 text-center">Müşteri Borç Takip Raporu</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Vadesi Geçmiş</h5>
+                    <h3 id="toplam-gecmis-bakiye">0,00 ₺</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <h5 class="card-title">Bugün Vadeli</h5>
+                    <h3 id="toplam-bugun-bakiye">0,00 ₺</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Gelecek Vadeli</h5>
+                    <h3 id="toplam-gelecek-bakiye">0,00 ₺</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Toplam Bakiye</h5>
+                    <h3 id="toplam-bakiye">0,00 ₺</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group mb-3">
+        <input type="text" id="musteriArama" class="form-control" placeholder="Müşteri adı veya kodu ile arama yapın...">
+    </div>
+
+    <div id="yukleniyor" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yükleniyor...</span>
+        </div>
+        <p class="mt-2">Veriler yükleniyor, lütfen bekleyin...</p>
+    </div>
+
+    <div id="hata-mesaji" class="alert alert-danger d-none">
+        Veriler yüklenirken bir hata oluştu.
+    </div>
+
+    <div id="veri-yok-mesaji" class="alert alert-info d-none">
+        Görüntülenecek borç kaydı bulunamadı.
+    </div>
+
+    <div class="accordion" id="musteriBorclar">
+        <!-- JavaScript ile doldurulacak -->
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Tarih ve para formatı için yardımcı fonksiyonlar
+            function formatTarih(tarihStr) {
+                if (!tarihStr) return "-";
+                const tarih = new Date(tarihStr);
+                return tarih.toLocaleDateString('tr-TR');
+            }
+
+            function formatPara(tutar) {
+                if (tutar === null || tutar === undefined) return "0,00 ₺";
+                return new Intl.NumberFormat('tr-TR', {
+                    style: 'currency',
+                    currency: 'TRY',
+                    minimumFractionDigits: 2
+                }).format(tutar);
+            }
+
+            // Vade durumunu belirleyen fonksiyon
+            function vadeDurumu(vadeTarihi) {
+                if (!vadeTarihi) return "gelecek";
+
+                const bugun = new Date();
+                bugun.setHours(0, 0, 0, 0);
+
+                const vade = new Date(vadeTarihi);
+                vade.setHours(0, 0, 0, 0);
+
+                if (vade < bugun) return "gecmis";
+                if (vade.getTime() === bugun.getTime()) return "bugun";
+                return "gelecek";
+            }
+
+            // Verileri getir
+            let tumMusteriler = [];
+
+            async function verileriGetir() {
+                try {
+                    $('#yukleniyor').show();
+                    $('#hata-mesaji').addClass('d-none');
+                    $('#veri-yok-mesaji').addClass('d-none');
+
+                    // API'den veri alma - DÜZELTME: doğru controller ve endpoint'i kullanma
+                    const response = await fetch('/Fatura/MusteriBorcListesiData');
+
+                    if (!response.ok) {
+                        throw new Error('Veriler getirilirken bir hata oluştu: ' + response.status);
+                    }
+
+                    const data = await response.json();
+                    console.log("Alınan veri:", data); // Gelen veriyi kontrol et
+
+                    if (!data || data.length === 0 || data.hata) {
+                        if (data && data.hata) {
+                            console.error("API hatası:", data.hata);
+                            $('#hata-mesaji').text('Veriler yüklenirken bir hata oluştu: ' + data.hata);
+                            $('#hata-mesaji').removeClass('d-none');
+                        } else {
+                            $('#veri-yok-mesaji').removeClass('d-none');
+                        }
+                        $('#yukleniyor').hide();
+                        return;
+                    }
+
+                    tumMusteriler = data;
+                    musterileriGoster(tumMusteriler);
+                    toplamBakiyeleriHesapla(tumMusteriler);
+
+                    $('#yukleniyor').hide();
+
+                } catch (hata) {
+                    console.error('Veri getirme hatası:', hata);
+                    $('#hata-mesaji').text('Veriler yüklenirken bir hata oluştu: ' + hata.message);
+                    $('#hata-mesaji').removeClass('d-none');
+                    $('#yukleniyor').hide();
+                }
+            }
+
+            // Müşterileri akordeon olarak gösterme
+            function musterileriGoster(musteriler) {
+                const akordeon = $('#musteriBorclar');
+                akordeon.empty();
+
+                // Eğer müşteri listesi boşsa
+                if (musteriler.length === 0) {
+                    $('#veri-yok-mesaji').removeClass('d-none');
+                    return;
+                }
+
+                // Her müşteri için akordeon öğesi oluştur
+                musteriler.forEach((musteri, index) => {
+                    // Boş fatura listesini kontrol et
+                    if (!musteri.faturalar || musteri.faturalar.length === 0) {
+                        return;
+                    }
+
+                    // Özet bakiyeleri hesapla
+                    const gecmisBakiye = musteri.faturalar.reduce((toplam, fatura) =>
+                        vadeDurumu(fatura.faturaVadeTarihi) === 'gecmis' ? toplam + fatura.kalanTutar : toplam, 0);
+
+                    const bugunBakiye = musteri.faturalar.reduce((toplam, fatura) =>
+                        vadeDurumu(fatura.faturaVadeTarihi) === 'bugun' ? toplam + fatura.kalanTutar : toplam, 0);
+
+                    const gelecekBakiye = musteri.faturalar.reduce((toplam, fatura) =>
+                        vadeDurumu(fatura.faturaVadeTarihi) === 'gelecek' ? toplam + fatura.kalanTutar : toplam, 0);
+
+                    const toplamBakiye = gecmisBakiye + bugunBakiye + gelecekBakiye;
+
+                    if (toplamBakiye <= 0) return; // Borcu olmayanları gösterme
+
+                    // Akordeon öğesi HTML'i
+                    const accordionItem = `
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading${index}">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${index}" aria-expanded="false" aria-controls="collapse${index}">
+                                    <div class="row w-100">
+                                        <div class="col-md-4">
+                                            <strong>${musteri.cariKodu} - ${musteri.cariUnvani}</strong>
+                                        </div>
+                                        <div class="col-md-2 text-danger">
+                                            ${formatPara(gecmisBakiye)}
+                                        </div>
+                                        <div class="col-md-2 text-warning">
+                                            ${formatPara(bugunBakiye)}
+                                        </div>
+                                        <div class="col-md-2 text-info">
+                                            ${formatPara(gelecekBakiye)}
+                                        </div>
+                                        <div class="col-md-2 fw-bold">
+                                            ${formatPara(toplamBakiye)}
+                                        </div>
+                                    </div>
+                                </button>
+                            </h2>
+                            <div id="collapse${index}" class="accordion-collapse collapse" aria-labelledby="heading${index}">
+                                <div class="accordion-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Fatura No</th>
+                                                    <th>Düzenleme Tarihi</th>
+                                                    <th>Vade Tarihi</th>
+                                                    <th>Tutar</th>
+                                                    <th>Kalan</th>
+                                                    <th>Durum</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>`;
+
+                    let tableRows = '';
+
+                    // Faturaları vade tarihine göre sırala
+                    const siralilisteFaturalar = [...musteri.faturalar].sort((a, b) => {
+                        // Null tarihleri en sona koy
+                        if (!a.faturaVadeTarihi) return 1;
+                        if (!b.faturaVadeTarihi) return -1;
+                        return new Date(a.faturaVadeTarihi) - new Date(b.faturaVadeTarihi);
+                    });
+
+                    siralilisteFaturalar.forEach(fatura => {
+                        if (fatura.kalanTutar <= 0) return; // Borç olmayan faturaları gösterme
+
+                        const durum = vadeDurumu(fatura.faturaVadeTarihi);
+                        let durumIcon = '';
+                        let durumClass = '';
+
+                        if (durum === 'gecmis') {
+                            durumIcon = '<i class="fas fa-exclamation-circle text-danger"></i>';
+                            durumClass = 'text-danger fw-bold';
+                        } else if (durum === 'bugun') {
+                            durumIcon = '<i class="fas fa-clock text-warning"></i>';
+                            durumClass = 'text-warning fw-bold';
+                        } else {
+                            durumIcon = '<i class="fas fa-calendar-alt text-info"></i>';
+                            durumClass = 'text-info';
+                        }
+
+                        tableRows += `
+                            <tr>
+                                <td>${fatura.evrakNo || '-'}</td>
+                                <td>${formatTarih(fatura.faturaTarihi)}</td>
+                                <td class="${durumClass}">${formatTarih(fatura.faturaVadeTarihi)}</td>
+                                <td>${formatPara(fatura.faturaTutari)}</td>
+                                <td>${formatPara(fatura.kalanTutar)}</td>
+                                <td>${durumIcon}</td>
+                            </tr>
+                        `;
+                    });
+
+                    const accordionClose = `
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    akordeon.append(accordionItem + tableRows + accordionClose);
+                });
+            }
+
+            // Toplam bakiyeleri hesapla ve göster
+            function toplamBakiyeleriHesapla(musteriler) {
+                let toplamGecmisBakiye = 0;
+                let toplamBugunBakiye = 0;
+                let toplamGelecekBakiye = 0;
+                let genelToplamBakiye = 0;
+
+                musteriler.forEach(musteri => {
+                    if (!musteri.faturalar) return;
+
+                    musteri.faturalar.forEach(fatura => {
+                        if (fatura.kalanTutar <= 0) return; // Borç olmayan faturaları hesaplama
+
+                        const durum = vadeDurumu(fatura.faturaVadeTarihi);
+
+                        if (durum === 'gecmis') {
+                            toplamGecmisBakiye += fatura.kalanTutar;
+                        } else if (durum === 'bugun') {
+                            toplamBugunBakiye += fatura.kalanTutar;
+                        } else {
+                            toplamGelecekBakiye += fatura.kalanTutar;
+                        }
+
+                        genelToplamBakiye += fatura.kalanTutar;
+                    });
+                });
+
+                $('#toplam-gecmis-bakiye').text(formatPara(toplamGecmisBakiye));
+                $('#toplam-bugun-bakiye').text(formatPara(toplamBugunBakiye));
+                $('#toplam-gelecek-bakiye').text(formatPara(toplamGelecekBakiye));
+                $('#toplam-bakiye').text(formatPara(genelToplamBakiye));
+            }
+
+            // Müşteri arama fonksiyonu
+            $('#musteriArama').on('input', function() {
+                const aramaMetni = $(this).val().toLowerCase().trim();
+
+                if (aramaMetni === '') {
+                    musterileriGoster(tumMusteriler);
+                    toplamBakiyeleriHesapla(tumMusteriler);
+                    return;
+                }
+
+                const filtrelenmisListe = tumMusteriler.filter(musteri =>
+                    (musteri.cariKodu && musteri.cariKodu.toLowerCase().includes(aramaMetni)) ||
+                    (musteri.cariUnvani && musteri.cariUnvani.toLowerCase().includes(aramaMetni))
+                );
+
+                musterileriGoster(filtrelenmisListe);
+                toplamBakiyeleriHesapla(filtrelenmisListe);
+            });
+
+            // Sayfa yüklendiğinde verileri getir
+            verileriGetir();
+        });
+    </script>
+}

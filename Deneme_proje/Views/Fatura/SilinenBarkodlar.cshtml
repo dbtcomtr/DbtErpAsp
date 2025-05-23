@@ -1,0 +1,103 @@
+﻿@model List<Deneme_proje.Models.Entities.SilinenBarkodViewModel>
+@{
+    ViewData["Title"] = "Silinen Barkodlar";
+    var baslangicTarihi = ViewData["BaslangicTarihi"]?.ToString();
+    var bitisTarihi = ViewData["BitisTarihi"]?.ToString();
+    var stokKodu = ViewData["StokKodu"]?.ToString();
+}
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Silinen Barkodlar ve Üretimler</h3>
+                        </div>
+                        <div class="card-body">
+                            <form method="get" action="@Url.Action("SilinenBarkodlar", "Fatura")" class="mb-4">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="baslangicTarihi">Başlangıç Tarihi:</label>
+                                            <input type="date" class="form-control" id="baslangicTarihi" name="baslangicTarihi" value="@baslangicTarihi">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="bitisTarihi">Bitiş Tarihi:</label>
+                                            <input type="date" class="form-control" id="bitisTarihi" name="bitisTarihi" value="@bitisTarihi">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="stokKodu">Stok Kodu:</label>
+                                            <input type="text" class="form-control" id="stokKodu" name="stokKodu" value="@stokKodu" placeholder="Stok kodu ile arayın...">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 d-flex align-items-end">
+                                        <button type="submit" class="btn btn-primary">Filtrele</button>
+                                        <a href="@Url.Action("SilinenBarkodlar", "Fatura")" class="btn btn-secondary ml-2">Temizle</a>
+                                    </div>
+                                </div>
+                            </form>
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                  
+                                            <th>Stok Kodu</th>
+                                            <th>Stok Adı</th>
+                                            <th>Miktar</th>
+                                            <th>Barkod No</th>
+                                            <th>Parti Kodu</th>
+                                            <th>Lot No</th>
+                                            <th>Silinme Nedeni</th>
+                                            <th>Silinme Tarihi</th>
+                                            <th>Silen Kullanıcı</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model != null && Model.Any())
+                                        {
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                      
+                                                    <td>@item.StokKodu</td>
+                                                    <td>@item.StokAdi</td>
+                                                    <td class="text-right">@item.Miktar.ToString("N2")</td>
+                                                    <td>@(string.IsNullOrEmpty(item.BarkodNo) ? "-" : item.BarkodNo)</td>
+                                                    <td>@(string.IsNullOrEmpty(item.PartiKodu) ? "-" : item.PartiKodu)</td>
+                                                    <td>@(item.LotNo.HasValue ? item.LotNo.Value.ToString() : "-")</td>
+                                                    <td>@item.SilinmeNedeni</td>
+                                                    <td>@item.SilinmeTarihi.ToString("dd.MM.yyyy HH:mm")</td>
+                                                    <td>@item.KullaniciAdi (@item.SilenKullaniciId)</td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="10" class="text-center">Seçilen kriterlere uygun silinen barkod kaydı bulunmamaktadır.</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            @if (Model != null && Model.Any())
+                            {
+                                <div class="mt-3">
+                                    <p class="font-weight-bold">Toplam: @Model.Count kayıt</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

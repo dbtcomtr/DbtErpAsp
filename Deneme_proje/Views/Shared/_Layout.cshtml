@@ -520,11 +520,151 @@
                         }
 
                         @* ERP Menüsü *@
+                  
+                        @if (MenuHelper.KullaniciYetkisiVarMi("Aktarim", "Index", userNo) ||
+                      
+                        MenuHelper.KullaniciYetkisiVarMi("Aktariim", "ParametreAyarla", userNo))
+                        {
+                            <li>
+                                <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                    <i class="mdi mdi-account-group"></i>
+                                    <span>Dbt Aktarım</span>
+
+                                </a>
+                                <ul class="sub-menu" aria-expanded="false">
+
+
+                                    <li>
+                                        <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                            <i class="mdi mdi-account-group"></i>
+                                            <span>Ercom Aktarım</span>
+                                        </a>
+
+                                        <ul class="sub-menu" aria-expanded="false">
+                                            @if (MenuHelper.KullaniciYetkisiVarMi("Aktarim", "Index", userNo))
+                                            {
+                                                <li><a href="/Aktarim/">Excell'den Aktar</a></li>
+                                            }
+                                            @if (MenuHelper.KullaniciYetkisiVarMi("Aktarim", "ParametreAyarla", userNo))
+                                            {
+                                                <li><a href="/Aktarim/ParametreAyarla">Parametre Ayarları</a></li>
+                                            }
+                                          
+
+
+                                        </ul>
+                                    </li>
+
+
+
+                                </ul>
+
+                            </li>
+                        }
+
+
+                        @* CRM Menüsü *@
+                        @if (
+                        MenuHelper.KullaniciYetkisiVarMi("CRM", "AktiviteEkle", userNo) ||
+                        MenuHelper.KullaniciYetkisiVarMi("CRM", "Aktiviteler", userNo) ||
+                        MenuHelper.KullaniciYetkisiVarMi("CRM", "CariAnaliz", userNo) ||
+                        MenuHelper.KullaniciYetkisiVarMi("CRM", "Dashboard", userNo) ||
+                        MenuHelper.KullaniciYetkisiVarMi("CRM", "Firsatlar", userNo) ||
+                        MenuHelper.KullaniciYetkisiVarMi("CRM", "MusteriEkle", userNo) ||
+                        MenuHelper.KullaniciYetkisiVarMi("CRM", "Musteriler", userNo) ||
+                        MenuHelper.KullaniciYetkisiVarMi("CRM", "SiparisEkle", userNo) ||
+                        MenuHelper.KullaniciYetkisiVarMi("CRM", "Siparisler", userNo) ||
+                        MenuHelper.KullaniciYetkisiVarMi("CRM", "StokEkle", userNo) ||
+                        MenuHelper.KullaniciYetkisiVarMi("CRM", "Stoklar", userNo) ||
+                        MenuHelper.KullaniciYetkisiVarMi("CRM", "Teklifler", userNo) ||
+                        MenuHelper.KullaniciYetkisiVarMi("CRM", "YeniTeklif", userNo) ||
+                        MenuHelper.KullaniciYetkisiVarMi("CRM", "CariAnaliz", userNo)
+                        )
+                        {
+                            <li>
+                                <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                    <i class="mdi mdi-account-group"></i>
+                                    <span>CRM</span>
+                                </a>
+                                <ul class="sub-menu" aria-expanded="false">
+                                    @if (MenuHelper.KullaniciYetkisiVarMi("CRM", "Dashboard", userNo))
+                                    {
+                                        <li><a href="/CRM/Dashboard">Dashboard</a></li>
+                                    }
+                                    @if (MenuHelper.KullaniciYetkisiVarMi("CRM", "AktiviteEkle", userNo))
+                                    {
+                                        <li><a href="/CRM/AktiviteEkle">AktiviteEkle</a></li>
+                                    }
+
+                                    @if (MenuHelper.KullaniciYetkisiVarMi("CRM", "Aktiviteler", userNo))
+                                    {
+                                        <li><a href="/CRM/Aktiviteler">Aktiviteler</a></li>
+                                    }
+
+
+
+                                    @if (MenuHelper.KullaniciYetkisiVarMi("CRM", "Firsatlar", userNo))
+                                    {
+                                        <li><a href="/CRM/Firsatlar">Fırsatlar</a></li>
+                                    }
+
+                                    @if (MenuHelper.KullaniciYetkisiVarMi("CRM", "MusteriEkle", userNo))
+                                    {
+                                        <li><a href="/CRM/MusteriEkle">Müşteri Ekle</a></li>
+                                    }
+
+                                    @if (MenuHelper.KullaniciYetkisiVarMi("CRM", "Musteriler", userNo))
+                                    {
+                                        <li><a href="/CRM/Musteriler">Müşteriler</a></li>
+                                    }
+
+                                    @if (MenuHelper.KullaniciYetkisiVarMi("CRM", "SiparisEkle", userNo))
+                                    {
+                                        <li><a href="/CRM/SiparisEkle">Sipariş Ekle</a></li>
+                                    }
+
+                                    @if (MenuHelper.KullaniciYetkisiVarMi("CRM", "Siparisler", userNo))
+                                    {
+                                        <li><a href="/CRM/Siparisler">Siparişler</a></li>
+                                    }
+
+                                    @if (MenuHelper.KullaniciYetkisiVarMi("CRM", "StokEkle", userNo))
+                                    {
+                                        <li><a href="/CRM/StokEkle">Stok Ekle</a></li>
+                                    }
+
+                                    @if (MenuHelper.KullaniciYetkisiVarMi("CRM", "Stoklar", userNo))
+                                    {
+                                        <li><a href="/CRM/Stoklar">Stoklar</a></li>
+                                    }
+
+                                    @if (MenuHelper.KullaniciYetkisiVarMi("CRM", "Teklifler", userNo))
+                                    {
+                                        <li><a href="/CRM/Teklifler">Teklifler</a></li>
+                                    }
+
+                                    @if (MenuHelper.KullaniciYetkisiVarMi("CRM", "YeniTeklif", userNo))
+                                    {
+                                        <li><a href="/CRM/YeniTeklif">Yeni Teklif</a></li>
+                                    }
+
+                                    @if (MenuHelper.KullaniciYetkisiVarMi("CRM", "CariAnaliz", userNo))
+                                    {
+                                        <li><a href="/CRM/CariAnaliz">Cari Analiz</a></li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+
+                        @* ERP Menüsü *@
+                        <!--ERP-->
                         @if (MenuHelper.KullaniciYetkisiVarMi("ServisHareketleri", "AllIsEmri", userNo) ||
                         MenuHelper.KullaniciYetkisiVarMi("ServisHareketleri", "IsEmriGiris", userNo) ||
                         MenuHelper.KullaniciYetkisiVarMi("Fatura", "IsEmriDurumu", userNo) ||
                         MenuHelper.KullaniciYetkisiVarMi("Fatura", "IsEmirleri", userNo) ||
                         MenuHelper.KullaniciYetkisiVarMi("Dioki", "Index", userNo) ||
+                        MenuHelper.KullaniciYetkisiVarMi("Fatura", "HataliUretimler", userNo) ||
+                        MenuHelper.KullaniciYetkisiVarMi("Dioki", "silinenbarkodlar", userNo) ||
                         MenuHelper.KullaniciYetkisiVarMi("Dioki", "UretimListesi", userNo))
                         {
                             <li>
@@ -534,7 +674,7 @@
                                 </a>
                                 <ul class="sub-menu" aria-expanded="false">
                                     @if (MenuHelper.KullaniciYetkisiVarMi("ServisHareketleri", "AllIsEmri", userNo) ||
-                                  MenuHelper.KullaniciYetkisiVarMi("ServisHareketleri", "IsEmriGiris", userNo))
+                                   MenuHelper.KullaniciYetkisiVarMi("ServisHareketleri", "IsEmriGiris", userNo))
                                     {
                                         <li>
                                             <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -555,7 +695,7 @@
                                     }
 
                                     @if (MenuHelper.KullaniciYetkisiVarMi("Dioki", "Index", userNo) ||
-                                  MenuHelper.KullaniciYetkisiVarMi("Dioki", "UretimListesi", userNo))
+                                   MenuHelper.KullaniciYetkisiVarMi("Dioki", "UretimListesi", userNo))
                                     {
                                         <li>
                                             <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -573,9 +713,9 @@
                                                 }
                                             </ul>
                                         </li>
-                                    }  
+                                    }
                                     @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "IsEmirleri", userNo) ||
-                                  MenuHelper.KullaniciYetkisiVarMi("Fatura", "IsEmriDurumu", userNo))
+                                   MenuHelper.KullaniciYetkisiVarMi("Fatura", "IsEmriDurumu", userNo))
                                     {
                                         <li>
                                             <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -590,6 +730,13 @@
                                                 @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "IsEmriDurumu", userNo))
                                                 {
                                                     <li><a href="/Fatura/IsEmriDurumu">İş Emirleri Yönetimi</a></li>
+                                                }  @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "HataliUretimler", userNo))
+                                                {
+                                                    <li><a href="/Fatura/HataliUretimler">Hatalı Üretimler</a></li>
+                                                }
+                                                @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "SilinenBarkodlar", userNo))
+                                                {
+                                                    <li><a href="/Fatura/silinenbarkodlar">Silinen Barkodlar</a></li>
                                                 }
                                             </ul>
                                         </li>
@@ -603,7 +750,7 @@
                                                 <span>Sipariş İzleme</span>
                                             </a>
                                             <ul class="sub-menu" aria-expanded="false">
-                                                
+
                                                 @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "SiparisDurum", userNo))
                                                 {
                                                     <li><a href="/Fatura/SiparisDurum">Sipariş Durumu</a></li>
@@ -616,29 +763,13 @@
                                 </ul>
                             </li>
                         }
-                         <li>
-                                <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                    <i class="mdi mdi-account-group"></i>
-                                    <span>Dbt Aktarım</span>
-                                </a>
-                                <ul class="sub-menu" aria-expanded="false">
-                                  
-                                        <li>
-                                            <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                                <i class="mdi mdi-account-group"></i>
-                                                <span>Aktarım</span>
-                                            </a>
-                                            <ul class="sub-menu" aria-expanded="false">
-                                               
-                                                    <li><a href="/Aktarim/Index">Ercom Aktarım</a></li>
-                                                
-                                              
-                                                   
-                                                
-                                            </ul>
-                                        </li>
-</ul>
-</li>
+
+
+
+
+
+
+
                         @* CRM Menüsü *@
                         @if (MenuHelper.KullaniciYetkisiVarMi("CRM", "DashBoard", userNo) ||
                         MenuHelper.KullaniciYetkisiVarMi("CRM", "Firsatlar", userNo) ||

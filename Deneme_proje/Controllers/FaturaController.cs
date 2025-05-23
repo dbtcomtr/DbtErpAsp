@@ -137,7 +137,6 @@ namespace Deneme_proje.Controllers
             var stockSelectList = stockCodesAndNames
                 .Select(x => new SelectListItem { Value = x.StockCode, Text = $"{x.StockCode} - {x.StockName}" })
                 .ToList();
-
             ViewData["StockCodesAndNames"] = stockSelectList;
 
             // Depo numarası ve adlarını al
@@ -145,7 +144,6 @@ namespace Deneme_proje.Controllers
             var depoSelectList = depoList
                 .Select(d => new SelectListItem { Value = d.DepoNo.ToString(), Text = d.DepoAdi })
                 .ToList();
-
             ViewData["DepoList"] = depoSelectList;
 
             // Verileri al, depo numarası veya stok kodu filtreleri uygula (eğer varsa)
@@ -900,8 +898,132 @@ namespace Deneme_proje.Controllers
                 return View("Error");
             }
         }
+        [AllowAnonymous]
+        public IActionResult MusteriAcikFaturalar(string aramaMetni = "")
+        {
+            try
+            {
+                var model = _faturaRepository.GetMusteriAcikFaturalar();
 
-       
+                // Arama filtresi uygula
+                if (!string.IsNullOrWhiteSpace(aramaMetni))
+                {
+                    aramaMetni = aramaMetni.ToLower();
+                    model = model.Where(m =>
+                        m.MusteriKodu.ToLower().Contains(aramaMetni) ||
+                        m.Unvan.ToLower().Contains(aramaMetni)
+                    ).ToList();
+                }
+
+                // Toplam değerleri hesapla
+                ViewBag.ToplamVadesiGecmis = model.Sum(m => m.VadesiGecmisBakiye);
+                ViewBag.ToplamBugunOdenmesiGereken = model.Sum(m => m.BugunOdenmesiGereken);
+                ViewBag.ToplamGelecekVadeli = model.Sum(m => m.GelecekVadeliFaturalar);
+                ViewBag.ToplamBorc = model.Sum(m => m.ToplamBorc);
+                ViewBag.AramaMetni = aramaMetni;
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Müşteri açık faturaları listelenirken hata oluştu");
+                TempData["ErrorMessage"] = "Müşteri açık faturaları alınırken bir hata oluştu.";
+                return View("Error");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult Ara(string aramaMetni)
+        {
+            return RedirectToAction("Index", new { aramaMetni });
+        }
+
+        public IActionResult ExcelExport()
+        {
+            try
+            {
+                var model = _faturaRepository.GetMusteriAcikFaturalar();
+
+                // Excel oluşturma işlemleri burada yapılacak
+                // ClosedXML kütüphanesi ile Excel dosyası oluşturulabilir
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Excel raporu oluşturulurken hata oluştu");
+                TempData["ErrorMessage"] = "Excel raporu oluşturulurken bir hata oluştu.";
+                return RedirectToAction("Index");
+            }
+        }
+      
+   // FaturaController.cs içindeki HataliUretimler metodunu güncelleyin
+public IActionResult HataliUretimler(DateTime? baslangicTarihi = null, DateTime? bitisTarihi = null, 
+    string baslangicSaati = "00:00", string bitisSaati = "23:59", string stokArama = "")
+{
+    // Varsayılan değerler
+    baslangicTarihi ??= DateTime.Now.AddMonths(-1);
+    bitisTarihi ??= DateTime.Now;
+
+    // Saat bilgilerini tarih ile birleştir
+    DateTime baslangicDateTime = baslangicTarihi.Value.Date.Add(TimeSpan.Parse(baslangicSaati + ":00"));
+    DateTime bitisDateTime = bitisTarihi.Value.Date.Add(TimeSpan.Parse(bitisSaati + ":59"));
+
+    var model = _faturaRepository.GetHataliUretimler(baslangicDateTime, bitisDateTime, stokArama);
+
+    ViewData["BaslangicTarihi"] = baslangicTarihi.Value.ToString("yyyy-MM-dd");
+    ViewData["BitisTarihi"] = bitisTarihi.Value.ToString("yyyy-MM-dd");
+    ViewData["BaslangicSaati"] = baslangicSaati;
+    ViewData["BitisSaati"] = bitisSaati;
+    ViewData["StokArama"] = stokArama;
+
+    return View(model);
+}
+        [AllowAnonymous]
+        [HttpPost]
+ 
+        public IActionResult HataliUretimleriSil(List<string> seciliUretimler)
+        {
+            if (seciliUretimler == null || seciliUretimler.Count == 0)
+            {
+                return Json(new { success = false, message = "Hiçbir üretim seçilmedi." });
+            }
+
+            try
+            {
+                int silinenKayitSayisi = _faturaRepository.HataliUretimleriSil(seciliUretimler);
+                return Json(new { success = true, message = $"{silinenKayitSayisi} adet hatalı üretim kaydı başarıyla silindi." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Hatalı üretimler silinirken hata oluştu");
+                return Json(new { success = false, message = "Silme işlemi sırasında bir hata oluştu: " + ex.Message });
+            }
+        }
+     
+        public IActionResult SilinenBarkodlar(DateTime? baslangicTarihi = null, DateTime? bitisTarihi = null, string stokKodu = null)
+        {
+            // Varsayılan değerler
+            baslangicTarihi ??= DateTime.Now.AddMonths(-1);
+            bitisTarihi ??= DateTime.Now;
+
+            try
+            {
+                var model = _faturaRepository.GetSilinenBarkodlar(baslangicTarihi.Value, bitisTarihi.Value, stokKodu);
+
+                ViewData["BaslangicTarihi"] = baslangicTarihi.Value.ToString("yyyy-MM-dd");
+                ViewData["BitisTarihi"] = bitisTarihi.Value.ToString("yyyy-MM-dd");
+                ViewData["StokKodu"] = stokKodu;
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Silinen barkodlar listelenirken hata oluştu");
+                TempData["ErrorMessage"] = "Silinen barkodlar görüntülenirken bir hata oluştu.";
+                return View("Error");
+            }
+        }
     }
 }
 

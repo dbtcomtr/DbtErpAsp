@@ -19,6 +19,201 @@
 <link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
 <!-- Mevcut stil bilgileri korundu -->
 <style>
+	/* Özet kartları için responsive stiller */
+	.summary-cards-container {
+		margin-bottom: 2rem;
+	}
+
+	/* Tablet ve küçük masaüstü ekranlar */
+	@@media (max-width: 991.98px) {
+		.summary-cards-container .col-md-4
+
+	{
+		margin-bottom: 1rem;
+	}
+
+	.summary-cards-container .card-header h5 {
+		font-size: 1rem;
+		margin-bottom: 0;
+	}
+
+	.summary-cards-container .table th,
+	.summary-cards-container .table td {
+		padding: 0.5rem 0.3rem;
+		font-size: 0.85rem;
+	}
+
+	}
+
+	/* Tablet ekranlar */
+	@@media (max-width: 768px) {
+		.summary-cards-container .col-md-4
+
+	{
+		flex: 0 0 100%;
+		max-width: 100%;
+		margin-bottom: 1rem;
+	}
+
+	.summary-cards-container .card {
+		margin-bottom: 1rem;
+	}
+
+	.summary-cards-container .card-header {
+		padding: 0.75rem 1rem;
+	}
+
+		.summary-cards-container .card-header h5 {
+			font-size: 0.95rem;
+			text-align: center;
+		}
+
+	.summary-cards-container .table {
+		margin-bottom: 0;
+	}
+
+		.summary-cards-container .table th,
+		.summary-cards-container .table td {
+			padding: 0.5rem 0.25rem;
+			font-size: 0.8rem;
+			text-align: center;
+		}
+
+		.summary-cards-container .table .text-right {
+			text-align: center !important;
+		}
+
+	}
+
+	/* Küçük mobil ekranlar */
+	@@media (max-width: 576px) {
+		.summary-cards-container .row
+
+	{
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	.summary-cards-container .col-md-4 {
+		padding-left: 0.5rem;
+		padding-right: 0.5rem;
+	}
+
+	.summary-cards-container .card-header {
+		padding: 0.5rem 0.75rem;
+	}
+
+		.summary-cards-container .card-header h5 {
+			font-size: 0.85rem;
+			text-align: center;
+		}
+
+		.summary-cards-container .card-header i {
+			margin-right: 0.3rem;
+		}
+
+	.summary-cards-container .table th,
+	.summary-cards-container .table td {
+		padding: 0.4rem 0.2rem;
+		font-size: 0.75rem;
+		text-align: center;
+		white-space: nowrap;
+	}
+
+	.summary-cards-container .table .text-right {
+		text-align: center !important;
+	}
+
+	/* Para birimi sembollerini küçült */
+	.summary-cards-container .table td strong {
+		font-size: 0.7rem;
+	}
+
+	}
+
+	/* Çok küçük mobil ekranlar */
+	@@media (max-width: 480px) {
+		.summary-cards-container .card-header h5
+
+	{
+		font-size: 0.8rem;
+		line-height: 1.2;
+	}
+
+	.summary-cards-container .table th,
+	.summary-cards-container .table td {
+		padding: 0.3rem 0.1rem;
+		font-size: 0.7rem;
+	}
+
+	.summary-cards-container .table th {
+		font-weight: 600;
+	}
+
+	.summary-cards-container .table td strong {
+		font-size: 0.65rem;
+		font-weight: 600;
+	}
+
+	}
+
+	/* Yatay scroll için alternatif çözüm (çok küçük ekranlar için) */
+	@@media (max-width: 400px) {
+		.summary-cards-container .card-body
+
+	{
+		overflow-x: auto;
+		padding: 0;
+	}
+
+	.summary-cards-container .table {
+		min-width: 300px;
+		margin-bottom: 0;
+	}
+
+		.summary-cards-container .table th,
+		.summary-cards-container .table td {
+			min-width: 60px;
+			padding: 0.3rem 0.2rem;
+		}
+
+	}
+
+	/* Kartlar arasında düzgün boşluk */
+	.summary-cards-container .card {
+		box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+		border: 1px solid rgba(0, 0, 0, 0.125);
+		transition: all 0.3s ease;
+	}
+
+		.summary-cards-container .card:hover {
+			box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+			transform: translateY(-2px);
+		}
+
+	/* Card header renk düzenlemeleri */
+	.summary-cards-container .card-header {
+		background: linear-gradient(135deg, #162e54 0%, #0076a8 100%);
+		color: white;
+		border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+	}
+
+		.summary-cards-container .card-header h5 {
+			margin: 0;
+			font-weight: 600;
+		}
+
+		.summary-cards-container .card-header i {
+			margin-right: 0.5rem;
+		}
+
+	/* Tablo başlık rengi */
+	.summary-cards-container .table-dark th {
+		background-color: #162e54;
+		border-color: #0c1a32;
+	}
+</style>
+<style>
 	/* Ana tasarım stilleri */
 	body {
 		background-color: #f8f9fa;
@@ -100,6 +295,30 @@
 		font-size: 15px;
 		word-wrap: break-word;
 		white-space: normal;
+	}
+</style>
+<style>
+	/* Alternatif: Basit yatay scroll çözümü */
+	.simple-scroll-table {
+		width: 100%;
+		overflow-x: auto;
+		overflow-y: visible;
+		margin-bottom: 1rem;
+	}
+
+		.simple-scroll-table table {
+			min-width: 800px; /* Tablonun minimum genişliği */
+			width: 100%;
+		}
+
+	@@media (max-width: 768px) {
+		.simple-scroll-table
+
+	{
+		border: 1px solid #dee2e6;
+		border-radius: 0.375rem;
+	}
+
 	}
 </style>
 <style>
@@ -317,26 +536,9 @@
 </style>
 
 <div class="main-content mt-5">
-	<div class="container-fluid px-lg-4 px-3">
+	<div class="container-fluid px-lg-4 px-3 mt-5">
 		<!-- Başlık ve Breadcrumb -->
-		<div class="row mb-4">
-			<div class="col-12">
-				<h2 class="page-title">Cari Hareket Raporu</h2>
-				<nav aria-label="breadcrumb">
-					<ol class="breadcrumb">
-						<li class="breadcrumb-item">
-							<a href="/Home/Index">
-								<i class="fa fa-home"></i> Ana Sayfa
-							</a>
-						</li>
-						<li class="breadcrumb-item">
-							<a href="/SirketDurumu/">Cari İşlemler</a>
-						</li>
-						<li class="breadcrumb-item active" aria-current="page">Cari Hareket</li>
-					</ol>
-				</nav>
-			</div>
-		</div>
+	
 
 		<!-- Arama Formu -->
 		<div class="row mb-4">
@@ -447,90 +649,97 @@
 			}
 
 			<!-- Özet Bilgiler -->
-			<div class="row mb-4">
+			<!-- Özet Bilgiler - Responsive -->
+			<div class="row mb-4 summary-cards-container">
 				<!-- TL Bakiye Özeti -->
-				<div class="col-md-4">
-					<div class="card">
+				<div class="col-lg-4 col-md-6 col-sm-12">
+					<div class="card h-100">
 						<div class="card-header">
 							<h5><i class="fa fa-lira-sign"></i> TL Bakiye Özeti</h5>
 						</div>
 						<div class="card-body p-0">
-							<table class="table table-bordered m-0">
-								<thead class="table-dark">
-									<tr>
-										<th>Devir</th>
-										<th>Borç</th>
-										<th>Alacak</th>
-										<th>Bakiye</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td><strong>Devir</strong></td>
-										<td class="text-right"><strong>@totalAnaDovizBorç.ToString("N2") ₺</strong></td>
-										<td class="text-right"><strong>@totalAnaDovizAlacak.ToString("N2") ₺</strong></td>
-										<td class="text-right"><strong>@totalAnaDovizBakiye.ToString("N2") ₺</strong></td>
-									</tr>
-								</tbody>
-							</table>
+							<div class="table-responsive">
+								<table class="table table-bordered m-0">
+									<thead class="table-dark">
+										<tr>
+											<th>Devir</th>
+											<th>Borç</th>
+											<th>Alacak</th>
+											<th>Bakiye</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td><strong>Devir</strong></td>
+											<td class="text-right"><strong>@totalAnaDovizBorç.ToString("N2") ₺</strong></td>
+											<td class="text-right"><strong>@totalAnaDovizAlacak.ToString("N2") ₺</strong></td>
+											<td class="text-right"><strong>@totalAnaDovizBakiye.ToString("N2") ₺</strong></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
 						</div>
 					</div>
 				</div>
 
 				<!-- USD Bakiye Özeti -->
-				<div class="col-md-4">
-					<div class="card">
+				<div class="col-lg-4 col-md-6 col-sm-12">
+					<div class="card h-100">
 						<div class="card-header">
 							<h5><i class="fa fa-dollar-sign"></i> USD Bakiye Özeti</h5>
 						</div>
 						<div class="card-body p-0">
-							<table class="table table-bordered m-0">
-								<thead class="table-dark">
-									<tr>
-										<th>Devir</th>
-										<th>Borç</th>
-										<th>Alacak</th>
-										<th>Bakiye</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td><strong>Devir</strong></td>
-										<td class="text-right"><strong>@totalAltDovizBorç.ToString("N2") $</strong></td>
-										<td class="text-right"><strong>@totalAltDovizAlacak.ToString("N2") $</strong></td>
-										<td class="text-right"><strong>@totalAltDovizBakiye.ToString("N2") $</strong></td>
-									</tr>
-								</tbody>
-							</table>
+							<div class="table-responsive">
+								<table class="table table-bordered m-0">
+									<thead class="table-dark">
+										<tr>
+											<th>Devir</th>
+											<th>Borç</th>
+											<th>Alacak</th>
+											<th>Bakiye</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td><strong>Devir</strong></td>
+											<td class="text-right"><strong>@totalAltDovizBorç.ToString("N2") $</strong></td>
+											<td class="text-right"><strong>@totalAltDovizAlacak.ToString("N2") $</strong></td>
+											<td class="text-right"><strong>@totalAltDovizBakiye.ToString("N2") $</strong></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
 						</div>
 					</div>
 				</div>
 
 				<!-- Orjinal Bakiye Özeti -->
-				<div class="col-md-4">
-					<div class="card">
+				<div class="col-lg-4 col-md-12 col-sm-12">
+					<div class="card h-100">
 						<div class="card-header">
 							<h5><i class="fa fa-globe"></i> Orjinal Döviz Bakiye Özeti</h5>
 						</div>
 						<div class="card-body p-0">
-							<table class="table table-bordered m-0">
-								<thead class="table-dark">
-									<tr>
-										<th>Devir</th>
-										<th>Borç</th>
-										<th>Alacak</th>
-										<th>Bakiye</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td><strong>Devir</strong></td>
-										<td class="text-right"><strong>@totalOrjDovizBorç.ToString("N2")</strong></td>
-										<td class="text-right"><strong>@totalOrjDovizAlacak.ToString("N2")</strong></td>
-										<td class="text-right"><strong>@totalOrjDovizBakiye.ToString("N2")</strong></td>
-									</tr>
-								</tbody>
-							</table>
+							<div class="table-responsive">
+								<table class="table table-bordered m-0">
+									<thead class="table-dark">
+										<tr>
+											<th>Devir</th>
+											<th>Borç</th>
+											<th>Alacak</th>
+											<th>Bakiye</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td><strong>Devir</strong></td>
+											<td class="text-right"><strong>@totalOrjDovizBorç.ToString("N2")</strong></td>
+											<td class="text-right"><strong>@totalOrjDovizAlacak.ToString("N2")</strong></td>
+											<td class="text-right"><strong>@totalOrjDovizBakiye.ToString("N2")</strong></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -551,7 +760,7 @@
 								Tabloyu dışa aktarmak için üstteki butonları kullanabilirsiniz.
 							</div>
 
-							<div class="table-responsive">
+							<div class="simple-scroll-table">
 								<table id="example" class="table table-bordered table-striped" style="width:100%">
 									<thead>
 										<tr>
@@ -674,7 +883,7 @@
 				</div>
 
 				<!-- Cari listesi tablosu -->
-				<div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+				<div class="table" style="max-height: 400px; overflow-y: auto;">
 					<table id="cariTable" class="table table-striped table-bordered table-hover">
 						<thead>
 							<tr>
@@ -734,12 +943,12 @@
 
 <!-- PDF export için html2pdf kütüphanesi (Modal için) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script>
+ <script>
 	document.addEventListener('DOMContentLoaded', function () {
 		let table = new DataTable('#example');
 	});
 </script>
-<script>
+ <script>
 			// Modal işlemleri için JavaScript
 	// Cari Arama Modal fonksiyonları
 	function openCariSearchModal() {
@@ -854,8 +1063,8 @@
 </script>
 
 
-<script>
-	$('#example').DataTable({
+ <script>
+		$('#example').DataTable({
 		"order": [[0, "asc"]], // İlk sütunu (Tarih sütunu) küçükten büyüğe sırala
 		"dom": '<"row"<"col-sm-12"B>>' +
 			'<"row"<"col-sm-6"l><"col-sm-6"f>>' +
@@ -894,18 +1103,34 @@
 				text: '<i class="fa fa-file-pdf"></i> PDF',
 				className: 'btn btn-danger',
 				exportOptions: {
-					columns: ':visible'
+					columns: [0, 1, 2, 3, 4, 5, 6, 7, 8] // Explicitly specify all columns including "Vade Gün"
 				},
 				customize: function(doc) {
-					doc.content[1].table.widths =
-						Array(doc.content[1].table.body[0].length + 1).join('*').split('');
-					doc.defaultStyle.fontSize = 10;
-					doc.styles.tableHeader.fontSize = 11;
-					doc.styles.tableHeader.alignment = 'left';
+					// Set column widths proportionally
+					doc.content[1].table.widths = ['10%', '20%', '12%', '10%', '12%', '12%', '12%', '8%', '4%'];
+
+					doc.defaultStyle.fontSize = 9;
+					doc.styles.tableHeader.fontSize = 10;
+					doc.styles.tableHeader.alignment = 'center';
 					doc.styles.title.fontSize = 14;
 					doc.content[0].text = 'Cari Hareket Raporu';
 					doc.styles.tableHeader.fillColor = '#162e54';
 					doc.styles.tableHeader.color = '#fff';
+
+					// Set text alignment for specific columns
+					doc.content[1].table.body.forEach(function(row, index) {
+						if (index > 0) { // Skip header row
+							// Right align numeric columns (Ana Döviz Borç, Alacak, Bakiye)
+							row[4].alignment = 'right'; // Ana Döviz Borç
+							row[5].alignment = 'right'; // Ana Döviz Alacak
+							row[6].alignment = 'right'; // Ana Döviz Bakiye
+							row[8].alignment = 'center'; // Vade Gün
+						}
+					});
+
+					// Set page orientation to landscape for better fit
+					doc.pageOrientation = 'landscape';
+					doc.pageMargins = [20, 20, 20, 20];
 				}
 			},
 			{
@@ -920,16 +1145,16 @@
 		"columnDefs": [
 			{ "targets": "_all" } // Kolon genişliklerini sabitleme
 		],
-		"responsive": true,
+		"responsive": false,
 		"ordering": true,
 		"paging": true,
 		"pageLength": 5000,
 		"lengthMenu": [[10, 25, 50, 100, 5000], [10, 25, 50, 100, "5000"]]
 	});
 </script>
-	</script>
 
-<script>
+
+ <script>
 		// Detay modalını açma işlevi - stokları gruplayarak getirecek
 		   // Detay modalını açma işlevi - iyileştirilmiş versiyon
 	function openDetailModal(guid) {
@@ -1090,7 +1315,7 @@
 	}
 </script>
 
-<script>
+ <script>
 	// Modal kapatma fonksiyonunu düzeltmek için
 	$(document).ready(function() {
 		// Modal kapatma düğmesine tıklandığında
@@ -1107,7 +1332,7 @@
 	});
 </script>
 
-<script>
+ <script>
 		// Arama inputundan seçilen değeri gerçek select'e aktarmak için
 		function updateCariCodeSelect(selectedValue) {
 		// Seçilen kodu gizli selectbox'a aktar
@@ -1304,7 +1529,7 @@
 			}
 		});
 </script>
-<style>
+ <style>
 	.stok-arama-container {
 		position: relative;
 		margin-right: 10px;
@@ -1382,7 +1607,7 @@
 		}
 	}
 </style>
-<style>
+ <style>
 	/* Grid düzeni için ek stiller */
 	.search-form {
 		background: transparent;
@@ -1455,7 +1680,7 @@
 		border-bottom-right-radius: 0.25rem;
 	}
 </style>
-<style>
+ <style>
 	/* Input grubu için stil */
 	.input-group {
 		display: flex;

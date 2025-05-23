@@ -1,0 +1,871 @@
+﻿@model List<Deneme_proje.Models.Entities.HataliUretimViewModel>
+@{
+    ViewData["Title"] = "Hatalı Üretimler";
+    var baslangicTarihi = ViewData["BaslangicTarihi"]?.ToString();
+    var bitisTarihi = ViewData["BitisTarihi"]?.ToString();
+    var baslangicSaati = ViewData["BaslangicSaati"]?.ToString() ?? "00:00";
+    var bitisSaati = ViewData["BitisSaati"]?.ToString() ?? "23:59";
+    var stokArama = ViewData["StokArama"]?.ToString() ?? "";
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hatalı Üretimler</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Roboto', sans-serif;
+            color: #333;
+        }
+
+        .main-content {
+            margin-top: 2rem;
+            padding: 0 1rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease;
+        }
+
+            .card:hover {
+                transform: translateY(-3px);
+            }
+
+        .card-header {
+            background: linear-gradient(135deg, #007bff, #6610f2);
+            color: white;
+            border-radius: 10px 10px 0 0;
+            padding: 1.25rem;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .form-control {
+            border-radius: 6px;
+            border: 1px solid #ced4da;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .form-control:focus {
+                border-color: #007bff;
+                box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+            }
+
+            .form-control:invalid {
+                border-color: #dc3545;
+            }
+
+        .btn-primary, .btn-danger, .btn-info {
+            border-radius: 6px;
+            padding: 0.5rem 1.25rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+            .btn-primary:hover, .btn-danger:hover, .btn-info:hover {
+                transform: translateY(-2px);
+            }
+
+            .btn-primary:disabled {
+                cursor: not-allowed;
+                opacity: 0.65;
+            }
+
+        .table-responsive {
+            max-height: 450px;
+            overflow-y: auto;
+            position: relative;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+            .table thead th {
+                position: sticky;
+                top: 0;
+                background: #fff;
+                z-index: 10;
+                box-shadow: inset 0 -1px 0 #dee2e6;
+            }
+
+            .table tbody tr {
+                transition: background-color 0.2s ease;
+            }
+
+                .table tbody tr:hover {
+                    background-color: #f1f3f5;
+                }
+
+            .table td, .table th {
+                padding: 0.75rem;
+                vertical-align: middle;
+            }
+
+        .action-buttons {
+            position: sticky;
+            bottom: 0;
+            background: #fff;
+            padding: 1rem 0;
+            margin-top: 1rem;
+            border-top: 1px solid #dee2e6;
+            text-align: right;
+        }
+
+        .modal-content {
+            border-radius: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @@keyframes fadeIn {
+            from
+
+        {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        }
+
+        .modal-header {
+            background: #f8f9fa;
+            border-bottom: none;
+        }
+
+        .modal-title {
+            font-weight: 500;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .alert-warning {
+            border-radius: 6px;
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .filter-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-highlight {
+            background-color: yellow;
+            font-weight: bold;
+        }
+
+        .result-count {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+
+        /* Stok arama modal stilleri */
+        .stok-arama-container {
+            position: relative;
+            width: 100%;
+        }
+
+        #stokSearchModal .modal-content {
+            border-radius: 0.5rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        #stokSearchModal .modal-header {
+            background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
+            color: white;
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+
+        #stokSearchModal .close {
+            color: white;
+            text-shadow: none;
+            opacity: 0.8;
+        }
+
+            #stokSearchModal .close:hover {
+                opacity: 1;
+            }
+
+        #stokTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            #stokTable th {
+                position: sticky;
+                top: 0;
+                background-color: #007bff;
+                color: white;
+                z-index: 10;
+                font-weight: bold;
+            }
+
+            #stokTable tbody tr:hover {
+                background-color: #f0f8ff;
+                cursor: pointer;
+            }
+
+            #stokTable td, #stokTable th {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
+
+        .loading-spinner {
+            padding: 2rem;
+        }
+
+            .loading-spinner i {
+                color: #007bff;
+            }
+
+        /* Input grup düzenlemesi */
+        .input-group {
+            display: flex;
+            width: 100%;
+        }
+
+        .input-group-append {
+            display: flex;
+        }
+
+            .input-group-append .btn {
+                border-radius: 0;
+                margin: 0;
+                border-left: 0;
+            }
+
+                .input-group-append .btn:last-child {
+                    border-radius: 0 4px 4px 0;
+                }
+
+                .input-group-append .btn:hover {
+                    background-color: #e9ecef;
+                }
+
+        #stokArama {
+            border-radius: 4px 0 0 4px;
+        }
+
+        @@media (max-width: 768px) {
+            .main-content
+
+        {
+            padding: 0 0.5rem;
+        }
+
+        .table-responsive {
+            max-height: 350px;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary, .btn-danger, .btn-info {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content mt-5">
+        <div class="px-lg-5 px-3 mt-5">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Hatalı Üretimler</h3>
+                            </div>
+                            <div class="card-body">
+                                <!-- Gelişmiş Filtreleme Bölümü -->
+                                <div class="filter-section">
+                                    <form id="dateFilterForm" method="get" action="@Url.Action("HataliUretimler", "Fatura")">
+                                        @Html.AntiForgeryToken()
+                                        <div class="row">
+                                            <!-- Tarih Filtreleri -->
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="baslangicTarihi">Başlangıç Tarihi:</label>
+                                                    <input type="date" class="form-control" id="baslangicTarihi" name="baslangicTarihi" value="@baslangicTarihi" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="bitisTarihi">Bitiş Tarihi:</label>
+                                                    <input type="date" class="form-control" id="bitisTarihi" name="bitisTarihi" value="@bitisTarihi" required>
+                                                </div>
+                                            </div>
+                                            <!-- Saat Filtreleri -->
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <label for="baslangicSaati">Başlangıç Saati:</label>
+                                                    <input type="time" class="form-control" id="baslangicSaati" name="baslangicSaati" value="@baslangicSaati">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <label for="bitisSaati">Bitiş Saati:</label>
+                                                    <input type="time" class="form-control" id="bitisSaati" name="bitisSaati" value="@bitisSaati">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 d-flex align-items-end">
+                                                <button type="submit" class="btn btn-primary btn-block" id="filterButton">
+                                                    <i class="fas fa-filter"></i> Filtrele
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <!-- Stok Arama -->
+                                        <div class="row mt-3">
+                                            <div class="col-md-6">
+                                                <div class="form-group stok-arama-container mb-0">
+                                                    <label for="stokArama">Stok Kodu/Adı Ara:</label>
+                                                    <div class="input-group">
+                                                        <input type="text" id="stokArama" name="stokArama" class="form-control"
+                                                               placeholder="Stok Kodu veya Adını Yazarak Arayın"
+                                                               value="@stokArama"
+                                                               autocomplete="off">
+
+                                                      @*   <!-- Stok Arama Modal Butonu -->
+                                                        <div class="input-group-append">
+                                                            <button class="btn btn-outline-secondary" type="button" onclick="openStokSearchModal()">
+                                                                <i class="fa fa-search"></i>
+                                                            </button>
+                                                        </div>
+
+                                                        <!-- Temizle Butonu -->
+                                                        <div class="input-group-append">
+                                                            <button class="btn btn-outline-secondary" type="button" onclick="clearStokSearch()">
+                                                                <i class="fa fa-times"></i>
+                                                            </button>
+                                                        </div> *@
+                                                    </div>
+
+                                                    <!-- Seçilen stok bilgisi için gizli alan -->
+                                                    <input type="hidden" id="selectedStokText" name="selectedStokText" value="@stokArama" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 d-flex align-items-end">
+                                                <div class="result-count" id="resultCount">
+                                                    @if (Model != null && Model.Any())
+                                                    {
+                                                        <span>Toplam @Model.Count kayıt bulundu</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- Tablo -->
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped" id="hataliUretimTable">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="tumunuSec">
+                                                        <label class="form-check-label" for="tumunuSec">Tümü</label>
+                                                    </div>
+                                                </th>
+                                                <th>Stok Kodu</th>
+                                                <th>Stok Adı</th>
+                                                <th>Parti Kodu</th>
+                                                <th>Lot No</th>
+                                                <th>Miktar</th>
+                                                <th>Birim</th>
+                                                <th>İşlem Tarihi</th>
+                                                <th>İşlem Saati</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (Model != null && Model.Any())
+                                            {
+                                                foreach (var item in Model)
+                                                {
+                                                    <tr class="data-row">
+                                                        <td>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input uretim-sec" type="checkbox" value="@item.StokHareketGuid">
+                                                            </div>
+                                                        </td>
+                                                        <td class="stok-kodu">@item.StokKodu</td>
+                                                        <td class="stok-adi">@item.StokAdi</td>
+                                                        <td>@item.PartiKodu</td>
+                                                        <td>@(item.LotNo.HasValue ? item.LotNo.Value.ToString() : "-")</td>
+                                                        <td class="text-right">@item.Miktar.ToString("N2")</td>
+                                                        <td>@item.BirimAdi</td>
+                                                        <td>@item.IslemTarihi.ToString("dd.MM.yyyy")</td>
+                                                        <td>@item.IslemTarihi.ToString("HH:mm:ss")</td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="9" class="text-center">Seçilen kriterlere uygun hatalı üretim kaydı bulunmamaktadır.</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                @if (Model != null && Model.Any())
+                                {
+                                    <div class="action-buttons">
+                                        <span class="mr-3 text-muted">Seçili: <span id="seciliSayiGoster">0</span> kayıt</span>
+                                        <button type="button" id="silButton" class="btn btn-danger">
+                                            <i class="fas fa-trash"></i> Seçili Üretimleri Sil
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Silme Onay Modalı -->
+            <div class="modal fade" id="silmeOnayi" tabindex="-1" role="dialog" aria-labelledby="silmeOnayiLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="silmeOnayiLabel">Silme Onayı</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            Seçilen <span id="seciliUretimSayisi">0</span> adet hatalı üretim kaydını silmek istediğinize emin misiniz?
+                            <div class="alert alert-warning mt-2">
+                                <strong>Dikkat!</strong> Bu işlem geri alınamaz. Seçilen üretimlere ait stok hareketleri, barkod tanımları ve parti lot kayıtları da silinecektir.
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                            <button type="button" id="silOnayButton" class="btn btn-danger">Sil</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section scripts {
+        <script>
+            $(document).ready(function () {
+                console.log("jQuery yüklendi, sayfa hazır.");
+
+                // İşlem durumunu takip etmek için değişken
+                var isProcessing = false;
+                var allStocks = []; // Tüm stokları saklamak için
+
+                // Stok Arama Modal fonksiyonları
+                window.openStokSearchModal = function() {
+                    $('#stokSearchModal').modal('show');
+                    loadAllStocks();
+                    setTimeout(function() {
+                        $('#stokModalSearch').focus();
+                    }, 500);
+                };
+
+                // Tüm stokları yükle
+                function loadAllStocks() {
+                    $('#stokModalSpinner').show();
+                    $('#stokTableContainer').hide();
+                    $('#stokErrorMessage').hide();
+
+                    $.ajax({
+                        url: '@Url.Action("GetAllStocks", "Fatura")',
+                        type: 'GET',
+                        dataType: 'json',
+                        timeout: 30000,
+                        success: function(data) {
+                            if (data && data.length > 0) {
+                                allStocks = data;
+                                renderStockTable(data);
+                                $('#stokModalSpinner').hide();
+                                $('#stokTableContainer').show();
+                            } else {
+                                $('#stokModalSpinner').hide();
+                                $('#stokErrorMessage').text('Hiç stok bulunamadı.').show();
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Stok yükleme hatası:', error);
+                            $('#stokModalSpinner').hide();
+                            $('#stokErrorMessage').show();
+                        }
+                    });
+                }
+
+                // Stok tablosunu render et
+                function renderStockTable(stocks) {
+                    var tableBody = $('#stokTableBody');
+                    tableBody.empty();
+
+                    stocks.forEach(function(stok) {
+                        var row = `
+                            <tr data-stok-kodu="${stok.StokKodu}" data-stok-adi="${stok.StokAdi}">
+                                <td>${stok.StokKodu}</td>
+                                <td>${stok.StokAdi}</td>
+                                <td>${stok.BirimAdi || '-'}</td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-sm btn-primary"
+                                            onclick="selectStokFromModal('${stok.StokKodu}', '${stok.StokAdi.replace(/'/g, "\\'")}')">
+                                        <i class="fas fa-check"></i> Seç
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                        tableBody.append(row);
+                    });
+                }
+
+                // Stok tablosunu filtrele
+                window.filterStokTable = function() {
+                    var searchTerm = $('#stokModalSearch').val().toLowerCase();
+
+                    if (searchTerm === '') {
+                        renderStockTable(allStocks);
+                        return;
+                    }
+
+                    var filteredStocks = allStocks.filter(function(stok) {
+                        return stok.StokKodu.toLowerCase().includes(searchTerm) ||
+                               stok.StokAdi.toLowerCase().includes(searchTerm);
+                    });
+
+                    renderStockTable(filteredStocks);
+                };
+
+                // Modal'dan stok seçimi
+                window.selectStokFromModal = function(stokKodu, stokAdi) {
+                    try {
+                        var displayText = stokKodu + " - " + stokAdi;
+
+                        // Ana arama kutusuna değeri yaz
+                        $('#stokArama').val(displayText);
+                        $('#selectedStokText').val(displayText);
+
+                        console.log("Stok seçildi: " + displayText);
+
+                        // Modalı kapat
+                        $('#stokSearchModal').modal('hide');
+
+                        // Gerçek zamanlı arama tetikle
+                        $('#stokArama').trigger('input');
+
+                    } catch (error) {
+                        console.error("Stok seçim hatası:", error);
+                    }
+                };
+
+                // Stok arama temizle
+                window.clearStokSearch = function() {
+                    $('#stokArama').val('');
+                    $('#selectedStokText').val('');
+                    $('#stokArama').trigger('input');
+                    $('#stokArama').focus();
+                };
+
+                // Modal event handlers
+                $('#stokSearchModal').on('shown.bs.modal', function() {
+                    $('#stokModalSearch').focus();
+                });
+
+                $('#stokSearchModal').on('hidden.bs.modal', function() {
+                    $('#stokModalSearch').val('');
+                    if (allStocks.length > 0) {
+                        renderStockTable(allStocks);
+                    }
+                });
+
+                // Satıra tıklanınca da seçim yap
+                $(document).on('click', '#stokTable tbody tr', function(e) {
+                    if (!$(e.target).is('button') && !$(e.target).is('i')) {
+                        var stokKodu = $(this).data('stok-kodu');
+                        var stokAdi = $(this).data('stok-adi');
+                        selectStokFromModal(stokKodu, stokAdi);
+                    }
+                });
+
+                // Enter tuşu ile arama
+                $('#stokModalSearch').keypress(function(e) {
+                    if (e.which == 13) {
+                        e.preventDefault();
+                        var firstVisibleRow = $('#stokTable tbody tr:visible').first();
+                        if (firstVisibleRow.length > 0) {
+                            var stokKodu = firstVisibleRow.data('stok-kodu');
+                            var stokAdi = firstVisibleRow.data('stok-adi');
+                            selectStokFromModal(stokKodu, stokAdi);
+                        }
+                    }
+                });
+
+                // Gerçek zamanlı arama fonksiyonu (mevcut)
+                $("#stokArama").on("input", function() {
+                    var searchTerm = $(this).val().toLowerCase();
+                    var visibleRows = 0;
+
+                    // Önceki vurguları temizle
+                    $('.search-highlight').each(function() {
+                        var parent = $(this).parent();
+                        parent.html(parent.text());
+                    });
+
+                    $(".data-row").each(function() {
+                        var row = $(this);
+                        var stokKodu = row.find('.stok-kodu').text().toLowerCase();
+                        var stokAdi = row.find('.stok-adi').text().toLowerCase();
+
+                        if (searchTerm === "" || stokKodu.includes(searchTerm) || stokAdi.includes(searchTerm)) {
+                            row.show();
+                            visibleRows++;
+
+                            // Arama terimi varsa vurgula
+                            if (searchTerm !== "") {
+                                highlightText(row.find('.stok-kodu'), searchTerm);
+                                highlightText(row.find('.stok-adi'), searchTerm);
+                            }
+                        } else {
+                            row.hide();
+                        }
+                    });
+
+                    // Sonuç sayısını güncelle
+                    $("#resultCount").html(`<span>Görüntülenen: ${visibleRows} kayıt</span>`);
+
+                    // Tümünü seç checkbox'ını güncelle
+                    updateSelectAllCheckbox();
+                });
+
+                // Metni vurgulama fonksiyonu
+                function highlightText(element, searchTerm) {
+                    var text = element.text();
+                    var regex = new RegExp(`(${searchTerm})`, 'gi');
+                    var highlightedText = text.replace(regex, '<span class="search-highlight">$1</span>');
+                    element.html(highlightedText);
+                }
+
+                // Arama temizleme
+                $("#clearSearchButton").click(function() {
+                    $("#stokArama").val("");
+                    $("#stokArama").trigger("input");
+                });
+
+                // Tarih filtresi için doğrulama
+                $("#dateFilterForm").on("submit", function (e) {
+                    var baslangic = $("#baslangicTarihi").val();
+                    var bitis = $("#bitisTarihi").val();
+                    var baslangicSaat = $("#baslangicSaati").val();
+                    var bitisSaat = $("#bitisSaati").val();
+
+                    if (!baslangic || !bitis) {
+                        e.preventDefault();
+                        alert("Lütfen başlangıç ve bitiş tarihlerini seçin.");
+                        return;
+                    }
+
+                    // Tarih ve saat kontrolü
+                    var baslangicDateTime = new Date(baslangic + " " + baslangicSaat);
+                    var bitisDateTime = new Date(bitis + " " + bitisSaat);
+
+                    if (baslangicDateTime > bitisDateTime) {
+                        e.preventDefault();
+                        alert("Başlangıç tarihi ve saati, bitiş tarihi ve saatinden sonra olamaz.");
+                        return;
+                    }
+
+                    $("#filterButton").prop("disabled", true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Filtreleniyor...');
+                });
+
+                // Form gönderildikten sonra butonu sıfırla
+                $(window).on("load", function () {
+                    $("#filterButton").prop("disabled", false).html('<i class="fas fa-filter"></i> Filtrele');
+                });
+
+                // Tümünü seç/kaldır (sadece görünür satırlar için)
+                $("#tumunuSec").change(function () {
+                    var isChecked = $(this).prop('checked');
+                    $(".data-row:visible .uretim-sec").prop('checked', isChecked);
+                    updateSelectedCount();
+                });
+
+                // Checkbox değişikliklerini dinle
+                $(document).on("change", ".uretim-sec", function () {
+                    updateSelectAllCheckbox();
+                    updateSelectedCount();
+                });
+
+                // Tümü seçilmiş mi kontrolü (sadece görünür satırlar için)
+                function updateSelectAllCheckbox() {
+                    var visibleCheckboxes = $(".data-row:visible .uretim-sec");
+                    var checkedCheckboxes = $(".data-row:visible .uretim-sec:checked");
+
+                    if (visibleCheckboxes.length === 0) {
+                        $("#tumunuSec").prop('checked', false);
+                        $("#tumunuSec").prop('indeterminate', false);
+                    } else if (checkedCheckboxes.length === visibleCheckboxes.length) {
+                        $("#tumunuSec").prop('checked', true);
+                        $("#tumunuSec").prop('indeterminate', false);
+                    } else if (checkedCheckboxes.length > 0) {
+                        $("#tumunuSec").prop('checked', false);
+                        $("#tumunuSec").prop('indeterminate', true);
+                    } else {
+                        $("#tumunuSec").prop('checked', false);
+                        $("#tumunuSec").prop('indeterminate', false);
+                    }
+                }
+
+                // Seçili sayı güncelleme
+                function updateSelectedCount() {
+                    var seciliSayisi = $(".uretim-sec:checked").length;
+                    $("#seciliSayiGoster").text(seciliSayisi);
+                }
+
+                // Silme butonu
+                $("#silButton").click(function () {
+                    var seciliSayisi = $(".uretim-sec:checked").length;
+                    console.log("Sil butonuna tıklandı, seçili üretim sayısı:", seciliSayisi);
+                    if (seciliSayisi === 0) {
+                        alert("Lütfen silmek istediğiniz üretimleri seçin.");
+                        return;
+                    }
+
+                    $("#seciliUretimSayisi").text(seciliSayisi);
+                    $("#silmeOnayi").modal('show');
+                    console.log("Silme onayı modalı açılıyor.");
+                });
+
+                // Silme onayı
+                $("#silOnayButton").click(function () {
+                    if (isProcessing) {
+                        console.log("İşlem zaten devam ediyor, lütfen bekleyin...");
+                        return;
+                    }
+
+                    isProcessing = true;
+                    $("#silOnayButton").prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> İşleniyor...');
+
+                    var seciliUretimler = [];
+                    $(".uretim-sec:checked").each(function () {
+                        seciliUretimler.push($(this).val());
+                    });
+
+                    $.ajax({
+                        url: '@Url.Action("HataliUretimleriSil", "Fatura")',
+                        type: 'POST',
+                        traditional: true,
+                        data: {
+                            seciliUretimler: seciliUretimler,
+                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function (result) {
+                            console.log("AJAX başarılı, yanıt:", result);
+                            isProcessing = false;
+                            $("#silOnayButton").prop('disabled', false).html('Sil');
+                            $("#silmeOnayi").modal('hide');
+
+                            if (result.success) {
+                                Swal.fire({
+                                    title: 'Başarılı!',
+                                    text: result.message,
+                                    icon: 'success',
+                                    confirmButtonText: 'Tamam'
+                                }).then((result) => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Hata!',
+                                    text: result.message || 'İşlem sırasında bir hata oluştu.',
+                                    icon: 'error',
+                                    confirmButtonText: 'Tamam'
+                                });
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("AJAX hatası - Durum:", status, "Hata:", error, "Yanıt:", xhr.responseText);
+                            isProcessing = false;
+                            $("#silOnayButton").prop('disabled', false).html('Sil');
+                            $("#silmeOnayi").modal('hide');
+                            Swal.fire({
+                                title: 'Hata!',
+                                text: 'İşlem sırasında bir hata oluştu: ' + xhr.status + ' - ' + error,
+                                icon: 'error',
+                                confirmButtonText: 'Tamam'
+                            });
+                        },
+                        timeout: 300000
+                    });
+                });
+
+                // Modal kapatıldığında işlem durumunu kontrol et
+                $('#silmeOnayi').on('hidden.bs.modal', function (e) {
+                    if (isProcessing) {
+                        Swal.fire({
+                            title: 'İşlem Devam Ediyor',
+                            text: 'Silme işlemi arka planda devam ediyor. Lütfen sayfayı yenilemeyin.',
+                            icon: 'info',
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            timer: 3000
+                        });
+                    } else {
+                        $("#silOnayButton").prop('disabled', false).html('Sil');
+                    }
+                });
+
+                // SweetAlert2 kütüphanesi mevcut değilse, normal alert kullan
+                if (typeof Swal === 'undefined') {
+                    window.Swal = {
+                        fire: function(options) {
+                            alert(options.title + '\n\n' + options.text);
+                            if (options.icon === 'success' && !options.timer) {
+                                location.reload();
+                            }
+                            return { then: function(callback) { callback(); } };
+                        }
+                    };
+                }
+
+                // Sayfa yüklendiğinde seçili sayıyı güncelle
+                updateSelectedCount();
+            });
+        </script>
+    }
+</body>
+</html>

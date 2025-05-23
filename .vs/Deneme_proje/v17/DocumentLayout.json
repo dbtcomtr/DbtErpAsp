@@ -3,20 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|c:\\users\\lenovo\\source\\repos\\dbtcomtr\\dbterpasp\\deneme_proje\\views\\aktarim\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|solutionrelative:deneme_proje\\views\\aktarim\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|c:\\users\\lenovo\\source\\repos\\dbtcomtr\\dbterpasp\\deneme_proje\\views\\fatura\\stokyaslandirma.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|solutionrelative:deneme_proje\\views\\fatura\\stokyaslandirma.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|c:\\users\\lenovo\\source\\repos\\dbtcomtr\\dbterpasp\\deneme_proje\\controllers\\aktarimcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|solutionrelative:deneme_proje\\controllers\\aktarimcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|c:\\users\\lenovo\\source\\repos\\dbtcomtr\\dbterpasp\\deneme_proje\\views\\aktarim\\parametreayarla.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|solutionrelative:deneme_proje\\views\\aktarim\\parametreayarla.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|c:\\users\\lenovo\\source\\repos\\dbtcomtr\\dbterpasp\\deneme_proje\\models\\aktarimentities.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|solutionrelative:deneme_proje\\models\\aktarimentities.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|c:\\users\\lenovo\\source\\repos\\dbtcomtr\\dbterpasp\\deneme_proje\\controllers\\faturacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|solutionrelative:deneme_proje\\controllers\\faturacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|c:\\users\\lenovo\\source\\repos\\dbtcomtr\\dbterpasp\\deneme_proje\\repository\\faturarepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -27,44 +19,8 @@
       "RelativeMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|solutionrelative:deneme_proje\\models\\entities.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|c:\\users\\lenovo\\source\\repos\\dbtcomtr\\dbterpasp\\deneme_proje\\repository\\gunayrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|solutionrelative:deneme_proje\\repository\\gunayrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|c:\\users\\lenovo\\source\\repos\\dbtcomtr\\dbterpasp\\deneme_proje\\repository\\denizlerrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|solutionrelative:deneme_proje\\repository\\denizlerrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|c:\\users\\lenovo\\source\\repos\\dbtcomtr\\dbterpasp\\deneme_proje\\controllers\\faturacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|solutionrelative:deneme_proje\\controllers\\faturacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|c:\\users\\lenovo\\source\\repos\\dbtcomtr\\dbterpasp\\deneme_proje\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|solutionrelative:deneme_proje\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|c:\\users\\lenovo\\source\\repos\\dbtcomtr\\dbterpasp\\deneme_proje\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|solutionrelative:deneme_proje\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|c:\\users\\lenovo\\source\\repos\\dbtcomtr\\dbterpasp\\deneme_proje\\views\\fatura\\canlibilanco.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|solutionrelative:deneme_proje\\views\\fatura\\canlibilanco.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|c:\\users\\lenovo\\source\\repos\\dbtcomtr\\dbterpasp\\deneme_proje\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|solutionrelative:deneme_proje\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|c:\\users\\lenovo\\source\\repos\\dbtcomtr\\dbterpasp\\deneme_proje\\views\\dioki\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|solutionrelative:deneme_proje\\views\\dioki\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|c:\\users\\lenovo\\source\\repos\\dbtcomtr\\dbterpasp\\deneme_proje\\views\\fatura\\stokyaslandirma.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|solutionrelative:deneme_proje\\views\\fatura\\stokyaslandirma.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|c:\\users\\lenovo\\source\\repos\\dbtcomtr\\dbterpasp\\deneme_proje\\views\\fatura\\siparisyuklemerampa1.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|solutionrelative:deneme_proje\\views\\fatura\\siparisyuklemerampa1.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|c:\\users\\lenovo\\source\\repos\\dbtcomtr\\dbterpasp\\deneme_proje\\views\\fatura\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{BEA156CE-F908-4950-9E9F-A50BAA744B1A}|Deneme_proje\\Deneme_proje.csproj|solutionrelative:deneme_proje\\views\\fatura\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
   "DocumentGroupContainers": [
@@ -74,8 +30,21 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 9,
+          "SelectedChildIndex": 6,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Entities.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Models\\Entities.cs",
+              "RelativeDocumentMoniker": "Deneme_proje\\Models\\Entities.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Models\\Entities.cs",
+              "RelativeToolTip": "Deneme_proje\\Models\\Entities.cs",
+              "ViewState": "AgIAACMCAAAAAAAAAAAawDcCAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-23T12:53:08.026Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
@@ -98,196 +67,55 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "GunayRepository.cs",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Repository\\GunayRepository.cs",
-              "RelativeDocumentMoniker": "Deneme_proje\\Repository\\GunayRepository.cs",
-              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Repository\\GunayRepository.cs",
-              "RelativeToolTip": "Deneme_proje\\Repository\\GunayRepository.cs",
-              "ViewState": "AgIAADIAAAAAAAAAAAAmwDYAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-14T14:48:45.654Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "DenizlerRepository.cs",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Repository\\DenizlerRepository.cs",
-              "RelativeDocumentMoniker": "Deneme_proje\\Repository\\DenizlerRepository.cs",
-              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Repository\\DenizlerRepository.cs",
-              "RelativeToolTip": "Deneme_proje\\Repository\\DenizlerRepository.cs",
-              "ViewState": "AgIAAJAAAAAAAAAAAAAwwJgAAAAYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-14T14:41:57.212Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "AktarimEntities.cs",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Models\\AktarimEntities.cs",
-              "RelativeDocumentMoniker": "Deneme_proje\\Models\\AktarimEntities.cs",
-              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Models\\AktarimEntities.cs",
-              "RelativeToolTip": "Deneme_proje\\Models\\AktarimEntities.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-14T08:42:08.668Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "ParametreAyarla.cshtml",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Views\\Aktarim\\ParametreAyarla.cshtml",
-              "RelativeDocumentMoniker": "Deneme_proje\\Views\\Aktarim\\ParametreAyarla.cshtml",
-              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Views\\Aktarim\\ParametreAyarla.cshtml",
-              "RelativeToolTip": "Deneme_proje\\Views\\Aktarim\\ParametreAyarla.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-05-14T13:08:10.815Z"
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Views\\Aktarim\\Index.cshtml",
-              "RelativeDocumentMoniker": "Deneme_proje\\Views\\Aktarim\\Index.cshtml",
-              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Views\\Aktarim\\Index.cshtml",
-              "RelativeToolTip": "Deneme_proje\\Views\\Aktarim\\Index.cshtml",
-              "ViewState": "AgIAAIsAAAAAAAAAAAAUwJ8AAAAKAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-05-14T07:09:16.804Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "AktarimController.cs",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Controllers\\AktarimController.cs",
-              "RelativeDocumentMoniker": "Deneme_proje\\Controllers\\AktarimController.cs",
-              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Controllers\\AktarimController.cs",
-              "RelativeToolTip": "Deneme_proje\\Controllers\\AktarimController.cs",
-              "ViewState": "AgIAAAsAAAAAAAAAAAAAABIAAAAEAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-13T13:38:33.001Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Views\\Dioki\\Index.cshtml",
-              "RelativeDocumentMoniker": "Deneme_proje\\Views\\Dioki\\Index.cshtml",
-              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Views\\Dioki\\Index.cshtml",
-              "RelativeToolTip": "Deneme_proje\\Views\\Dioki\\Index.cshtml",
-              "ViewState": "AgIAAC0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-05-14T07:01:29.17Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Views\\Home\\Index.cshtml",
-              "RelativeDocumentMoniker": "Deneme_proje\\Views\\Home\\Index.cshtml",
-              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Views\\Home\\Index.cshtml",
-              "RelativeToolTip": "Deneme_proje\\Views\\Home\\Index.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAF0AAAAyAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-05-13T13:44:32.013Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "FaturaRepository.cs",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Repository\\FaturaRepository.cs",
-              "RelativeDocumentMoniker": "Deneme_proje\\Repository\\FaturaRepository.cs",
-              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Repository\\FaturaRepository.cs",
-              "RelativeToolTip": "Deneme_proje\\Repository\\FaturaRepository.cs",
-              "ViewState": "AgIAAO8LAAAAAAAAAAAUwPsLAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-12T08:20:53.032Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "Entities.cs",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Models\\Entities.cs",
-              "RelativeDocumentMoniker": "Deneme_proje\\Models\\Entities.cs",
-              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Models\\Entities.cs",
-              "RelativeToolTip": "Deneme_proje\\Models\\Entities.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-12T08:49:58.058Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "FaturaController.cs",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Controllers\\FaturaController.cs",
-              "RelativeDocumentMoniker": "Deneme_proje\\Controllers\\FaturaController.cs",
-              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Controllers\\FaturaController.cs",
-              "RelativeToolTip": "Deneme_proje\\Controllers\\FaturaController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAHAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-12T08:20:40.714Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "_Layout.cshtml",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Views\\Shared\\_Layout.cshtml",
-              "RelativeDocumentMoniker": "Deneme_proje\\Views\\Shared\\_Layout.cshtml",
-              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Views\\Shared\\_Layout.cshtml",
-              "RelativeToolTip": "Deneme_proje\\Views\\Shared\\_Layout.cshtml",
-              "ViewState": "AgIAAPIAAAAAAAAAAAAswHQCAABEAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-05-14T08:09:17.204Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\appsettings.json",
-              "RelativeDocumentMoniker": "Deneme_proje\\appsettings.json",
-              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\appsettings.json",
-              "RelativeToolTip": "Deneme_proje\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAVAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-05-14T11:27:15.641Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "SiparisYuklemeRampa1.cshtml",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Views\\Fatura\\SiparisYuklemeRampa1.cshtml",
-              "RelativeDocumentMoniker": "Deneme_proje\\Views\\Fatura\\SiparisYuklemeRampa1.cshtml",
-              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Views\\Fatura\\SiparisYuklemeRampa1.cshtml",
-              "RelativeToolTip": "Deneme_proje\\Views\\Fatura\\SiparisYuklemeRampa1.cshtml",
-              "ViewState": "AgIAAGEBAAAAAAAAAAAAwIUBAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-05-13T13:33:37.445Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "CanliBilanco.cshtml",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Views\\Fatura\\CanliBilanco.cshtml",
-              "RelativeDocumentMoniker": "Deneme_proje\\Views\\Fatura\\CanliBilanco.cshtml",
-              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Views\\Fatura\\CanliBilanco.cshtml",
-              "RelativeToolTip": "Deneme_proje\\Views\\Fatura\\CanliBilanco.cshtml",
-              "ViewState": "AgIAAEUBAAAAAAAAAAAvwFYBAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-05-08T13:33:42.007Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
               "Title": "StokYaslandirma.cshtml",
               "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Views\\Fatura\\StokYaslandirma.cshtml",
               "RelativeDocumentMoniker": "Deneme_proje\\Views\\Fatura\\StokYaslandirma.cshtml",
               "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Views\\Fatura\\StokYaslandirma.cshtml",
               "RelativeToolTip": "Deneme_proje\\Views\\Fatura\\StokYaslandirma.cshtml",
-              "ViewState": "AgIAAGkBAAAAAAAAAAAswJoBAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAOoBAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-05-08T12:42:00.139Z"
+              "WhenOpened": "2025-05-23T11:58:22.291Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "FaturaRepository.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Repository\\FaturaRepository.cs",
+              "RelativeDocumentMoniker": "Deneme_proje\\Repository\\FaturaRepository.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Repository\\FaturaRepository.cs",
+              "RelativeToolTip": "Deneme_proje\\Repository\\FaturaRepository.cs",
+              "ViewState": "AgIAAKQBAAAAAAAAAAAUwMwBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-22T07:05:24.873Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Views\\Fatura\\Index.cshtml",
+              "RelativeDocumentMoniker": "Deneme_proje\\Views\\Fatura\\Index.cshtml",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Views\\Fatura\\Index.cshtml",
+              "RelativeToolTip": "Deneme_proje\\Views\\Fatura\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAC4AAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-05-23T08:32:54.954Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "FaturaController.cs",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Controllers\\FaturaController.cs",
+              "RelativeDocumentMoniker": "Deneme_proje\\Controllers\\FaturaController.cs",
+              "ToolTip": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\Controllers\\FaturaController.cs",
+              "RelativeToolTip": "Deneme_proje\\Controllers\\FaturaController.cs",
+              "ViewState": "AgIAAHsAAAAAAAAAAAAswKIAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-22T07:05:18.218Z",
+              "EditorCaption": ""
             }
           ]
         }

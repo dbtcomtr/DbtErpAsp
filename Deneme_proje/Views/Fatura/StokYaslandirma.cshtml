@@ -7,12 +7,17 @@
     var selectedStockCode = ViewData["SelectedStockCode"] as string;
     var hasFilterApplied = !string.IsNullOrEmpty(selectedStockCode);
 
-    // Değişkenler yuvarlama olmadan kullanılacak
+    // Negatif stok kontrolü
+    var hasNegativeStock = Model != null && Model.Any(x => x.IsNegativeStock);
+    var positiveStocks = Model?.Where(x => !x.IsNegativeStock).ToList() ?? new List<Deneme_proje.Models.Entities.StockMovement>();
+    var negativeStock = Model?.FirstOrDefault(x => x.IsNegativeStock);
+
+    // Değişkenler yuvarlama olmadan kullanılacak (sadece pozitif stoklar için)
     double toplamGirenMiktar = 0;
     double toplamGirenTarih = 0;
     double toplamGirenBrutFiyat = 0;
     double toplamGirenUsdBrutFiyat = 0;
-    var enSonGirenStok = Model.OrderByDescending(x => x.NumericDate).FirstOrDefault();
+    var enSonGirenStok = positiveStocks.OrderByDescending(x => x.NumericDate).FirstOrDefault();
     double enSonGirenStokBirimTutar = enSonGirenStok != null ? enSonGirenStok.StokTutar / enSonGirenStok.StokMiktar : 0;
     DateTime excelStartDate = new DateTime(1900, 1, 1); // Excel's starting date
 }
@@ -51,6 +56,27 @@
 
     .hidden-select {
         display: none;
+    }
+
+    /* Negatif stok için özel stiller */
+    .negative-stock-alert {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .negative-stock-row {
+        background-color: #ffe6e6 !important;
+        font-weight: bold;
+    }
+
+    .negative-stock-icon {
+        color: #dc3545;
+        font-weight: bold;
+        margin-right: 5px;
     }
 </style>
 
@@ -104,12 +130,39 @@
             </div>
         </div>
 
+        <!-- Negatif stok uyarısı -->
+        @if (hasNegativeStock && negativeStock != null)
+        {
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="negative-stock-alert">
+                        <strong><i class="fa fa-exclamation-triangle negative-stock-icon"></i>DİKKAT:</strong>
+                        Bu stokun depoda negatif miktarı bulunmaktadır!
+                        <br>
+                        <strong>Stok Kodu:</strong> @negativeStock.MsgS0078
+                        <br>
+                        <strong>Stok Adı:</strong> @negativeStock.MsgS0870
+                        <br>
+                        <strong>Negatif Miktar:</strong> @negativeStock.StoktaGirenMiktar.ToString("N2")
+                        <br>
+                        <strong>Depo:</strong> @negativeStock.DepoAdi
+                    </div>
+                </div>
+            </div>
+        }
+
         <!-- Tablo ve içerik -->
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
-                        <h5 class="card-header-text text-white">Stok Yaşlandırma</h5>
+                        <h5 class="card-header-text text-white">
+                            Stok Yaşlandırma
+                            @if (hasNegativeStock)
+                            {
+                                <span class="badge badge-danger ml-2">NEGATİF STOK</span>
+                            }
+                        </h5>
                     </div>
 
                     <div class="card-block accordion-block px-0">
@@ -121,6 +174,7 @@
                                         <table id="example" class="display dataTable" style="width:100%">
                                             <thead>
                                                 <tr>
+                                                    <th>Durum</th>
                                                     <th>Stok Kodu</th>
                                                     <th>Adı</th>
                                                     <th>Giren Miktar</th>
@@ -134,7 +188,24 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach (var item in Model)
+                                                @if (hasNegativeStock && negativeStock != null)
+                                                {
+                                                    <tr class="negative-stock-row">
+                                                        <td><span class="negative-stock-icon">⚠️</span> NEGATİF</td>
+                                                        <td>@negativeStock.MsgS0078</td>
+                                                        <td>@negativeStock.MsgS0870</td>
+                                                        <td style="text-align: right; color: red;">@negativeStock.StoktaGirenMiktar.ToString("N0")</td>
+                                                        <td>@negativeStock.BirimAdi</td>
+                                                        <td style="text-align: right;">-</td>
+                                                        <td style="text-align: right;">-</td>
+                                                        <td style="text-align: right;">-</td>
+                                                        <td>@negativeStock.StokTarih.ToString("dd/MM/yyyy")</td>
+                                                        <td style="text-align: right;">-</td>
+                                                        <td>@negativeStock.DepoAdi</td>
+                                                    </tr>
+                                                }
+
+                                                @foreach (var item in positiveStocks)
                                                 {
                                                     // Birim hesaplamaları (yuvarlama yapılmadan)
                                                     var brüt_birim = item.StokTutar / item.StokMiktar;
@@ -150,13 +221,14 @@
                                                     // Stok yaşı hesaplama (bugünkü tarihe göre)
                                                     var giren_yas = bugunuNumericDate1 - item.NumericDate;
 
-                                                    // Toplam hesaplamalar
+                                                    // Toplam hesaplamalar (sadece pozitif stoklar için)
                                                     toplamGirenMiktar += item.StoktaGirenMiktar;
                                                     toplamGirenTarih += giren_tarih;
                                                     toplamGirenBrutFiyat += giren_brütfiyat;
                                                     toplamGirenUsdBrutFiyat += giren_brütfiyat_usd;
 
                                                     <tr>
+                                                        <td><span style="color: green;">✓</span> POZİTİF</td>
                                                         <td>@item.MsgS0078</td>
                                                         <td>@item.MsgS0870</td>
                                                         <td style="text-align: right;">@item.StoktaGirenMiktar.ToString("N0")</td>
@@ -170,85 +242,96 @@
                                                     </tr>
                                                 }
                                             </tbody>
-                                            <tfoot>
-                                                @{
-                                                    // Ağırlıklı Ortalama Giriş Tarihi (A.O.G. Tarihi) ve stok yaşı hesaplamaları
-                                                    var aogt = toplamGirenMiktar > 0 ? toplamGirenTarih / toplamGirenMiktar : 0;
-                                                    var finalAogtDate = toplamGirenMiktar > 0 ? excelStartDate.AddDays(aogt - 2) : excelStartDate;
-                                                    var bugunuNumericDate = (int)(DateTime.Now - excelStartDate.AddDays(-2)).TotalDays;
+                                            @if (positiveStocks.Any())
+                                            {
+                                                <tfoot>
+                                                    @{
+                                                        // Ağırlıklı Ortalama Giriş Tarihi (A.O.G. Tarihi) ve stok yaşı hesaplamaları (sadece pozitif stoklar için)
+                                                        var aogt = toplamGirenMiktar > 0 ? toplamGirenTarih / toplamGirenMiktar : 0;
+                                                        var finalAogtDate = toplamGirenMiktar > 0 ? excelStartDate.AddDays(aogt - 2) : excelStartDate;
+                                                        var bugunuNumericDate = (int)(DateTime.Now - excelStartDate.AddDays(-2)).TotalDays;
 
-                                                    var stokyas = toplamGirenMiktar > 0 ? bugunuNumericDate - aogt : 0;
-                                                    var stoktutar_sonsatinalma = toplamGirenMiktar * enSonGirenStokBirimTutar;
+                                                        var stokyas = toplamGirenMiktar > 0 ? bugunuNumericDate - aogt : 0;
+                                                        var stoktutar_sonsatinalma = toplamGirenMiktar * enSonGirenStokBirimTutar;
 
-                                                    var aobm = toplamGirenMiktar > 0 ? toplamGirenBrutFiyat / toplamGirenMiktar : 0;
-                                                    var aobm_usd = toplamGirenMiktar > 0 ? toplamGirenUsdBrutFiyat / toplamGirenMiktar : 0;
+                                                        var aobm = toplamGirenMiktar > 0 ? toplamGirenBrutFiyat / toplamGirenMiktar : 0;
+                                                        var aobm_usd = toplamGirenMiktar > 0 ? toplamGirenUsdBrutFiyat / toplamGirenMiktar : 0;
 
-                                                    // Yaşlandırma hesaplamaları için değişkenler
-                                                    double yas0_30 = 0, yas31_60 = 0, yas61_90 = 0, yas90_plus = 0;
+                                                        // Yaşlandırma hesaplamaları için değişkenler (sadece pozitif stoklar)
+                                                        double yas0_30 = 0, yas31_60 = 0, yas61_90 = 0, yas90_plus = 0;
 
-                                                    foreach (var item in Model)
-                                                    {
-                                                        var bugunuNumericDate1 = (int)(DateTime.Now - excelStartDate).TotalDays;
-                                                        var giren_yas = bugunuNumericDate1 - item.NumericDate;
-
-                                                        if (giren_yas <= 30)
+                                                        foreach (var item in positiveStocks)
                                                         {
-                                                            yas0_30 += item.StoktaGirenMiktar;
-                                                        }
-                                                        else if (giren_yas <= 60)
-                                                        {
-                                                            yas31_60 += item.StoktaGirenMiktar;
-                                                        }
-                                                        else if (giren_yas <= 90)
-                                                        {
-                                                            yas61_90 += item.StoktaGirenMiktar;
-                                                        }
-                                                        else
-                                                        {
-                                                            yas90_plus += item.StoktaGirenMiktar;
+                                                            var bugunuNumericDate1 = (int)(DateTime.Now - excelStartDate).TotalDays;
+                                                            var giren_yas = bugunuNumericDate1 - item.NumericDate;
+
+                                                            if (giren_yas <= 30)
+                                                            {
+                                                                yas0_30 += item.StoktaGirenMiktar;
+                                                            }
+                                                            else if (giren_yas <= 60)
+                                                            {
+                                                                yas31_60 += item.StoktaGirenMiktar;
+                                                            }
+                                                            else if (giren_yas <= 90)
+                                                            {
+                                                                yas61_90 += item.StoktaGirenMiktar;
+                                                            }
+                                                            else
+                                                            {
+                                                                yas90_plus += item.StoktaGirenMiktar;
+                                                            }
                                                         }
                                                     }
-                                                }
-                                                <div class="table-responsive">
-                                                    <table class="table table-bordered table-striped">
-                                                        <thead class="thead-dark">
-                                                            <tr>
-                                                                <th>Kalan Stok Miktarı</th>
-                                                                <th>A.O.G. Tarihi</th>
-                                                                <th>Stok Yaşı</th>
-                                                                <th>Ağırlıkl Ortalama Birim Maliyeti (TL)</th>
-                                                                <th>Ağırlıkl Ortalama Birim Maliyeti (USD)</th>
-                                                                <th>En Son Giren Stoğun Birim Tutarı</th>
-                                                                <th>Stok Tutarı (Son Satın Alma Fiyatı ile TL)</th>
-                                                                <th>StokTutarı Usd</th>
-                                                                <th>0-30 Gün</th>
-                                                                <th>31-60 Gün</th>
-                                                                <th>61-90 Gün</th>
-                                                                <th>90+ Gün</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td style="text-align: right;" id="toplamGirenMiktar">@toplamGirenMiktar.ToString("N0")</td>
-                                                                <td>@finalAogtDate.ToString("dd/MM/yyyy")</td>
-                                                                <td style="text-align: right;">@stokyas.ToString("N0")</td>
-                                                                <td style="text-align: right;">@aobm.ToString("N5")</td>
-                                                                <td style="text-align: right;" id="aobm_usd">@aobm_usd.ToString("N5")</td>
-                                                                <td style="text-align: right;">@enSonGirenStokBirimTutar.ToString("N5")</td>
-                                                                <td style="text-align: right;">@stoktutar_sonsatinalma.ToString("N5")</td>
-                                                                <td style="text-align: right;" id="stok_tutari_usd">Hesaplanıyor...</td>
-                                                                <td style="text-align: right;">@yas0_30.ToString("N0")</td>
-                                                                <td style="text-align: right;">@yas31_60.ToString("N0")</td>
-                                                                <td style="text-align: right;">@yas61_90.ToString("N0")</td>
-                                                                <td style="text-align: right;">@yas90_plus.ToString("N0")</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td colspan="12">Döviz Kuru (USD/TL): <span id="usd_exchange_rate">Yükleniyor...</span></td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </tfoot>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered table-striped">
+                                                            <thead class="thead-dark">
+                                                                <tr>
+                                                                    <th>Kalan Pozitif Stok Miktarı</th>
+                                                                    <th>A.O.G. Tarihi</th>
+                                                                    <th>Stok Yaşı</th>
+                                                                    <th>Ağırlıkl Ortalama Birim Maliyeti (TL)</th>
+                                                                    <th>Ağırlıkl Ortalama Birim Maliyeti (USD)</th>
+                                                                    <th>En Son Giren Stoğun Birim Tutarı</th>
+                                                                    <th>Stok Tutarı (Son Satın Alma Fiyatı ile TL)</th>
+                                                                    <th>StokTutarı Usd</th>
+                                                                    <th>0-30 Gün</th>
+                                                                    <th>31-60 Gün</th>
+                                                                    <th>61-90 Gün</th>
+                                                                    <th>90+ Gün</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td style="text-align: right;" id="toplamGirenMiktar">@toplamGirenMiktar.ToString("N0")</td>
+                                                                    <td>@finalAogtDate.ToString("dd/MM/yyyy")</td>
+                                                                    <td style="text-align: right;">@stokyas.ToString("N0")</td>
+                                                                    <td style="text-align: right;">@aobm.ToString("N5")</td>
+                                                                    <td style="text-align: right;" id="aobm_usd">@aobm_usd.ToString("N5")</td>
+                                                                    <td style="text-align: right;">@enSonGirenStokBirimTutar.ToString("N5")</td>
+                                                                    <td style="text-align: right;">@stoktutar_sonsatinalma.ToString("N5")</td>
+                                                                    <td style="text-align: right;" id="stok_tutari_usd">Hesaplanıyor...</td>
+                                                                    <td style="text-align: right;">@yas0_30.ToString("N0")</td>
+                                                                    <td style="text-align: right;">@yas31_60.ToString("N0")</td>
+                                                                    <td style="text-align: right;">@yas61_90.ToString("N0")</td>
+                                                                    <td style="text-align: right;">@yas90_plus.ToString("N0")</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td colspan="12">
+                                                                        Döviz Kuru (USD/TL): <span id="usd_exchange_rate">Yükleniyor...</span>
+                                                                        @if (hasNegativeStock && negativeStock != null)
+                                                                        {
+                                                                            <span style="margin-left: 20px; color: #721c24; font-weight: bold;">
+                                                                                ⚠️ Bu stokta @negativeStock.StoktaGirenMiktar.ToString("N2") birimlik negatif stok bulunmaktadır!
+                                                                            </span>
+                                                                        }
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </tfoot>
+                                            }
                                         </table>
                                     </div>
                                 }
@@ -303,109 +386,114 @@
             }
         }
 
-        // Döviz kuru kodları
-        fetchExchangeRate();
+        // Döviz kuru kodları (sadece pozitif stoklar varsa çalıştır)
+    @if (positiveStocks.Any())
+    {
+        <text>
+                fetchExchangeRate();
 
-        function fetchExchangeRate() {
-            tryFrankfurterAPI();
-        }
-
-        function tryFrankfurterAPI() {
-            $.ajax({
-                url: "https://api.frankfurter.app/latest?from=USD&to=TRY",
-                type: "GET",
-                dataType: "json",
-                timeout: 5000,
-                success: function(data) {
-                    if (data && data.rates && data.rates.TRY) {
-                        updateExchangeRate(data.rates.TRY);
-                    } else {
-                        tryOpenExchangeAPI();
-                    }
-                },
-                error: function() {
-                    tryOpenExchangeAPI();
+                function fetchExchangeRate() {
+                    tryFrankfurterAPI();
                 }
-            });
-        }
 
-        function tryOpenExchangeAPI() {
-            $.ajax({
-                url: "https://open.er-api.com/v6/latest/USD",
-                type: "GET",
-                dataType: "json",
-                timeout: 5000,
-                success: function(data) {
-                    if (data && data.rates && data.rates.TRY) {
-                        updateExchangeRate(data.rates.TRY);
-                    } else {
-                        tryExchangeRatesAPI();
-                    }
-                },
-                error: function() {
-                    tryExchangeRatesAPI();
+                function tryFrankfurterAPI() {
+                    $.ajax({
+                        url: "https://api.frankfurter.app/latest?from=USD&to=TRY",
+                        type: "GET",
+                        dataType: "json",
+                        timeout: 5000,
+                        success: function(data) {
+                            if (data && data.rates && data.rates.TRY) {
+                                updateExchangeRate(data.rates.TRY);
+                            } else {
+                                tryOpenExchangeAPI();
+                            }
+                        },
+                        error: function() {
+                            tryOpenExchangeAPI();
+                        }
+                    });
                 }
-            });
-        }
 
-        function tryExchangeRatesAPI() {
-            $.ajax({
-                url: "https://api.exchangerate.host/latest?base=USD&symbols=TRY",
-                type: "GET",
-                dataType: "json",
-                timeout: 5000,
-                success: function(data) {
-                    if (data && data.rates && data.rates.TRY) {
-                        updateExchangeRate(data.rates.TRY);
-                    } else {
-                        useFallbackRate();
-                    }
-                },
-                error: function() {
-                    useFallbackRate();
+                function tryOpenExchangeAPI() {
+                    $.ajax({
+                        url: "https://open.er-api.com/v6/latest/USD",
+                        type: "GET",
+                        dataType: "json",
+                        timeout: 5000,
+                        success: function(data) {
+                            if (data && data.rates && data.rates.TRY) {
+                                updateExchangeRate(data.rates.TRY);
+                            } else {
+                                tryExchangeRatesAPI();
+                            }
+                        },
+                        error: function() {
+                            tryExchangeRatesAPI();
+                        }
+                    });
                 }
-            });
-        }
 
-        function useFallbackRate() {
-            var fallbackRate = 32.50;
-            updateExchangeRate(fallbackRate, true);
-        }
+                function tryExchangeRatesAPI() {
+                    $.ajax({
+                        url: "https://api.exchangerate.host/latest?base=USD&symbols=TRY",
+                        type: "GET",
+                        dataType: "json",
+                        timeout: 5000,
+                        success: function(data) {
+                            if (data && data.rates && data.rates.TRY) {
+                                updateExchangeRate(data.rates.TRY);
+                            } else {
+                                useFallbackRate();
+                            }
+                        },
+                        error: function() {
+                            useFallbackRate();
+                        }
+                    });
+                }
 
-        function updateExchangeRate(rate, isFallback) {
-            // Döviz kurunu 5 basamaklı göster
-            var formattedRate = rate.toFixed(5);
-            if (isFallback) {
-                $("#usd_exchange_rate").text(formattedRate + " (Tahmini değer)");
-            } else {
-                $("#usd_exchange_rate").text(formattedRate);
-            }
+                function useFallbackRate() {
+                    var fallbackRate = 32.50;
+                    updateExchangeRate(fallbackRate, true);
+                }
 
-            // Virgülle ayrılmış değerleri doğru şekilde al
-            var aobmUsdText = $("#aobm_usd").text();
-            var toplamGirenMiktarText = $("#toplamGirenMiktar").text();
+                function updateExchangeRate(rate, isFallback) {
+                    // Döviz kurunu 5 basamaklı göster
+                    var formattedRate = rate.toFixed(5);
+                    if (isFallback) {
+                        $("#usd_exchange_rate").text(formattedRate + " (Tahmini değer)");
+                    } else {
+                        $("#usd_exchange_rate").text(formattedRate);
+                    }
 
-            var aobmUsd = parseFloat(aobmUsdText.replace(/\./g, '').replace(',', '.'));
-            var toplamGirenMiktar = parseFloat(toplamGirenMiktarText.replace(/\./g, '').replace(',', '.'));
+                    // Virgülle ayrılmış değerleri doğru şekilde al
+                    var aobmUsdText = $("#aobm_usd").text();
+                    var toplamGirenMiktarText = $("#toplamGirenMiktar").text();
 
-            console.log("AOBM USD:", aobmUsd);
-            console.log("Toplam Giren Miktar:", toplamGirenMiktar);
-            console.log("Döviz Kuru:", rate);
+                    var aobmUsd = parseFloat(aobmUsdText.replace(/\./g, '').replace(',', '.'));
+                    var toplamGirenMiktar = parseFloat(toplamGirenMiktarText.replace(/\./g, '').replace(',', '.'));
 
-            if (!isNaN(aobmUsd) && !isNaN(toplamGirenMiktar)) {
-                var stokTutariUsd = aobmUsd * toplamGirenMiktar;
-                var stokTutariTl = stokTutariUsd * rate;
+                    console.log("AOBM USD:", aobmUsd);
+                    console.log("Toplam Giren Miktar:", toplamGirenMiktar);
+                    console.log("Döviz Kuru:", rate);
 
-                // Yuvarlamasız, 5 basamaklı gösterim
-                $("#stok_tutari_usd").text(
-                    stokTutariUsd.toLocaleString('tr-TR', { minimumFractionDigits: 5, maximumFractionDigits: 5 }) +
-                    " USD (" +
-                    stokTutariTl.toLocaleString('tr-TR', { minimumFractionDigits: 5, maximumFractionDigits: 5 }) +
-                    " TL)"
-                );
-            } else {
-                $("#stok_tutari_usd").text("Hesaplanamadı");
-            }
-        }
+                    if (!isNaN(aobmUsd) && !isNaN(toplamGirenMiktar)) {
+                        var stokTutariUsd = aobmUsd * toplamGirenMiktar;
+                        var stokTutariTl = stokTutariUsd * rate;
+
+                        // Yuvarlamasız, 5 basamaklı gösterim
+                        $("#stok_tutari_usd").text(
+                            stokTutariUsd.toLocaleString('tr-TR', { minimumFractionDigits: 5, maximumFractionDigits: 5 }) +
+                            " USD (" +
+                            stokTutariTl.toLocaleString('tr-TR', { minimumFractionDigits: 5, maximumFractionDigits: 5 }) +
+                            " TL)"
+                        );
+                    } else {
+                        $("#stok_tutari_usd").text("Hesaplanamadı");
+                    }
+                }
+        </text>
+    }
     });
 </script>

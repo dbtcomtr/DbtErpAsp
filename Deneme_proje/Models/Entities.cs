@@ -4,6 +4,62 @@ namespace Deneme_proje.Models
 {
     public class Entities
     {
+        public class HataliUretimViewModel
+        {
+            public Guid StokHareketGuid { get; set; }
+            public string StokKodu { get; set; }
+            public string StokAdi { get; set; }
+            public string PartiKodu { get; set; }
+            public int? LotNo { get; set; }
+            public double Miktar { get; set; }
+            public string BirimAdi { get; set; }
+            public DateTime? UretimTarihi { get; set; }
+            public DateTime IslemTarihi { get; set; }
+        }
+
+        // FaturaRepository.cs içerisine aşağıdaki yardımcı sınıfı ekleyin
+        public class StokHareketSilModel
+        {
+            public string StokKodu { get; set; }
+            public string PartiKodu { get; set; }
+            public int? LotNo { get; set; }
+            public decimal Miktar { get; set; }
+            public string StokAdi { get; set; }
+            public string BarkodNo { get; set; }
+        }
+
+        public class SilinenBarkodViewModel
+        {
+            public int Id { get; set; }
+            public string StokKodu { get; set; }
+            public string StokAdi { get; set; }
+            public decimal Miktar { get; set; }
+            public DateTime SilinmeTarihi { get; set; }
+            public int? SilenKullaniciId { get; set; }
+            public string KullaniciAdi { get; set; } // Kullanıcı adını göstermek için
+            public string BarkodNo { get; set; }
+            public string PartiKodu { get; set; }
+            public int? LotNo { get; set; }
+            public Guid? StokHareketGuid { get; set; }
+            public string SilinmeNedeni { get; set; }
+        }
+        public class MusteriAcikFaturaViewModel
+        {
+            public string MusteriKodu { get; set; }
+            public string Unvan { get; set; }
+            public decimal VadesiGecmisBakiye { get; set; }
+            public decimal BugunOdenmesiGereken { get; set; }
+            public decimal GelecekVadeliFaturalar { get; set; }
+            public decimal ToplamBorc { get; set; }
+            public List<FaturaViewModel> Faturalar { get; set; } = new List<FaturaViewModel>();
+        }
+
+        
+        public class SorumluKod
+        {
+            public string SorumluKodu { get; set; }
+            public string SorumluAdi { get; set; }
+        }
         public class StokMaliyetViewModel
         {
             public string StokKodu { get; set; }
@@ -484,6 +540,7 @@ namespace Deneme_proje.Models
 
 
         // Models/StockMovement.cs
+
         public class StockMovement
         {
             public Guid MsgS0088 { get; set; }
@@ -494,6 +551,7 @@ namespace Deneme_proje.Models
             public int DepoNo { get; set; }
             public double MsgS0165 { get; set; }
             public string StokEvraknoSeri { get; set; }
+            public bool IsNegativeStock { get; set; } // bool olarak değiştirildi
             public int StokEvraknoSira { get; set; }
             public double StokMiktar { get; set; }
             public double StokTutar { get; set; }
@@ -505,7 +563,6 @@ namespace Deneme_proje.Models
             public double Days61To90 { get; set; }
             public double Days90Plus { get; set; }
             public double NumericDate { get; set; }
-
             // Döviz kuru alanı
             public double AltDovizKuru { get; set; }
         }

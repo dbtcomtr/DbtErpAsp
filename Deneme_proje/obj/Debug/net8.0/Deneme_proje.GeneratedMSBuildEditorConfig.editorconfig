@@ -184,6 +184,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXEVuQ29rU2F0aWxhbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/HataliUretimler.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXEhhdGFsaVVyZXRpbWxlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -198,6 +202,14 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/maliBorc.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXG1hbGlCb3JjLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/MusteriAcikFaturalar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXE11c3RlcmlBY2lrRmF0dXJhbGFyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/MusteriBorcListesi.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXE11c3RlcmlCb3JjTGlzdGVzaS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/MusteriRiskAnalizi.cshtml]
@@ -218,6 +230,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/SatilanMalinKarlilikveMaliyet.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXFNhdGlsYW5NYWxpbkthcmxpbGlrdmVNYWxpeWV0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/SilinenBarkodlar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXFNpbGluZW5CYXJrb2RsYXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/SiparisDurum.cshtml]

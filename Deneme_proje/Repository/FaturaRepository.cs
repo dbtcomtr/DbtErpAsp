@@ -7,7 +7,11 @@ using Microsoft.Extensions.Logging; // ILogger ekleyin
 using Deneme_proje.Models;
 using static Deneme_proje.Models.Entities;
 using static Deneme_proje.Models.SirketDurumuEntites;
+
+using Deneme_proje.Helpers;
+using System.Configuration;
 namespace Deneme_proje.Repository
+
 {
     public class FaturaRepository
     {
@@ -402,23 +406,18 @@ ORDER BY krsoztaksit_vade -- Vadeye göre sıralama
         public IEnumerable<StockMovement> GetStokYaslandirma(string stockCode, DateTime reportDate, int? depoNo = null)
         {
             var stockMovements = new List<StockMovement>();
-
             try
             {
                 var connectionString = _dbSelectorService.GetConnectionString();
-
                 using (var connection = new SqlConnection(connectionString))
                 {
                     using (var command = new SqlCommand("dbo.stok_yaslandirma_WEB", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
-
                         command.Parameters.AddWithValue("@StokKod", (object)stockCode ?? DBNull.Value);
                         command.Parameters.AddWithValue("@RaporTarihi", reportDate);
-                        command.Parameters.AddWithValue("@DepoNo", (object)depoNo ?? DBNull.Value); // Depo numarası parametresi ekleme
-
+                        command.Parameters.AddWithValue("@DepoNo", (object)depoNo ?? DBNull.Value);
                         connection.Open();
-
                         using (var reader = command.ExecuteReader())
                         {
                             while (reader.Read())
@@ -443,9 +442,10 @@ ORDER BY krsoztaksit_vade -- Vadeye göre sıralama
                                     Days61To90 = reader.GetDouble(reader.GetOrdinal("Days61To90")),
                                     Days90Plus = reader.GetDouble(reader.GetOrdinal("Days90Plus")),
                                     NumericDate = reader.GetDouble(reader.GetOrdinal("NumericDate")),
-                                    AltDovizKuru = reader.GetDouble(reader.GetOrdinal("sth_alt_doviz_kuru"))
+                                    AltDovizKuru = reader.GetDouble(reader.GetOrdinal("sth_alt_doviz_kuru")),
+                                    // Negatif stok kontrolü (bool olarak)
+                                    IsNegativeStock = reader.GetString(reader.GetOrdinal("sth_evrakno_seri")) == "NEG-STOCK"
                                 };
-
                                 stockMovements.Add(stockMovement);
                             }
                         }
@@ -454,12 +454,11 @@ ORDER BY krsoztaksit_vade -- Vadeye göre sıralama
             }
             catch (Exception ex)
             {
-                // Hata işlemleri
                 Console.WriteLine($"Hata: {ex.Message}");
             }
-
             return stockMovements;
         }
+
 
         public IEnumerable<Depo> GetDepoList()
         {
@@ -3065,6 +3064,597 @@ ORDER BY sb.cari_unvan1, sb.sip_evrakno_sira, sb.sip_stok_kod;";
                 return stokMaliyetData;
             }
         }
+        public IEnumerable<SorumluKod> GetSorumluKodlari(DateTime baslangicTarihi, DateTime bitisTarihi)
+        {
+            var connectionString = _dbSelectorService.GetConnectionString();
 
+            using (var connection = new SqlConnection(connectionString))
+            { 
+                string query = @"
+  SELECT DISTINCT
+      som_kod AS SorumluKodu,
+      som_isim AS SorumluAdi
+  FROM SORUMLULUK_MERKEZLERI
+      ";
+
+                var parameters = new { BaslangicTarihi = baslangicTarihi, BitisTarihi = bitisTarihi };
+
+                return connection.Query<SorumluKod>(query, parameters);
+            }
+        }
+
+        public IEnumerable<MusteriAcikFaturaViewModel> GetMusteriAcikFaturalar()
+        {
+            var connectionString = _dbSelectorService.GetConnectionString();
+            var bugunTarihi = DateTime.Now.Date;
+            var sonuclar = new List<MusteriAcikFaturaViewModel>();
+
+            try
+            {
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+
+                    // Müşterileri getirme sorgusu
+                    var musteriSorgusu = @"
+                    SELECT 
+                        ch.cari_kod AS MusteriKodu,
+                        ch.cari_unvan1 AS Unvan,
+                        SUM(CASE WHEN cha.CHA_VADE_TARIHI < @BugunTarihi THEN cha.CHA_CARI_MEBLAG_ANA ELSE 0 END) AS VadesiGecmisBakiye,
+                        SUM(CASE WHEN cha.CHA_VADE_TARIHI = @BugunTarihi THEN cha.CHA_CARI_MEBLAG_ANA ELSE 0 END) AS BugunOdenmesiGereken,
+                        SUM(CASE WHEN cha.CHA_VADE_TARIHI > @BugunTarihi THEN cha.CHA_CARI_MEBLAG_ANA ELSE 0 END) AS GelecekVadeliFaturalar,
+                        SUM(cha.CHA_CARI_MEBLAG_ANA) AS ToplamBorc
+                    FROM CARI_HESAPLAR ch
+                    JOIN CARI_HESAP_HAREKETLERI cha ON ch.cari_kod = cha.cha_kod
+                    WHERE 
+                        ch.cari_kod LIKE '120%' 
+                        AND cha.CHA_CARI_BORC_ALACAK_TIP = 0  -- Borç hareketleri
+                        AND cha.CHA_CARI_MEBLAG_ANA > 0
+                        AND cha.cha_evrak_tip IN (29, 63)     -- Satış ve Hizmet Faturaları
+                    GROUP BY ch.cari_kod, ch.cari_unvan1
+                    HAVING SUM(cha.CHA_CARI_MEBLAG_ANA) > 0  -- Sadece borç bakiyesi olan cariler
+                    ORDER BY ch.cari_unvan1";
+
+                    var musteriler = connection.Query(musteriSorgusu, new { BugunTarihi = bugunTarihi }).ToList();
+
+                    foreach (var musteri in musteriler)
+                    {
+                        // Müşteri faturalarını getirme sorgusu
+                        var faturaSorgusu = @"
+                        SELECT 
+                            cha.cha_evrakno_seri + '-' + CAST(cha.cha_evrakno_sira AS VARCHAR) AS FaturaNo,
+                            cha.cha_tarihi AS FaturaTarihi,
+                            cha.CHA_VADE_TARIHI AS VadeTarihi,
+                            cha.CHA_CARI_MEBLAG_ANA AS Tutar
+                        FROM CARI_HESAP_HAREKETLERI cha
+                        WHERE 
+                            cha.cha_kod = @MusteriKodu
+                            AND cha.CHA_CARI_BORC_ALACAK_TIP = 0  -- Borç hareketleri
+                            AND cha.cha_evrak_tip IN (29, 63)     -- Satış ve Hizmet Faturaları
+                            AND cha.CHA_CARI_MEBLAG_ANA > 0        -- Sadece pozitif tutarlar
+                        ORDER BY cha.CHA_VADE_TARIHI";
+
+                        var faturalar = connection.Query<FaturaViewModel>(faturaSorgusu,
+                            new { MusteriKodu = musteri.MusteriKodu }).ToList();
+
+                        // Müşteri ve faturalarını modele ekle
+                        var musteriModel = new MusteriAcikFaturaViewModel
+                        {
+                            MusteriKodu = musteri.MusteriKodu,
+                            Unvan = musteri.Unvan,
+                            VadesiGecmisBakiye = musteri.VadesiGecmisBakiye,
+                            BugunOdenmesiGereken = musteri.BugunOdenmesiGereken,
+                            GelecekVadeliFaturalar = musteri.GelecekVadeliFaturalar,
+                            ToplamBorc = musteri.ToplamBorc,
+                            Faturalar = faturalar
+                        };
+
+                        sonuclar.Add(musteriModel);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Müşteri açık faturaları alınırken hata oluştu");
+                throw;
+            }
+
+            return sonuclar;
+        }
+        // FaturaRepository.cs içindeki GetHataliUretimler metodunu güncelleyin
+        // FaturaRepository.cs içindeki GetHataliUretimler metodunu güncelleyin
+        // FaturaRepository.cs içindeki GetHataliUretimler metodunu güncelleyin
+        // FaturaRepository.cs içindeki GetHataliUretimler metodunu güncelleyin
+        public List<HataliUretimViewModel> GetHataliUretimler(DateTime baslangicTarihi, DateTime bitisTarihi, string stokArama = "")
+        {
+            var connectionString = _dbSelectorService.GetConnectionString();
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                var query = @"
+SELECT 
+    sh.sth_Guid AS StokHareketGuid,
+    sh.sth_stok_kod AS StokKodu,
+    s.sto_isim AS StokAdi,
+    pl.pl_partikodu AS PartiKodu,
+    pl.pl_lotno AS LotNo,
+    sh.sth_miktar AS Miktar,
+    s.sto_birim1_ad AS BirimAdi,
+    pl.pl_uretim_tar AS UretimTarihi,
+    sh.sth_create_date AS IslemTarihi
+FROM STOK_HAREKETLERI sh
+JOIN STOKLAR s ON sh.sth_stok_kod = s.sto_kod
+LEFT JOIN PARTILOT pl 
+    ON sh.sth_parti_kodu = pl.pl_partikodu 
+    AND sh.sth_lot_no = pl.pl_lotno 
+    AND sh.sth_stok_kod = pl.pl_stokkodu
+WHERE 
+    sh.sth_tip = 0 
+    AND sh.sth_evraktip = 12
+    AND sh.sth_cins = 7
+    AND sh.sth_create_date >= @BaslangicTarihi 
+    AND sh.sth_create_date <= @BitisTarihi
+    AND (@StokArama IS NULL OR @StokArama = '' OR 
+         sh.sth_stok_kod LIKE '%' + @StokArama + '%' OR 
+         s.sto_isim LIKE '%' + @StokArama + '%')
+    AND NOT EXISTS (
+        SELECT 1 
+        FROM STOK_HAREKETLERI sh2 
+        WHERE sh2.sth_tip = 1
+          AND sh2.sth_parti_kodu = sh.sth_parti_kodu
+          AND sh2.sth_lot_no = sh.sth_lot_no
+          AND sh2.sth_stok_kod = sh.sth_stok_kod
+    )
+ORDER BY sh.sth_create_date DESC";
+
+                var parameters = new
+                {
+                    BaslangicTarihi = baslangicTarihi,
+                    BitisTarihi = bitisTarihi,
+                    StokArama = string.IsNullOrWhiteSpace(stokArama) ? null : stokArama.Trim()
+                };
+
+                try
+                {
+                    var results = connection.Query<HataliUretimViewModel>(query, parameters).ToList();
+
+                    string aramaInfo = string.IsNullOrWhiteSpace(stokArama) ? "" : $", Arama: '{stokArama}'";
+                    _logger.LogInformation($"Hatalı üretim sayısı: {results.Count} " +
+                        $"(sth_create_date aralığı: {baslangicTarihi:dd.MM.yyyy HH:mm} - {bitisTarihi:dd.MM.yyyy HH:mm}{aramaInfo})");
+
+                    return results;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Hatalı üretimler listelenirken hata oluştu");
+                    throw;
+                }
+            }
+        }
+        public int HataliUretimleriSil(List<string> seciliUretimler)
+        {
+            var connectionString = _dbSelectorService.GetConnectionString();
+            var erpConnectionString = ConnectionHelper.GetConnectionString("ERPDatabase");
+            int silinenKayitSayisi = 0;
+
+            // ========= KULLANICI BİLGİSİ ALMA BÖLÜMÜ =========
+            // Birkaç farklı yöntemle kullanıcı ID'sini almaya çalışıyoruz
+            int? silenKullaniciId = null;
+
+            try
+            {
+                // 1. Session kontrolü ve session'dan alma
+                if (_httpContextAccessor.HttpContext != null && _httpContextAccessor.HttpContext.Session != null)
+                {
+                    // string tipinden alıp parse etmeyi deneyelim
+                    var userNoStr = _httpContextAccessor.HttpContext.Session.GetString("UserNo");
+                    if (!string.IsNullOrEmpty(userNoStr) && int.TryParse(userNoStr, out int userNo))
+                    {
+                        silenKullaniciId = userNo;
+                        _logger.LogInformation($"Session string'den kullanıcı no: {silenKullaniciId}");
+                    }
+                    else
+                    {
+                        // Int32 olarak almayı deneyelim
+                        silenKullaniciId = _httpContextAccessor.HttpContext.Session.GetInt32("UserNo");
+                        _logger.LogInformation($"Session Int32'den kullanıcı no: {silenKullaniciId}");
+                    }
+
+                    // Hala bulunamadıysa Session elemanlarını logla
+                    if (silenKullaniciId == null)
+                    {
+                        _logger.LogWarning("Session'da UserNo bulunamadı. Session içerikleri:");
+                        foreach (var key in _httpContextAccessor.HttpContext.Session.Keys)
+                        {
+                            _logger.LogWarning($"- {key}: {_httpContextAccessor.HttpContext.Session.GetString(key)}");
+                        }
+                    }
+                }
+
+                // 2. Claim'den almayı dene (Session yoksa veya Session'da yoksa)
+                if (silenKullaniciId == null && _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true)
+                {
+                    var userNoClaim = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserNo");
+                    if (userNoClaim != null && int.TryParse(userNoClaim.Value, out int userNo))
+                    {
+                        silenKullaniciId = userNo;
+                        _logger.LogInformation($"Claim'den kullanıcı no: {silenKullaniciId}");
+                    }
+                }
+
+                // 3. Username'i al, veritabanından UserNo'yu bul
+                if (silenKullaniciId == null && _httpContextAccessor.HttpContext?.User?.Identity?.Name != null)
+                {
+                    var username = _httpContextAccessor.HttpContext.User.Identity.Name;
+                    _logger.LogInformation($"Kullanıcı adı: {username}");
+
+                    // Veritabanından user_no'yu bul
+                    using (var conn = new SqlConnection(connectionString))
+                    {
+                        conn.Open();
+                        var query = "SELECT User_no FROM KULLANICILAR WHERE User_name = @username";
+                        var foundUserNo = conn.QueryFirstOrDefault<int?>(query, new { username });
+
+                        if (foundUserNo.HasValue)
+                        {
+                            silenKullaniciId = foundUserNo.Value;
+                            _logger.LogInformation($"Veritabanından kullanıcı no: {silenKullaniciId}");
+                        }
+                    }
+                }
+
+                // 4. Hiçbir yöntemle bulamazsak 1 olarak varsayalım (default admin)
+                if (silenKullaniciId == null)
+                {
+                    silenKullaniciId = 1;
+                    _logger.LogWarning("Kullanıcı no bulunamadı, varsayılan olarak 1 kullanılıyor.");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Kullanıcı no alınırken hata oluştu: {Message}", ex.Message);
+                silenKullaniciId = 1; // Hata durumunda yine 1 olarak varsayalım
+            }
+
+            // ========= KAYIT SİLME İŞLEMİ BÖLÜMÜ =========
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // Çift tıklama koruması: daha önce silinmiş stok hareketleri filtreleniyor
+                        var filteredGuidList = new List<string>();
+                        foreach (var guidStr in seciliUretimler)
+                        {
+                            if (!Guid.TryParse(guidStr, out Guid stokHareketGuid))
+                            {
+                                _logger.LogWarning($"Geçersiz GUID formatı: {guidStr}");
+                                continue;
+                            }
+
+                            // Bu GUID daha önce silinmiş mi kontrol et
+                            using (var erpConnection = new SqlConnection(erpConnectionString))
+                            {
+                                erpConnection.Open();
+
+                                var existingRecord = erpConnection.QueryFirstOrDefault<int>(
+                                    "SELECT COUNT(1) FROM silinen_barkodlar WHERE stok_hareket_guid = @StokHareketGuid",
+                                    new { StokHareketGuid = stokHareketGuid });
+
+                                if (existingRecord > 0)
+                                {
+                                    _logger.LogInformation($"GUID {guidStr} daha önce silinmiş, işlem atlanıyor.");
+                                    continue;
+                                }
+                            }
+
+                            filteredGuidList.Add(guidStr);
+                        }
+
+                        foreach (var guidStr in filteredGuidList)
+                        {
+                            if (!Guid.TryParse(guidStr, out Guid stokHareketGuid))
+                            {
+                                continue; // Zaten yukarıda kontrol ettik
+                            }
+
+                            // İlgili stok hareketini bul
+                            var stokHareket = connection.QueryFirstOrDefault<StokHareketSilModel>(
+                                @"SELECT 
+                            sth_stok_kod AS StokKodu, 
+                            sth_parti_kodu AS PartiKodu, 
+                            sth_lot_no AS LotNo,
+                            sth_miktar AS Miktar,
+                            (SELECT sto_isim FROM STOKLAR WHERE sto_kod = sth_stok_kod) AS StokAdi,
+                            (SELECT TOP 1 bar_kodu FROM BARKOD_TANIMLARI 
+                             WHERE bar_stokkodu = sth_stok_kod 
+                             AND bar_partikodu = sth_parti_kodu 
+                             AND bar_lotno = sth_lot_no) AS BarkodNo
+                        FROM STOK_HAREKETLERI WHERE sth_Guid = @StokHareketGuid",
+                                new { StokHareketGuid = stokHareketGuid },
+                                transaction);
+
+                            if (stokHareket == null)
+                            {
+                                _logger.LogWarning($"Stok hareketi bulunamadı: {guidStr}");
+                                continue;
+                            }
+
+                            // Silinen kaydı ERP veritabanına kaydet
+                            using (var erpConnection = new SqlConnection(erpConnectionString))
+                            {
+                                erpConnection.Open();
+
+                                _logger.LogInformation($"Silinen barkod kaydı yapılıyor: StokKodu={stokHareket.StokKodu}, UserNo={silenKullaniciId}");
+
+                                erpConnection.Execute(
+                                    @"INSERT INTO silinen_barkodlar 
+                              (stok_kodu, stok_adi, miktar, silinme_tarihi, silen_kullanici_id, 
+                               barkod_no, parti_kodu, lot_no, stok_hareket_guid, silinme_nedeni)
+                              VALUES 
+                              (@StokKodu, @StokAdi, @Miktar, GETDATE(), @SilenKullaniciId, 
+                               @BarkodNo, @PartiKodu, @LotNo, @StokHareketGuid, 'Hatalı Üretim')",
+                                    new
+                                    {
+                                        stokHareket.StokKodu,
+                                        stokHareket.StokAdi,
+                                        stokHareket.Miktar,
+                                        SilenKullaniciId = silenKullaniciId,
+                                        stokHareket.BarkodNo,
+                                        stokHareket.PartiKodu,
+                                        stokHareket.LotNo,
+                                        StokHareketGuid = stokHareketGuid
+                                    });
+                            }
+
+                            // 1. İlgili barkod tanımlarını sil
+                            int silinenBarkodSayisi = connection.Execute(
+                                @"DELETE FROM BARKOD_TANIMLARI 
+                          WHERE bar_stokkodu = @StokKodu 
+                          AND bar_partikodu = @PartiKodu 
+                          AND bar_lotno = @LotNo",
+                                stokHareket,
+                                transaction);
+
+                            _logger.LogInformation($"Silinen barkod sayısı: {silinenBarkodSayisi} ({stokHareket.StokKodu}, {stokHareket.PartiKodu}, {stokHareket.LotNo})");
+
+                            // 2. Stok hareketini sil
+                            int silinenStokHareketi = connection.Execute(
+                                "DELETE FROM STOK_HAREKETLERI WHERE sth_Guid = @StokHareketGuid",
+                                new { StokHareketGuid = stokHareketGuid },
+                                transaction);
+
+                            _logger.LogInformation($"Silinen stok hareketi: {silinenStokHareketi} (GUID: {stokHareketGuid})");
+
+                            // 3. Parti lot kaydını sil (eğer başka stok hareketleri tarafından kullanılmıyorsa)
+                            if (!string.IsNullOrEmpty(stokHareket.PartiKodu) && stokHareket.LotNo.HasValue)
+                            {
+                                // Parti lot kontrolü
+                                bool partiKullaniliyor = connection.QueryFirstOrDefault<bool>(
+                                    @"SELECT CASE WHEN EXISTS (
+                                SELECT 1 FROM STOK_HAREKETLERI 
+                                WHERE sth_stok_kod = @StokKodu 
+                                AND sth_parti_kodu = @PartiKodu 
+                                AND sth_lot_no = @LotNo) 
+                              THEN 1 ELSE 0 END",
+                                    stokHareket,
+                                    transaction);
+
+                                if (!partiKullaniliyor)
+                                {
+                                    int silinenPartiLot = connection.Execute(
+                                        @"DELETE FROM PARTILOT 
+                                  WHERE pl_stokkodu = @StokKodu 
+                                  AND pl_partikodu = @PartiKodu 
+                                  AND pl_lotno = @LotNo",
+                                        stokHareket,
+                                        transaction);
+
+                                    _logger.LogInformation($"Silinen parti lot: {silinenPartiLot} ({stokHareket.StokKodu}, {stokHareket.PartiKodu}, {stokHareket.LotNo})");
+                                }
+                            }
+
+                            silinenKayitSayisi++;
+                        }
+
+                        transaction.Commit();
+                        return silinenKayitSayisi;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Hatalı üretimler silinirken hata oluştu: {Message}", ex.Message);
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
+
+
+        public List<SilinenBarkodViewModel> GetSilinenBarkodlar(DateTime? baslangicTarihi = null, DateTime? bitisTarihi = null, string stokKodu = null)
+        {
+            // ERP veritabanı bağlantısı ConnectionHelper üzerinden alınıyor
+            var erpConnectionString = ConnectionHelper.GetConnectionString("ERPDatabase");
+            var normalConnectionString = _dbSelectorService.GetConnectionString(); // Mikro DB bağlantısı
+
+            using (var connection = new SqlConnection(erpConnectionString))
+            {
+                connection.Open();
+
+                // Silinen barkodlar tablosundan verileri çek
+                var query = @"
+            SELECT 
+                sb.id AS Id,
+                sb.stok_kodu AS StokKodu,
+                sb.stok_adi AS StokAdi,
+                sb.miktar AS Miktar,
+                sb.silinme_tarihi AS SilinmeTarihi,
+                sb.silen_kullanici_id AS SilenKullaniciId,
+                sb.barkod_no AS BarkodNo,
+                sb.parti_kodu AS PartiKodu,
+                sb.lot_no AS LotNo,
+                sb.stok_hareket_guid AS StokHareketGuid,
+                sb.silinme_nedeni AS SilinmeNedeni
+            FROM 
+                silinen_barkodlar sb
+            WHERE 
+                1=1";
+
+                var parameters = new DynamicParameters();
+
+                if (baslangicTarihi.HasValue)
+                {
+                    query += " AND sb.silinme_tarihi >= @BaslangicTarihi";
+                    parameters.Add("BaslangicTarihi", baslangicTarihi.Value);
+                }
+
+                if (bitisTarihi.HasValue)
+                {
+                    query += " AND sb.silinme_tarihi <= @BitisTarihi";
+                    parameters.Add("BitisTarihi", bitisTarihi.Value.AddDays(1).AddSeconds(-1)); // Günün sonuna kadar
+                }
+
+                if (!string.IsNullOrEmpty(stokKodu))
+                {
+                    query += " AND sb.stok_kodu LIKE @StokKodu";
+                    parameters.Add("StokKodu", "%" + stokKodu + "%");
+                }
+
+                query += " ORDER BY sb.silinme_tarihi DESC";
+
+                try
+                {
+                    var results = connection.Query<SilinenBarkodViewModel>(query, parameters).ToList();
+                    _logger.LogInformation($"Silinen barkod sayısı: {results.Count}");
+
+                    // Kullanıcı adlarını ayrıca mikro veri tabanından al
+                    if (results.Any())
+                    {
+                        Dictionary<int, string> kullaniciAdlari = new Dictionary<int, string>();
+
+                        // Tüm kullanıcı ID'lerini topla
+                        var kullaniciIdler = results
+                            .Where(r => r.SilenKullaniciId.HasValue && r.SilenKullaniciId.Value > 0)
+                            .Select(r => r.SilenKullaniciId.Value)
+                            .Distinct()
+                            .ToList();
+
+                        if (kullaniciIdler.Any())
+                        {
+                            try
+                            {
+                                using (var mikroConn = new SqlConnection(normalConnectionString))
+                                {
+                                    mikroConn.Open();
+                                    string kullaniciQuery = @"
+                                SELECT 
+                                    User_no, 
+                                    User_name 
+                                FROM 
+                                    KULLANICILAR 
+                                WHERE 
+                                    User_no IN @KullaniciIdler";
+
+                                    var kullanicilar = mikroConn.Query<dynamic>(kullaniciQuery, new { KullaniciIdler = kullaniciIdler });
+
+                                    foreach (var kullanici in kullanicilar)
+                                    {
+                                        if (kullanici.User_no != null && !string.IsNullOrEmpty(kullanici.User_name))
+                                        {
+                                            kullaniciAdlari[kullanici.User_no] = kullanici.User_name;
+                                        }
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex, "Kullanıcı adları alınırken hata oluştu: {Message}", ex.Message);
+                            }
+                        }
+
+                        // Sonuçlara kullanıcı adlarını ekle
+                        foreach (var result in results)
+                        {
+                            if (result.SilenKullaniciId.HasValue && result.SilenKullaniciId.Value > 0)
+                            {
+                                if (kullaniciAdlari.ContainsKey(result.SilenKullaniciId.Value))
+                                {
+                                    result.KullaniciAdi = kullaniciAdlari[result.SilenKullaniciId.Value];
+                                }
+                                else
+                                {
+                                    result.KullaniciAdi = $"Kullanıcı #{result.SilenKullaniciId}";
+                                }
+                            }
+                            else
+                            {
+                                result.KullaniciAdi = "Bilinmiyor";
+                            }
+                        }
+                    }
+
+                    return results;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Silinen barkodlar listelenirken hata oluştu: {Message}", ex.Message);
+
+                    // Hata durumunda basit bir sorgu ile yeniden dene
+                    try
+                    {
+                        var simpleQuery = @"
+                    SELECT 
+                        id AS Id,
+                        stok_kodu AS StokKodu,
+                        stok_adi AS StokAdi,
+                        miktar AS Miktar,
+                        silinme_tarihi AS SilinmeTarihi,
+                        silen_kullanici_id AS SilenKullaniciId,
+                        'Bilinmiyor' AS KullaniciAdi,
+                        barkod_no AS BarkodNo,
+                        parti_kodu AS PartiKodu,
+                        lot_no AS LotNo,
+                        stok_hareket_guid AS StokHareketGuid,
+                        silinme_nedeni AS SilinmeNedeni
+                    FROM 
+                        silinen_barkodlar
+                    ORDER BY silinme_tarihi DESC";
+
+                        var simpleResults = connection.Query<SilinenBarkodViewModel>(simpleQuery).ToList();
+                        _logger.LogInformation($"Basit sorgu ile silinen barkod sayısı: {simpleResults.Count}");
+                        return simpleResults;
+                    }
+                    catch (Exception innerEx)
+                    {
+                        _logger.LogError(innerEx, "Basit sorgu ile silinen barkodlar listelenirken de hata oluştu");
+                        return new List<SilinenBarkodViewModel>();
+                    }
+                }
+            }
+        }
+        public class MusteriAcikFaturaViewModel
+        {
+            public string MusteriKodu { get; set; }
+            public string Unvan { get; set; }
+            public decimal VadesiGecmisBakiye { get; set; }
+            public decimal BugunOdenmesiGereken { get; set; }
+            public decimal GelecekVadeliFaturalar { get; set; }
+            public decimal ToplamBorc { get; set; }
+            public List<FaturaViewModel> Faturalar { get; set; } = new List<FaturaViewModel>();
+        }
+
+        public class FaturaViewModel
+        {
+            public string FaturaNo { get; set; }
+            public DateTime FaturaTarihi { get; set; }
+            public DateTime VadeTarihi { get; set; }
+            public decimal Tutar { get; set; }
+        }
     }
 }
