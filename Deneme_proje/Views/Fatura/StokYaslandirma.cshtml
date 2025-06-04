@@ -130,6 +130,25 @@
             </div>
         </div>
 
+        <!-- Debug bilgileri (geliştirme aşamasında kullanın) -->
+      @*   @if (!string.IsNullOrEmpty(ViewBag.Message as string))
+        {
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="alert alert-info">
+                        @ViewBag.Message
+                        <br>
+                        <small>
+                            Seçilen Stok: @selectedStockCode <br>
+                            Model Count: @(Model?.Count() ?? 0) <br>
+                            Has Filter: @hasFilterApplied <br>
+                            Has Negative: @hasNegativeStock
+                        </small>
+                    </div>
+                </div>
+            </div>
+        } *@
+
         <!-- Negatif stok uyarısı -->
         @if (hasNegativeStock && negativeStock != null)
         {
@@ -168,7 +187,7 @@
                     <div class="card-block accordion-block px-0">
                         <div class="col-md-12">
                             <div id="tablesContainer">
-                                @if (hasFilterApplied && Model != null && Model.Any())
+                                @if ((hasFilterApplied || ViewData["HasData"] != null) && Model != null && Model.Any())
                                 {
                                     <div id="example_wrapper" class="dataTables_wrapper">
                                         <table id="example" class="display dataTable" style="width:100%">

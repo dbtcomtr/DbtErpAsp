@@ -16,12 +16,8 @@
         --success: #16a34a; /* Soft green */
     }
 
-
-  
-
     .main-content {
         padding: 15px;
-      
     }
 
     .card {
@@ -47,13 +43,6 @@
         padding: 3rem 3rem 0 3rem;
     }
 
-    input, select {
-        padding: 6px !important;
-        border-radius: 4px !important;
-        border: 1px solid var(--border);
-        font-size: 13px !important;
-        background: #fafafa;
-    }
     .form-group {
         display: flex;
         flex-direction: column;
@@ -74,10 +63,10 @@
         background: #fafafa;
     }
 
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
+    input:focus, select:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
 
     .buttons-section {
         padding: 16px;
@@ -97,9 +86,14 @@
         transition: background 0.2s;
     }
 
-        .aktarimbtn:hover {
-            background: #1d4ed8;
-        }
+    .aktarimbtn:hover {
+        background: #1d4ed8;
+    }
+
+    .aktarimbtn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+    }
 
     .grid-container {
         overflow-x: auto;
@@ -125,6 +119,23 @@
 
     tbody tr:hover {
         background: #f9fafb;
+    }
+
+    /* Loading Spinner */
+    .loading-spinner {
+        display: none;
+        margin: 20px auto;
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 
     /* Toast Notification */
@@ -170,6 +181,91 @@
         font-size: 14px;
         font-weight: 500;
     }
+
+    /* Srm Merkezi Combobox Stili */
+    .srm-search-container {
+        position: relative;
+    }
+
+    .combobox-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    #srm-merkezi-search {
+        width: 100%;
+        padding: 10px 35px 10px 10px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        font-size: 14px;
+        background: #fafafa;
+        cursor: pointer;
+    }
+
+    #srm-merkezi-search:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .dropdown-arrow {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: #6b7280;
+        transition: transform 0.2s;
+    }
+
+    .dropdown-arrow.rotated {
+        transform: translateY(-50%) rotate(180deg);
+    }
+
+    .dropdown-list {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid var(--border);
+        border-top: none;
+        border-radius: 0 0 6px 6px;
+        max-height: 150px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .dropdown-list.show {
+        display: block;
+    }
+
+    .dropdown-item {
+        padding: 10px 12px;
+        cursor: pointer;
+        border-bottom: 1px solid #f3f4f6;
+        font-size: 14px;
+        transition: background-color 0.1s;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f3f4f6;
+    }
+
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .dropdown-item.selected {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    #srm-merkezi {
+        display: none;
+    }
+
     /* Responsive Design */
     @@media (max-width: 768px) {
         .form-section {
@@ -184,101 +280,113 @@
             width: 100%;
             text-align: center;
         }
+
+        #srm-merkezi-search {
+            font-size: 14px;
+        }
+
+        .dropdown-list {
+            max-height: 100px;
+        }
     }
 </style>
+
 <div class="main-content mt-5">
     <div class="px-lg-5 px-3">
+        <div class="card">
+            <div class="form-section">
+                <!-- Ürün Kodu -->
+                <div class="form-group">
+                    <label for="urun-kodu">Ürün Kodu</label>
+                    <input type="text" id="urun-kodu" name="urunKodu" value="@(TempData["UrunKodu"]?.ToString() ?? "")" />
+                </div>
+                <!-- Ürün Giriş Depo -->
+                <div class="form-group">
+                    <label for="giris-depo">Ürün Giriş Depo</label>
+                    <select id="giris-depo" name="girisDep">
+                        <option value="">Seçiniz</option>
+                        @foreach (var depo in ViewBag.Depolar ?? new List<Deneme_proje.Models.Entities.Depo>())
+                        {
+                            <option value="@depo.DepoNo" @@(TempData["GirisDepo"]?.ToString()= =depo.DepoNo.ToString() ? "selected" : "" )>@depo.DepoAdi</option>
+                        }
+                    </select>
+                </div>
+                <!-- Hammadde Çıkış Depo -->
+                <div class="form-group">
+                    <label for="cikis-depo">Hammadde Çıkış Depo</label>
+                    <select id="cikis-depo" name="cikisDep">
+                        <option value="">Seçiniz</option>
+                        @foreach (var depo in ViewBag.Depolar ?? new List<Deneme_proje.Models.Entities.Depo>())
+                        {
+                            <option value="@depo.DepoNo" @@(TempData["CikisDepo"]?.ToString()= =depo.DepoNo.ToString() ? "selected" : "" )>@depo.DepoAdi</option>
+                        }
+                    </select>
+                </div>
+                <!-- Miktar -->
+                <div class="form-group">
+                    <label for="miktar">Miktar</label>
+                    <input type="text" id="miktar" name="miktar" value="@(TempData["Miktar"]?.ToString() ?? "")" />
+                </div>
+                <!-- Srm Merkezi - Combobox -->
+                <div class="form-group srm-search-container">
+                    <label for="srm-merkezi">Srm Merkezi</label>
+                    <div class="combobox-wrapper">
+                        <input type="text" id="srm-merkezi-search" placeholder="Sorumluluk merkezi seçin veya arayın..." readonly />
+                        <div class="dropdown-arrow">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="dropdown-list" id="dropdown-list">
+                            <div class="dropdown-item" data-value="">Seçiniz</div>
+                            @foreach (var sorumlu in (ViewBag.SorumluKodlari as List<Deneme_proje.Models.Entities.SorumluKod> ?? new List<Deneme_proje.Models.Entities.SorumluKod>()).OrderBy(s => s.SorumluAdi))
+                            {
+                                <div class="dropdown-item" data-value="@sorumlu.SorumluKodu">@sorumlu.SorumluAdi</div>
+                            }
+                        </div>
+                    </div>
+                    <select id="srm-merkezi" name="srmMerkezi">
+                        <option value="">Seçiniz</option>
+                        @foreach (var sorumlu in (ViewBag.SorumluKodlari as List<Deneme_proje.Models.Entities.SorumluKod> ?? new List<Deneme_proje.Models.Entities.SorumluKod>()).OrderBy(s => s.SorumluAdi))
+                        {
+                            <option value="@sorumlu.SorumluKodu" @@(TempData["SrmMerkezi"]?.ToString()= =sorumlu.SorumluKodu.ToString() ? "selected" : "" )>@sorumlu.SorumluAdi</option>
+                        }
+                    </select>
+                </div>
+                <!-- Tarih -->
+                <div class="form-group">
+                    <label for="tarih">Tarih</label>
+                    <input type="date" id="tarih" name="tarih" value="@(TempData["Tarih"]?.ToString() ?? DateTime.Now.ToString("yyyy-MM-dd"))" />
+                </div>
+                <!-- Parametre -->
+                <div class="form-group">
+                    <label for="selectedParametre">Parametre</label>
+                    <select id="selectedParametre" name="selectedParametre" onchange="parametreChanged()">
+                        <option value="">Parametre Seçiniz</option>
+                        @foreach (var param in ViewBag.Parametreler ?? new List<ParametreModel>())
+                        {
+                            <option value="@param.ParametreAdi" @@(ViewBag.SelectedParametre= =param.ParametreAdi || TempData["SelectedParametre"]?.ToString()= =param.ParametreAdi ? "selected" : "" )>@param.ParametreAdi</option>
+                        }
+                    </select>
+                </div>
+            </div>
 
-
-
-    <div class="card">
-        <div class="form-section">
-            <!-- Ürün Kodu -->
-            <div class="form-group">
-                <label for="urun-kodu">Ürün Kodu</label>
-                <input type="text" id="urun-kodu" name="urunKodu" value="@(TempData["UrunKodu"]?.ToString() ?? "")" />
-            </div>
-            <!-- Ürün Giriş Depo -->
-            <div class="form-group">
-                <label for="giris-depo">Ürün Giriş Depo</label>
-                <select id="giris-depo" name="girisDep">
-                    <option value="">Seçiniz</option>
-                    @foreach (var depo in ViewBag.Depolar ?? new List<Deneme_proje.Models.Entities.Depo>())
-                    {
-                        <option value="@depo.DepoNo" @@(TempData["GirisDepo"]?.ToString()= =depo.DepoNo.ToString() ? "selected" : "" )>@depo.DepoAdi</option>
-                    }
-                </select>
-            </div>
-            <!-- Hammadde Çıkış Depo -->
-            <div class="form-group">
-                <label for="cikis-depo">Hammadde Çıkış Depo</label>
-                <select id="cikis-depo" name="cikisDep">
-                    <option value="">Seçiniz</option>
-                    @foreach (var depo in ViewBag.Depolar ?? new List<Deneme_proje.Models.Entities.Depo>())
-                    {
-                        <option value="@depo.DepoNo" @@(TempData["CikisDepo"]?.ToString()= =depo.DepoNo.ToString() ? "selected" : "" )>@depo.DepoAdi</option>
-                    }
-                </select>
-            </div>
-            <!-- Miktar -->
-            <div class="form-group">
-                <label for="miktar">Miktar</label>
-                <input type="text" id="miktar" name="miktar" value="@(TempData["Miktar"]?.ToString() ?? "")" />
-            </div>
-            <!-- Srm Merkezi -->
-            <div class="form-group">
-                <label for="srm-merkezi">Srm Merkezi</label>
-                <select id="srm-merkezi" name="srmMerkezi">
-                    <option value="">Seçiniz</option>
-                    @foreach (var sorumlu in ViewBag.SorumluKodlari ?? new List<Deneme_proje.Models.Entities.SorumluKod>())
-                    {
-                        <option value="@sorumlu.SorumluKodu" @@(TempData["SrmMerkezi"]?.ToString()= =sorumlu.SorumluKodu.ToString() ? "selected" : "" )>@sorumlu.SorumluAdi</option>
-                    }
-                </select>
-            </div>
-            <!-- Tarih -->
-            <div class="form-group">
-                <label for="tarih">Tarih</label>
-                <input type="date" id="tarih" name="tarih" value="@(TempData["Tarih"]?.ToString() ?? DateTime.Now.ToString("yyyy-MM-dd"))" />
-            </div>
-            <!-- Parametre -->
-            <div class="form-group">
-                <label for="selectedParametre">Parametre</label>
-                <select id="selectedParametre" name="selectedParametre">
-                    <option value="">Parametre Seçiniz</option>
-                    @foreach (var param in ViewBag.Parametreler ?? new List<ParametreModel>())
-                    {
-                        <option value="@param.ParametreAdi" @@(ViewBag.SelectedParametre == param.ParametreAdi || TempData["SelectedParametre"]?.ToString() == param.ParametreAdi ? "selected" : "")>@param.ParametreAdi</option>
-                    }
-                </select>
-            </div>
-        </div>
-
-        <form id="listeleForm" asp-controller="Aktarim" asp-action="Index" method="post" enctype="multipart/form-data" style="padding: 16px;">
             <div class="buttons-section">
-                <input type="file" name="excelFile" style="flex-grow: 1;" />
-                <input type="hidden" name="selectedParametre" id="hiddenSelectedParametre" />
-                <input type="hidden" name="urunKodu" id="formUrunKodu" />
-                <input type="hidden" name="girisDep" id="formGirisDepo" />
-                <input type="hidden" name="cikisDep" id="formCikisDepo" />
-                <input type="hidden" name="miktar" id="formMiktar" />
-                <input type="hidden" name="srmMerkezi" id="formSrmMerkezi" />
-                <input type="hidden" name="tarih" id="formTarih" />
-                <button type="button" class="aktarimbtn" onclick="submitListeleForm()">Listele</button>
+                <input type="file" name="excelFile" id="excelFile" style="flex-grow: 1;" />
+                <button type="button" class="aktarimbtn" id="listeleBtn" onclick="submitListeleForm()">Listele</button>
                 <button type="button" class="aktarimbtn" onclick="aktarVerileri()">Aktar</button>
             </div>
-        </form>
 
-        <form id="aktarForm" asp-controller="Aktarim" asp-action="TablodanAktar" method="post">
-            <input type="hidden" name="urunKodu" id="hiddenUrunKodu" />
-            <input type="hidden" name="girisDep" id="hiddenGirisDep" />
-            <input type="hidden" name="cikisDep" id="hiddenCikisDep" />
-            <input type="hidden" name="miktar" id="hiddenMiktar" />
-            <input type="hidden" name="srmMerkezi" id="hiddenSrmMerkezi" />
-            <input type="hidden" name="tarih" id="hiddenTarih" />
-            <div id="stokKodlariContainer"></div>
-        </form>
-    </div>
+            <form id="aktarForm" asp-controller="Aktarim" asp-action="TablodanAktar" method="post">
+                <input type="hidden" name="urunKodu" id="hiddenUrunKodu" />
+                <input type="hidden" name="girisDep" id="hiddenGirisDep" />
+                <input type="hidden" name="cikisDep" id="hiddenCikisDep" />
+                <input type="hidden" name="miktar" id="hiddenMiktar" />
+                <input type="hidden" name="srmMerkezi" id="hiddenSrmMerkezi" />
+                <input type="hidden" name="tarih" id="hiddenTarih" />
+                <div id="stokKodlariContainer"></div>
+            </form>
+        </div>
 
         @if (!string.IsNullOrEmpty(TempData["SuccessMessage"]?.ToString()))
         {
@@ -295,146 +403,284 @@
                 <span style="font-size: 14px;">@TempData["ErrorMessage"]</span>
             </div>
         }
-    <!-- Gruplanmış tablo alanı -->
-    @foreach (var group in Model.GroupBy(x => x.Grup))
-    {
-        <div class="card">
-            <div class="card-header tablo">@group.Key</div>
-            <div class="grid-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Aktarılsın</th>
-                            <th>Stok Kodu</th>
-                            <th>Açıklama</th>
-                            <th>Birim</th>
-                            <th>Fiyat</th>
-                            <th>Net</th>
-                            <th>Brüt</th>
-                            <th>Ağırlık</th>
-                            <th>Net Tutar</th>
-                            <th>Brüt Tutar</th>
-                            <th>Para</th>
-                            <th>Kur</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in group)
-                        {
-                            bool isChecked = true;
-                            if (ViewBag.SecilenStokKodlari != null && ViewBag.SecilenStokKodlari.Contains(item.StokKodu))
-                            {
-                                isChecked = false;
-                            }
-                            <tr>
-                                <td><input type="checkbox" class="stok-checkbox" @(isChecked ? "checked" : "") /></td>
-                                <td>@item.StokKodu</td>
-                                <td>@item.Aciklama</td>
-                                <td>@item.Birim</td>
-                                <td>@item.Fiyat</td>
-                                <td>@item.Net</td>
-                                <td>@item.Brut</td>
-                                <td>@item.Agirlik</td>
-                                <td>@item.NetTutar</td>
-                                <td>@item.BrutTutar</td>
-                                <td>@item.Para</td>
-                                <td>@item.Kur</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+
+        <!-- Loading Spinner -->
+        <div class="loading-spinner" id="loadingSpinner"></div>
+
+        <!-- Tablo Alanı -->
+        <div id="tabloAlani">
+            @foreach (var group in Model.GroupBy(x => x.Grup))
+            {
+                <div class="card">
+                    <div class="card-header tablo">@group.Key</div>
+                    <div class="grid-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Aktarılsın</th>
+                                    <th>Stok Kodu</th>
+                                    <th>Açıklama</th>
+                                    <th>Birim</th>
+                                    <th>Fiyat</th>
+                                    <th>Net</th>
+                                    <th>Brüt</th>
+                                    <th>Ağırlık</th>
+                                    <th>Net Tutar</th>
+                                    <th>Brüt Tutar</th>
+                                    <th>Para</th>
+                                    <th>Kur</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in group)
+                                {
+                                    bool isChecked = true;
+                                    if (ViewBag.SecilenStokKodlari != null && ViewBag.SecilenStokKodlari.Contains(item.StokKodu))
+                                    {
+                                        isChecked = false;
+                                    }
+                                    <tr>
+                                        <td><input type="checkbox" class="stok-checkbox" data-stok-kodu="@item.StokKodu" @(isChecked ? "checked" : "") /></td>
+                                        <td>@item.StokKodu</td>
+                                        <td>@item.Aciklama</td>
+                                        <td>@item.Birim</td>
+                                        <td>@item.Fiyat</td>
+                                        <td>@item.Net</td>
+                                        <td>@item.Brut</td>
+                                        <td>@item.Agirlik</td>
+                                        <td>@item.NetTutar</td>
+                                        <td>@item.BrutTutar</td>
+                                        <td>@item.Para</td>
+                                        <td>@item.Kur</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
         </div>
-    }
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
-    // JavaScript remains unchanged to preserve functionality
-    document.addEventListener('DOMContentLoaded', function() {
+    let isListLoaded = false;
+    let checkboxStates = {};
+    let formValues = {};
+
+    $(document).ready(function() {
+        // Srm Merkezi Combobox işlevselliği
+        const searchInput = document.getElementById('srm-merkezi-search');
+        const select = document.getElementById('srm-merkezi');
+        const dropdownList = document.getElementById('dropdown-list');
+        const dropdownArrow = document.querySelector('.dropdown-arrow');
+        const dropdownItems = document.querySelectorAll('.dropdown-item');
+        
+        let originalOptions = Array.from(dropdownItems).map(item => ({
+            value: item.getAttribute('data-value'),
+            text: item.textContent,
+            element: item
+        }));
+
+        let isDropdownOpen = false;
+
+        // Input'a tıklandığında dropdown'ı aç/kapat
+        searchInput.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleDropdown();
+        });
+
+        // Input'a odaklanınca readonly'i kaldır ve arama moduna geç
+        searchInput.addEventListener('focus', function() {
+            this.removeAttribute('readonly');
+            this.placeholder = 'Arayın...';
+            showAllItems();
+            openDropdown();
+        });
+
+        // Input'tan çıkınca readonly yap
+        searchInput.addEventListener('blur', function() {
+            setTimeout(() => {
+                this.setAttribute('readonly', 'readonly');
+                this.placeholder = 'Sorumluluk merkezi seçin veya arayın...';
+                closeDropdown();
+            }, 200);
+        });
+
+        // Arama işlevselliği
+        searchInput.addEventListener('input', function(e) {
+            const searchText = e.target.value.toLowerCase();
+            filterItems(searchText);
+            if (!isDropdownOpen) {
+                openDropdown();
+            }
+        });
+
+        // Dropdown item'lara tıklama
+        dropdownItems.forEach(item => {
+            item.addEventListener('click', function() {
+                selectItem(this);
+            });
+        });
+
+        // Dropdown dışına tıklandığında kapat
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.srm-search-container')) {
+                closeDropdown();
+            }
+        });
+
+        function toggleDropdown() {
+            if (isDropdownOpen) {
+                closeDropdown();
+            } else {
+                openDropdown();
+            }
+        }
+
+        function openDropdown() {
+            dropdownList.classList.add('show');
+            dropdownArrow.classList.add('rotated');
+            isDropdownOpen = true;
+        }
+
+        function closeDropdown() {
+            dropdownList.classList.remove('show');
+            dropdownArrow.classList.remove('rotated');
+            isDropdownOpen = false;
+        }
+
+        function showAllItems() {
+            dropdownItems.forEach(item => {
+                item.style.display = 'block';
+            });
+        }
+
+        function filterItems(searchText) {
+            dropdownItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchText)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function selectItem(item) {
+            const value = item.getAttribute('data-value');
+            const text = item.textContent;
+            
+            // Input'u güncelle
+            searchInput.value = text;
+            searchInput.setAttribute('readonly', 'readonly');
+            
+            // Hidden select'i güncelle
+            select.value = value;
+            
+            // Seçili item'ı işaretle
+            dropdownItems.forEach(i => i.classList.remove('selected'));
+            item.classList.add('selected');
+            
+            closeDropdown();
+            saveCurrentFormValues();
+        }
+
+        // İlk yüklemede seçili değeri ayarla
+        const initialValue = select.value;
+        if (initialValue) {
+            const selectedItem = document.querySelector(`[data-value="${initialValue}"]`);
+            if (selectedItem) {
+                searchInput.value = selectedItem.textContent;
+                selectedItem.classList.add('selected');
+            }
+        }
+
         var successMessage = '@TempData["SuccessMessage"]';
         if (successMessage && successMessage.length > 0) {
             showToast(successMessage, 'success');
         }
-        
+
         var errorMessage = '@TempData["ErrorMessage"]';
         if (errorMessage && errorMessage.length > 0) {
             showToast(errorMessage, 'error');
         }
-        
-        saveFormValuesToLocalStorage();
-        checkUrlParameters();
+
+        // Eğer model doluysa liste yüklenmiş demektir
+        @if (Model != null && Model.Any())
+        {
+            <text>isListLoaded = true;</text>
+        }
+
+        // Form değerlerini kaydet
+        saveCurrentFormValues();
+
+        // Checkbox değişikliklerini dinle
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('stok-checkbox')) {
+                saveCheckboxStates();
+            }
+        });
+
+        // Form değerlerinin değişimini dinle
+        document.addEventListener('input', function(e) {
+            if (e.target.id !== 'selectedParametre' && e.target.id !== 'srm-merkezi-search') {
+                saveCurrentFormValues();
+            }
+        });
+
+        document.addEventListener('change', function(e) {
+            if (e.target.id !== 'selectedParametre' && e.target.id !== 'srm-merkezi-search') {
+                saveCurrentFormValues();
+            }
+        });
     });
 
-    function checkUrlParameters() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const selectedParametre = urlParams.get('selectedParametre');
-        
-        if (selectedParametre) {
-            const selectElement = document.getElementById('selectedParametre');
-            if (selectElement) {
-                for (let i = 0; i < selectElement.options.length; i++) {
-                    if (selectElement.options[i].value === selectedParametre) {
-                        selectElement.selectedIndex = i;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    function saveFormValuesToLocalStorage() {
-        const formValues = {
+    // Form değerlerini kaydetme
+    function saveCurrentFormValues() {
+        formValues = {
             urunKodu: document.getElementById('urun-kodu').value,
-            girisDepo: document.getElementById('giris-depo').value,
-            cikisDepo: document.getElementById('cikis-depo').value,
+            girisDep: document.getElementById('giris-depo').value,
+            cikisDep: document.getElementById('cikis-depo').value,
             miktar: document.getElementById('miktar').value,
             srmMerkezi: document.getElementById('srm-merkezi').value,
-            tarih: document.getElementById('tarih').value,
-            selectedParametre: document.getElementById('selectedParametre').value
+            tarih: document.getElementById('tarih').value
         };
-        
-        localStorage.setItem('aktarimFormValues', JSON.stringify(formValues));
     }
 
-    function loadFormValuesFromLocalStorage() {
-        const savedValues = localStorage.getItem('aktarimFormValues');
-        if (savedValues) {
-            const values = JSON.parse(savedValues);
-            
-            if (!document.getElementById('urun-kodu').value && values.urunKodu) {
-                document.getElementById('urun-kodu').value = values.urunKodu;
-            }
-            
-            if (!document.getElementById('giris-depo').value && values.girisDepo) {
-                setSelectValue('giris-depo', values.girisDepo);
-            }
-            
-            if (!document.getElementById('cikis-depo').value && values.cikisDepo) {
-                setSelectValue('cikis-depo', values.cikisDepo);
-            }
-            
-            if (!document.getElementById('miktar').value && values.miktar) {
-                document.getElementById('miktar').value = values.miktar;
-            }
-            
-            if (!document.getElementById('srm-merkezi').value && values.srmMerkezi) {
-                setSelectValue('srm-merkezi', values.srmMerkezi);
-            }
-            
-            if (!document.getElementById('tarih').value && values.tarih) {
-                document.getElementById('tarih').value = values.tarih;
-            }
-            
-            if (!document.getElementById('selectedParametre').value && values.selectedParametre) {
-                setSelectValue('selectedParametre', values.selectedParametre);
+    // Form değerlerini geri yükleme
+    function restoreFormValues() {
+        if (Object.keys(formValues).length > 0) {
+            document.getElementById('urun-kodu').value = formValues.urunKodu || '';
+            setSelectValue('giris-depo', formValues.girisDep);
+            setSelectValue('cikis-depo', formValues.cikisDep);
+            document.getElementById('miktar').value = formValues.miktar || '';
+            setSelectValue('srm-merkezi', formValues.srmMerkezi);
+            document.getElementById('tarih').value = formValues.tarih || '';
+
+            // Arama input'unu güncelle
+            const select = document.getElementById('srm-merkezi');
+            const searchInput = document.getElementById('srm-merkezi-search');
+            if (select.value) {
+                const selectedItem = document.querySelector(`[data-value="${select.value}"]`);
+                if (selectedItem) {
+                    searchInput.value = selectedItem.textContent;
+                    selectedItem.classList.add('selected');
+                }
+            } else {
+                searchInput.value = '';
+                document.querySelectorAll('.dropdown-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
             }
         }
     }
 
     function setSelectValue(elementId, value) {
         const selectElement = document.getElementById(elementId);
-        if (selectElement) {
+        if (selectElement && value) {
             for (let i = 0; i < selectElement.options.length; i++) {
                 if (selectElement.options[i].value === value) {
                     selectElement.selectedIndex = i;
@@ -444,29 +690,110 @@
         }
     }
 
-    function submitListeleForm() {
-        var selectedParametre = document.getElementById('selectedParametre').value;
-        var urunKodu = document.getElementById('urun-kodu').value;
-        var girisDepo = document.getElementById('giris-depo').value;
-        var cikisDepo = document.getElementById('cikis-depo').value;
-        var miktar = document.getElementById('miktar').value;
-        var srmMerkezi = document.getElementById('srm-merkezi').value;
-        var tarih = document.getElementById('tarih').value;
-        
-        document.getElementById('hiddenSelectedParametre').value = selectedParametre;
-        document.getElementById('formUrunKodu').value = urunKodu;
-        document.getElementById('formGirisDepo').value = girisDepo;
-        document.getElementById('formCikisDepo').value = cikisDepo;
-        document.getElementById('formMiktar').value = miktar;
-        document.getElementById('formSrmMerkezi').value = srmMerkezi;
-        document.getElementById('formTarih').value = tarih;
-        
-        saveFormValuesToLocalStorage();
-        document.getElementById('listeleForm').submit();
+    function parametreChanged() {
+        console.log('=== PARAMETRE DEĞİŞTİ ===');
+        const selectedParametre = document.getElementById('selectedParametre').value;
+        console.log('Yeni parametre:', selectedParametre);
+
+        // Checkbox durumlarını sıfırla
+        checkboxStates = {};
+        console.log('Checkbox durumları sıfırlandı');
+
+        // Formu gönder
+        submitListeleForm();
     }
 
-    function dosyaSec() {
-        document.querySelector('input[name="excelFile"]').click();
+    function saveCheckboxStates() {
+        const checkboxes = document.querySelectorAll('.stok-checkbox');
+        checkboxStates = {};
+
+        checkboxes.forEach(function(checkbox) {
+            const stokKodu = checkbox.getAttribute('data-stok-kodu');
+            checkboxStates[stokKodu] = checkbox.checked;
+        });
+    }
+
+    function submitListeleForm() {
+        console.log('=== submitListeleForm BAŞLADI ===');
+
+        // Form değerlerini kaydet
+        saveCurrentFormValues();
+
+        // Butonu devre dışı bırak ve loading göster
+        const listeleBtn = document.getElementById('listeleBtn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+
+        listeleBtn.disabled = true;
+        listeleBtn.textContent = 'Yükleniyor...';
+        loadingSpinner.style.display = 'block';
+
+        // Form verilerini hazırla
+        const formData = new FormData();
+
+        // Excel dosyası varsa ekle
+        const excelFile = document.getElementById('excelFile').files[0];
+        if (excelFile) {
+            formData.append('excelFile', excelFile);
+            console.log('Excel dosyası eklendi:', excelFile.name);
+        } else {
+            console.log('Excel dosyası YOK - session verisi kullanılacak');
+        }
+
+        // Seçilen parametreyi ekle
+        const selectedParametre = document.getElementById('selectedParametre').value;
+        console.log('AJAX\'a gönderilecek parametre:', selectedParametre);
+        formData.append('selectedParametre', selectedParametre);
+
+        // AJAX isteği
+        const ajaxUrl = '@Url.Action("GetAjaxData", "Aktarim")';
+        console.log('AJAX URL:', ajaxUrl);
+
+        fetch(ajaxUrl, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('AJAX yanıtı alındı:', data);
+
+            if (data.success) {
+                // Tabloyu güncelle
+                document.getElementById('tabloAlani').innerHTML = data.html;
+                console.log('Tablo güncellendi');
+
+                // Form değerlerini geri yükle
+                restoreFormValues();
+                console.log('Form değerleri geri yüklendi');
+
+                // Checkbox durumlarını AJAX yanıtındaki secilenStokKodlari'na göre ayarla
+                const secilenStokKodlari = data.secilenStokKodlari || [];
+                const checkboxes = document.querySelectorAll('.stok-checkbox');
+                checkboxes.forEach(function(checkbox) {
+                    const stokKodu = checkbox.getAttribute('data-stok-kodu');
+                    checkbox.checked = !secilenStokKodlari.includes(stokKodu);
+                });
+                console.log('Checkbox durumları yeni parametreye göre ayarlandı');
+
+                isListLoaded = true;
+                showToast('Liste başarıyla güncellendi', 'success');
+            } else {
+                console.error('AJAX hatası:', data.message);
+                showToast(data.message || 'Veri yüklenirken bir hata oluştu', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Veri yüklenirken bir hata oluştu: ' + error.message, 'error');
+        })
+        .finally(() => {
+            // Butonu tekrar aktif et
+            listeleBtn.disabled = false;
+            listeleBtn.textContent = 'Listele';
+            loadingSpinner.style.display = 'none';
+        });
     }
 
     function showToast(message, type = 'success') {
@@ -481,12 +808,12 @@
             </div>
             <div class="toast-message">${message}</div>
         `;
-        
+
         document.body.appendChild(toast);
         setTimeout(() => {
             toast.classList.add('toast-visible');
         }, 10);
-        
+
         setTimeout(() => {
             toast.classList.remove('toast-visible');
             setTimeout(() => {
@@ -502,73 +829,62 @@
         var miktar = document.getElementById('miktar').value;
         var srmMerkezi = document.getElementById('srm-merkezi').value;
         var tarih = document.getElementById('tarih').value;
-        
+
         if (!urunKodu) {
             showToast('Ürün kodu boş olamaz!', 'error');
             return false;
         }
-        
+
         if (!cikisDepo) {
             showToast('Hammadde Çıkış Depo seçilmelidir!', 'error');
             return false;
         }
-        
+
         if (!miktar) {
             showToast('Miktar boş olamaz!', 'error');
             return false;
         }
-        
+
         if (!tarih) {
             showToast('Tarih boş olamaz!', 'error');
             return false;
         }
-        
+
         document.getElementById('hiddenUrunKodu').value = urunKodu;
         document.getElementById('hiddenGirisDep').value = girisDepo;
         document.getElementById('hiddenCikisDep').value = cikisDepo;
         document.getElementById('hiddenMiktar').value = miktar;
         document.getElementById('hiddenSrmMerkezi').value = srmMerkezi;
         document.getElementById('hiddenTarih').value = tarih;
-        
+
         var checkboxes = document.querySelectorAll('.stok-checkbox:checked');
         var container = document.getElementById('stokKodlariContainer');
         container.innerHTML = '';
-        
+
         if (checkboxes.length === 0) {
             showToast('Aktarılacak stok seçilmedi!', 'error');
             return false;
         }
-        
+
         checkboxes.forEach(function(checkbox) {
             var row = checkbox.closest('tr');
             var stokKodu = row.cells[1].textContent.trim();
             var netMiktar = row.cells[5].textContent.trim().replace(/\s/g, '');
-            
+
             var inputKod = document.createElement('input');
             inputKod.type = 'hidden';
             inputKod.name = 'stokKodlari';
             inputKod.value = stokKodu;
             container.appendChild(inputKod);
-            
+
             var inputMiktar = document.createElement('input');
             inputMiktar.type = 'hidden';
             inputMiktar.name = 'netMiktarlar';
             inputMiktar.value = netMiktar;
             container.appendChild(inputMiktar);
         });
-        
-        saveFormValuesToLocalStorage();
+
         document.getElementById('aktarForm').submit();
         return true;
     }
-
-    function filtreliAktar() {
-        var allCheckboxes = document.querySelectorAll('.stok-checkbox');
-        allCheckboxes.forEach(function(checkbox) {
-            checkbox.checked = !checkbox.checked;
-        });
-        aktarVerileri();
-    }
-
-    window.addEventListener('load', loadFormValuesFromLocalStorage);
 </script>

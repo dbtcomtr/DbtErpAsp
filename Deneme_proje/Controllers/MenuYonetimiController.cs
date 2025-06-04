@@ -34,16 +34,23 @@ namespace Deneme_proje.Controllers
                     return NotFound("Kullanıcı bulunamadı.");
                 }
 
+                var menuItems = await GetMenuItems();
+
+                // Kategorilere göre grupla
+                var kategoriliMenuler = menuItems
+                    .GroupBy(m => m.MenuBaslik ?? "Diğer")
+                    .OrderBy(g => GetMenuBaslikSirasi(g.Key))
+                    .ToDictionary(g => g.Key, g => g.OrderBy(item => item.SiraNo).ToList());
+
                 var model = new MenuYonetimiViewModel
                 {
                     Kullanicilar = kullanicilar,
                     SelectedUserNo = selectedUser.UserNo,
-                    MenuItems = await GetMenuItems()
+                    MenuItems = menuItems, // Geriye uyumluluk için
+                    KategoriliMenuler = kategoriliMenuler
                 };
 
-                // Seçili kullanıcı bilgisini ViewBag'e ekleyelim
                 ViewBag.SelectedUserName = selectedUser.UserName;
-
                 return View(model);
             }
             catch (Exception ex)
@@ -52,6 +59,26 @@ namespace Deneme_proje.Controllers
                 return View("Error");
             }
         }
+
+        private int GetMenuBaslikSirasi(string MenuBaslik)
+        {
+            return MenuBaslik switch
+            {
+                "Finans Raporları" => 1,
+                "Satış Raporları" => 2,
+                "Dbt Aktarım" => 3,
+                "Bakım ve Servis" => 4,
+                "Üretim Ayarları" => 5,
+                "Üretim " => 6,
+                "İş Emirleri" => 7,
+                "Sipariş İzleme" => 8,
+                "Özel Raporlar" => 9,
+                "HR" => 10,
+                "Yetki ve Yönetim" => 11,
+                _ => 999
+            };
+        }
+
         [AllowAnonymous]
         private async Task<List<MenuItemModel>> GetMenuItems()
         {
@@ -72,10 +99,11 @@ namespace Deneme_proje.Controllers
                         Yetki, 
                         SiraNo, 
                         ParentId, 
-                        Icon 
+                        Icon,
+                        ISNULL(MenuBaslik, 'Diğer') as MenuBaslik
                     FROM MenuYonetim 
                     WHERE Aktif = 1 
-                    ORDER BY SiraNo");
+                    ORDER BY MenuBaslik, SiraNo");
 
                     return items.ToList();
                 }
@@ -86,6 +114,7 @@ namespace Deneme_proje.Controllers
                 return new List<MenuItemModel>();
             }
         }
+
         [AllowAnonymous]
         private async Task<List<KullaniciModel>> GetKullanicilar()
         {
@@ -109,9 +138,8 @@ namespace Deneme_proje.Controllers
             }
         }
 
-
         [HttpPost]
-        [ValidateAntiForgeryToken]  // Bunu ekleyin
+        [ValidateAntiForgeryToken]
         [AllowAnonymous]
         public async Task<IActionResult> UpdateYetki(int menuId, int userNo, bool hasPermission)
         {
@@ -122,7 +150,6 @@ namespace Deneme_proje.Controllers
                 {
                     await connection.OpenAsync();
 
-                    // Debug log
                     _logger.LogInformation($"MenuId: {menuId}, UserNo: {userNo}, HasPermission: {hasPermission}");
 
                     // Mevcut yetkileri al
@@ -138,12 +165,10 @@ namespace Deneme_proje.Controllers
 
                     if (hasPermission)
                     {
-                        // Yetki verme
                         yetkiler.Add(userNo.ToString());
                     }
                     else
                     {
-                        // Yetki alma
                         yetkiler.Remove(userNo.ToString());
                     }
 

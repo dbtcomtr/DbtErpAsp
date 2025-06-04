@@ -29,7 +29,35 @@
                 </div>
             </div>
         </div>
-
+        <div class="row mb-lg-5 mb-1">
+            <div class="col-lg-8">
+                <form method="get" class="form-inline">
+                   
+                    <div class="form-group mr-3">
+                        <label for="cariIlkKod" style="font-size: 12px;">İlk Kod:</label>
+                        <input type="text" id="cariIlkKod" name="cariIlkKod" class="form-control" placeholder="İlk cari kodu" />
+                    </div>
+                    <div class="form-group mr-3">
+                        <label for="cariSonKod" style="font-size: 12px;">Son Kod:</label>
+                        <input type="text" id="cariSonKod" name="cariSonKod" class="form-control" placeholder="Son cari kodu" />
+                    </div>
+                  
+                   
+                    <div class="form-group mr-3">
+                        <label for="hangiHesaplar" style="font-size: 12px;">Hesap Tipi:</label>
+                        <select id="hangiHesaplar" name="hangiHesaplar" class="form-control">
+                            <option value="0">Borçlu Hesaplar</option>
+                            <option value="1">Alacaklı Hesaplar</option>
+                            <option value="2">Tüm Hesaplar</option>
+                        </select>
+                    </div>
+                
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-tumblr btn-shadow waves-effect waves-light">Ara</button>
+                    </div>
+                </form>
+            </div>
+        </div>
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">

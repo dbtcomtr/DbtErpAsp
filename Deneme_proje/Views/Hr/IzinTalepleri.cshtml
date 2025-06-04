@@ -48,10 +48,10 @@
 											<th>Gün Sayısı</th>
 											<th>İzin Saati</th>
 											<th>Başlangıç</th>
-									
 											<th>Bitiş </th>
 											<th>Amaç</th>
-											<th>Durum</th>
+											<th>Kalan İzin Hakkı</th>
+									
 											<th>İşlemler</th>
 										</tr>
 									</thead>
@@ -66,16 +66,14 @@
 												<td>@izin.IzinSaat</td>
 												<td>@izin.BaslangicTarihi.ToShortDateString()</td>
 												<td>@izin.BitisTarihi.ToShortDateString()</td>
-
-											
 												<td>@izin.Amac</td>
-												<td>
-													<span class="badge @(izin.IzinDurumu == 1 ? "bg-success" :
-                                                   izin.IzinDurumu == 2 ? "bg-danger" : "bg-warning")">
-														@(izin.IzinDurumu == 0 ? "Beklemede" :
-																								izin.IzinDurumu == 1 ? "Onaylandı" :
-																								izin.IzinDurumu == 2 ? "Reddedildi" : izin.IzinDurumuAdi)
+												<td class="text-center">
+													<span class="badge @(izin.KalanIzinHakki >= 10 ? "bg-success" :
+                                                       izin.KalanIzinHakki >= 5 ? "bg-warning" : "bg-danger")">
+														@izin.KalanIzinHakki.ToString("N1") gün
 													</span>
+												</td>
+												<td>
 													@if (izin.IzinDurumu == 0)
 													{
 														<button class="btn btn-success btn-sm"
@@ -88,7 +86,7 @@
 														</button>
 													}
 												</td>
-
+											
 											</tr>
 										}
 									</tbody>
@@ -100,9 +98,33 @@
 			</div>
 		</div>
 
+		<!-- Modal HTML - Statik olarak sayfada tanımlanmış -->
+		<div class="modal fade" id="reddetModal" tabindex="-1" role="dialog" aria-labelledby="reddetModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="reddetModalLabel">İzin Talebi Reddetme</h5>
+						<button type="button" class="btn-close close-modal-btn" data-bs-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<form id="reddetForm">
+							<div class="form-group">
+								<label for="reddetmeNedeni" class="col-form-label">Reddetme Nedeni:</label>
+								<textarea class="form-control" id="reddetmeNedeni" required></textarea>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary close-modal-btn" id="iptalBtn">İptal</button>
+						<button type="button" class="btn btn-danger" id="reddetmeOnayBtn">Reddet</button>
+					</div>
+				</div>
+			</div>
+		</div>
 
 		<style>
-
 			/* Yatay kaydırma için */
 			.table {
 				overflow-x: auto;
@@ -130,55 +152,58 @@
 				}
 
 			@@media screen and (max-width: 768px) {
-				.table {
-					position: relative !important;
-					display: block !important;
-					width: 100% !important;
-					-webkit-overflow-scrolling: touch !important;
-				}
+				.table
 
-				.table-mobile-container {
-					overflow-x: auto !important;
-					max-width: 100% !important;
-					position: relative !important;
-					-webkit-overflow-scrolling: touch !important;
-				}
+			{
+				position: relative !important;
+				display: block !important;
+				width: 100% !important;
+				-webkit-overflow-scrolling: touch !important;
+			}
 
-				.table thead th {
-					position: sticky !important;
-					top: 0 !important;
-					z-index: 10 !important;
-					background-color: #f8f9fa !important;
-					white-space: nowrap !important;
-					min-width: 120px !important;
-					padding: 10px !important;
-					font-size: 14px !important;
-					box-shadow: inset 0 1px 0 #dee2e6, inset 0 -1px 0 #dee2e6 !important;
-				}
+			.table-mobile-container {
+				overflow-x: auto !important;
+				max-width: 100% !important;
+				position: relative !important;
+				-webkit-overflow-scrolling: touch !important;
+			}
 
-				.table tbody td {
-					white-space: nowrap !important;
-					min-width: 120px !important;
-					padding: 10px !important;
-					font-size: 14px !important;
-					vertical-align: middle !important;
-				}
+			.table thead th {
+				position: sticky !important;
+				top: 0 !important;
+				z-index: 10 !important;
+				background-color: #f8f9fa !important;
+				white-space: nowrap !important;
+				min-width: 120px !important;
+				padding: 10px !important;
+				font-size: 14px !important;
+				box-shadow: inset 0 1px 0 #dee2e6, inset 0 -1px 0 #dee2e6 !important;
+			}
 
-				.badge {
-					white-space: nowrap !important;
-					font-size: 12px !important;
-					padding: 5px 8px !important;
-				}
+			.table tbody td {
+				white-space: nowrap !important;
+				min-width: 120px !important;
+				padding: 10px !important;
+				font-size: 14px !important;
+				vertical-align: middle !important;
+			}
 
-				.card {
-					margin: 0 -15px !important;
-					border-radius: 0 !important;
-				}
+			.badge {
+				white-space: nowrap !important;
+				font-size: 12px !important;
+				padding: 5px 8px !important;
+			}
 
-				.px-lg-5 {
-					padding-left: 1rem !important;
-					padding-right: 1rem !important;
-				}
+			.card {
+				margin: 0 -15px !important;
+				border-radius: 0 !important;
+			}
+
+			.px-lg-5 {
+				padding-left: 1rem !important;
+				padding-right: 1rem !important;
+			}
+
 			}
 
 			/* Scrollbar stilleri her ekran boyutu için */
@@ -241,11 +266,14 @@
 			}
 
 			@@media (max-width: 576px) {
-				.modal-dialog {
-					margin: 20px auto;
-					max-width: 95%;
-					width: auto;
-				}
+				.modal-dialog
+
+			{
+				margin: 20px auto;
+				max-width: 95%;
+				width: auto;
+			}
+
 			}
 
 			.modal-content {
@@ -263,189 +291,7 @@
 				width: 100%;
 				max-width: 100%;
 			}
-		</style>
 
-		<!-- Modal HTML - Statik olarak sayfada tanımlanmış -->
-		<div class="modal fade" id="reddetModal" tabindex="-1" role="dialog" aria-labelledby="reddetModalLabel" aria-hidden="true">
-			<div class="modal-dialog" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="reddetModalLabel">İzin Talebi Reddetme</h5>
-						<button type="button" class="btn-close close-modal-btn" data-bs-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<form id="reddetForm">
-							<div class="form-group">
-								<label for="reddetmeNedeni" class="col-form-label">Reddetme Nedeni:</label>
-								<textarea class="form-control" id="reddetmeNedeni" required></textarea>
-							</div>
-						</form>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary close-modal-btn" id="iptalBtn">İptal</button>
-						<button type="button" class="btn btn-danger" id="reddetmeOnayBtn">Reddet</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
-
-		@section Scripts {
-			
-
-			<!-- Toastr JS - jQuery'den sonra eklenmelidir -->
-			<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-			
-			<script>
-				// DOM tamamen yüklendiğinde çalışacak
-				$(document).ready(function() {
-					// Çakışmaları önlemek için önce mevcut event listener'ları temizle
-					$('#reddetmeOnayBtn').off('click');
-
-					// İptal butonu ve kapatma butonları için event listener ekle
-					$('.close-modal-btn, #iptalBtn').on('click', function() {
-						$('#reddetModal').modal('hide');
-					});
-
-					// Bootstrap sürümüne göre modal kapatma fonksiyonu
-					function closeModal() {
-						// Bootstrap 5 destekli
-						if (typeof bootstrap !== 'undefined') {
-							var modalInstance = bootstrap.Modal.getInstance(document.getElementById('reddetModal'));
-							if (modalInstance) {
-								modalInstance.hide();
-								return;
-							}
-						}
-
-						// Bootstrap 4 ve jQuery destekli
-						$('#reddetModal').modal('hide');
-					}
-
-					// Global scope'a fonksiyonu ekle
-					window.closeReddetModal = closeModal;
-				});
-
-				function onaylaIzin(guid, personelKodu, talepTarihi) {
-					if (confirm('Bu izin talebini onaylamak istediğinizden emin misiniz?')) {
-						// İşlem başladığını göstermek için spinner veya mesaj gösterilebilir
-
-						$.ajax({
-							url: '/Hr/OnaylaIzinTalebi',
-							type: 'POST',
-							data: {
-								guid: guid,
-								personelKodu: personelKodu,
-								talepTarihi: talepTarihi
-							},
-							success: function(response) {
-								if (response.success) {
-									// Show success message
-									
-
-								window.location.reload()
-								} else {
-									// Show error message
-									toastr.error(response.message);
-								}
-							},
-							error: function() {
-								toastr.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-							}
-						});
-					}
-				}
-
-				function reddetIzin(guid, personelKodu, talepTarihi) {
-					// Modal verilerini ayarla
-					$('#reddetModal').data('guid', guid);
-					$('#reddetModal').data('personelKodu', personelKodu);
-					$('#reddetModal').data('talepTarihi', talepTarihi);
-
-					// Önceki girişi temizle
-					$('#reddetmeNedeni').val('');
-
-					// Modalı göster
-					$('#reddetModal').modal('show');
-
-					// Reddetme onay butonuna tıklandığında
-					$('#reddetmeOnayBtn').off('click').on('click', function() {
-						var reddetmeNedeni = $('#reddetmeNedeni').val();
-
-						if (!reddetmeNedeni || reddetmeNedeni.trim() === '') {
-							toastr.warning('Lütfen bir reddetme nedeni giriniz.');
-							return;
-						}
-
-						// Modal verilerini al
-						var guid = $('#reddetModal').data('guid');
-						var personelKodu = $('#reddetModal').data('personelKodu');
-						var talepTarihi = $('#reddetModal').data('talepTarihi');
-
-						// Reddetme işlemini gerçekleştir
-						$.ajax({
-							url: '/Hr/ReddetIzinTalebi',
-							type: 'POST',
-							data: {
-								guid: guid,
-								personelKodu: personelKodu,
-								talepTarihi: talepTarihi,
-								reddetmeNedeni: reddetmeNedeni
-							},
-							success: function(response) {
-								// Modalı kapat - her iki yöntemle de dene
-								$('#reddetModal').modal('hide');
-								if (typeof window.closeReddetModal === 'function') {
-									window.closeReddetModal();
-								}
-
-								if (response.success) {
-									// Başarı mesajı göster
-							
-
-									// Sayfayı yenile - düzeltilmiş
-									window.location.reload()
-								} else {
-									// Hata mesajı göster
-									toastr.error(response.message);
-								}
-							},
-							error: function() {
-								// Modalı kapat
-								$('#reddetModal').modal('hide');
-								if (typeof window.closeReddetModal === 'function') {
-									window.closeReddetModal();
-								}
-								toastr.error('Bir hata oluştu. Lütfen tekrar deneyin.');
-							}
-						});
-					});
-				}
-
-				// Modal kapatıldığında event listener'ları temizle
-				$('#reddetModal').on('hidden.bs.modal', function () {
-					$('#reddetmeOnayBtn').off('click');
-				});
-
-				// Bootstrap versiyonu için ek kontroller
-				$(document).ready(function() {
-					// jQuery UI desteği kontrolü
-					if (typeof $.ui !== 'undefined') {
-						// jQuery UI dialog alternatifi
-						$('#iptalBtn, .close-modal-btn').on('click', function() {
-							if ($('#reddetModal').hasClass('ui-dialog-content')) {
-								$('#reddetModal').dialog('close');
-							} else {
-								$('#reddetModal').modal('hide');
-							}
-						});
-					}
-				});
-			</script>
-		}
-		<style>
 			/* Modal z-index ayarları */
 			.modal {
 				z-index: 9999 !important;
@@ -520,3 +366,153 @@
 				margin-right: 0.5rem;
 			}
 		</style>
+
+		@section Scripts {
+			<!-- Toastr JS - jQuery'den sonra eklenmelidir -->
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+			<script>
+				// DOM tamamen yüklendiğinde çalışacak
+				$(document).ready(function() {
+					// Çakışmaları önlemek için önce mevcut event listener'ları temizle
+					$('#reddetmeOnayBtn').off('click');
+
+					// İptal butonu ve kapatma butonları için event listener ekle
+					$('.close-modal-btn, #iptalBtn').on('click', function() {
+						$('#reddetModal').modal('hide');
+					});
+
+					// Bootstrap sürümüne göre modal kapatma fonksiyonu
+					function closeModal() {
+						// Bootstrap 5 destekli
+						if (typeof bootstrap !== 'undefined') {
+							var modalInstance = bootstrap.Modal.getInstance(document.getElementById('reddetModal'));
+							if (modalInstance) {
+								modalInstance.hide();
+								return;
+							}
+						}
+
+						// Bootstrap 4 ve jQuery destekli
+						$('#reddetModal').modal('hide');
+					}
+
+					// Global scope'a fonksiyonu ekle
+					window.closeReddetModal = closeModal;
+				});
+
+				function onaylaIzin(guid, personelKodu, talepTarihi) {
+					if (confirm('Bu izin talebini onaylamak istediğinizden emin misiniz?')) {
+						// İşlem başladığını göstermek için spinner veya mesaj gösterilebilir
+
+						$.ajax({
+							url: '/Hr/OnaylaIzinTalebi',
+							type: 'POST',
+							data: {
+								guid: guid,
+								personelKodu: personelKodu,
+								talepTarihi: talepTarihi
+							},
+							success: function(response) {
+								if (response.success) {
+									// Show success message
+									window.location.reload()
+								} else {
+									// Show error message
+									toastr.error(response.message);
+								}
+							},
+							error: function() {
+								toastr.error('Bir hata oluştu. Lütfen tekrar deneyin.');
+							}
+						});
+					}
+				}
+
+				function reddetIzin(guid, personelKodu, talepTarihi) {
+					// Modal verilerini ayarla
+					$('#reddetModal').data('guid', guid);
+					$('#reddetModal').data('personelKodu', personelKodu);
+					$('#reddetModal').data('talepTarihi', talepTarihi);
+
+					// Önceki girişi temizle
+					$('#reddetmeNedeni').val('');
+
+					// Modalı göster
+					$('#reddetModal').modal('show');
+
+					// Reddetme onay butonuna tıklandığında
+					$('#reddetmeOnayBtn').off('click').on('click', function() {
+						var reddetmeNedeni = $('#reddetmeNedeni').val();
+
+						if (!reddetmeNedeni || reddetmeNedeni.trim() === '') {
+							toastr.warning('Lütfen bir reddetme nedeni giriniz.');
+							return;
+						}
+
+						// Modal verilerini al
+						var guid = $('#reddetModal').data('guid');
+						var personelKodu = $('#reddetModal').data('personelKodu');
+						var talepTarihi = $('#reddetModal').data('talepTarihi');
+
+						// Reddetme işlemini gerçekleştir
+						$.ajax({
+							url: '/Hr/ReddetIzinTalebi',
+							type: 'POST',
+							data: {
+								guid: guid,
+								personelKodu: personelKodu,
+								talepTarihi: talepTarihi,
+								reddetmeNedeni: reddetmeNedeni
+							},
+							success: function(response) {
+								// Modalı kapat - her iki yöntemle de dene
+								$('#reddetModal').modal('hide');
+								if (typeof window.closeReddetModal === 'function') {
+									window.closeReddetModal();
+								}
+
+								if (response.success) {
+									// Başarı mesajı göster
+									// Sayfayı yenile - düzeltilmiş
+									window.location.reload()
+								} else {
+									// Hata mesajı göster
+									toastr.error(response.message);
+								}
+							},
+							error: function() {
+								// Modalı kapat
+								$('#reddetModal').modal('hide');
+								if (typeof window.closeReddetModal === 'function') {
+									window.closeReddetModal();
+								}
+								toastr.error('Bir hata oluştu. Lütfen tekrar deneyin.');
+							}
+						});
+					});
+				}
+
+				// Modal kapatıldığında event listener'ları temizle
+				$('#reddetModal').on('hidden.bs.modal', function () {
+					$('#reddetmeOnayBtn').off('click');
+				});
+
+				// Bootstrap versiyonu için ek kontroller
+				$(document).ready(function() {
+					// jQuery UI desteği kontrolü
+					if (typeof $.ui !== 'undefined') {
+						// jQuery UI dialog alternatifi
+						$('#iptalBtn, .close-modal-btn').on('click', function() {
+							if ($('#reddetModal').hasClass('ui-dialog-content')) {
+								$('#reddetModal').dialog('close');
+							} else {
+								$('#reddetModal').modal('hide');
+							}
+						});
+					}
+				});
+			</script>
+		}
+	</div>
+</div>

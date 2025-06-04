@@ -149,20 +149,31 @@ namespace Deneme_proje.Controllers
             // Verileri al, depo numarası veya stok kodu filtreleri uygula (eğer varsa)
             var data = _faturaRepository.GetStokYaslandirma(stockCode, reportDate.Value, depoNo);
 
+            // Debug için log ekleyin
+            System.Diagnostics.Debug.WriteLine($"StokCode: {stockCode}");
+            System.Diagnostics.Debug.WriteLine($"Data Count: {data.Count()}");
+            foreach (var item in data)
+            {
+                System.Diagnostics.Debug.WriteLine($"Stok: {item.MsgS0078}, Seri: {item.StokEvraknoSeri}, IsNegative: {item.IsNegativeStock}");
+            }
+
             if (!data.Any())
             {
                 ViewBag.Message = string.IsNullOrEmpty(stockCode)
                     ? "Veri bulunamadı. Stok kodu veya depo seçimi yapabilirsiniz."
-                    : "Aramanıza uygun veri bulunamadı.";
+                    : $"'{stockCode}' stok kodu için veri bulunamadı.";
+            }
+            else
+            {
+                ViewBag.Message = $"{data.Count()} kayıt bulundu.";
             }
 
             ViewData["SelectedStockCode"] = stockCode;
             ViewData["SelectedDepoNo"] = depoNo;
+            ViewData["HasData"] = data.Any(); // Veri olup olmadığını view'a gönder
 
             return View(data);
         }
-
-
 
 
 
@@ -1022,6 +1033,52 @@ public IActionResult HataliUretimler(DateTime? baslangicTarihi = null, DateTime?
                 _logger.LogError(ex, "Silinen barkodlar listelenirken hata oluştu");
                 TempData["ErrorMessage"] = "Silinen barkodlar görüntülenirken bir hata oluştu.";
                 return View("Error");
+            }
+        }
+
+        // FaturaController.cs içine eklenecek metotlar
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult GetMalzemePlanlama(string isEmriKodu)
+        {
+            try
+            {
+                var malzemePlanlama = _faturaRepository.GetMalzemePlanlama(isEmriKodu);
+                return Json(new { success = true, data = malzemePlanlama });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Malzeme planlaması alınırken hata oluştu. İş Emri: {IsEmriKodu}", isEmriKodu);
+                return Json(new { success = false, message = "Malzeme planlaması alınırken hata oluştu." });
+            }
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public JsonResult MalzemeTuketimi(string isEmriKodu, List<TuketimItem> tuketimListesi)
+        {
+            try
+            {
+                // Yetki kontrolü
+                if (!_faturaRepository.HasProductionPermission())
+                {
+                    return Json(new { success = false, message = "Tüketim yetkiniz bulunmamaktadır." });
+                }
+
+                // Boş liste kontrolü
+                if (tuketimListesi == null || !tuketimListesi.Any(t => t.Miktar > 0))
+                {
+                    return Json(new { success = false, message = "Tüketilecek malzeme seçilmedi." });
+                }
+
+                var sonuc = _faturaRepository.MalzemeTuketimi(isEmriKodu, tuketimListesi);
+                return Json(new { success = true, message = sonuc });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Malzeme tüketimi sırasında hata oluştu. İş Emri: {IsEmriKodu}", isEmriKodu);
+                return Json(new { success = false, message = "Tüketim işlemi sırasında bir hata oluştu: " + ex.Message });
             }
         }
     }

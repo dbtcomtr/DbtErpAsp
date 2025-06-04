@@ -502,7 +502,7 @@ namespace Deneme_proje.Controllers
                 <p><strong>İzin Amacı:</strong> {izinTalebi.Amac ?? "Belirtilmemiş"}</p>
             </div>
             
-            <p>Bu izin talebini incelemek ve işlem yapmak için lütfen İnsan Kaynakları portalına giriş yapınız.</p>
+            <p>Bu izin talebini incelemek ve işlem yapmak için lütfen İnsan Kaynakları portalına giriş yapınız. https://hr.dioki.com.tr/Login/LoginKullanici </p>
             
             <p>Bilgilerinize sunarız.</p>
         </div>
@@ -1496,8 +1496,10 @@ ORDER BY t.pit_baslangictarih DESC", erpConnection);
                         return View(new List<IzinTalepModel>());
                     }
 
-                    // Ana sorgu - Güncellendi: Hem IdariAmirKodu hem de raporlama_yapacagi_per_kod için sorgu
+                    // Ana sorgu - Kalan izin hakkı hesaplaması da dahil
                     using SqlCommand command = new SqlCommand(@"
+DECLARE @Yil INT = YEAR(GETDATE());
+
 WITH PersonelHiyerarsi AS (
     -- Direct administrative subordinates
     SELECT 
@@ -1521,9 +1523,93 @@ WITH PersonelHiyerarsi AS (
         (p1.per_IdariAmirKodu = p2.per_kod OR p1.per_raporlama_yapacagi_per_kod = p2.per_kod)
     INNER JOIN PersonelHiyerarsi ph ON p2.per_kod = ph.AltPersonelKod
     WHERE ph.Seviye < 5
+),
+IzinHakedisleri AS (
+    SELECT 
+        ph.AltPersonelKod,
+        p.per_giris_tar,
+        -- Çalışma süresi hesaplama
+        CASE
+            WHEN DATEFROMPARTS(@Yil, MONTH(p.per_giris_tar), DAY(p.per_giris_tar)) <= GETDATE() THEN 
+                DATEDIFF(YEAR, p.per_giris_tar, GETDATE())
+            ELSE 
+                DATEDIFF(YEAR, p.per_giris_tar, GETDATE()) - 1
+        END AS CalismaSuresiYil,
+        -- Yıldönümü geçti mi kontrolü
+        CASE
+            WHEN DATEFROMPARTS(@Yil, MONTH(p.per_giris_tar), DAY(p.per_giris_tar)) <= GETDATE() THEN 1
+            ELSE 0
+        END AS YildonumuGectiMi
+    FROM PersonelHiyerarsi ph
+    INNER JOIN PERSONELLER p ON ph.AltPersonelKod = p.per_kod
+),
+YillikIzinHaklari AS (
+    SELECT
+        AltPersonelKod,
+        CalismaSuresiYil,
+        YildonumuGectiMi,
+        CASE 
+            WHEN YildonumuGectiMi = 0 THEN 0 -- Yıldönümü geçmediyse yeni izin yok
+            WHEN CalismaSuresiYil >= 15 THEN 26
+            WHEN CalismaSuresiYil > 5 THEN 20
+            WHEN CalismaSuresiYil >= 1 THEN 14
+            ELSE 0
+        END AS HakEdilenYillikIzin
+    FROM IzinHakedisleri
+),
+DevirIzinler AS (
+    SELECT
+        yih.AltPersonelKod,
+        yih.HakEdilenYillikIzin,
+        ISNULL((SELECT SUM(pro_gecyil_devir_izin) 
+                FROM dbo.PERSONEL_TAHAKKUK_OZETLERI WITH (NOLOCK) 
+                WHERE pro_kodozet = yih.AltPersonelKod 
+                AND pro_ozetyili = @Yil), 0) AS GecenYilDevirIzinGun,
+        ISNULL((SELECT SUM(pro_gecyil_devir_saatlikizin) 
+                FROM dbo.PERSONEL_TAHAKKUK_OZETLERI WITH (NOLOCK) 
+                WHERE pro_kodozet = yih.AltPersonelKod 
+                AND pro_ozetyili = @Yil), 0) AS GecenYilDevirIzinSaat
+    FROM YillikIzinHaklari yih
+),
+KullanilanIzinler AS (
+    SELECT
+        di.AltPersonelKod,
+        di.HakEdilenYillikIzin,
+        di.GecenYilDevirIzinGun,
+        di.GecenYilDevirIzinSaat,
+        ISNULL((
+            SELECT SUM(
+                CASE
+                    WHEN pz_saat IS NOT NULL AND pz_saat > 0 THEN
+                        CASE 
+                            WHEN pz_saat <= 4 THEN 0.5 + pz_gun_sayisi
+                            ELSE 1.0 + pz_gun_sayisi
+                        END
+                    ELSE pz_gun_sayisi
+                END
+            )
+            FROM PERSONEL_IZINLERI WITH (NOLOCK) 
+            WHERE pz_pers_kod = di.AltPersonelKod 
+            AND pz_izin_yil = @Yil
+AND pz_izin_tipi = 0  -- Only annual leave
+        ), 0) AS KullanilanIzinGun
+    FROM DevirIzinler di
+),
+KalanIzinler AS (
+    SELECT
+        ki.AltPersonelKod,
+        CASE
+            WHEN ki.GecenYilDevirIzinSaat IS NOT NULL AND ki.GecenYilDevirIzinSaat > 0 THEN
+                CASE 
+                    WHEN ki.GecenYilDevirIzinSaat <= 4 THEN 0.5 + (ki.GecenYilDevirIzinGun + ki.HakEdilenYillikIzin - ki.KullanilanIzinGun)
+                    ELSE 1.0 + (ki.GecenYilDevirIzinGun + ki.HakEdilenYillikIzin - ki.KullanilanIzinGun)
+                END
+            ELSE (ki.GecenYilDevirIzinGun + ki.HakEdilenYillikIzin - ki.KullanilanIzinGun)
+        END AS KalanIzinBakiyesi
+    FROM KullanilanIzinler ki
 )
 SELECT DISTINCT 
-    t.pit_guid,  -- GUID Eklendi
+    t.pit_guid,
     t.pit_pers_kod,
     p.per_adi + ' ' + p.per_soyadi as PersonelAdSoyad,
     p.per_IdariAmirKodu,
@@ -1539,9 +1625,11 @@ SELECT DISTINCT
     t.pit_amac,
     t.pit_izin_durum,
     t.pit_create_date,
-    t.pit_onaylayan_kullanici
+    t.pit_onaylayan_kullanici,
+    CAST(ISNULL(ki.KalanIzinBakiyesi, 0) AS DECIMAL(10,2)) as KalanIzinHakki
 FROM PERSONEL_IZIN_TALEPLERI t
 INNER JOIN PERSONELLER p ON t.pit_pers_kod = p.per_kod
+LEFT JOIN KalanIzinler ki ON t.pit_pers_kod = ki.AltPersonelKod
 WHERE t.pit_izin_durum = 0 AND t.pit_pers_kod IN (
     SELECT AltPersonelKod 
     FROM PersonelHiyerarsi 
@@ -1573,7 +1661,10 @@ ORDER BY t.pit_baslangictarih DESC", erpConnection);
                             BitisTarihi = reader.GetDateTime(reader.GetOrdinal("pit_BaslamaSaati")),
                             Amac = !reader.IsDBNull(reader.GetOrdinal("pit_amac")) ? reader.GetString(reader.GetOrdinal("pit_amac")) : string.Empty,
                             IzinDurumu = reader.GetByte(reader.GetOrdinal("pit_izin_durum")),
-                            OlusturmaTarihi = reader.GetDateTime(reader.GetOrdinal("pit_create_date"))
+                            OlusturmaTarihi = reader.GetDateTime(reader.GetOrdinal("pit_create_date")),
+                            KalanIzinHakki = !reader.IsDBNull(reader.GetOrdinal("KalanIzinHakki"))
+                                ? reader.GetDecimal(reader.GetOrdinal("KalanIzinHakki"))
+                                : 0m
                         });
                         System.Diagnostics.Debug.WriteLine($"Kayıt eklendi: {izinTalepleri[izinTalepleri.Count - 1].PersonelAdSoyad}");
                     }
@@ -2552,6 +2643,7 @@ KullanilanIzinler AS (
             FROM PERSONEL_IZINLERI WITH (NOLOCK) 
             WHERE pz_pers_kod = GYD.PersonelKod 
             AND pz_izin_yil = @Yil
+AND pz_izin_tipi = 0  -- Only annual leave
         ), 0) AS KullanilanIzinGun
     FROM GecenYilDevredilen GYD
 )
@@ -2720,6 +2812,8 @@ KullanilanIzinler AS (
             FROM PERSONEL_IZINLERI WITH (NOLOCK) 
             WHERE pz_pers_kod = GYD.per_kod 
             AND pz_izin_yil = @Yil
+AND pz_izin_tipi = 0  -- Only annual leave
+
         ), 0) AS KullanilanIzinGun
     FROM GecenYilDevredilen GYD
 )

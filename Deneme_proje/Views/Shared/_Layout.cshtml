@@ -322,6 +322,7 @@
                         MenuHelper.KullaniciYetkisiVarMi("Fatura", "IsEmriDurumu", userNo) ||
 
                         MenuHelper.KullaniciYetkisiVarMi("SirketDurumu", "Dashboard", userNo) ||
+                        MenuHelper.KullaniciYetkisiVarMi("SirketDurumu", "KasaRaporu", userNo) ||
                         MenuHelper.KullaniciYetkisiVarMi("SirketDurumu", "BankaAnaliz", userNo))
                         {
                             <li>
@@ -340,10 +341,19 @@
                                             </a>
 
                                             <ul class="sub-menu" aria-expanded="false">
-                                                @if (MenuHelper.KullaniciYetkisiVarMi("SirketDurumu", "Dashboard", userNo))
-                                                {
-                                                    <li><a href="/SirketDurumu/Dashboard">Dashboard</a></li>
-                                                }
+                                            @if (MenuHelper.KullaniciYetkisiVarMi("SirketDurumu", "KasaRaporu", userNo))
+                                            {
+                                                <li><a href="/SirketDurumu/KasaRaporu">Kasa Raporu</a></li>
+                                            }
+                                            @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "CanliBilanco", userNo))
+                                            {
+                                                <li><a href="/fatura/CanliBilanco">Canlı Bilanço</a></li>
+                                            }
+                                            @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "NakitAkisi", userNo))
+                                            {
+                                                <li><a href="/fatura/nakitakisi">Nakit Akışı</a></li>
+                                            }
+                                         
                                                 @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "Index", userNo))
                                                 {
                                                     <li><a href="/Fatura/">Kapalı Müşteri Fatura Analizi</a></li>
@@ -380,26 +390,12 @@
                                                 {
                                                     <li><a href="/fatura/stokyaslandirma">Stok Yaşlandırma</a></li>
                                                 }
-                                                @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "NakitAkisi", userNo))
-                                                {
-                                                    <li><a href="/fatura/nakitakisi">Nakit Akışı</a></li>
-                                                }
-                                                @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "CiroRaporuDepoBazli", userNo))
-                                                {
-                                                    <li><a href="/fatura/ciroraporudepobazli">Depo Bazlı Ciro Raporu</a></li>
-                                                }
-                                                @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "EnCokSatilan", userNo))
-                                                {
-                                                    <li><a href="/fatura/encoksatilan">Satış Miktarına Göre En Çok Satılan Ürünler</a></li>
-                                                }
-                                                @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "SatilanMalinKarlilikveMaliyet", userNo))
-                                                {
-                                                    <li><a href="/fatura/SatilanMalinKarlilikveMaliyet">Satılan Malın Kârlılık ve Maliyet Raporu</a></li>
-                                                }
-                                                @if (MenuHelper.KullaniciYetkisiVarMi("SirketDurumu", "BankaAnaliz", userNo))
+                                               
+                                             
+                                              @*   @if (MenuHelper.KullaniciYetkisiVarMi("SirketDurumu", "BankaAnaliz", userNo))
                                                 {
                                                     <li><a href="/sirketdurumu/BankaAnaliz">Banka Analiz</a></li>
-                                                }
+                                                } *@
 
                                             @*     @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "SiparisDurum", userNo))
                                                 {
@@ -409,16 +405,37 @@
                                                 {
                                                     <li><a href="/fatura/MusteriRiskAnalizi">Müşteri Risk Raporu</a></li>
                                                 }
-                                                @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "CanliBilanco", userNo))
-                                                {
-                                                    <li><a href="/fatura/CanliBilanco">Canlı Bilanço</a></li>
-                                                }
+                                             
                                                 
 
                                             </ul>
                                         </li>
-                                    
 
+                                    <li>
+                                        <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                            <i class="mdi mdi-account-group"></i>
+                                            <span>Satış Raporları</span>
+                                        </a>
+
+                                        <ul class="sub-menu" aria-expanded="false">
+                                         
+                                            @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "CiroRaporuDepoBazli", userNo))
+                                            {
+                                                <li><a href="/fatura/ciroraporudepobazli">Depo Bazlı Ciro Raporu</a></li>
+                                            }
+                                            @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "EnCokSatilan", userNo))
+                                            {
+                                                <li><a href="/fatura/encoksatilan">Satış Miktarına Göre En Çok Satılan Ürünler</a></li>
+                                            }
+                                            @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "SatilanMalinKarlilikveMaliyet", userNo))
+                                            {
+                                                <li><a href="/fatura/SatilanMalinKarlilikveMaliyet">Satılan Malın Kârlılık ve Maliyet Raporu</a></li>
+                                            }
+                                      
+
+
+                                        </ul>
+                                    </li>
                                 
                                 </ul>
 

@@ -303,7 +303,7 @@ ORDER BY krsoztaksit_vade -- Vadeye göre sıralama
             }
         }
 
-        public IEnumerable<CariBakiyeYaslandirma> GetCariMusteriYaslandirma(string cariIlkKod, string cariSonKod, string cariKodYapisi, DateTime? raporTarihi, byte hangiHesaplar)
+        public IEnumerable<CariBakiyeYaslandirma> GetCariMusteriYaslandirma(string cariIlkKod, string cariSonKod, string cariKodYapisi, DateTime? raporTarihi, byte hangiHesaplar, bool includeZeroBalances = false)
         {
             var connectionString = _dbSelectorService.GetConnectionString();
 
@@ -319,6 +319,7 @@ ORDER BY krsoztaksit_vade -- Vadeye göre sıralama
                     command.Parameters.AddWithValue("@CariKodYapisi", cariKodYapisi);
                     command.Parameters.AddWithValue("@RaporTarihi", raporTarihi.HasValue ? (object)raporTarihi.Value : DBNull.Value);
                     command.Parameters.AddWithValue("@HangiHesaplar", hangiHesaplar);
+                    command.Parameters.AddWithValue("@IncludeZeroBalances", includeZeroBalances);
 
                     using (var reader = command.ExecuteReader())
                     {
@@ -343,17 +344,15 @@ ORDER BY krsoztaksit_vade -- Vadeye göre sıralama
                                 gecmisGun120 = reader.GetDouble(13),
                                 GunUstu120 = reader.GetDouble(14),
                                 eksi120GunUstu = reader.GetDouble(reader.GetOrdinal("eksi120GunUstu"))
-
                             });
                         }
                         return result;
                     }
                 }
             }
-
         }
 
-        public IEnumerable<CariBakiyeYaslandirma> GetCariTedarikciYaslandirma(string cariIlkKod, string cariSonKod, string cariKodYapisi, DateTime? raporTarihi, byte hangiHesaplar)
+        public IEnumerable<CariBakiyeYaslandirma> GetCariTedarikciYaslandirma(string cariIlkKod, string cariSonKod, string cariKodYapisi, DateTime? raporTarihi, byte hangiHesaplar, bool includeZeroBalances = false)
         {
             var connectionString = _dbSelectorService.GetConnectionString();
 
@@ -369,6 +368,7 @@ ORDER BY krsoztaksit_vade -- Vadeye göre sıralama
                     command.Parameters.AddWithValue("@CariKodYapisi", cariKodYapisi);
                     command.Parameters.AddWithValue("@RaporTarihi", raporTarihi.HasValue ? (object)raporTarihi.Value : DBNull.Value);
                     command.Parameters.AddWithValue("@HangiHesaplar", hangiHesaplar);
+                    command.Parameters.AddWithValue("@IncludeZeroBalances", includeZeroBalances);
 
                     using (var reader = command.ExecuteReader())
                     {
@@ -393,15 +393,12 @@ ORDER BY krsoztaksit_vade -- Vadeye göre sıralama
                                 gecmisGun120 = reader.GetDouble(13),
                                 GunUstu120 = reader.GetDouble(14),
                                 eksi120GunUstu = reader.GetDouble(reader.GetOrdinal("eksi120GunUstu"))
-
-
                             });
                         }
                         return result;
                     }
                 }
             }
-
         }
         public IEnumerable<StockMovement> GetStokYaslandirma(string stockCode, DateTime reportDate, int? depoNo = null)
         {
@@ -429,20 +426,29 @@ ORDER BY krsoztaksit_vade -- Vadeye göre sıralama
                                     MsgS0870 = reader.GetString(reader.GetOrdinal("msg_S_0870")),
                                     DepoAdi = reader.GetString(reader.GetOrdinal("dep_adi")),
                                     BirimAdi = reader.GetString(reader.GetOrdinal("sto_birim1_ad")),
-                                    MsgS0165 = reader.GetDouble(reader.GetOrdinal("msg_S_0165")),
+
+                                    // Güvenli double okuma
+                                    MsgS0165 = GetSafeDouble(reader, "msg_S_0165"),
+
                                     StokEvraknoSeri = reader.GetString(reader.GetOrdinal("sth_evrakno_seri")),
                                     StokEvraknoSira = reader.GetInt32(reader.GetOrdinal("sth_evrakno_sira")),
-                                    StokMiktar = reader.GetDouble(reader.GetOrdinal("sth_miktar")),
-                                    StokTutar = reader.GetDouble(reader.GetOrdinal("sth_tutar")),
+
+                                    // Güvenli double okuma
+                                    StokMiktar = GetSafeDouble(reader, "sth_miktar"),
+                                    StokTutar = GetSafeDouble(reader, "sth_tutar"),
+
                                     StokTarih = reader.GetDateTime(reader.GetOrdinal("sth_tarih")),
-                                    CumulativeQuantity = reader.GetDouble(reader.GetOrdinal("CumulativeQuantity")),
-                                    StoktaGirenMiktar = reader.GetDouble(reader.GetOrdinal("Stokta_Giren_Miktar")),
-                                    Days0To30 = reader.GetDouble(reader.GetOrdinal("Days0To30")),
-                                    Days31To60 = reader.GetDouble(reader.GetOrdinal("Days31To60")),
-                                    Days61To90 = reader.GetDouble(reader.GetOrdinal("Days61To90")),
-                                    Days90Plus = reader.GetDouble(reader.GetOrdinal("Days90Plus")),
-                                    NumericDate = reader.GetDouble(reader.GetOrdinal("NumericDate")),
-                                    AltDovizKuru = reader.GetDouble(reader.GetOrdinal("sth_alt_doviz_kuru")),
+
+                                    // Güvenli double okuma
+                                    CumulativeQuantity = GetSafeDouble(reader, "CumulativeQuantity"),
+                                    StoktaGirenMiktar = GetSafeDouble(reader, "Stokta_Giren_Miktar"),
+                                    Days0To30 = GetSafeDouble(reader, "Days0To30"),
+                                    Days31To60 = GetSafeDouble(reader, "Days31To60"),
+                                    Days61To90 = GetSafeDouble(reader, "Days61To90"),
+                                    Days90Plus = GetSafeDouble(reader, "Days90Plus"),
+                                    NumericDate = GetSafeDouble(reader, "NumericDate"),
+                                    AltDovizKuru = GetSafeDouble(reader, "sth_alt_doviz_kuru"),
+
                                     // Negatif stok kontrolü (bool olarak)
                                     IsNegativeStock = reader.GetString(reader.GetOrdinal("sth_evrakno_seri")) == "NEG-STOCK"
                                 };
@@ -455,8 +461,72 @@ ORDER BY krsoztaksit_vade -- Vadeye göre sıralama
             catch (Exception ex)
             {
                 Console.WriteLine($"Hata: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"GetStokYaslandirma Hata: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
             }
             return stockMovements;
+        }
+
+        // Güvenli double okuma helper metodu - sınıfınıza ekleyin
+        private double GetSafeDouble(SqlDataReader reader, string columnName)
+        {
+            try
+            {
+                var ordinal = reader.GetOrdinal(columnName);
+                var value = reader.GetValue(ordinal);
+
+                if (value == null || value == DBNull.Value)
+                    return 0.0;
+
+                // Farklı numeric türleri handle et
+                switch (value)
+                {
+                    case double d:
+                        return d;
+                    case float f:
+                        return (double)f;
+                    case decimal dec:
+                        return (double)dec;
+                    case int i:
+                        return (double)i;
+                    case long l:
+                        return (double)l;
+                    case short s:
+                        return (double)s;
+                    case byte b:
+                        return (double)b;
+                    default:
+                        // String olarak parse etmeyi dene
+                        if (double.TryParse(value.ToString(), out double result))
+                            return result;
+                        return 0.0;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GetSafeDouble error for column {columnName}: {ex.Message}");
+                return 0.0;
+            }
+        }
+
+        // Alternatif olarak, Convert.ToDouble kullanabilirsiniz
+        private double GetSafeDoubleAlternative(SqlDataReader reader, string columnName)
+        {
+            try
+            {
+                var ordinal = reader.GetOrdinal(columnName);
+                var value = reader.GetValue(ordinal);
+
+                if (value == null || value == DBNull.Value)
+                    return 0.0;
+
+                return Convert.ToDouble(value);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GetSafeDoubleAlternative error for column {columnName}: {ex.Message}");
+                return 0.0;
+            }
         }
 
 
@@ -3636,8 +3706,82 @@ ORDER BY sh.sth_create_date DESC";
                         return new List<SilinenBarkodViewModel>();
                     }
                 }
+
             }
         }
+
+        // FaturaRepository.cs içine eklenecek metotlar
+
+        // Malzeme planlamayı getir
+        public IEnumerable<MalzemePlanlama> GetMalzemePlanlama(string isEmriKodu)
+        {
+            var connectionString = _dbSelectorService.GetConnectionString();
+            using (var connection = new SqlConnection(connectionString))
+            {
+                string query = @"
+            SELECT 
+                upl.upl_kodu AS StokKodu,
+                s.sto_isim AS StokAdi,
+                s.sto_birim1_ad AS BirimAdi,
+                upl.upl_miktar AS PlanlananMiktar,
+                ISNULL(imd.ish_tuket_miktar, 0) AS TuketilenMiktar,
+                (upl.upl_miktar - ISNULL(imd.ish_tuket_miktar, 0)) AS KalanMiktar
+            FROM URETIM_MALZEME_PLANLAMA upl
+            INNER JOIN STOKLAR s ON s.sto_kod = upl.upl_kodu
+            LEFT JOIN ISEMRI_MALZEME_DURUMLARI imd ON imd.ish_isemri = upl.upl_isemri 
+                AND imd.ish_stokhizm_gid_kod = upl.upl_kodu
+            WHERE upl.upl_isemri = @IsEmriKodu 
+                AND upl.upl_uretim_tuket = 0  -- Sadece tüketilen malzemeler
+            ORDER BY s.sto_isim";
+
+                try
+                {
+                    return connection.Query<MalzemePlanlama>(query, new { IsEmriKodu = isEmriKodu });
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Malzeme planlaması alınırken hata oluştu. İş Emri: {IsEmriKodu}", isEmriKodu);
+                    throw;
+                }
+            }
+        }
+
+        // Malzeme tüketimi yap
+        public string MalzemeTuketimi(string isEmriKodu, List<TuketimItem> tuketimListesi)
+        {
+            var connectionString = _dbSelectorService.GetConnectionString();
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                using (var command = new SqlCommand("MalzemeTuketimi", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    // JSON formatına çevir
+                    var jsonListesi = System.Text.Json.JsonSerializer.Serialize(
+                        tuketimListesi.Select(t => new { stokKodu = t.StokKodu, miktar = t.Miktar })
+                    );
+
+                    command.Parameters.AddWithValue("@isemri", isEmriKodu);
+                    command.Parameters.AddWithValue("@tuketim_listesi", jsonListesi);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            string durum = reader.GetString("durum");
+                            string evrakNo = reader.GetString("evrak_no");
+                            int malzemeSayisi = reader.GetInt32("tuketilen_malzeme_sayisi");
+
+                            return $"Tüketim başarılı! Evrak No: {evrakNo}, {malzemeSayisi} adet malzeme tüketildi.";
+                        }
+                        return "Tüketim yapıldı fakat sonuç alınamadı.";
+                    }
+                }
+            }
+        }
+
+     
         public class MusteriAcikFaturaViewModel
         {
             public string MusteriKodu { get; set; }

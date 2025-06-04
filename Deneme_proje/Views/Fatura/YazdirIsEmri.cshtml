@@ -8,11 +8,7 @@
     <meta charset="utf-8" />
     <title>Bahçepınar Ürün Etiketi</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+       
 
         body {
             margin: 0;
@@ -93,7 +89,7 @@
             color: #666;
             text-transform: uppercase;
             padding-right: 10px;
-            border-right: 2px solid #888; /* <<< BURAYA EKLİYORUZ */
+            border-right: 2px solid #888;
             flex: 1;
             display: flex;
             align-items: center;
@@ -161,12 +157,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 80px;
-            width: 80px;
+            height: 120px;
+            width: 120px;
         }
 
         @@page {
-            size: 13cm 10cm;
+            size: 15cm 10cm;
             margin: 0;
             padding: 0;
         }
@@ -234,7 +230,7 @@
             <div class="detay-baslik">ÜRET. TARİHİ</div>
             <div class="detay-deger">@DateTime.Now.ToString("dd.MM.yyyy")</div>
             <div class="detay-baslik">BARKOD NO</div>
-            <div class="detay-deger">@Model.IsEmriKodu</div> <!-- Bu artık gerçek barkod değeri olacak -->
+            <div class="detay-deger">@Model.IsEmriKodu</div>
 
             <div class="detay-baslik">ÜRETİM YERİ</div>
             <div class="detay-deger">BAHÇE OSMANİYE</div>
@@ -245,10 +241,9 @@
         <div class="etiket-footer">
             <div class="barcode-area">
                 <svg id="barcode"></svg>
-                <!-- Barkod metni - Bu artık gerçek barkod değeri olacak -->
                 <div class="barcode-text">@Model.IsEmriKodu</div>
             </div>
-            <div id="qrcode" class="qr-code"></div>
+           
         </div>
     </div>
 
@@ -256,21 +251,18 @@
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <script>
         window.onload = function () {
-            // Barkod oluşturma - Bu artık gerçek barkod değeri kullanacak
+            // Barkod oluşturma - Boyut 2 katına çıkarıldı
             JsBarcode("#barcode", "@Model.IsEmriKodu", {
                 format: "CODE128",
                 lineColor: "#000",
-                width: 1.5,
-                height: 40,
+                width: 3,      // 1.5'den 3'e çıkarıldı (2 katı)
+                height: 160,    // 40'dan 80'e çıkarıldı (2 katı)
                 displayValue: false,
                 margin: 0
             });
 
-            // QR kod oluşturma - Bu artık gerçek barkod değeri kullanacak
-            var qr = qrcode(0, 'L');
-            qr.addData('@Model.IsEmriKodu');
-            qr.make();
-            document.getElementById('qrcode').innerHTML = qr.createImgTag(3);
+            // QR kod oluşturma
+          
 
             setTimeout(function () {
                 window.print();

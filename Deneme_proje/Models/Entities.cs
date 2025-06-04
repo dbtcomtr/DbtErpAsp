@@ -4,6 +4,22 @@ namespace Deneme_proje.Models
 {
     public class Entities
     {
+        // Model sınıfları
+        public class MalzemePlanlama
+        {
+            public string StokKodu { get; set; }
+            public string StokAdi { get; set; }
+            public string BirimAdi { get; set; }
+            public decimal PlanlananMiktar { get; set; }
+            public decimal TuketilenMiktar { get; set; }
+            public decimal KalanMiktar { get; set; }
+        }
+
+        public class TuketimItem
+        {
+            public string StokKodu { get; set; }
+            public decimal Miktar { get; set; }
+        }
         public class HataliUretimViewModel
         {
             public Guid StokHareketGuid { get; set; }

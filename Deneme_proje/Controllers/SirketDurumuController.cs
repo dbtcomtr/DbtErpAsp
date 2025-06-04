@@ -456,7 +456,7 @@ namespace Deneme_proje.Controllers
         {
             return View();
         }
-        [AllowAnonymous]
+     
         public IActionResult KasaRaporu(DateTime? baslamaTarihi, DateTime? bitisTarihi)
         {
             // Varsayılan tarih aralığı: cari ayın başlangıcından bugüne

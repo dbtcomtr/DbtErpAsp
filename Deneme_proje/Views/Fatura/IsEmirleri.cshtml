@@ -4,171 +4,279 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
-
 <div class="main-content mt-5">
-
-                <div class="card">
-                  
-                    <div class="cards">
-                        @foreach (var isEmri in Model)
-                        {
-                            <div class="card product-card">
-                                <div class="info">
-                                    <p><span>İş Emri Kodu:</span> @isEmri.is_Kod</p>
+    <div class="card">
+        <div class="cards">
+            @foreach (var isEmri in Model)
+            {
+                <div class="card product-card">
+                    <div class="info">
+                        <p><span>İş Emri Kodu:</span> @isEmri.is_Kod</p>
                         <strong>Ürün Kodu: @isEmri.UrunKodu </strong>
-                            
-                                    <strong>
-                                        @isEmri.UrunAdi
-                                    </strong>
-                                </div>
-                                <div class="button-container">
-                                    @{
-                                        var hasProductionPermission = ViewBag.HasProductionPermission ?? false;
-                                    }
+                        <strong>@isEmri.UrunAdi</strong>
+                    </div>
+                    <div class="button-container">
+                        @{
+                            var hasProductionPermission = ViewBag.HasProductionPermission ?? false;
+                        }
 
-                                    @if (hasProductionPermission)
-                                    {
-                                        <button onclick="uretIsEmri('@isEmri.is_Kod', '@isEmri.UrunKodu', 3)"
-                                                class="btn uret @(isEmri.is_EmriDurumu == 1 ? "" : "darker")">
-                                            Üret
-                                        </button>
-                                    }
-                                </div>
-                               
-                            </div>
+                        @if (hasProductionPermission)
+                        {
+                            <button onclick="uretIsEmri('@isEmri.is_Kod', '@isEmri.UrunKodu', 3)"
+                                    class="btn uret @(isEmri.is_EmriDurumu == 1 ? "" : "darker")">
+                                Üret
+                            </button>
+
+                            <button onclick="tuketimModalAc('@isEmri.is_Kod', '@isEmri.UrunKodu')"
+                                    class="btn tuket @(isEmri.is_EmriDurumu == 1 ? "" : "darker")"
+                                    style="margin-left: 10px;">
+                                Tüket
+                            </button>
                         }
                     </div>
                 </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- MODAL -->
+<div id="tuketimModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999;">
+    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:20px; border-radius:10px; width:90%; max-width:1000px; max-height:90%; overflow-y:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #ccc; padding-bottom:10px;">
+            <h3>Malzeme Tüketimi</h3>
+            <button onclick="modalKapat()" style="background:none; border:none; font-size:24px; cursor:pointer;">&times;</button>
+        </div>
+
+        <div id="modal-content">
+            <p><strong>İş Emri:</strong> <span id="modal-isemri"></span></p>
+            <p><strong>Ürün:</strong> <span id="modal-urun"></span></p>
+
+            <div id="loading" style="text-align:center; display:none;">
+                <p>Yükleniyor...</p>
             </div>
 
+            <div id="malzeme-container" style="display:none;">
+                <h4>Malzeme Listesi:</h4>
+                <button onclick="ornekVeriDoldur()" style="background:#007bff; color:white; border:none; padding:5px 10px; margin:10px 0; border-radius:5px; cursor:pointer;">Örnek Veri Doldur</button>
 
-@section Scripts {
-    <script>
-           function uretIsEmri(isEmriKodu, urunKodu, depoNo) {
-            $.ajax({
-                url: '@Url.Action("UretIsEmri", "Fatura")',
-                type: 'POST',
-                data: {
-                    isEmriKodu: isEmriKodu,
-                    urunKodu: urunKodu,
-                    depoNo: depoNo
-                },
-                success: function(response) {
-                    if (response.success) {
-                        // Sunucudan dönen barkod değerini çıkaralım
-                        var barkodMatch = response.message.match(/Barkod: ([^,]+)/);
-                        var barkod = barkodMatch ? barkodMatch[1].trim() : isEmriKodu;
+                <table style="width:100%; border-collapse:collapse; margin:10px 0;">
+                    <thead>
+                        <tr style="background:#f8f9fa;">
+                            <th style="border:1px solid #ddd; padding:8px;">Stok Kodu</th>
+                            <th style="border:1px solid #ddd; padding:8px;">Malzeme Adı</th>
+                            <th style="border:1px solid #ddd; padding:8px;">Birim</th>
+                            <th style="border:1px solid #ddd; padding:8px;">Planlanan</th>
+                            <th style="border:1px solid #ddd; padding:8px;">Tüketilen</th>
+                            <th style="border:1px solid #ddd; padding:8px;">Kalan</th>
+                            <th style="border:1px solid #ddd; padding:8px;">Tüketilecek</th>
+                        </tr>
+                    </thead>
+                    <tbody id="malzeme-tbody">
+                    </tbody>
+                </table>
+            </div>
 
-                        console.log("Üretilen barkod:", barkod);
+            <div id="error-msg" style="color:red; display:none;"></div>
+        </div>
 
-                        // Yazdırma ekranını barkod ile birlikte aç
-                        yazdirmaEkraniAc(isEmriKodu, urunKodu, barkod);
-                    } else {
-                        // Hata varsa sadece hata mesajı gösterelim
-                        Swal.fire({
-                            title: 'Hata!',
-                            text: 'Üretim yetkiniz bulunmamaktadır.',
-                            icon: 'error',
-                            confirmButtonText: 'Tamam'
-                        });
-                    }
-                },
-                error: function() {
-                    Swal.fire({
-                        title: 'Hata!',
-                        text: 'İşlem sırasında bir hata oluştu.',
-                        icon: 'error',
-                        confirmButtonText: 'Tamam'
-                    });
+        <div style="text-align:right; margin-top:20px; border-top:1px solid #ccc; padding-top:10px;">
+            <button onclick="modalKapat()" style="background:#6c757d; color:white; border:none; padding:10px 20px; margin-right:10px; border-radius:5px; cursor:pointer;">İptal</button>
+            <button id="kaydet-btn" onclick="tuketimKaydet()" style="background:#28a745; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer;">Tüketimi Kaydet</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Değişkenler
+    var currentIsEmri = '';
+    var currentUrun = '';
+
+    // Modal açma
+    function tuketimModalAc(isEmriKodu, urunKodu) {
+        console.log('Modal açılıyor:', isEmriKodu, urunKodu);
+        currentIsEmri = isEmriKodu;
+        currentUrun = urunKodu;
+
+        document.getElementById('modal-isemri').textContent = isEmriKodu;
+        document.getElementById('modal-urun').textContent = urunKodu;
+        document.getElementById('tuketimModal').style.display = 'block';
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('malzeme-container').style.display = 'none';
+        document.getElementById('error-msg').style.display = 'none';
+
+        // AJAX ile malzemeleri getir
+        fetch('@Url.Action("GetMalzemePlanlama", "Fatura")?isEmriKodu=' + encodeURIComponent(isEmriKodu))
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loading').style.display = 'none';
+
+                if (data.success && data.data.length > 0) {
+                    malzemeTablosuOlustur(data.data);
+                    document.getElementById('malzeme-container').style.display = 'block';
+                } else {
+                    document.getElementById('error-msg').textContent = 'Malzeme planlaması bulunamadı.';
+                    document.getElementById('error-msg').style.display = 'block';
                 }
+            })
+            .catch(error => {
+                console.error('Hata:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error-msg').textContent = 'Veri yüklenirken hata oluştu.';
+                document.getElementById('error-msg').style.display = 'block';
             });
+    }
+
+    // Modal kapatma
+    function modalKapat() {
+        document.getElementById('tuketimModal').style.display = 'none';
+        document.getElementById('malzeme-tbody').innerHTML = '';
+    }
+
+    // Malzeme tablosu oluşturma
+    function malzemeTablosuOlustur(malzemeler) {
+        var tbody = document.getElementById('malzeme-tbody');
+        tbody.innerHTML = '';
+
+        malzemeler.forEach(function(malzeme, index) {
+            var row = tbody.insertRow();
+            row.innerHTML = `
+                <td style="border:1px solid #ddd; padding:8px;">${malzeme.stokKodu}</td>
+                <td style="border:1px solid #ddd; padding:8px;">${malzeme.stokAdi}</td>
+                <td style="border:1px solid #ddd; padding:8px;">${malzeme.birimAdi}</td>
+                <td style="border:1px solid #ddd; padding:8px; text-align:right;">${malzeme.planlananMiktar}</td>
+                <td style="border:1px solid #ddd; padding:8px; text-align:right;">${malzeme.tuketilenMiktar}</td>
+                <td style="border:1px solid #ddd; padding:8px; text-align:right;">${malzeme.kalanMiktar}</td>
+                <td style="border:1px solid #ddd; padding:8px;">
+                    <input type="number" class="tuketim-input" data-stok="${malzeme.stokKodu}"
+                           min="0" max="${malzeme.kalanMiktar}" step="0.01"
+                           style="width:100px; padding:5px; border:1px solid #ccc; border-radius:3px;">
+                </td>
+            `;
+        });
+    }
+
+    // Örnek veri doldurma
+    function ornekVeriDoldur() {
+        var inputs = document.querySelectorAll('.tuketim-input');
+        inputs.forEach(function(input, index) {
+            if (index < 2) {
+                input.value = (index + 1) * 10;
+            }
+        });
+    }
+
+    // Tüketim kaydetme
+    function tuketimKaydet() {
+        var tuketimListesi = [];
+        var inputs = document.querySelectorAll('.tuketim-input');
+
+        console.log('Tüketim kontrolü başladı...');
+
+        inputs.forEach(function(input) {
+            var miktar = parseFloat(input.value) || 0;
+            var stokKodu = input.getAttribute('data-stok');
+
+            console.log('Input:', stokKodu, miktar);
+
+            if (miktar > 0) {
+                tuketimListesi.push({
+                    StokKodu: stokKodu,
+                    Miktar: miktar
+                });
+            }
+        });
+
+        console.log('Tüketim listesi:', tuketimListesi);
+
+        if (tuketimListesi.length === 0) {
+            alert('Tüketilecek malzeme seçilmedi. Lütfen miktar girin.');
+            return;
         }
 
-        // Yazdırma ekranını açan fonksiyon (barkod parametresi eklendi)
-        function yazdirmaEkraniAc(isEmriKodu, urunKodu, barkod) {
-            // İş emri yazdırma sayfasına yönlendirme (barkod parametresi ile)
-            var yazdirmaURL = '@Url.Action("YazdirIsEmri", "Fatura")' +
-                              '?isEmriKodu=' + encodeURIComponent(isEmriKodu) +
-                              '&urunKodu=' + encodeURIComponent(urunKodu) +
-                              '&barkod=' + encodeURIComponent(barkod);
+        if (!confirm(`${tuketimListesi.length} adet malzeme tüketilecek. Devam edilsin mi?`)) {
+            return;
+        }
 
-            // Yazdırma sayfasını yeni pencerede aç
-            var yazdirmaPenceresi = window.open(yazdirmaURL, '_blank', 'width=800,height=600');
+        // Butonu devre dışı bırak
+        var btn = document.getElementById('kaydet-btn');
+        btn.disabled = true;
+        btn.textContent = 'Kaydediliyor...';
 
-            // Sayfa yüklendiğinde otomatik yazdırma diyaloğunu başlat
+        // AJAX ile kaydet
+        var formData = new FormData();
+        formData.append('isEmriKodu', currentIsEmri);
+
+        tuketimListesi.forEach(function(item, index) {
+            formData.append(`tuketimListesi[${index}].StokKodu`, item.StokKodu);
+            formData.append(`tuketimListesi[${index}].Miktar`, item.Miktar);
+        });
+
+        fetch('@Url.Action("MalzemeTuketimi", "Fatura")', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.textContent = 'Tüketimi Kaydet';
+
+            if (data.success) {
+                alert('Başarılı: ' + data.message);
+                modalKapat();
+                location.reload();
+            } else {
+                alert('Hata: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('AJAX Hata:', error);
+            btn.disabled = false;
+            btn.textContent = 'Tüketimi Kaydet';
+            alert('Tüketim işlemi sırasında hata oluştu.');
+        });
+    }
+
+    // Üretim fonksiyonu
+    function uretIsEmri(isEmriKodu, urunKodu, depoNo) {
+        fetch('@Url.Action("UretIsEmri", "Fatura")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `isEmriKodu=${encodeURIComponent(isEmriKodu)}&urunKodu=${encodeURIComponent(urunKodu)}&depoNo=${depoNo}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                var barkodMatch = data.message.match(/Barkod: ([^,]+)/);
+                var barkod = barkodMatch ? barkodMatch[1].trim() : isEmriKodu;
+                yazdirmaEkraniAc(isEmriKodu, urunKodu, barkod);
+            } else {
+                alert('Hata: Üretim yetkiniz bulunmamaktadır.');
+            }
+        })
+        .catch(error => {
+            console.error('Hata:', error);
+            alert('İşlem sırasında bir hata oluştu.');
+        });
+    }
+
+    // Yazdırma fonksiyonu
+    function yazdirmaEkraniAc(isEmriKodu, urunKodu, barkod) {
+        var yazdirmaURL = '@Url.Action("YazdirIsEmri", "Fatura")' +
+                          '?isEmriKodu=' + encodeURIComponent(isEmriKodu) +
+                          '&urunKodu=' + encodeURIComponent(urunKodu) +
+                          '&barkod=' + encodeURIComponent(barkod);
+
+        var yazdirmaPenceresi = window.open(yazdirmaURL, '_blank', 'width=800,height=600');
+        if (yazdirmaPenceresi) {
             yazdirmaPenceresi.onload = function() {
                 yazdirmaPenceresi.print();
             };
         }
-
-        function updateIsEmirleri() {
-            $.ajax({
-                url: '@Url.Action("GetIsEmirleri", "Fatura")',
-                type: 'GET',
-                success: function(response) {
-                    if (response.success && response.isEmirleri.length > 0) {
-                        var cardsContainer = $(".cards");
-                        cardsContainer.empty(); // Eski verileri temizle
-
-                        // Debug - check what properties are actually in the response
-                        console.log("First item properties:", response.isEmirleri[0]);
-
-                        response.isEmirleri.forEach(function(isEmri) {
-                            var durumBadge = isEmri.is_EmriDurumu == 1
-                                ? '<span class="badge badge-success">Aktif</span>'
-                                : '<span class="badge badge-warning">Pasif</span>';
-
-                            var uretButtonClass = isEmri.is_EmriDurumu == 1 ? '' : 'darker';
-
-                            var uretButton = response.hasProductionPermission
-                                ? `<button onclick="uretIsEmri('${isEmri.is_Kod}', '${isEmri.urunKodu || isEmri.UrunKodu}', 3)"
-                                        class="btn uret ${uretButtonClass}">Üret</button>`
-                                : '';
-
-                            var updateButton = '';
-
-                            // Try both camelCase and PascalCase property names
-                            var urunKodu = isEmri.urunKodu || isEmri.UrunKodu || '';
-                            var urunAdi = isEmri.urunAdi || isEmri.UrunAdi || '';
-                            var miktar = isEmri.miktar || isEmri.Miktar || '';
-                            var isMerkezi = isEmri.isMerkezi || isEmri.IsMerkezi || '';
-                            var baslangicTarihi = isEmri.is_BaslangicTarihi ? new Date(isEmri.is_BaslangicTarihi).toLocaleDateString() : '';
-
-                            var card = `
-                                <div class="card product-card">
-                                    <div class="info">
-                                        <p><span>İş Emri Kodu:</span> ${isEmri.is_Kod}</p>
-                                          <strong>Ürün Kodu:</span>${urunKodu}</strong>
-                                        
-                                        <strong>${urunAdi}</strong>
-                                    </div>
-                                    <div class="button-container">
-                                        ${uretButton}
-                                    </div>
-
-                                </div>`;
-
-                            cardsContainer.append(card);
-                        });
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error("İş emirleri güncellenirken hata oluştu:", error);
-                    console.log("XHR:", xhr.responseText);
-                }
-            });
-        }
-
-        // // 5 saniyede bir verileri yenile
-        // setInterval(updateIsEmirleri, 5000);
-
-        // Sayfa yüklendiğinde ilk veriyi al
-        $(document).ready(function() {
-            updateIsEmirleri();
-        });
-    </script>
-}
+    }
+</script>
 
 <style>
     .cards {
@@ -214,34 +322,68 @@
         display: flex;
         justify-content: center;
         margin-top: 15px;
+        gap: 10px;
     }
 
     .uret {
         background-color: #6cc24a;
         color: white;
         font-weight: 900;
-        font-size: 20px;
+        font-size: 18px;
         padding: 12px;
         border: none;
         border-radius: 10px;
         cursor: pointer;
-        width: 170px;
-        height: 70px;
+        width: 120px;
+        height: 60px;
     }
 
-        .uret.darker {
-            background-color: #f57c00;
-        }
+    .tuket {
+        background-color: #ff6b35;
+        color: white;
+        font-weight: 900;
+        font-size: 18px;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        width: 120px;
+        height: 60px;
+    }
+
+    .uret.darker {
+        background-color: #f57c00;
+    }
+
+    .tuket.darker {
+        background-color: #cc5429;
+    }
 
     @@media (max-width: 1200px) {
-        .cards {
-            grid-template-columns: repeat(2, 1fr);
-        }
+        .cards
+
+    {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .button-container {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .uret, .tuket {
+        width: 100%;
+        margin: 0;
+    }
+
     }
 
     @@media (max-width: 768px) {
-        .cards {
-            grid-template-columns: 1fr;
-        }
+        .cards
+
+    {
+        grid-template-columns: 1fr;
+    }
+
     }
 </style>

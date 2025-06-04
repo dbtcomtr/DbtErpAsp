@@ -30,11 +30,37 @@
             </div>
         </div>
         <div class="row mb-lg-5 mb-1">
-            <div class="col-lg-4">
+            <div class="col-lg-8">
                 <form method="get" class="form-inline">
-                    <div class="form-group">
-                        <label for="filter" style="font-size: 12px;">Filter:</label>
-                        <input type="text" id="filter" name="filter" class="form-control" placeholder="Enter filter criteria" required />
+                  
+                    <div class="form-group mr-3">
+                        <label for="cariIlkKod" style="font-size: 12px;">İlk Kod:</label>
+                        <input type="text" id="cariIlkKod" name="cariIlkKod" class="form-control" placeholder="İlk cari kodu" />
+                    </div>
+                    <div class="form-group mr-3">
+                        <label for="cariSonKod" style="font-size: 12px;">Son Kod:</label>
+                        <input type="text" id="cariSonKod" name="cariSonKod" class="form-control" placeholder="Son cari kodu" />
+                    </div>
+                  
+                    <div class="form-group mr-3">
+                        <label for="raporTarihi" style="font-size: 12px;">Rapor Tarihi:</label>
+                        <input type="date" id="raporTarihi" name="raporTarihi" class="form-control" />
+                    </div>
+                    <div class="form-group mr-3">
+                        <label for="hangiHesaplar" style="font-size: 12px;">Hesap Tipi:</label>
+                        <select id="hangiHesaplar" name="hangiHesaplar" class="form-control">
+                            <option value="0">Borçlu Hesaplar</option>
+                            <option value="1">Alacaklı Hesaplar</option>
+                            <option value="2">Tüm Hesaplar</option>
+                        </select>
+                    </div>
+                    <div class="form-group mr-3">
+                        <div class="form-check">
+                            <input type="checkbox" id="includeZeroBalances" name="includeZeroBalances" value="true" class="form-check-input" />
+                            <label for="includeZeroBalances" class="form-check-label" style="font-size: 12px;">
+                                Sıfır Bakiyelileri Göster
+                            </label>
+                        </div>
                     </div>
                     <div class="form-group">
                         <button type="submit" class="btn btn-tumblr btn-shadow waves-effect waves-light">Ara</button>
@@ -234,7 +260,66 @@
 
 
         <script>
+                      const form = document.querySelector('form');
+            const cariIlkKodInput = document.getElementById('cariIlkKod');
+            const cariSonKodInput = document.getElementById('cariSonKod');
+            const raporTarihiInput = document.getElementById('raporTarihi');
+            const hangiHesaplarSelect = document.getElementById('hangiHesaplar');
+            const resetButton = document.getElementById('resetButton');
 
+            // Sayfa yüklendiğinde verileri geri yükle
+            function restoreFormData() {
+                const savedData = {
+                    cariIlkKod: sessionStorage.getItem('cariIlkKod'),
+                    cariSonKod: sessionStorage.getItem('cariSonKod'),
+                    raporTarihi: sessionStorage.getItem('raporTarihi'),
+                    hangiHesaplar: sessionStorage.getItem('hangiHesaplar')
+                };
+
+                if (savedData.cariIlkKod) cariIlkKodInput.value = savedData.cariIlkKod;
+                if (savedData.cariSonKod) cariSonKodInput.value = savedData.cariSonKod;
+                if (savedData.raporTarihi) raporTarihiInput.value = savedData.raporTarihi;
+                if (savedData.hangiHesaplar) hangiHesaplarSelect.value = savedData.hangiHesaplar;
+            }
+
+            // Form verilerini kaydet
+            function saveFormData() {
+                sessionStorage.setItem('cariIlkKod', cariIlkKodInput.value);
+                sessionStorage.setItem('cariSonKod', cariSonKodInput.value);
+                sessionStorage.setItem('raporTarihi', raporTarihiInput.value);
+                sessionStorage.setItem('hangiHesaplar', hangiHesaplarSelect.value);
+            }
+
+            // Form gönderildiğinde verileri kaydet
+            form.addEventListener('submit', function(e) {
+                saveFormData();
+            });
+
+            // Input değişikliklerinde anlık kaydet (opsiyonel - daha güvenli)
+            cariIlkKodInput.addEventListener('input', saveFormData);
+            cariSonKodInput.addEventListener('input', saveFormData);
+            raporTarihiInput.addEventListener('change', saveFormData);
+            hangiHesaplarSelect.addEventListener('change', saveFormData);
+
+            // Sıfırla butonu
+            resetButton.addEventListener('click', function(e) {
+                e.preventDefault(); // Sayfanın yenilenmesini engelle
+
+                // SessionStorage'ı temizle
+                sessionStorage.removeItem('cariIlkKod');
+                sessionStorage.removeItem('cariSonKod');
+                sessionStorage.removeItem('raporTarihi');
+                sessionStorage.removeItem('hangiHesaplar');
+
+                // Form alanlarını sıfırla
+                form.reset();
+
+                // Sayfa yenile (isteğe bağlı)
+                // window.location.reload();
+            });
+
+            // Sayfa yüklendiğinde verileri geri yükle
+            restoreFormData();
 
             $('#example').dataTable({
                 "dom": '<"row"<"col-sm-12"B>>' +

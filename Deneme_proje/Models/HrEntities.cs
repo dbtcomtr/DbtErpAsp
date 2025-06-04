@@ -42,6 +42,7 @@
             public string OnaylayanKullanici { get; set; }
             public string OnaylayanKullaniciAdi { get; set; }
             public string ReddetmeNedeni { get; set; }  // Corresponds to pit_aciklama1
+            public decimal KalanIzinHakki { get; set; }
 
             public string IzinTipiAdi =>
                 IzinTipi switch

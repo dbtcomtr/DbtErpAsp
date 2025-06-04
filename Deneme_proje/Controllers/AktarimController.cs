@@ -4,6 +4,7 @@ using OfficeOpenXml;
 using System.Data.SqlClient;
 using static Deneme_proje.Models.AktarimEntities;
 using System.Globalization;
+using System.Text;
 
 
 namespace Deneme_proje.Controllers
@@ -362,6 +363,292 @@ rec_fireyuzde,rec_baslama_tarihi,rec_bitis_tarihi,rec_alt_tukkod1,rec_alt_tukkod
                                 urunKodu, stokKodu);
                 throw; // Hatayı yukarı fırlat
             }
+        }
+        // Bu metotları AktarimController sınıfına ekleyin
+
+        [AllowAnonymous]
+        [HttpPost]
+        public IActionResult ParametreGuncelle(string eskiParametreAdi, string yeniParametreAdi, List<string> modalSecilenStoklar)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(eskiParametreAdi) || string.IsNullOrWhiteSpace(yeniParametreAdi))
+                {
+                    ViewBag.Mesaj = "Parametre adları boş olamaz.";
+                    ViewBag.Parametreler = GetParametreler();
+                    return View("ParametreAyarla", GetStokList());
+                }
+
+                if (modalSecilenStoklar == null || !modalSecilenStoklar.Any())
+                {
+                    ViewBag.Mesaj = "En az bir stok seçilmelidir.";
+                    ViewBag.Parametreler = GetParametreler();
+                    return View("ParametreAyarla", GetStokList());
+                }
+
+                var stoklarVirgullu = string.Join(",", modalSecilenStoklar);
+
+                using var conn = new SqlConnection(_configuration.GetConnectionString("ERPDatabase"));
+                conn.Open();
+
+                // Eğer parametre adı değiştiyse, aynı isimde başka parametre var mı kontrol et
+                if (eskiParametreAdi != yeniParametreAdi)
+                {
+                    using var checkCmd = new SqlCommand("SELECT COUNT(*) FROM AktarimParametre WHERE ParametreAdi = @yeniAdi", conn);
+                    checkCmd.Parameters.AddWithValue("@yeniAdi", yeniParametreAdi);
+                    var existCount = (int)checkCmd.ExecuteScalar();
+
+                    if (existCount > 0)
+                    {
+                        ViewBag.Mesaj = "Bu parametre adı zaten kullanılıyor. Lütfen farklı bir ad seçin.";
+                        ViewBag.Parametreler = GetParametreler();
+                        return View("ParametreAyarla", GetStokList());
+                    }
+                }
+
+                // Parametreyi güncelle
+                using var cmd = new SqlCommand("UPDATE AktarimParametre SET ParametreAdi = @yeniAdi, StokKodu = @kodlar WHERE ParametreAdi = @eskiAdi", conn);
+                cmd.Parameters.AddWithValue("@eskiAdi", eskiParametreAdi);
+                cmd.Parameters.AddWithValue("@yeniAdi", yeniParametreAdi);
+                cmd.Parameters.AddWithValue("@kodlar", stoklarVirgullu);
+
+                int affectedRows = cmd.ExecuteNonQuery();
+
+                if (affectedRows > 0)
+                {
+                    ViewBag.Mesaj = "Parametre başarıyla güncellendi.";
+                }
+                else
+                {
+                    ViewBag.Mesaj = "Parametre güncellenemedi. Parametre bulunamadı.";
+                }
+
+                ViewBag.Parametreler = GetParametreler();
+                return View("ParametreAyarla", GetStokList());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Parametre güncellenirken hata oluştu. EskiParametreAdi: {EskiParametreAdi}, YeniParametreAdi: {YeniParametreAdi}",
+                                eskiParametreAdi, yeniParametreAdi);
+                ViewBag.ErrorMessage = "Parametre güncellenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.";
+                ViewBag.Parametreler = GetParametreler();
+                return View("ParametreAyarla", GetStokList());
+            }
+        }
+
+
+
+        [AllowAnonymous]
+        [HttpPost]
+        public IActionResult ParametreKopyala(string yeniParametreAdi, string stokKodlari)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(yeniParametreAdi) || string.IsNullOrWhiteSpace(stokKodlari))
+                {
+                    ViewBag.Mesaj = "Parametre kopyalanırken hata oluştu: Gerekli bilgiler eksik.";
+                    ViewBag.Parametreler = GetParametreler();
+                    return View("ParametreAyarla", GetStokList());
+                }
+
+                using var conn = new SqlConnection(_configuration.GetConnectionString("ERPDatabase"));
+                conn.Open();
+
+                // Aynı isimde parametre var mı kontrol et
+                using var checkCmd = new SqlCommand("SELECT COUNT(*) FROM AktarimParametre WHERE ParametreAdi = @adi", conn);
+                checkCmd.Parameters.AddWithValue("@adi", yeniParametreAdi);
+                var existCount = (int)checkCmd.ExecuteScalar();
+
+                if (existCount > 0)
+                {
+                    ViewBag.Mesaj = "Bu parametre adı zaten kullanılıyor. Lütfen farklı bir ad seçin.";
+                    ViewBag.Parametreler = GetParametreler();
+                    return View("ParametreAyarla", GetStokList());
+                }
+
+                // Yeni parametreyi kaydet
+                using var cmd = new SqlCommand("INSERT INTO AktarimParametre (ParametreAdi, StokKodu) VALUES (@adi, @kodlar)", conn);
+                cmd.Parameters.AddWithValue("@adi", yeniParametreAdi);
+                cmd.Parameters.AddWithValue("@kodlar", stokKodlari);
+                cmd.ExecuteNonQuery();
+
+                ViewBag.Mesaj = "Parametre başarıyla kopyalandı.";
+                ViewBag.Parametreler = GetParametreler();
+                return View("ParametreAyarla", GetStokList());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Parametre kopyalanırken hata oluştu. YeniParametreAdi: {YeniParametreAdi}", yeniParametreAdi);
+                ViewBag.ErrorMessage = "Parametre kopyalanırken bir hata oluştu. Lütfen daha sonra tekrar deneyin.";
+                ViewBag.Parametreler = GetParametreler();
+                return View("ParametreAyarla", GetStokList());
+            }
+        }
+        // AktarimController.cs dosyasına bu metodu ekleyin
+
+        [AllowAnonymous]
+        [HttpPost]
+        public IActionResult GetAjaxData(IFormFile excelFile, string selectedParametre)
+        {
+            try
+            {
+                var data = new List<StockMovement>();
+                var sessionKey = "ExcelData_" + HttpContext.Session.Id;
+
+                // Excel dosyası varsa veya session'da veri varsa veriyi al
+                if (excelFile != null && excelFile.Length > 0)
+                {
+                    using var stream = new MemoryStream();
+                    excelFile.CopyTo(stream);
+                    stream.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+                    using var package = new ExcelPackage(stream);
+                    var worksheet = package.Workbook.Worksheets.FirstOrDefault();
+
+                    if (worksheet == null)
+                    {
+                        return Json(new { success = false, message = "Excel dosyasında geçerli bir sayfa bulunamadı." });
+                    }
+
+                    string currentGroup = string.Empty;
+                    int rowCount = worksheet.Dimension?.Rows ?? 0;
+
+                    for (int row = 2; row <= rowCount; row++)
+                    {
+                        var kod = worksheet.Cells[row, 1].Text;
+                        var aciklama = worksheet.Cells[row, 2].Text;
+
+                        if (string.IsNullOrWhiteSpace(kod) && !string.IsNullOrWhiteSpace(aciklama))
+                        {
+                            currentGroup = aciklama.Trim();
+                            continue;
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(kod))
+                        {
+                            data.Add(new StockMovement
+                            {
+                                Grup = currentGroup,
+                                StokKodu = kod.Replace("#", "").Trim(),
+                                Aciklama = aciklama,
+                                Birim = worksheet.Cells[row, 3].Text,
+                                Fiyat = worksheet.Cells[row, 4].Text,
+                                Net = worksheet.Cells[row, 5].Text,
+                                Brut = worksheet.Cells[row, 6].Text,
+                                Agirlik = worksheet.Cells[row, 7].Text,
+                                NetTutar = worksheet.Cells[row, 8].Text,
+                                BrutTutar = worksheet.Cells[row, 9].Text,
+                                Para = worksheet.Cells[row, 10].Text,
+                                Kur = worksheet.Cells[row, 11].Text
+                            });
+                        }
+                    }
+
+                    // Verileri session'a kaydet
+                    var dataBytes = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(data);
+                    HttpContext.Session.Set(sessionKey, dataBytes);
+                }
+                else
+                {
+                    // Session'dan veriyi al
+                    if (HttpContext.Session.TryGetValue(sessionKey, out var sessionData))
+                    {
+                        var jsonString = System.Text.Encoding.UTF8.GetString(sessionData);
+                        data = System.Text.Json.JsonSerializer.Deserialize<List<StockMovement>>(jsonString) ?? new List<StockMovement>();
+                    }
+                    else
+                    {
+                        // Session'da veri yoksa ve Excel dosyası yüklenmemişse hata döndür
+                        return Json(new { success = false, message = "Excel dosyası yüklenmedi. Lütfen bir dosya yükleyin." });
+                    }
+                }
+
+                // Seçilen stok kodlarını al
+                List<string> secilenStokKodlari = new List<string>();
+                if (!string.IsNullOrEmpty(selectedParametre))
+                {
+                    _logger.LogInformation("Seçilen parametre: {SelectedParametre}", selectedParametre);
+                    var parametreler = GetParametreler();
+                    var secilenParametre = parametreler.FirstOrDefault(p => p.ParametreAdi == selectedParametre);
+                    if (secilenParametre != null)
+                    {
+                        secilenStokKodlari = secilenParametre.StokKodu.Split(',').Select(s => s.Trim()).ToList();
+                        _logger.LogInformation("Seçilen stok kodları: {StokKodlari}", string.Join(", ", secilenStokKodlari));
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Parametre bulunamadı: {SelectedParametre}", selectedParametre);
+                    }
+                }
+                else
+                {
+                    _logger.LogInformation("Parametre seçilmedi");
+                }
+
+                // HTML oluştur
+                var html = GenerateTableHtml(data, secilenStokKodlari);
+
+                return Json(new { success = true, html = html, secilenStokKodlari = secilenStokKodlari });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "AJAX veri yüklenirken hata oluştu");
+                return Json(new { success = false, message = "Veri yüklenirken bir hata oluştu: " + ex.Message });
+            }
+        }
+
+        private string GenerateTableHtml(List<StockMovement> data, List<string> secilenStokKodlari)
+        {
+            var html = new StringBuilder();
+
+            foreach (var group in data.GroupBy(x => x.Grup))
+            {
+                html.AppendLine("<div class='card'>");
+                html.AppendLine($"<div class='card-header tablo'>{group.Key}</div>");
+                html.AppendLine("<div class='grid-container'>");
+                html.AppendLine("<table>");
+                html.AppendLine("<thead>");
+                html.AppendLine("<tr>");
+                html.AppendLine("<th>Aktarılsın</th><th>Stok Kodu</th><th>Açıklama</th><th>Birim</th>");
+                html.AppendLine("<th>Fiyat</th><th>Net</th><th>Brüt</th><th>Ağırlık</th>");
+                html.AppendLine("<th>Net Tutar</th><th>Brüt Tutar</th><th>Para</th><th>Kur</th>");
+                html.AppendLine("</tr>");
+                html.AppendLine("</thead>");
+                html.AppendLine("<tbody>");
+
+                foreach (var item in group)
+                {
+                    bool isChecked = true;
+                    if (secilenStokKodlari != null && secilenStokKodlari.Contains(item.StokKodu))
+                    {
+                        isChecked = false;
+                    }
+
+                    html.AppendLine("<tr>");
+                    html.AppendLine($"<td><input type='checkbox' class='stok-checkbox' data-stok-kodu='{item.StokKodu}' {(isChecked ? "checked" : "")} /></td>");
+                    html.AppendLine($"<td>{item.StokKodu}</td>");
+                    html.AppendLine($"<td>{item.Aciklama}</td>");
+                    html.AppendLine($"<td>{item.Birim}</td>");
+                    html.AppendLine($"<td>{item.Fiyat}</td>");
+                    html.AppendLine($"<td>{item.Net}</td>");
+                    html.AppendLine($"<td>{item.Brut}</td>");
+                    html.AppendLine($"<td>{item.Agirlik}</td>");
+                    html.AppendLine($"<td>{item.NetTutar}</td>");
+                    html.AppendLine($"<td>{item.BrutTutar}</td>");
+                    html.AppendLine($"<td>{item.Para}</td>");
+                    html.AppendLine($"<td>{item.Kur}</td>");
+                    html.AppendLine("</tr>");
+                }
+
+                html.AppendLine("</tbody>");
+                html.AppendLine("</table>");
+                html.AppendLine("</div>");
+                html.AppendLine("</div>");
+            }
+
+            return html.ToString();
         }
 
         [AllowAnonymous]

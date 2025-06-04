@@ -142,8 +142,8 @@
                         var resultDate1 = baseDate1.AddDays(daysToAdd1);
                         var faotsayi1 = faott1 - firstItem.FaturaTarihiSayi;
                         var sapma1 = faotsayi1 - firstItem.FaturaVadesi;
-                        var fm1 = ((decimal)66.24 / 360) * sapma1;
-                        var fgg1 = Math.Round((totalPayment * fm1) / 100, 4);
+                        var fm1 = -(((decimal)66.24 / 360) * sapma1);
+                        var fgg1 =   (Math.Round((totalPayment * fm1) / 100, 4));
 
                                                 <tr>
                                                     <td>@firstItem.EvrakNo</td>

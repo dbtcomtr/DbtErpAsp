@@ -133,26 +133,22 @@ public class EmailNotificationService
     // E-posta içeriğini HTML formatında hazırlama metodu
     private string PrepareEmailBody(IzinTalepModel leaveRequest, bool isApproved)
     {
-        // Türkçe tarih formatını ayarla
         CultureInfo trCulture = new CultureInfo("tr-TR");
-
-        // Tarihleri doğru formatla
         string talepTarihi = leaveRequest.TalepTarihi.ToString("dd.MM.yyyy", trCulture);
         string baslangicTarihi = leaveRequest.BaslangicTarihi.ToString("dd.MM.yyyy", trCulture);
         string bitisTarihi = leaveRequest.BitisTarihi.ToString("dd.MM.yyyy", trCulture);
 
-        // İzin saati bilgisini formatla
         string izinSaatText = "Belirtilmemiş";
         if (leaveRequest.IzinSaat > 0)
         {
-            // Ondalık sayı ise virgüllü, tam sayı ise virgülsüz göster
             if (Math.Abs(leaveRequest.IzinSaat % 1) < 0.001)
                 izinSaatText = ((int)leaveRequest.IzinSaat).ToString();
             else
-                izinSaatText = leaveRequest.IzinSaat.ToString("N2", trCulture).Replace(".00", ""); // 2 ondalık basamaklı
+                izinSaatText = leaveRequest.IzinSaat.ToString("N2", trCulture).Replace(".00", "");
         }
 
-        // HTML formatında zengin içerikli e-posta şablonu
+        string loginUrl = _configuration["AppSettings:LoginUrl"] ?? "https://hr.dioki.com.tr/Login/LoginKullanici";
+
         return $@"
 <!DOCTYPE html>
 <html lang=""tr"">
@@ -166,23 +162,20 @@ public class EmailNotificationService
         .content {{ padding: 20px 0; }}
         .details {{ background-color: #f8f9fa; padding: 15px; margin: 15px 0; border-left: 3px solid #007bff; }}
         .footer {{ font-size: 12px; color: #6c757d; margin-top: 30px; border-top: 1px solid #e9ecef; padding-top: 10px; }}
+        a {{ color: #007bff; text-decoration: none; }}
+        a:hover {{ text-decoration: underline; }}
     </style>
 </head>
 <body>
     <div class=""container"">
         <div class=""header"">
-       
             <h1>{(isApproved ? "İzin Talebiniz Onaylandı" : "İzin Talebiniz Reddedildi")}</h1>
         </div>
         <div class=""content"">
-           
             <p>Sayın {leaveRequest.PersonelAdSoyad},</p>
-            
             <p>{(isApproved
-                ? "İzin talebiniz başarıyla onaylanmıştır."
-                : "Üzülerek belirtmek isteriz ki, izin talebiniz reddedilmiştir.")}</p>
-            
-         
+                    ? "İzin talebiniz başarıyla onaylanmıştır."
+                    : "Üzülerek belirtmek isteriz ki, izin talebiniz reddedilmiştir.")} <a href=""{loginUrl}"">Giriş Yap</a></p>
             <div class=""details"">
                 <h3>İzin Detayları:</h3>
                 <p><strong>Talep Tarihi:</strong> {talepTarihi}</p>
@@ -191,14 +184,10 @@ public class EmailNotificationService
                 <p><strong>İzin Günü Sayısı:</strong> {leaveRequest.GunSayisi}</p>
                 <p><strong>İzin Saati:</strong> {izinSaatText}</p>
                 <p><strong>İzin Amacı:</strong> {leaveRequest.Amac ?? "Belirtilmemiş"}</p>
-                
-        
                 {(isApproved ? "" : $@"
                 <p><strong>Red Nedeni:</strong> {leaveRequest.ReddetmeNedeni ?? "Neden belirtilmemiş"}</p>
                 ")}
             </div>
-            
-          
             <p>Detaylı bilgi için İnsan Kaynakları departmanı ile iletişime geçebilirsiniz.</p>
         </div>
     </div>
