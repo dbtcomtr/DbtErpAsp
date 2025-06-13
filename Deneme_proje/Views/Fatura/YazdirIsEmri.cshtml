@@ -14,13 +14,13 @@
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            width: 13cm;
+            width: 17cm;
             height: 10cm;
             overflow: hidden;
         }
 
         .etiket-container {
-            width: 13cm;
+            width: 17cm;
             height: 10cm;
             border: 1px solid #888;
             display: flex;
@@ -144,6 +144,7 @@
             align-items: center;
             justify-content: center;
             flex: 1;
+            width: 100%;
         }
 
         .barcode-text {
@@ -162,14 +163,14 @@
         }
 
         @@page {
-            size: 15cm 10cm;
+            size: 17cm 10cm;
             margin: 0;
             padding: 0;
         }
 
         @@media print {
             html, body {
-                width: 13cm;
+                width: 17cm;
                 height: 10cm;
                 margin: 0;
                 padding: 0;
@@ -178,7 +179,7 @@
 
             .etiket-container {
                 border: none;
-                width: 13cm;
+                width: 17cm;
                 height: 10cm;
                 page-break-inside: avoid;
             }
@@ -251,18 +252,15 @@
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <script>
         window.onload = function () {
-            // Barkod oluşturma - Boyut 2 katına çıkarıldı
+            // Barkod oluşturma - 17cm genişliğe uygun boyut
             JsBarcode("#barcode", "@Model.IsEmriKodu", {
                 format: "CODE128",
                 lineColor: "#000",
-                width: 3,      // 1.5'den 3'e çıkarıldı (2 katı)
-                height: 160,    // 40'dan 80'e çıkarıldı (2 katı)
+                width: 6,      // Daha geniş kağıt için artırıldı
+                height: 160,   
                 displayValue: false,
-                margin: 0
+                margin: 10     // Kenarlardan boşluk
             });
-
-            // QR kod oluşturma
-          
 
             setTimeout(function () {
                 window.print();

@@ -1049,37 +1049,39 @@ ORDER BY krsoztaksit_vade -- Vadeye göre sıralama
         private string GetFullProductionQuery()
         {
             return @"
-    SELECT 
-        i.is_Guid,
-        i.is_Kod,
-        i.is_Ismi,
-        i.is_EmriDurumu,
-        i.is_BaslangicTarihi,
-        rtp.RtP_PlanlananIsMerkezi AS IsMerkezi,
-        im.IsM_Aciklama AS IsMerkeziAciklama,
-        upl.upl_kodu AS UrunKodu,
-        s.sto_isim AS UrunAdi,
-        s.sto_yabanci_isim AS YabanciIsim,
-        s.sto_kisa_ismi AS KisaIsim,
-        s.sto_birim1_ad AS Birim1Ad,
-        s.sto_birim2_ad AS Birim2Ad,
-        s.sto_birim2_katsayi AS Birim2Katsayi,
-        upl.upl_miktar AS Miktar
-    FROM ISEMIRLERI i
-    LEFT JOIN URETIM_MALZEME_PLANLAMA upl 
-        ON upl.upl_isemri = i.is_Kod 
-        AND upl.upl_uretim_tuket = 1
-    LEFT JOIN STOKLAR s 
-        ON s.sto_kod = upl.upl_kodu
-    LEFT JOIN URETIM_ROTA_PLANLARI rtp
-        ON rtp.RtP_IsEmriKodu = i.is_Kod 
-        AND rtp.RtP_UrunKodu = upl.upl_kodu 
-        AND rtp.RtP_SatirNo = 0
-    LEFT JOIN IS_MERKEZLERI im
-        ON im.IsM_Kodu = rtp.RtP_PlanlananIsMerkezi
-    WHERE i.is_EmriDurumu IN (0, 1)
-        AND upl.upl_kodu IS NOT NULL
-    ORDER BY upl.upl_kodu ASC, i.is_BaslangicTarihi DESC;
+SELECT 
+      i.is_Guid,
+      i.is_Kod,
+      i.is_Ismi,
+      i.is_EmriDurumu,
+      i.is_BaslangicTarihi,
+      i.is_Emri_PlanBitisTarihi,
+      rtp.RtP_PlanlananIsMerkezi AS IsMerkezi,
+      im.IsM_Aciklama AS IsMerkeziAciklama,
+      upl.upl_kodu AS UrunKodu,
+      s.sto_isim AS UrunAdi,
+      s.sto_yabanci_isim AS YabanciIsim,
+      s.sto_kisa_ismi AS KisaIsim,
+      s.sto_birim1_ad AS Birim1Ad,
+      s.sto_birim2_ad AS Birim2Ad,
+      s.sto_birim2_katsayi AS Birim2Katsayi,
+      upl.upl_miktar AS Miktar
+  FROM ISEMIRLERI i 
+  LEFT JOIN URETIM_MALZEME_PLANLAMA upl 
+      ON upl.upl_isemri = i.is_Kod 
+      AND upl.upl_uretim_tuket = 1
+  LEFT JOIN STOKLAR s 
+      ON s.sto_kod = upl.upl_kodu
+  LEFT JOIN URETIM_ROTA_PLANLARI rtp
+      ON rtp.RtP_IsEmriKodu = i.is_Kod 
+      AND rtp.RtP_UrunKodu = upl.upl_kodu 
+      AND rtp.RtP_SatirNo = 0
+  LEFT JOIN IS_MERKEZLERI im
+      ON im.IsM_Kodu = rtp.RtP_PlanlananIsMerkezi
+  WHERE i.is_EmriDurumu IN (0, 1)
+      AND upl.upl_kodu IS NOT NULL
+      AND i.is_Emri_PlanBitisTarihi >= CAST(GETDATE() AS DATE)
+  ORDER BY upl.upl_kodu ASC, i.is_BaslangicTarihi DESC;
     ";
         }
 
@@ -1087,38 +1089,41 @@ ORDER BY krsoztaksit_vade -- Vadeye göre sıralama
         private string GetLimitedProductionQuery()
         {
             return @"
-    SELECT 
-        i.is_Guid,
-        i.is_Kod,
-        i.is_Ismi,
-        i.is_EmriDurumu,
-        i.is_BaslangicTarihi,
-        rtp.RtP_PlanlananIsMerkezi AS IsMerkezi,
-        im.IsM_Aciklama AS IsMerkeziAciklama,
-        upl.upl_kodu AS UrunKodu,
-        s.sto_isim AS UrunAdi,
-        s.sto_yabanci_isim AS YabanciIsim,
-        s.sto_kisa_ismi AS KisaIsim,
-        s.sto_birim1_ad AS Birim1Ad,
-        s.sto_birim2_ad AS Birim2Ad,
-        s.sto_birim2_katsayi AS Birim2Katsayi,
-        upl.upl_miktar AS Miktar
-    FROM ISEMIRLERI i
-    LEFT JOIN URETIM_MALZEME_PLANLAMA upl 
-        ON upl.upl_isemri = i.is_Kod 
-        AND upl.upl_uretim_tuket = 1
-    LEFT JOIN STOKLAR s 
-        ON s.sto_kod = upl.upl_kodu
-    LEFT JOIN URETIM_ROTA_PLANLARI rtp
-        ON rtp.RtP_IsEmriKodu = i.is_Kod 
-        AND rtp.RtP_UrunKodu = upl.upl_kodu 
-        AND rtp.RtP_SatirNo = 0
-    LEFT JOIN IS_MERKEZLERI im
-        ON im.IsM_Kodu = rtp.RtP_PlanlananIsMerkezi
-    WHERE i.is_EmriDurumu IN (0, 1)
-        AND rtp.RtP_PlanlananIsMerkezi = '010'
-        AND upl.upl_kodu IS NOT NULL
-    ORDER BY upl.upl_kodu ASC, i.is_BaslangicTarihi DESC;
+SELECT 
+      i.is_Guid,
+      i.is_Kod,
+      i.is_Ismi,
+      i.is_EmriDurumu,
+      i.is_BaslangicTarihi,
+      i.is_Emri_PlanBitisTarihi,
+      rtp.RtP_PlanlananIsMerkezi AS IsMerkezi,
+      im.IsM_Aciklama AS IsMerkeziAciklama,
+      upl.upl_kodu AS UrunKodu,
+      s.sto_isim AS UrunAdi,
+      s.sto_yabanci_isim AS YabanciIsim,
+      s.sto_kisa_ismi AS KisaIsim,
+      s.sto_birim1_ad AS Birim1Ad,
+      s.sto_birim2_ad AS Birim2Ad,
+      s.sto_birim2_katsayi AS Birim2Katsayi,
+      upl.upl_miktar AS Miktar
+  FROM ISEMIRLERI i 
+  LEFT JOIN URETIM_MALZEME_PLANLAMA upl 
+      ON upl.upl_isemri = i.is_Kod 
+      AND upl.upl_uretim_tuket = 1
+  LEFT JOIN STOKLAR s 
+      ON s.sto_kod = upl.upl_kodu
+  LEFT JOIN URETIM_ROTA_PLANLARI rtp
+      ON rtp.RtP_IsEmriKodu = i.is_Kod 
+      AND rtp.RtP_UrunKodu = upl.upl_kodu 
+      AND rtp.RtP_SatirNo = 0
+  LEFT JOIN IS_MERKEZLERI im
+      ON im.IsM_Kodu = rtp.RtP_PlanlananIsMerkezi
+  WHERE i.is_EmriDurumu IN (0, 1)
+     AND rtp.RtP_PlanlananIsMerkezi = '010'
+      AND upl.upl_kodu IS NOT NULL
+      AND i.is_Emri_PlanBitisTarihi >= CAST(GETDATE() AS DATE)
+  ORDER BY upl.upl_kodu ASC, i.is_BaslangicTarihi DESC;
+
     ";
         }
 
