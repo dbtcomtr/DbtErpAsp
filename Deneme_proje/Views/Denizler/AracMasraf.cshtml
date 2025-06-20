@@ -11,7 +11,6 @@
 
 }
 
-
 <link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
 <link href="~/content/assets/css/site.css" rel="stylesheet" />
 <style>
@@ -28,9 +27,7 @@
     html, body {
         height: 100%;
         margin: 0;
-        /* overflow: auto; */
     }
-
 
     .table {
         margin-bottom: 0rem;
@@ -40,7 +37,6 @@
         padding: 0px !important;
     }
 
-    /* Genel düzenleme */
     .column-width {
         overflow: hidden;
         text-overflow: ellipsis;
@@ -53,8 +49,6 @@
     .table-responsive th, .table-responsive td {
         padding: 2px 10px;
     }
-
-
 
     .tablo-th-baslik th {
         color: black;
@@ -127,46 +121,118 @@
     }
 
     @@media print {
-        .print-header {
-            display: block !important;
-            text-align: left;
-            margin-bottom: 20px;
+        table {
+            width: 100%;
+            font-size: 8px !important; /* Font boyutu 8px */
+            font-family: Arial, sans-serif;
+            border-collapse: collapse;
+            table-layout: fixed;
         }
 
-        .no-print {
-            display: none !important;
+        td, th {
+          /*   padding: 2px 2px; */
+            line-height: 1.2;
+            border: 1px solid #E5E7EB;
+            font-size: 8px !important; /* Hücreler için de 8px */
         }
 
-        .main-content {
-            margin-top: 0 !important;
+        th {
+            background-color: #F3F4F6;
+            color: #1E3A8A;
+            font-weight: bold;
         }
 
-        .card-header, .form-group, .btn {
-            display: none !important;
+        .table-striped > tbody > tr:last-child {
+            background-color: #FFF7ED;
+            font-weight: bold;
         }
 
-        .card {
-            box-shadow: none !important;
-            border: none !important;
+            .table-striped > tbody > tr:last-child td {
+                color: #B8860B;
+                font-size: 8px !important; /* Son satır için de 8px */
+            }
+
+        h5 {
+            font-size: 6px !important; /* Başlıklar için */
+            color: #B8860B;
+         /*    margin: 8px 0 4px; */
         }
 
-        .table-container, .table-responsive {
-            page-break-inside: avoid;
+        h3 {
+            font-size: 6px !important; /* Başlıklar için */
+            color: #1E3A8A;
+       /*      margin: 10px 0 5px; */
         }
+        .print-header
+
+    {
+        display: block !important;
+        text-align: center;
+/*         margin-bottom: 15px; */
+        border-bottom: 2px solid #1E3A8A;
+    /*     padding-bottom: 5px; */
     }
+
+    .print-header h3 {
+        font-size: 8pt !important;
+        color: #1E3A8A;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .print-header p {
+        font-size: 6pt !important;
+        color: #374151;
+        margin: 2px 0;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .main-content {
+        margin-top: 0 !important;
+    }
+
+    .card-header, .form-group, .btn {
+        display: none !important;
+    }
+
+    .card {
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    .table-container, .table-responsive {
+        page-break-inside: avoid;
+ /*        margin-bottom: 3px; */
+    }
+
+  
+
+    .table-striped > tbody > tr:last-child {
+        background-color: #FFF7ED;
+        font-weight: bold;
+    }
+
+        .table-striped > tbody > tr:last-child td {
+            color: #B8860B;
+        }
+
+    }
+    
 </style>
 
+<!-- HTML içeriği aynı kaldı -->
 <div class="main-content mt-5">
     <div class="px-lg-5 px-3">
         <div class="row no-print">
             <div class="col-sm-12 p-0 no-print">
                 <div class="main-header">
-
                     <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
                         <li class="breadcrumb-item">
                             <a href="/Home/Index"><i class="icofont icofont-home"></i></a>
                         </li>
-
                     </ol>
                 </div>
             </div>
@@ -174,18 +240,16 @@
 
         <!-- Print-only header -->
         <div class="print-header" style="display: none;">
-            <h3 style="text-align:center"><span id="printSrmKodu">@(string.IsNullOrEmpty(HttpContextAccessor.HttpContext.Request.Query["srmKodu"]) ? "Seçilmedi" : HttpContextAccessor.HttpContext.Request.Query["srmKodu"])</span>Araç Masrafı Raporu</h3>
+            <h3>Araç Masrafı Raporu</h3>
+            <p><strong>Sorumlu Kodu:</strong> <span id="printSrmKodu">@(string.IsNullOrEmpty(HttpContextAccessor.HttpContext.Request.Query["srmKodu"]) ? "Seçilmedi" : HttpContextAccessor.HttpContext.Request.Query["srmKodu"])</span></p>
             <p><strong>Başlama Tarihi:</strong> <span id="printBaslamaTarihi">@Model.BaslamaTarihi.ToString("dd.MM.yyyy")</span></p>
             <p><strong>Bitiş Tarihi:</strong> <span id="printBitisTarihi">@Model.BitisTarihi.ToString("dd.MM.yyyy")</span></p>
             <p><strong>Proje Kodu:</strong> <span id="printProjeKodu">@(string.IsNullOrEmpty(HttpContextAccessor.HttpContext.Request.Query["projeKodu"]) ? "Seçilmedi" : HttpContextAccessor.HttpContext.Request.Query["projeKodu"])</span></p>
-
-            <hr />
         </div>
+
         <div class="row mb-lg-5 mb-1">
             <div class="card">
-                <div class="card-header d-flex justify-content-between">
-                    <!-- Header içeriği buraya gelecek -->
-                </div>
+                <div class="card-header d-flex justify-content-between"></div>
                 <div class="row d-flex justify-content-center">
                     <div class="col-md-4 d-flex flex-column justify-content-center">
                         <form id="veri" method="get" class="mb-4 px-5 pt-5">
@@ -201,7 +265,6 @@
                                     <label for="bitisTarihi">Bitiş Tarihi:</label>
                                     <input type="date" id="bitisTarihi" name="bitisTarihi" class="form-control form-control-sm" required value="@Model.BitisTarihi.ToString("yyyy-MM-dd")" />
                                 </div>
-                                <!-- Proje Kodu Input ve Datalist -->
                                 <div class="form-group col">
                                     <label for="projeKoduInput">Proje Kodu:</label>
                                     <input type="text" id="projeKoduInput" name="projeKodu" class="form-control form-control-sm" list="projeKoduList" placeholder="Proje Kodu / Adı Ara..." />
@@ -212,8 +275,6 @@
                                         }
                                     </datalist>
                                 </div>
-
-                                <!-- Sorumlu Kodu Input ve Datalist -->
                                 <div class="form-group col">
                                     <label for="srmKodu">Sorumlu Kodu:</label>
                                     <input type="text" id="srmKodu" name="srmKodu" class="form-control form-control-sm" list="srmKoduList" placeholder="Sorumlu Kodu Ara..." />
@@ -224,9 +285,6 @@
                                         }
                                     </datalist>
                                 </div>
-
-
-
                                 <div class="form-group col-md-12 text-right mt-3">
                                     <button type="submit" class="btn btn-primary btn-sm">Verileri Getir</button>
                                     <button type="button" id="resetButton" class="btn btn-secondary btn-sm ml-2">Seçimleri Sıfırla</button>
@@ -359,7 +417,6 @@
                                     </tbody>
                                 </table>
                             </div>
-
                             <div class="table-responsive">
                                 <h5>Araç Bilgileri</h5>
                                 <table id="denizler_srm_tablo" class="table table-bordered table-striped tablo-th-baslik">
@@ -410,39 +467,39 @@
                                         {
                                             <tr>
                                                 <th>Firma Adı</th>
-                                                <td class="tooltip-cell">0</td>
+                                                <td class="tooltip-cell">Veri yok</td>
                                             </tr>
                                             <tr>
                                                 <th>Araç Marka</th>
-                                                <td class="tooltip-cell">0</td>
+                                                <td class="tooltip-cell">Veri yok</td>
                                             </tr>
                                             <tr>
                                                 <th>Araç Modeli</th>
-                                                <td class="tooltip-cell">0</td>
+                                                <td class="tooltip-cell">Veri yok</td>
                                             </tr>
                                             <tr>
                                                 <th>Araç Model Yılı</th>
-                                                <td class="tooltip-cell">0</td>
+                                                <td class="tooltip-cell">Veri yok</td>
                                             </tr>
                                             <tr>
                                                 <th>Ruhsat Seri No</th>
-                                                <td class="tooltip-cell">0</td>
+                                                <td class="tooltip-cell">Veri yok</td>
                                             </tr>
                                             <tr>
                                                 <th>Şase No</th>
-                                                <td class="tooltip-cell">0</td>
+                                                <td class="tooltip-cell">Veri yok</td>
                                             </tr>
                                             <tr>
                                                 <th>Muayene Bitiş Tarihi</th>
-                                                <td class="tooltip-cell">0</td>
+                                                <td class="tooltip-cell">Veri yok</td>
                                             </tr>
                                             <tr>
                                                 <th>Kullanıcı Adı</th>
-                                                <td class="tooltip-cell">0</td>
+                                                <td class="tooltip-cell">Veri yok</td>
                                             </tr>
                                             <tr>
                                                 <th>Kullanıcı Adı (İkinci)</th>
-                                                <td class="tooltip-cell">0</td>
+                                                <td class="tooltip-cell">Veri yok</td>
                                             </tr>
                                         }
                                     </tbody>
@@ -473,13 +530,9 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                @if (Model.Denizler1Data != null || Model.Denizler2Data != null || Model.Denizler3Data != null || Model.Denizler4Data != null)
-                {
                     <div class="card-body px-5">
-                        <!-- Denizler 2 Data -->
                         <div class="row">
-                            <div class="col-md-6 mb-4" style=" page-break-before: always;">
+                            <div class="col-md-6 mb-4" style="page-break-before: always;">
                                 <h5 class="pb-3">Sanayide Yapılan</h5>
                                 <div class="table-responsive">
                                     <table id="denizler2tablo" class="table table-bordered table-striped">
@@ -510,7 +563,6 @@
                                                     <td class="column-width tooltip-cell" style="text-align: right" title="@item.Tutar">@string.Format("{0:N2}₺", item.Tutar)</td>
                                                 </tr>
                                             }
-                                            <!-- Toplam Satırı -->
                                             <tr>
                                                 <td colspan="3" style="text-align: right;"><strong>Toplam:</strong></td>
                                                 <td style="text-align: right;">
@@ -528,9 +580,7 @@
                                     </table>
                                 </div>
                             </div>
-
-                            <!-- Denizler 3 Data -->
-                            <div class="col-md-6 mb-4" style=" page-break-before: always;">
+                            <div class="col-md-6 mb-4" style="page-break-before: always;">
                                 <h5 class="pb-3">Stokta Kullanılan</h5>
                                 <div class="table-responsive">
                                     <table id="denizler3tablo" class="table table-bordered table-striped">
@@ -578,549 +628,348 @@
                                     </table>
                                 </div>
                             </div>
-
-                            <div class="col-md-6 mb-4" style=" page-break-before: always;">
-                            
-                            </div>
-
+                            <div class="col-md-6 mb-4" style="page-break-before: always;"></div>
                         </div>
                     </div>
-                }
-                else
-                {
+                    }
+                    else
+                    {
                     <div class="alert alert-warning" role="alert">
                         Veri bulunamadı. Lütfen tarih aralığını girip tekrar deneyin.
                     </div>
-                }
-
+                    }
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.flash.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.flash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
- <script>
-    $(document).ready(function () {
-        // Her iki tablo için DataTable özelliklerini uygula
-        $('#denizler1tablo, #denizler2tablo').DataTable({
-            responsive: true,
-            dom: '<"row"<"col-sm-12"B>>' +
-                '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
-                't' +
-                '<"row"<"col-sm-6"i><"col-sm-6"p>>',
-            language: {
-                url: "/Content/DataTables/turkish.json" // Türkçe dil dosyası
-            },
-            buttons: [
-                'copy', 'csv', 'excel', 'pdf', 'print'  // Export butonları
-            ],
-            paging: true,  // Sayfalama
-            searching: true,  // Arama
-            ordering: true  // Sıralama
+    <script>
+        $(document).ready(function () {
+            // DataTable başlatma
+            $('#denizler1tablo, #denizler2tablo').DataTable({
+                responsive: true,
+                dom: '<"row"<"col-sm-12"B>>' +
+                    '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+                    't' +
+                    '<"row"<"col-sm-6"i><"col-sm-6"p>>',
+                language: {
+                    url: "/Content/DataTables/turkish.json"
+                },
+                buttons: [
+                    'copy', 'csv', 'excel', 'pdf', 'print'
+                ],
+                paging: true,
+                searching: true,
+                ordering: true
+            });
+
+            // Select2 başlatma
+            $('#projeKoduInput').select2({
+                placeholder: "Proje kodu ara...",
+                allowClear: true
+            });
+
+            $('#srmKodu').select2({
+                placeholder: "Sorumlu kodu ara...",
+                allowClear: true,
+                dropdownParent: $('.form-group') // Select2 açılır menüsünün doğru konumda görünmesi için
+            });
         });
-    });
-</script>
- <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        new DataTable('#example');
-        new DataTable('#second_table');
-    });
-</script>
- <script>
-    function filterTable(columnIndex, tableId) {
-        var input, filter, table, tr, td, i, txtValue;
-        input = document.querySelectorAll("#" + tableId + " thead tr:nth-child(2) th input")[columnIndex];
-        filter = input.value.toUpperCase();
-        table = document.getElementById(tableId);
-        tr = table.getElementsByTagName("tr");
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('veri');
+            const baslamaTarihi = document.getElementById('baslamaTarihi');
+            const bitisTarihi = document.getElementById('bitisTarihi');
+            const projeKoduInput = document.getElementById('projeKoduInput');
+            const srmKodu = document.getElementById('srmKodu');
+            const resetButton = document.getElementById('resetButton');
 
-        // Tablo satırlarını filtreleme işlemi
-        for (i = 2; i < tr.length; i++) { // İlk iki satır başlık ve arama kutuları
-            td = tr[i].getElementsByTagName("td")[columnIndex];
-            if (td) {
-                txtValue = td.textContent || td.innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    tr[i].style.display = ""; // Eşleşen satırları gösteriyoruz
-                } else {
-                    tr[i].style.display = "none"; // Eşleşmeyen satırları gizliyoruz
-                }
-            }
-        }
-    }
-</script>
-
- <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // URL parametrelerinden seçimleri geri yükle
-        const urlParams = new URLSearchParams(window.location.search);
-        const projeKodu = urlParams.get('projeKodu');
-        const srmKodu = urlParams.get('srmKodu');
-
-        // Seçimleri URL parametrelerinden al ve formda ayarla
-        if (projeKodu) {
-            document.getElementById('projeKodu').value = projeKodu;
-        }
-
-        if (srmKodu) {
-            document.getElementById('srmKodu').value = srmKodu;
-        }
-
-        // `localStorage`'dan seçimleri geri yükle
-        restoreSelections();
-
-        // Seçimleri sıfırlama butonuna işlev ekle
-        document.getElementById('resetButton').addEventListener('click', function () {
-            document.querySelector('#veri').reset();
-            const url = new URL(window.location.href);
-            url.searchParams.delete('projeKodu');
-            url.searchParams.delete('srmKodu');
-            window.history.replaceState({}, '', url);
-            localStorage.removeItem('projeKodu');
-            localStorage.removeItem('srmKodu');
-        });
-
-
-
-        function restoreSelections() {
-            // LocalStorage'daki seçimleri geri yükle
-            const savedProjeKodu = localStorage.getItem('projeKodu');
-            const savedSrmKodu = localStorage.getItem('srmKodu');
+            // URL parametrelerini al ve formu doldur
+            const urlParams = new URLSearchParams(window.location.search);
+            const savedProjeKodu = urlParams.get('projeKodu') || localStorage.getItem('projeKodu');
+            const savedSrmKodu = urlParams.get('srmKodu') || localStorage.getItem('srmKodu');
 
             if (savedProjeKodu) {
-                document.getElementById('projeKodu').value = savedProjeKodu;
+                projeKoduInput.value = savedProjeKodu;
+                $(projeKoduInput).trigger('change'); // Select2 için tetikleme
             }
 
             if (savedSrmKodu) {
-                document.getElementById('srmKodu').value = savedSrmKodu;
-            }
-        }
-
-</script>
- <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const srmKoduInput = document.getElementById("srmKodu");
-
-        // Input elemanına `change` olayı ekleniyor
-        srmKoduInput.addEventListener("change", function () {
-            console.log("Seçilen Sorumlu Kodu:", srmKoduInput.value);
-        });
-    });
-    document.addEventListener("DOMContentLoaded", function () {
-        // URL parametrelerinden seçimleri geri yükle
-        const urlParams = new URLSearchParams(window.location.search);
-        const projeKodu = urlParams.get('projeKodu');
-        const srmKodu = urlParams.get('srmKodu');
-
-        // Seçimleri URL parametrelerinden al ve formda ayarla
-        if (projeKodu) {
-            document.getElementById('projeKodu').value = projeKodu;
-        }
-
-        if (srmKodu) {
-            document.getElementById('srmKodu').value = srmKodu;
-        }
-
-        // `localStorage`'dan seçimleri geri yükle
-        restoreSelections();
-
-        // Seçimleri sıfırlama butonuna işlev ekle
-        document.getElementById('resetButton').addEventListener('click', function () {
-            document.querySelector('#veri').reset();
-            const url = new URL(window.location.href);
-            url.searchParams.delete('projeKodu');
-            url.searchParams.delete('srmKodu');
-            window.history.replaceState({}, '', url);
-            localStorage.removeItem('projeKodu');
-            localStorage.removeItem('srmKodu');
-        });
-
-        // Yazdırma butonuna işlev ekle
-        document.getElementById('printButton').addEventListener('click', function (e) {
-            e.preventDefault(); // Sayfanın yenilenmesini engelle
-            saveSelections(); // Seçimleri `localStorage`'a kaydet
-            printPage(); // Yazdırma işlemini başlat
-        });
-    });
-
-    function saveSelections() {
-        const projeKodu = document.getElementById('projeKodu').value;
-        const srmKodu = document.getElementById('srmKodu').value;
-
-        // Seçimleri localStorage'a kaydet
-        localStorage.setItem('projeKodu', projeKodu);
-        localStorage.setItem('srmKodu', srmKodu);
-    }
-
-    function restoreSelections() {
-        // LocalStorage'daki seçimleri geri yükle
-        const savedProjeKodu = localStorage.getItem('projeKodu');
-        const savedSrmKodu = localStorage.getItem('srmKodu');
-
-        if (savedProjeKodu) {
-            document.getElementById('projeKodu').value = savedProjeKodu;
-        }
-
-        if (savedSrmKodu) {
-            document.getElementById('srmKodu').value = savedSrmKodu;
-        }
-    }
-
-        function printPage() {
-            // Get the selected value from input
-            var srmKoduInput = document.getElementById('srmKodu');
-            var srmKoduList = document.getElementById('srmKoduList');
-            var selectedValue = srmKoduInput.value;
-
-            // Find matching option text from datalist
-            var selectedOption = Array.from(srmKoduList.options).find(option => option.value === selectedValue);
-            var selectedText = selectedOption ? selectedOption.text : selectedValue;
-
-            var printContents = '';
-
-            // Add a normal text line with selected responsibility code at the top
-            printContents += '<p style="text-align: center; font-weight: bold;">SEÇİLMİŞ OLAN SORUMLULUK KODU: ' + selectedText + '</p>';
-
-            // Get other form values
-            var baslamaTarihi = document.getElementById('baslamaTarihi').value;
-            var bitisTarihi = document.getElementById('bitisTarihi').value;
-            var projeKodu = document.getElementById('projeKodu').selectedOptions[0].text;
-
-            // Add report details
-            printContents += '<p><strong>Rapor Başlangıç- Bitiş Tarihi:</strong> ' + baslamaTarihi + " / " + bitisTarihi + '</p>';
-            printContents += '<p><strong>Proje Kodu:</strong> ' + projeKodu + '</p>';
-
-            // Add table styles
-            printContents += `<style>
-        table {
-            width: 100%;
-            font-size: 8pt;
-            line-height: 1.2;
-            table-layout: fixed;
-        }
-        td, th {
-            padding: 2px;
-            line-height: 1.2;
-        }
-    </style>`;
-
-            // Add tables if they exist
-            var denizlerTablo = document.getElementById('denizlertablo');
-            if (denizlerTablo) {
-                printContents += '<h5 style="color: red">Gelir Gider Tabloları</h5>' + denizlerTablo.outerHTML;
+                srmKodu.value = savedSrmKodu;
+                $(srmKodu).trigger('change'); // Select2 için tetikleme
             }
 
-            var denizlerSrmTablo = document.getElementById('denizler_srm_tablo');
-            if (denizlerSrmTablo) {
-                printContents += '<h5 style="color: red">Sorumluluk Merkezi Verileri</h5>' + denizlerSrmTablo.outerHTML;
+            // Form değerlerini kaydet
+            function saveFormValues() {
+                const formValues = {
+                    baslamaTarihi: baslamaTarihi.value,
+                    bitisTarihi: bitisTarihi.value,
+                    projeKodu: projeKoduInput.value,
+                    srmKodu: srmKodu.value
+                };
+                localStorage.setItem('formValues', JSON.stringify(formValues));
+                localStorage.setItem('projeKodu', projeKoduInput.value);
+                localStorage.setItem('srmKodu', srmKodu.value);
+
+                // URL parametrelerini güncelle
+                const url = new URL(window.location);
+                url.searchParams.set('projeKodu', projeKoduInput.value);
+                url.searchParams.set('srmKodu', srmKodu.value);
+                window.history.replaceState({}, '', url);
             }
 
-            var denizler1Tablolar = document.querySelectorAll('#denizler1tablo');
-            denizler1Tablolar.forEach(function (tablo) {
-                printContents += '<h5 style="color: red">Araç Özeti</h5>' + tablo.outerHTML;
+            // Form gönderildiğinde kaydet
+            form.addEventListener('submit', function (e) {
+                saveFormValues();
             });
 
-            var denizler2Tablo = document.getElementById('denizler2tablo');
+            // Değerler değiştiğinde kaydet
+            [baslamaTarihi, bitisTarihi, projeKoduInput, srmKodu].forEach(element => {
+                if (element) {
+                    element.addEventListener('change', saveFormValues);
+                }
+            });
+
+            // Select2 değişikliğinde kaydet
+            $(srmKodu).on('select2:select', function () {
+                saveFormValues();
+            });
+
+            $(projeKoduInput).on('select2:select', function () {
+                saveFormValues();
+            });
+
+            // Formu sıfırla
+            resetButton.addEventListener('click', function () {
+                localStorage.removeItem('formValues');
+                localStorage.removeItem('projeKodu');
+                localStorage.removeItem('srmKodu');
+                form.reset();
+                $(projeKoduInput).val(null).trigger('change');
+                $(srmKodu).val(null).trigger('change');
+                const url = new URL(window.location);
+                url.searchParams.delete('projeKodu');
+                url.searchParams.delete('srmKodu');
+                window.history.replaceState({}, '', url);
+            });
+        });
+
+        function printPage() {
+            const srmKoduInput = document.getElementById('srmKodu');
+            const srmKoduList = document.getElementById('srmKoduList');
+            const selectedValue = srmKoduInput.value;
+
+            const selectedOption = Array.from(srmKoduList.options).find(option => option.value === selectedValue);
+            const selectedText = selectedOption ? selectedOption.text : selectedValue || 'Seçilmedi';
+
+            let printContents = '';
+
+            printContents += '<div style="text-align: center; font-weight: bold; font-size: 8pt; color: #1E3A8A; margin-bottom: 10px;">SEÇİLMİŞ OLAN SORUMLULUK KODU: ' + selectedText + '</div>';
+
+            const baslamaTarihi = document.getElementById('baslamaTarihi').value;
+            const bitisTarihi = document.getElementById('bitisTarihi').value;
+            const projeKodu = document.getElementById('projeKoduInput').value || 'Seçilmedi';
+
+            printContents += '<p style="font-size: 6pt; color: #374151;"><strong>Rapor Başlangıç-Bitiş Tarihi:</strong> ' + baslamaTarihi + " / " + bitisTarihi + '</p>';
+            printContents += '<p style="font-size: 6pt; color: #374151;"><strong>Proje Kodu:</strong> ' + projeKodu + '</p>';
+
+            printContents += `<style>
+                table {
+                    width: 100%;
+                    font-size: 8px; /* Font boyutu 8px olarak güncellendi */
+                    font-family: Arial, sans-serif;
+                    border-collapse: collapse;
+                    table-layout: fixed;
+                }
+                td, th {
+                    padding: 2px 5px;
+                    line-height: 1.2;
+                    border: 1px solid #E5E7EB;
+                }
+                th {
+                    background-color: #F3F4F6;
+                    color: #1E3A8A;
+                    font-weight: bold;
+                }
+                .table-striped > tbody > tr:last-child {
+                    background-color: #FFF7ED;
+                    font-weight: bold;
+                }
+                .table-striped > tbody > tr:last-child td {
+                    color: #B8860B;
+                }
+            </style>`;
+
+            const denizlerTablo = document.getElementById('denizlertablo');
+            if (denizlerTablo) {
+                printContents += '<h5 style="color: #B8860B; font-size: 2pt; margin: 8px 0 4px;">Gelir Gider Tabloları</h5>' + denizlerTablo.outerHTML;
+            }
+
+            const denizlerSrmTablo = document.getElementById('denizler_srm_tablo');
+            if (denizlerSrmTablo) {
+                printContents += '<h5 style="color: #B8860B; font-size: 2pt; margin: 8px 0 4px;">Sorumluluk Merkezi Verileri</h5>' + denizlerSrmTablo.outerHTML;
+            }
+
+            const denizler1Tablolar = document.querySelectorAll('#denizler1tablo');
+            denizler1Tablolar.forEach(function (tablo) {
+                printContents += '<h5 style="color: #B8860B; font-size: 2pt; margin: 8px 0 4px;">Araç Özeti</h5>' + tablo.outerHTML;
+            });
+
+            const denizler2Tablo = document.getElementById('denizler2tablo');
             if (denizler2Tablo) {
-                printContents += '<h3>Sanayide Yapılan</h3>' + denizler2Tablo.outerHTML;
+                printContents += '<h3 style="color: #1E3A8A; font-size: 8pt; margin: 10px 0 5px;">Sanayide Yapılan</h3>' + denizler2Tablo.outerHTML;
             }
 
-            var denizler3Tablo = document.getElementById('denizler3tablo');
+            const denizler3Tablo = document.getElementById('denizler3tablo');
             if (denizler3Tablo) {
-                printContents += '<h3>Stokta Kullanılan</h3>' + denizler3Tablo.outerHTML;
+                printContents += '<h3 style="color: #1E3A8A; font-size: 8pt; margin: 10px 0 5px;">Stokta Kullanılan</h3>' + denizler3Tablo.outerHTML;
             }
 
-            // Print the content
-            var originalContents = document.body.innerHTML;
+            const originalContents = document.body.innerHTML;
             document.body.innerHTML = printContents;
             window.print();
             document.body.innerHTML = originalContents;
 
-            // Restore selections if needed
-            if (typeof restoreSelections === 'function') {
-                restoreSelections();
+            // Form değerlerini geri yükle
+            const savedProjeKodu = localStorage.getItem('projeKodu');
+            const savedSrmKodu = localStorage.getItem('srmKodu');
+            if (savedProjeKodu) {
+                projeKoduInput.value = savedProjeKodu;
+                $(projeKoduInput).trigger('change');
+            }
+            if (savedSrmKodu) {
+                srmKodu.value = savedSrmKodu;
+                $(srmKodu).trigger('change');
             }
         }
 
+        function filterTable(columnIndex, tableId) {
+            const input = document.querySelectorAll("#" + tableId + " thead tr:nth-child(2) th input")[columnIndex];
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById(tableId);
+            const tr = table.getElementsByTagName("tr");
+            let visibleRows = [];
 
-
-</script>
-
-
-<script>
-    $(document).ready(function () {
-        // Proje kodu ve sorumlu kodu select'lerine Select2 uygulama
-        $('#projeKodu').select2({
-            placeholder: "Proje kodu ara...",
-            allowClear: true
-        });
-
-        $('#srmKodu').select2({
-            placeholder: "Sorumlu kodu ara...",
-            allowClear: true
-        });
-    });
-</script>
-
- <script>
-      // Filtreleme fonksiyonu
-    document.getElementById('srmKoduFilter').addEventListener('keyup', function () {
-        var filterValue = this.value.toLowerCase();
-        var select = document.getElementById('srmKodu');
-        var options = select.getElementsByTagName('option');
-
-        // Her bir option üzerinde arama yap
-        for (var i = 1; i < options.length; i++) { // İlk option "Seçiniz" olduğu için 1'den başlıyoruz
-            var optionText = options[i].textContent.toLowerCase();
-            if (optionText.includes(filterValue)) {
-                options[i].style.display = ''; // Göster
-            } else {
-                options[i].style.display = 'none'; // Gizle
-            }
-        }
-    });
-</script>
-
- <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.getElementById('veri');
-        const baslamaTarihi = document.getElementById('baslamaTarihi');
-        const bitisTarihi = document.getElementById('bitisTarihi');
-        const projeKoduInput = document.getElementById('projeKoduInput');
-        const srmKodu = document.getElementById('srmKodu');
-        const resetButton = document.getElementById('resetButton');
-
-        // Only restore values if there are URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.toString()) {
-            restoreFormValues();
-        }
-
-        form.addEventListener('submit', function () {
-            saveFormValues();
-        });
-
-        [baslamaTarihi, bitisTarihi, projeKoduInput, srmKodu].forEach(element => {
-            if (element) {
-                element.addEventListener('change', saveFormValues);
-            }
-        });
-
-        resetButton.addEventListener('click', function () {
-            localStorage.removeItem('formValues');
-            form.reset();
-        });
-
-        function saveFormValues() {
-            const formValues = {
-                baslamaTarihi: baslamaTarihi.value,
-                bitisTarihi: bitisTarihi.value,
-                projeKodu: projeKoduInput.value,
-                srmKodu: srmKodu.value
-            };
-            localStorage.setItem('formValues', JSON.stringify(formValues));
-        }
-
-        function restoreFormValues() {
-            const savedValues = localStorage.getItem('formValues');
-            if (savedValues) {
-                const formValues = JSON.parse(savedValues);
-
-                if (formValues.baslamaTarihi) baslamaTarihi.value = formValues.baslamaTarihi;
-                if (formValues.bitisTarihi) bitisTarihi.value = formValues.bitisTarihi;
-                if (formValues.projeKodu) projeKoduInput.value = formValues.projeKodu;
-                if (formValues.srmKodu) srmKodu.value = formValues.srmKodu;
-            }
-        }
-    });
-
-            function filterTable(columnIndex, tableId) {
-        var input, filter, table, tr, td, i, txtValue;
-        input = document.querySelectorAll("#" + tableId + " thead tr:nth-child(2) th input")[columnIndex];
-        filter = input.value.toUpperCase();
-        table = document.getElementById(tableId);
-        tr = table.getElementsByTagName("tr");
-
-        // Keep track of visible rows for calculation
-        var visibleRows = [];
-
-        // Tablo satırlarını filtreleme işlemi
-        for (i = 2; i < tr.length - 1; i++) { // Skip header rows and total row
-            td = tr[i].getElementsByTagName("td")[columnIndex];
-            if (td) {
-                txtValue = td.textContent || td.innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    tr[i].style.display = ""; // Eşleşen satırları gösteriyoruz
-                    visibleRows.push(tr[i]);
-                } else {
-                    tr[i].style.display = "none"; // Eşleşmeyen satırları gizliyoruz
+            for (let i = 2; i < tr.length - 1; i++) {
+                const td = tr[i].getElementsByTagName("td")[columnIndex];
+                if (td) {
+                    const txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                        visibleRows.push(tr[i]);
+                    } else {
+                        tr[i].style.display = "none";
+                    }
                 }
             }
-        }
 
-        // Update totals based on visible rows
-        updateSubtotals(tableId, visibleRows);
-    }
-
-    function updateSubtotals(tableId, visibleRows) {
-        var table = document.getElementById(tableId);
-        var totalRow = table.rows[table.rows.length - 1]; // Last row is total row
-
-        // For denizler2tablo and denizler3tablo
-        if (tableId === 'denizler2tablo' || tableId === 'denizler3tablo') {
-            // Reset totals
-            var totalMiktar = 0;
-            var totalTutar = 0;
-
-            // Calculate totals from visible rows
-            for (var i = 0; i < visibleRows.length; i++) {
-                var row = visibleRows[i];
-                var miktarCell = row.cells[3]; // Miktar column
-                var tutarCell = row.cells[4];  // Tutar column
-
-                // Extract numeric values (remove currency symbol and formatting)
-                var miktarValue = parseFloat(miktarCell.textContent.replace(/\./g, '').replace(',', '.'));
-                var tutarValue = parseFloat(tutarCell.textContent.replace('₺', '').replace(/\./g, '').replace(',', '.'));
-
-                if (!isNaN(miktarValue)) totalMiktar += miktarValue;
-                if (!isNaN(tutarValue)) totalTutar += tutarValue;
-            }
-
-            // Update total cells with new values
-            var totalMiktarCell = totalRow.cells[totalRow.cells.length - 2]; // Second last cell
-            var totalTutarCell = totalRow.cells[totalRow.cells.length - 1]; // Last cell
-
-            // Format numbers with Turkish formatting
-            totalMiktarCell.innerHTML = '<strong>' + totalMiktar.toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '</strong>';
-            totalTutarCell.innerHTML = '<strong>' + totalTutar.toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '₺</strong>';
-        }
-
-        // If no visible rows, show "0" in totals
-        if (visibleRows.length === 0) {
-            if (tableId === 'denizler2tablo' || tableId === 'denizler3tablo') {
-                var totalMiktarCell = totalRow.cells[totalRow.cells.length - 2];
-                var totalTutarCell = totalRow.cells[totalRow.cells.length - 1];
-
-                totalMiktarCell.innerHTML = '<strong>0,00</strong>';
-                totalTutarCell.innerHTML = '<strong>0,00₺</strong>';
-            }
-        }
-    }
-
-
-</script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const tables = ['denizler2tablo', 'denizler3tablo'];
-
-        tables.forEach(function(tableId) {
-            const table = document.getElementById(tableId);
-            if (!table) return;
-
-            const filterInputs = table.querySelectorAll('thead tr:nth-child(2) th input');
-
-            filterInputs.forEach(function(input, columnIndex) {
-                input.addEventListener('keyup', function() {
-                    applyMultipleFilters(tableId);
-                });
-            });
-        });
-
-        function applyMultipleFilters(tableId) {
-            const table = document.getElementById(tableId);
-            const filterInputs = table.querySelectorAll('thead tr:nth-child(2) th input');
-            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-
-            // Skip the last row (total row)
-            const totalRow = rows[rows.length - 1];
-            const dataRows = Array.from(rows).slice(0, -1);
-
-            let visibleRows = dataRows;
-
-            // Apply filters for each column
-            filterInputs.forEach((input, columnIndex) => {
-                const filterValue = input.value.toUpperCase().trim();
-
-                if (filterValue) {
-                    visibleRows = visibleRows.filter(row => {
-                        const cell = row.getElementsByTagName('td')[columnIndex];
-                        const cellText = cell.textContent.toUpperCase().trim();
-                        return cellText.includes(filterValue);
-                    });
-                }
-            });
-
-            // Hide/show rows based on filters
-            dataRows.forEach(row => {
-                row.style.display = visibleRows.includes(row) ? '' : 'none';
-            });
-
-            // Update subtotals based on visible rows
             updateSubtotals(tableId, visibleRows);
         }
 
         function updateSubtotals(tableId, visibleRows) {
             const table = document.getElementById(tableId);
-            const totalRow = table.rows[table.rows.length - 1]; // Last row is total row
+            const totalRow = table.rows[table.rows.length - 1];
 
-            // For denizler2tablo and denizler3tablo
             if (tableId === 'denizler2tablo' || tableId === 'denizler3tablo') {
-                // Reset totals
                 let totalMiktar = 0;
                 let totalTutar = 0;
 
-                // Calculate totals from visible rows
-                visibleRows.forEach(row => {
-                    const miktarCell = row.cells[3]; // Miktar column
-                    const tutarCell = row.cells[4];  // Tutar column
+                for (let i = 0; i < visibleRows.length; i++) {
+                    const row = visibleRows[i];
+                    const miktarCell = row.cells[3];
+                    const tutarCell = row.cells[4];
 
-                    // Extract numeric values (remove currency symbol and formatting)
                     const miktarValue = parseFloat(miktarCell.textContent.replace(/\./g, '').replace(',', '.'));
                     const tutarValue = parseFloat(tutarCell.textContent.replace('₺', '').replace(/\./g, '').replace(',', '.'));
 
                     if (!isNaN(miktarValue)) totalMiktar += miktarValue;
                     if (!isNaN(tutarValue)) totalTutar += tutarValue;
-                });
+                }
 
-                // Update total cells with new values
-                const totalMiktarCell = totalRow.cells[totalRow.cells.length - 2]; // Second last cell
-                const totalTutarCell = totalRow.cells[totalRow.cells.length - 1]; // Last cell
+                const totalMiktarCell = totalRow.cells[totalRow.cells.length - 2];
+                const totalTutarCell = totalRow.cells[totalRow.cells.length - 1];
 
-                // Format numbers with Turkish formatting
                 totalMiktarCell.innerHTML = '<strong>' + totalMiktar.toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '</strong>';
                 totalTutarCell.innerHTML = '<strong>' + totalTutar.toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '₺</strong>';
 
-                // If no visible rows, show "0" in totals
                 if (visibleRows.length === 0) {
                     totalMiktarCell.innerHTML = '<strong>0,00</strong>';
                     totalTutarCell.innerHTML = '<strong>0,00₺</strong>';
                 }
             }
         }
-    });
-                window.onbeforeprint = function () {
-                    const baslamaTarihi = document.getElementById('baslamaTarihi').value;
-                    const bitisTarihi = document.getElementById('bitisTarihi').value;
-                    const projeKodu = document.getElementById('projeKoduInput').value || 'Seçilmedi';
-                    const srmKodu = document.getElementById('srmKodu').value || 'Seçilmedi';
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tables = ['denizler2tablo', 'denizler3tablo'];
 
-                    const formatDate = (dateStr) => {
-                        if (!dateStr) return '';
-                        const date = new Date(dateStr);
-                        return date.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                    };
+            tables.forEach(function(tableId) {
+                const table = document.getElementById(tableId);
+                if (!table) return;
 
-                    document.getElementById('printBaslamaTarihi').textContent = formatDate(baslamaTarihi);
-                    document.getElementById('printBitisTarihi').textContent = formatDate(bitisTarihi);
-                    document.getElementById('printProjeKodu').textContent = projeKodu;
-                    document.getElementById('printSrmKodu').textContent = srmKodu;
+                const filterInputs = table.querySelectorAll('thead tr:nth-child(2) th input');
+
+                filterInputs.forEach(function(input, columnIndex) {
+                    input.addEventListener('keyup', function() {
+                        applyMultipleFilters(tableId);
+                    });
+                });
+            });
+
+            function applyMultipleFilters(tableId) {
+                const table = document.getElementById(tableId);
+                const filterInputs = table.querySelectorAll('thead tr:nth-child(2) th input');
+                const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+                const totalRow = rows[rows.length - 1];
+                const dataRows = Array.from(rows).slice(0, -1);
+                let visibleRows = dataRows;
+
+                filterInputs.forEach((input, columnIndex) => {
+                    const filterValue = input.value.toUpperCase().trim();
+                    if (filterValue) {
+                        visibleRows = visibleRows.filter(row => {
+                            const cell = row.getElementsByTagName('td')[columnIndex];
+                            const cellText = cell.textContent.toUpperCase().trim();
+                            return cellText.includes(filterValue);
+                        });
+                    }
+                });
+
+                dataRows.forEach(row => {
+                    row.style.display = visibleRows.includes(row) ? '' : 'none';
+                });
+
+                updateSubtotals(tableId, visibleRows);
+            }
+
+            window.onbeforeprint = function () {
+                const baslamaTarihi = document.getElementById('baslamaTarihi').value;
+                const bitisTarihi = document.getElementById('bitisTarihi').value;
+                const projeKodu = document.getElementById('projeKoduInput').value || 'Seçilmedi';
+                const srmKodu = document.getElementById('srmKodu').value || 'Seçilmedi';
+
+                const formatDate = (dateStr) => {
+                    if (!dateStr) return '';
+                    const date = new Date(dateStr);
+                    return date.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
                 };
-</script>
+
+                document.getElementById('printBaslamaTarihi').textContent = formatDate(baslamaTarihi);
+                document.getElementById('printBitisTarihi').textContent = formatDate(bitisTarihi);
+                document.getElementById('printProjeKodu').textContent = projeKodu;
+                document.getElementById('printSrmKodu').textContent = srmKodu;
+            };
+        });
+    </script>

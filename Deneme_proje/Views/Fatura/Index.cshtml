@@ -1,8 +1,10 @@
-﻿@model IEnumerable<Deneme_proje.Models.Entities.FaturaViewModel>
+﻿@using Org.BouncyCastle.Asn1.Ocsp
+@model IEnumerable<Deneme_proje.Models.Entities.FaturaViewModel>
 
 @{
     ViewData["Title"] = "Fatura Raporu";
     Layout = "~/Views/Shared/_Layout.cshtml";
+  
 }
 <link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
 
@@ -26,15 +28,19 @@
         </div>
         <div class="row mb-lg-5 mb-1">
             <div class="col-lg-4">
-                <form action="@Url.Action("Index", "Bahcepinar")" method="get" class="form-inline">
-                    <div class="form-group">
-                        <label for="cariKodu" style="font-size: 12px;">Cari Unvanı:</label>
-                        <input type="text" id="cariKodu" name="cariKodu" class="form-control" placeholder="Cari Unvanı" required />
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-tumblr btn-shadow waves-effect waves-light">Sorgula</button>
-                    </div>
+                <form method="get" action="@Url.Action("Index")" class="form-inline mb-3">
+                    <label class="mr-2">Vade Başlangıç:</label>
+                    <input type="date" name="vadeBaslangic" class="form-control mr-2"
+                           value="@ViewBag.VadeBaslangic" />
+
+                    <label class="mr-2">Vade Bitiş:</label>
+                    <input type="date" name="vadeBitis" class="form-control mr-2"
+                           value="@ViewBag.VadeBitis" />
+
+                    <button type="submit" class="btn btn-primary">Filtrele</button>
                 </form>
+
+
             </div>
         </div>
 
@@ -143,31 +149,28 @@
                         var faotsayi1 = faott1 - firstItem.FaturaTarihiSayi;
                         var sapma1 = faotsayi1 - firstItem.FaturaVadesi;
                         var fm1 = -(((decimal)66.24 / 360) * sapma1);
-                        var fgg1 =   (Math.Round((totalPayment * fm1) / 100, 4));
+                        var fgg1 = Math.Round((totalPayment * fm1) / 100, 4);
+
+                        var tr = new System.Globalization.CultureInfo("tr-TR");
 
                                                 <tr>
                                                     <td>@firstItem.EvrakNo</td>
-                                                    <td class="cari-unvani-cell" data-bs-toggle="tooltip" title="@firstItem.CariUnvani">
-                                @firstItem.CariUnvani
-                                                    </td>
+                                                    <td class="cari-unvani-cell" data-bs-toggle="tooltip" title="@firstItem.CariUnvani">@firstItem.CariUnvani</td>
                                                     <td>@firstItem.FaturaTarihi.ToString("dd.MM.yyyy")</td>
                                                     <td>@firstItem.FaturaVadeTarihi.ToString("dd.MM.yyyy")</td>
-                                                    <td>@firstItem.FaturaVadesi</td>
-                                                    <td>@totalPayment.ToString("₺#,##0.00")</td>
+                                                    <td>@firstItem.FaturaVadesi.ToString("N0", tr)</td>
+                                                    <td>@totalPayment.ToString("C2", tr)</td>
                                                     <td>@resultDate1.ToString("dd.MM.yyyy")</td>
-                                                    <td>@faotsayi1.ToString("0.00")</td>
-                                                    <td>@sapma1.ToString("0.00")</td>
-                                                    <td>@fm1.ToString("0.0000")</td>
-                                                    <td>@fgg1.ToString("0.00")</td>
-                                                    <td>@firstItem.FaizOrani.ToString("0.00")</td>
+                                                    <td>@faotsayi1.ToString("N2", tr)</td>
+                                                    <td>@sapma1.ToString("N2", tr)</td>
+                                                    <td>@fm1.ToString("N4", tr)</td>
+                                                    <td>@fgg1.ToString("N2", tr)</td>
+                                                    <td>@firstItem.FaizOrani.ToString("P2", tr)</td>
                                                     <td>
-                                                        <!-- Detay butonu -->
-                                                      
                                                         <button class="btn btn-tumblr btn-sm git-btn" type="button" data-bs-toggle="modal" data-bs-target="#detayModal" onclick="loadModalContent('@firstItem.EvrakNo-@firstItem.CariKodu')">
                                                             Detay
                                                         </button>
 
-                                                        <!-- Modal içeriği için gizli div -->
                                                         <div id="content-@firstItem.EvrakNo-@firstItem.CariKodu" style="display:none;">
                                                             <h6>@firstItem.CariUnvani - Detaylar</h6>
 
@@ -183,8 +186,8 @@
                                             @foreach (var item in group)
                                             {
                                                                         <tr>
-                                                                            <td>@item.AlacakVade.ToShortDateString()</td>
-                                                                            <td>@Math.Round(item.TaksitTutar, 4).ToString("F2")</td>
+                                                                            <td>@item.AlacakVade.ToString("dd.MM.yyyy")</td>
+                                                                            <td>@Math.Round(item.TaksitTutar, 4).ToString("N2", tr)</td>
                                                                         </tr>
                                             }
                                                                 </tbody>

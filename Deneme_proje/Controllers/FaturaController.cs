@@ -28,15 +28,30 @@ namespace Deneme_proje.Controllers
             _faturaRepository = faturaRepository;
         }
 
-        public ActionResult Index(string cariKodu)
+        public ActionResult Index(string cariKodu, DateTime? vadeBaslangic, DateTime? vadeBitis)
         {
             float ticariFaiz = 66.24f;
 
-            // Cari kodu boş olsa bile tüm verileri getirin
-            var faturaData = _faturaRepository.GetFaturaData(cariKodu, ticariFaiz);
+            // Eğer tarih girilmemişse, yılın başı ve sonu olarak ayarla
+            DateTime defaultBaslangic = new DateTime(DateTime.Now.Year, 1, 1);
+            DateTime defaultBitis = new DateTime(DateTime.Now.Year, 12, 31);
+
+            var baslangic = vadeBaslangic ?? defaultBaslangic;
+            var bitis = vadeBitis ?? defaultBitis;
+
+            var faturaData = _faturaRepository.GetFaturaData(cariKodu, ticariFaiz)
+                              .Where(x => x.FaturaVadeTarihi >= baslangic && x.FaturaVadeTarihi <= bitis)
+                              .ToList();
+
+            // ViewBag'e aktar
+            ViewBag.VadeBaslangic = baslangic.ToString("yyyy-MM-dd");
+            ViewBag.VadeBitis = bitis.ToString("yyyy-MM-dd");
 
             return View(faturaData);
         }
+
+
+
 
         public IActionResult TedarikciKapaliFatura(string cariKodu)
         {

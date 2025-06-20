@@ -3724,20 +3724,34 @@ ORDER BY sh.sth_create_date DESC";
             using (var connection = new SqlConnection(connectionString))
             {
                 string query = @"
-            SELECT 
-                upl.upl_kodu AS StokKodu,
-                s.sto_isim AS StokAdi,
-                s.sto_birim1_ad AS BirimAdi,
-                upl.upl_miktar AS PlanlananMiktar,
-                ISNULL(imd.ish_tuket_miktar, 0) AS TuketilenMiktar,
-                (upl.upl_miktar - ISNULL(imd.ish_tuket_miktar, 0)) AS KalanMiktar
-            FROM URETIM_MALZEME_PLANLAMA upl
-            INNER JOIN STOKLAR s ON s.sto_kod = upl.upl_kodu
-            LEFT JOIN ISEMRI_MALZEME_DURUMLARI imd ON imd.ish_isemri = upl.upl_isemri 
-                AND imd.ish_stokhizm_gid_kod = upl.upl_kodu
-            WHERE upl.upl_isemri = @IsEmriKodu 
-                AND upl.upl_uretim_tuket = 0  -- Sadece tüketilen malzemeler
-            ORDER BY s.sto_isim";
+        SELECT 
+            upl.upl_kodu AS StokKodu,
+            s.sto_isim AS StokAdi,
+            s.sto_birim1_ad AS BirimAdi,
+            upl.upl_miktar AS PlanlananMiktar,
+            -- Tüketilen miktarı stok hareketlerinden hesapla
+            ISNULL((
+                SELECT SUM(sh.sth_miktar) 
+                FROM STOK_HAREKETLERI sh 
+                WHERE sh.sth_belge_no = @IsEmriKodu 
+                AND sh.sth_stok_kod = upl.upl_kodu 
+                AND sh.sth_tip = 1  -- Çıkış hareketi
+                AND sh.sth_cins = 7 -- Tüketim hareketi
+            ), 0) AS TuketilenMiktar,
+            -- Kalan miktarı hesapla
+            upl.upl_miktar - ISNULL((
+                SELECT SUM(sh.sth_miktar) 
+                FROM STOK_HAREKETLERI sh 
+                WHERE sh.sth_belge_no = @IsEmriKodu 
+                AND sh.sth_stok_kod = upl.upl_kodu 
+                AND sh.sth_tip = 1 
+                AND sh.sth_cins = 7
+            ), 0) AS KalanMiktar
+        FROM URETIM_MALZEME_PLANLAMA upl
+        INNER JOIN STOKLAR s ON s.sto_kod = upl.upl_kodu
+        WHERE upl.upl_isemri = @IsEmriKodu 
+            AND upl.upl_uretim_tuket = 0  -- Sadece tüketilen malzemeler
+        ORDER BY s.sto_isim";
 
                 try
                 {

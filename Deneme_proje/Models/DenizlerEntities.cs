@@ -230,7 +230,7 @@ namespace Deneme_proje.Models
 				public decimal SanayideYapilan { get; set; }           // Sanayide Yapılan Harcamalar
 				public decimal MazotHariçStoktaKullanılan { get; set; } // Mazot Hariç Stokta Kullanılan
 				public decimal TümGiderler { get; set; }               // Toplam Giderler
-				public decimal NakliyeCiroBedeli { get; set; }         // Nakliye Ciro Bedeli
+				public double NakliyeCiroBedeli { get; set; }         // Nakliye Ciro Bedeli
 				public decimal BirSaatKmYapılanYakıtLitresiTutar { get; set; } // Bir Saat KM Başına Yakıt Litresi Tutarı
 				public decimal ÇalışmaSaatiYapılanKM { get; set; }     // Çalışma Saati Olarak Yapılan KM
 				public decimal BirSaatKMYapılanYakıtLitresi { get; set; } // Bir Saatte Yapılan KM Başına Yakıt Litresi
