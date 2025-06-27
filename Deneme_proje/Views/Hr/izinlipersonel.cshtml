@@ -20,6 +20,74 @@
             </div>
         </div>
 
+        <!-- Filtre Alanı -->
+        <div class="row mb-3">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">
+                            <i class="fa fa-filter"></i> Filtreler
+                        </h5>
+                    </div>
+                    <div class="card-block p-3">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label for="tarihBaslangic" class="form-label">Başlangıç Tarihi:</label>
+                                <input type="date" id="tarihBaslangic" class="form-control" />
+                            </div>
+                            <div class="col-md-3">
+                                <label for="tarihBitis" class="form-label">Bitiş Tarihi:</label>
+                                <input type="date" id="tarihBitis" class="form-control" />
+                            </div>
+                            <div class="col-md-3">
+                                <label for="izinTipiFiltre" class="form-label">İzin Türü:</label>
+                                <select id="izinTipiFiltre" class="form-control">
+                                    <option value="">Tümü</option>
+                                    <option value="0">Yıllık İzin</option>
+                                    <option value="3">Askerlik</option>
+                                    <option value="5">Devamsızlık</option>
+                                    <option value="7">Diğer</option>
+                                    <option value="8">Ücretsiz</option>
+                                    <option value="10">Evlilik</option>
+                                    <option value="11">Doğum</option>
+                                    <option value="12">Babalık</option>
+                                    <option value="13">Süt</option>
+                                    <option value="14">Ölüm</option>
+                                    <option value="15">İş Arama</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="onaylayanFiltre" class="form-label">Onaylayan:</label>
+                                <select id="onaylayanFiltre" class="form-control">
+                                    <option value="">Tümü</option>
+                                    @{
+                                        var onaylayanlar = Model.Where(x => !string.IsNullOrEmpty(x.OnaylayanKullanici))
+                                        .Select(x => x.OnaylayanKullanici)
+                                        .Distinct()
+                                        .OrderBy(x => x);
+                                    }
+                                    @foreach (var onaylayan in onaylayanlar)
+                                    {
+                                        <option value="@onaylayan">@onaylayan</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <button type="button" id="btnFiltrele" class="btn btn-primary" onclick="filtrele()">
+                                    <i class="fa fa-search"></i> Filtrele
+                                </button>
+                                <button type="button" id="btnTemizle" class="btn btn-secondary ml-2" onclick="temizle()">
+                                    <i class="fa fa-refresh"></i> Temizle
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">
@@ -30,7 +98,13 @@
                         @if (!Model.Any())
                         {
                             <div class="alert alert-info m-3">
-                                Görüntülenecek onaylı izin bulunmamaktadır.
+                                <h5>Görüntülenecek onaylı izin bulunmamaktadır.</h5>
+                                <p><strong>Olası nedenler:</strong></p>
+                                <ul>
+                                    <li>Henüz onaylanmış izin talebi bulunmuyor</li>
+                                    <li>Bu kullanıcının yönetiminde personel bulunmuyor</li>
+                                    <li>İzin talepleri başka bir amir tarafından onaylanmış olabilir</li>
+                                </ul>
                             </div>
                         }
                         else
@@ -54,7 +128,10 @@
                                     <tbody>
                                         @foreach (var izin in Model)
                                         {
-                                            <tr>
+                                            <tr data-izin-tipi="@izin.IzinTipi"
+                                                data-baslangic="@izin.BaslangicTarihi.ToString("yyyy-MM-dd")"
+                                                data-bitis="@izin.BitisTarihi.ToString("yyyy-MM-dd")"
+                                                data-onaylayan="@(izin.OnaylayanKullanici ?? "")">
                                                 <td>@izin.PersonelAdSoyad</td>
                                                 <td>
                                                     @{
@@ -88,11 +165,22 @@
                                                         <a href="@Url.Action("IzinTalepPdfIndir", "Hr", new { izinGuid = izin.Guid })"
                                                            class="btn btn-sm btn-danger"
                                                            title="PDF İndir">
-                                                            <i class="fa fa-file-pdf-o"></i> PDF İndir
+                                                            <i class="fa fa-file-pdf-o"></i> PDF
                                                         </a>
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-warning"
+                                                                onclick="bekletModal('@izin.Guid', '@izin.PersonelKodu', '@izin.TalepTarihi.ToString("yyyy-MM-dd")')"
+                                                                title="Beklemeye Al">
+                                                            <i class="fa fa-pause"></i> Beklet
+                                                        </button>
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-danger"
+                                                                onclick="reddetModal('@izin.Guid', '@izin.PersonelKodu', '@izin.TalepTarihi.ToString("yyyy-MM-dd")')"
+                                                                title="İzni Reddet">
+                                                            <i class="fa fa-times"></i> Reddet
+                                                        </button>
                                                     </div>
                                                 </td>
-
                                             </tr>
                                         }
                                     </tbody>
@@ -101,6 +189,52 @@
                         }
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reddetme Modal -->
+<div class="modal fade" id="reddetModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">İzin Talebini Reddet</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="reddetmeNedeni">Reddetme Nedeni:</label>
+                    <textarea class="form-control" id="reddetmeNedeni" rows="3" placeholder="İzin talebinin reddedilme nedenini açıklayınız..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-danger" onclick="reddetOnay()">Reddet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Beklemeye Alma Modal -->
+<div class="modal fade" id="bekletModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">İzin Talebini Beklemeye Al</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Bu izin talebini beklemeye almak istediğinizden emin misiniz?</p>
+                <p><strong>Onaylanmış izin iptal edilecek ve tekrar inceleme sürecine alınacaktır.</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-warning" onclick="bekletOnay()">Beklemeye Al</button>
             </div>
         </div>
     </div>
@@ -132,74 +266,73 @@
             border-radius: 4px;
         }
 
+    .btn-group .btn {
+        margin-right: 2px;
+    }
+
+        .btn-group .btn:last-child {
+            margin-right: 0;
+        }
+
+    /* Modal z-index */
+    .modal {
+        z-index: 9999 !important;
+    }
+
+    .modal-backdrop {
+        z-index: 9998 !important;
+    }
+
+    .modal-dialog {
+        z-index: 10000 !important;
+    }
+
     @@media screen and (max-width: 768px) {
-        .table {
-            position: relative !important;
-            display: block !important;
-            width: 100% !important;
-            -webkit-overflow-scrolling: touch !important;
-        }
+        .table
 
-        .table-mobile-container {
-            overflow-x: auto !important;
-            max-width: 100% !important;
-            position: relative !important;
-            -webkit-overflow-scrolling: touch !important;
-        }
-
-        .table thead th {
-            position: sticky !important;
-            top: 0 !important;
-            z-index: 10 !important;
-            background-color: #f8f9fa !important;
-            white-space: nowrap !important;
-            min-width: 120px !important;
-            padding: 10px !important;
-            font-size: 14px !important;
-            box-shadow: inset 0 1px 0 #dee2e6, inset 0 -1px 0 #dee2e6 !important;
-        }
-
-        .table tbody td {
-            white-space: nowrap !important;
-            min-width: 120px !important;
-            padding: 10px !important;
-            font-size: 14px !important;
-            vertical-align: middle !important;
-        }
-
-        .card {
-            margin: 0 -15px !important;
-            border-radius: 0 !important;
-        }
-
-        .px-lg-5 {
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
-        }
+    {
+        position: relative !important;
+        display: block !important;
+        width: 100% !important;
+        -webkit-overflow-scrolling: touch !important;
     }
 
-    .table-mobile-container::-webkit-scrollbar {
-        width: 8px !important;
-        height: 8px !important;
+    .table thead th {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 10 !important;
+        background-color: #f8f9fa !important;
+        white-space: nowrap !important;
+        min-width: 120px !important;
+        padding: 10px !important;
+        font-size: 14px !important;
     }
 
-    .table-mobile-container::-webkit-scrollbar-track {
-        background: #f0f0f0 !important;
-        border-radius: 4px !important;
+    .table tbody td {
+        white-space: nowrap !important;
+        min-width: 120px !important;
+        padding: 10px !important;
+        font-size: 14px !important;
+        vertical-align: middle !important;
     }
 
-    .table-mobile-container::-webkit-scrollbar-thumb {
-        background: #1D3A67 !important;
-        border-radius: 4px !important;
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .btn-group .btn {
+            margin-bottom: 2px;
+            margin-right: 0;
+        }
+
     }
 </style>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-
-<!-- DataTables -->
+<!-- Minimal Script Dependencies -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 <script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
-
-<!-- Buttons ve Uzantıları -->
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
@@ -207,84 +340,271 @@
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
 
-<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
-
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        $('#example').DataTable({
-            "dom": '<"row"<"col-sm-12"B>>' +
-                '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
-                't' +
-                '<"row"<"col-sm-6"i><"col-sm-6"p>>',
-            "language": {
-                "url": "/Content/DataTables/turkish.json"
-            },
-            "buttons": [
-                {
-                    extend: 'copy',
-                    text: '<i class="fa fa-copy"></i> Kopyala',
-                    className: 'btn btn-info',
-                    exportOptions: {
-                        columns: ':visible'
-                    }
-                },
-                {
-                    extend: 'csv',
-                    text: '<i class="fa fa-file-csv"></i> CSV',
-                    className: 'btn btn-primary',
-                    exportOptions: {
-                        columns: ':visible'
-                    }
-                },
-                {
-                    extend: 'excel',
-                    text: '<i class="fa fa-file-excel"></i> Excel',
-                    className: 'btn btn-success',
-                    exportOptions: {
-                        columns: ':visible'
-                    }
-                },
-                {
-                    extend: 'pdf',
-                    text: '<i class="fa fa-file-pdf"></i> PDF',
-                    className: 'btn btn-danger',
-                    exportOptions: {
-                        columns: ':visible'
-                    },
-                    customize: function(doc) {
-                        doc.content[1].table.widths =
-                            Array(doc.content[1].table.body[0].length + 1).join('*').split('');
-                        doc.defaultStyle.fontSize = 10;
-                        doc.styles.tableHeader.fontSize = 11;
-                        doc.styles.tableHeader.alignment = 'left';
-                        doc.styles.title.fontSize = 14;
-                        doc.content[0].text = 'İzinli Personeller Raporu';
+    // Global değişkenler
+    var dataTable;
+    var currentGuid, currentPersonel, currentTarih;
 
-                        doc.styles.tableHeader.fillColor = '#162e54';
-                        doc.styles.tableHeader.color = '#fff';
+    // Sayfa yüklendiğinde çalış
+    window.onload = function() {
+        console.log('Sayfa yüklendi, script çalışıyor');
+        initializeDataTable();
+    };
+
+    // DataTable başlatma
+    function initializeDataTable() {
+        try {
+            if ($.fn.DataTable.isDataTable('#example')) {
+                $('#example').DataTable().destroy();
+            }
+
+            dataTable = $('#example').DataTable({
+                "language": {
+                    "sProcessing": "İşleniyor...",
+                    "sLengthMenu": "_MENU_ kayıt göster",
+                    "sZeroRecords": "Eşleşen kayıt bulunamadı",
+                    "sInfo": "_TOTAL_ kayıttan _START_ - _END_ arası gösteriliyor",
+                    "sInfoEmpty": "0 kayıttan 0 - 0 arası gösteriliyor",
+                    "sInfoFiltered": "(_MAX_ kayıt içerisinden bulunan)",
+                    "sSearch": "Ara:",
+                    "oPaginate": {
+                        "sFirst": "İlk",
+                        "sPrevious": "Önceki",
+                        "sNext": "Sonraki",
+                        "sLast": "Son"
                     }
                 },
-                {
-                    extend: 'print',
-                    text: '<i class="fa fa-print"></i> Yazdır',
-                    className: 'btn btn-secondary',
-                    exportOptions: {
-                        columns: ':visible'
+                "dom": 'Bfrtip',
+                "buttons": [
+                    {
+                        extend: 'copy',
+                        text: 'Kopyala',
+                        className: 'btn btn-info btn-sm'
+                    },
+                    {
+                        extend: 'csv',
+                        text: 'CSV',
+                        className: 'btn btn-primary btn-sm'
+                    },
+                    {
+                        extend: 'excel',
+                        text: 'Excel',
+                        className: 'btn btn-success btn-sm'
+                    },
+                    {
+                        extend: 'pdf',
+                        text: 'PDF',
+                        className: 'btn btn-danger btn-sm'
+                    },
+                    {
+                        extend: 'print',
+                        text: 'Yazdır',
+                        className: 'btn btn-secondary btn-sm'
                     }
-                }
-            ],
-            "columnDefs": [
-                { "targets": "_all" },
-                {
-                    "targets": -1,
-                    "orderable": false,
-                    "searchable": false
-                }
-            ],
-            "responsive": true,
-            "ordering": true,
-            "paging": true,
-            "pageLength": 5000
+                ],
+                "pageLength": 25,
+                "responsive": true,
+                "columnDefs": [
+                    {
+                        "targets": -1,
+                        "orderable": false,
+                        "searchable": false
+                    }
+                ]
+            });
+
+            console.log('DataTable başarıyla yüklendi');
+        } catch (error) {
+            console.error('DataTable hatası:', error);
+            // DataTable yüklenemezse basit tablo olarak bırak
+        }
+    }
+
+    // Filtre fonksiyonu
+    function filtrele() {
+        console.log('Filtre butonu tıklandı');
+
+        var tarihBaslangic = document.getElementById('tarihBaslangic').value;
+        var tarihBitis = document.getElementById('tarihBitis').value;
+        var izinTipi = document.getElementById('izinTipiFiltre').value;
+        var onaylayan = document.getElementById('onaylayanFiltre').value;
+
+        console.log('Filtre değerleri:', { tarihBaslangic, tarihBitis, izinTipi, onaylayan });
+
+        // Basit DOM filtreleme
+        var rows = document.querySelectorAll('#example tbody tr');
+
+        rows.forEach(function(row) {
+            var show = true;
+
+            // Tarih kontrolü
+            if (tarihBaslangic) {
+                var baslangic = row.getAttribute('data-baslangic');
+                if (baslangic < tarihBaslangic) show = false;
+            }
+
+            if (tarihBitis) {
+                var bitis = row.getAttribute('data-bitis');
+                if (bitis > tarihBitis) show = false;
+            }
+
+            // İzin tipi kontrolü
+            if (izinTipi) {
+                var rowIzinTipi = row.getAttribute('data-izin-tipi');
+                if (rowIzinTipi != izinTipi) show = false;
+            }
+
+            // Onaylayan kontrolü
+            if (onaylayan) {
+                var rowOnaylayan = row.getAttribute('data-onaylayan');
+                if (rowOnaylayan !== onaylayan) show = false;
+            }
+
+            row.style.display = show ? '' : 'none';
         });
-    });
+
+        alert('Filtre uygulandı');
+    }
+
+    // Temizleme fonksiyonu
+    function temizle() {
+        console.log('Temizle butonu tıklandı');
+
+        document.getElementById('tarihBaslangic').value = '';
+        document.getElementById('tarihBitis').value = '';
+        document.getElementById('izinTipiFiltre').value = '';
+        document.getElementById('onaylayanFiltre').value = '';
+
+        // Tüm satırları göster
+        var rows = document.querySelectorAll('#example tbody tr');
+        rows.forEach(function(row) {
+            row.style.display = '';
+        });
+
+        alert('Filtreler temizlendi');
+    }
+
+    // Beklet modal açma
+    function bekletModal(guid, personel, tarih) {
+        console.log('Beklet modal açılıyor:', { guid, personel, tarih });
+
+        currentGuid = guid;
+        currentPersonel = personel;
+        currentTarih = tarih;
+
+        $('#bekletModal').modal('show');
+    }
+
+    // Reddet modal açma
+    function reddetModal(guid, personel, tarih) {
+        console.log('Reddet modal açılıyor:', { guid, personel, tarih });
+
+        currentGuid = guid;
+        currentPersonel = personel;
+        currentTarih = tarih;
+
+        document.getElementById('reddetmeNedeni').value = '';
+        $('#reddetModal').modal('show');
+    }
+
+    // Bekletme onayı
+    function bekletOnay() {
+        console.log('Bekletme onayı:', { currentGuid, currentPersonel, currentTarih });
+
+        if (!currentGuid || !currentPersonel || !currentTarih) {
+            alert('Gerekli bilgiler eksik!');
+            return;
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/Hr/BeklemetIzinTalebi', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                $('#bekletModal').modal('hide');
+
+                if (xhr.status === 200) {
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        if (response.success) {
+                            alert('İzin talebi başarıyla beklemeye alındı.');
+                            location.reload();
+                        } else {
+                            alert('Hata: ' + (response.message || 'Bilinmeyen hata'));
+                        }
+                    } catch (e) {
+                        alert('İşlem başarıyla tamamlandı.');
+                        location.reload();
+                    }
+                } else {
+                    alert('Sunucu hatası: ' + xhr.status);
+                }
+            }
+        };
+
+        var data = 'guid=' + encodeURIComponent(currentGuid) +
+                   '&personelKodu=' + encodeURIComponent(currentPersonel) +
+                   '&talepTarihi=' + encodeURIComponent(currentTarih);
+
+        xhr.send(data);
+    }
+
+    // Reddetme onayı
+    function reddetOnay() {
+        var nedeni = document.getElementById('reddetmeNedeni').value.trim();
+
+        if (!nedeni) {
+            alert('Reddetme nedeni boş olamaz!');
+            return;
+        }
+
+        console.log('Reddetme onayı:', { currentGuid, currentPersonel, currentTarih, nedeni });
+
+        if (!currentGuid || !currentPersonel || !currentTarih) {
+            alert('Gerekli bilgiler eksik!');
+            return;
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/Hr/ReddetIzinTalebi', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                $('#reddetModal').modal('hide');
+
+                if (xhr.status === 200) {
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        if (response.success) {
+                            alert('İzin talebi başarıyla reddedildi.');
+                            location.reload();
+                        } else {
+                            alert('Hata: ' + (response.message || 'Bilinmeyen hata'));
+                        }
+                    } catch (e) {
+                        alert('İşlem başarıyla tamamlandı.');
+                        location.reload();
+                    }
+                } else {
+                    alert('Sunucu hatası: ' + xhr.status);
+                }
+            }
+        };
+
+        var data = 'guid=' + encodeURIComponent(currentGuid) +
+                   '&personelKodu=' + encodeURIComponent(currentPersonel) +
+                   '&talepTarihi=' + encodeURIComponent(currentTarih) +
+                   '&reddetmeNedeni=' + encodeURIComponent(nedeni);
+
+        xhr.send(data);
+    }
+
+    // Test fonksiyonu
+    function test() {
+        alert('JavaScript çalışıyor!');
+    }
+
+    console.log('Script yüklendi');
 </script>

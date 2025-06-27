@@ -123,17 +123,18 @@
     @@media print {
         table {
             width: 100%;
-            font-size: 8px !important; /* Font boyutu 8px */
+            font-size: 12px !important;
             font-family: Arial, sans-serif;
             border-collapse: collapse;
             table-layout: fixed;
+            margin-bottom: 5px !important; /* Reduced margin between tables */
         }
 
         td, th {
-          /*   padding: 2px 2px; */
+            padding: 2px 5px !important; /* Minimal padding for cells */
             line-height: 1.2;
             border: 1px solid #E5E7EB;
-            font-size: 8px !important; /* Hücreler için de 8px */
+            font-size: 12px !important;
         }
 
         th {
@@ -149,76 +150,71 @@
 
             .table-striped > tbody > tr:last-child td {
                 color: #B8860B;
-                font-size: 8px !important; /* Son satır için de 8px */
+                font-size: 8px !important;
             }
 
         h5 {
-            font-size: 6px !important; /* Başlıklar için */
+            font-size: 12px !important;
             color: #B8860B;
-         /*    margin: 8px 0 4px; */
+            margin: 4px 0 !important; /* Reduced margin for headings */
         }
 
         h3 {
-            font-size: 6px !important; /* Başlıklar için */
+            font-size: 15px !important;
             color: #1E3A8A;
-       /*      margin: 10px 0 5px; */
-        }
-        .print-header
-
-    {
-        display: block !important;
-        text-align: center;
-/*         margin-bottom: 15px; */
-        border-bottom: 2px solid #1E3A8A;
-    /*     padding-bottom: 5px; */
-    }
-
-    .print-header h3 {
-        font-size: 8pt !important;
-        color: #1E3A8A;
-        font-weight: bold;
-        margin: 0;
-    }
-
-    .print-header p {
-        font-size: 6pt !important;
-        color: #374151;
-        margin: 2px 0;
-    }
-
-    .no-print {
-        display: none !important;
-    }
-
-    .main-content {
-        margin-top: 0 !important;
-    }
-
-    .card-header, .form-group, .btn {
-        display: none !important;
-    }
-
-    .card {
-        box-shadow: none !important;
-        border: none !important;
-    }
-
-    .table-container, .table-responsive {
-        page-break-inside: avoid;
- /*        margin-bottom: 3px; */
-    }
-
-  
-
-    .table-striped > tbody > tr:last-child {
-        background-color: #FFF7ED;
-        font-weight: bold;
-    }
-
-        .table-striped > tbody > tr:last-child td {
-            color: #B8860B;
+            margin: 5px 0 !important; /* Reduced margin for headings */
         }
 
+        .print-header {
+            display: block !important;
+            text-align: center;
+            margin-bottom: 8px !important; /* Reduced margin */
+            border-bottom: 2px solid #1E3A8A;
+            padding-bottom: 3px !important; /* Reduced padding */
+        }
+
+            .print-header h3 {
+                font-size: 8pt !important;
+                color: #1E3A8A;
+                font-weight: bold;
+                margin: 0 !important;
+            }
+
+            .print-header p {
+                font-size: 6pt !important;
+                color: #374151;
+                margin: 2px 0 !important;
+            }
+
+        .no-print {
+            display: none !important;
+        }
+
+        .main-content {
+            margin-top: 0 !important;
+        }
+
+        .card-header, .form-group, .btn {
+            display: none !important;
+        }
+
+        .card {
+            box-shadow: none !important;
+            border: none !important;
+        }
+
+        .table-container, .table-responsive {
+            page-break-inside: avoid;
+            margin-bottom: 5px !important; /* Reduced margin for table containers */
+            padding: 0 !important; /* Remove padding */
+        }
+
+            .table-container td, .table-container th {
+                max-width: 100px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
     }
     
 </style>
@@ -813,17 +809,17 @@
 
             const denizlerTablo = document.getElementById('denizlertablo');
             if (denizlerTablo) {
-                printContents += '<h5 style="color: #B8860B; font-size: 2pt; margin: 8px 0 4px;">Gelir Gider Tabloları</h5>' + denizlerTablo.outerHTML;
+                printContents += '<h5 style="color: #B8860B; font-size: 2pt; ">Gelir Gider Tabloları</h5>' + denizlerTablo.outerHTML;
             }
 
             const denizlerSrmTablo = document.getElementById('denizler_srm_tablo');
             if (denizlerSrmTablo) {
-                printContents += '<h5 style="color: #B8860B; font-size: 2pt; margin: 8px 0 4px;">Sorumluluk Merkezi Verileri</h5>' + denizlerSrmTablo.outerHTML;
+                printContents += '<h5 style="color: #B8860B; font-size: 2pt; ">Sorumluluk Merkezi Verileri</h5>' + denizlerSrmTablo.outerHTML;
             }
 
             const denizler1Tablolar = document.querySelectorAll('#denizler1tablo');
             denizler1Tablolar.forEach(function (tablo) {
-                printContents += '<h5 style="color: #B8860B; font-size: 2pt; margin: 8px 0 4px;">Araç Özeti</h5>' + tablo.outerHTML;
+                printContents += '<h5 style="color: #B8860B; font-size: 2pt; ">Araç Özeti</h5>' + tablo.outerHTML;
             });
 
             const denizler2Tablo = document.getElementById('denizler2tablo');

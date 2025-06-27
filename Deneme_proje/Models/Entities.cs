@@ -4,6 +4,7 @@ namespace Deneme_proje.Models
 {
     public class Entities
     {
+       
         // Model sınıfları
         public class MalzemePlanlama
         {
@@ -82,11 +83,13 @@ namespace Deneme_proje.Models
             public string StokAdi { get; set; }
             public int DepoNo { get; set; }
             public string DepoAdi { get; set; }
-            public double DepoMiktari { get; set; }
-            public decimal DepoMaliyeti { get; set; }
             public string BirimAdi { get; set; }
-            public DateTime StokTarihi { get; set; }
-            public int StokYasi { get; set; }
+            public decimal DepoMiktari { get; set; }
+            public decimal DepoMaliyeti { get; set; }
+            public decimal BirimMaliyet { get; set; }
+            public decimal ToplamMaliyet { get; set; }
+            public decimal ToplamMiktar { get; set; }
+            public string Kategori { get; set; } // Yeni eklenen alan
         }
         public class StokDetayModel
         {

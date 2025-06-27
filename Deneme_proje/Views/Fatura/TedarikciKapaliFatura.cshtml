@@ -11,14 +11,14 @@
         <div class="row">
             <div class="col-sm-12 p-0">
                 <div class="main-header">
-                @*     <h4>Kapalı Tedarikçi Fatura Analizi</h4> *@
+                    @*     <h4>Kapalı Tedarikçi Fatura Analizi</h4> *@
                     <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
                         <li class="breadcrumb-item">
                             <a href="/Home/Index">
                                 <i class="icofont icofont-home"></i>
                             </a>
                         </li>
-             
+
                     </ol>
                 </div>
             </div>
@@ -35,11 +35,20 @@
 
                     <!-- Search Form Inside Card -->
                     <div class="card-body">
-                        <form action="@Url.Action("Index", "Bahcepinar")" method="get" class="form-inline">
+                        <form action="@Url.Action("TedarikciKapaliFatura", "Fatura")" method="get" class="form-inline">
+
                             <div class="form-group me-3">
-                                <label for="cariKodu" style="font-size: 12px;">Cari Unvanı:</label>
-                                <input type="text" id="cariKodu" name="cariKodu" class="form-control" placeholder="Cari Unvanı" required />
+                                <label for="vadeBaslangic" style="font-size: 12px;">Vade Başlangıç:</label>
+                                <input type="date" id="vadeBaslangic" name="vadeBaslangic" class="form-control"
+                                       value="@ViewBag.VadeBaslangic" />
                             </div>
+
+                            <div class="form-group me-3">
+                                <label for="vadeBitis" style="font-size: 12px;">Vade Bitiş:</label>
+                                <input type="date" id="vadeBitis" name="vadeBitis" class="form-control"
+                                       value="@ViewBag.VadeBitis" />
+                            </div>
+
                             <div class="form-group">
                                 <button type="submit" class="btn btn-tumblr btn-shadow waves-effect waves-light">Sorgula</button>
                             </div>
@@ -152,11 +161,13 @@
                                                     <td class="cari-unvani-cell" data-bs-toggle="tooltip" title="@firstItem.CariUnvani">
                                                         @firstItem.CariUnvani
                                                     </td>
-                                                    <td>@firstItem.FaturaTarihi.ToShortDateString()</td>
-                                                    <td>@firstItem.FaturaVadeTarihi.ToShortDateString()</td>
+                                                    <td>@firstItem.FaturaTarihi.ToString("dd.MM.yyyy")</td>
+                                                    <td>@firstItem.FaturaVadeTarihi.ToString("dd.MM.yyyy")</td>
+
+
                                                     <td>@firstItem.FaturaVadesi</td>
                                                     <td>@totalPayment.ToString("C")</td>
-                                                    <td>@resultDate1.ToShortDateString()</td>
+                                                    <td>@resultDate1.ToString("dd.MM.yyyy")</td>
                                                     <td>@faotsayi1</td>
                                                     <td>@sapma1</td>
                                                     <td>@fm1</td>
@@ -197,7 +208,23 @@
                                                 </tr>
                                             }
                                         </tbody>
-
+                                        <tfoot>
+                                            <tr style="background-color: #f8f9fa; font-weight: bold;">
+                                                <th></th> <!-- Evrak No -->
+                                                <th></th> <!-- Cari Unvanı -->
+                                                <th></th> <!-- Fatura Tarihi -->
+                                                <th></th> <!-- Fatura Vade Tarihi -->
+                                                <th></th> <!-- Vade (Gün) -->
+                                                <th></th> <!-- Borç Tutarı - Toplam buraya gelecek -->
+                                                <th></th> <!-- Fatura A. O. Ths. Tarih -->
+                                                <th></th> <!-- Fatura A. O. Ths. Süresi (Gün) -->
+                                                <th></th> <!-- Vadeden sapma (Gün) -->
+                                                <th></th> <!-- Fonlama Amaliyeti (Günlük %) -->
+                                                <th></th> <!-- Faiz Gider Geliri (TL) - Toplam buraya gelecek -->
+                                                <th></th> <!-- Ticari Kredi Faiz Oranı (Yıllık) -->
+                                                <th></th> <!-- İşlemler -->
+                                            </tr>
+                                        </tfoot>
                                     </table>
                                 </div>
                                 <div class="bottom">
@@ -229,49 +256,184 @@
             </div>
         </div>
 
-
-
-
-
-
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
         <script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
 
-
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                let table = new DataTable('#example');
-            });
             $('#example').DataTable({
-                "dom": '<"row d-flex justify-content-between align-items-center"<"col-sm-6"l><"col-sm-6 d-flex justify-content-end"B>>' +
-                    '<"row"<"col-sm-12 d-flex justify-content-end"f>>' +
-                    't' +
-                    '<"row"<"col-sm-6"i><"col-sm-6"p>>', // Alt satırda bilgi ve sayfa numaralandırma
-                "language": {
-                    "url": "/Content/DataTables/turkish.json"
+                dom: '<"row"<"col-sm-12"B>>' +
+                     '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+                     't' +
+                     '<"row"<"col-sm-6"i><"col-sm-6"p>>',
+                language: {
+                    url: "/Content/DataTables/turkish.json"
                 },
-                "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'],
-                "columnDefs": [
-                    { "targets": "_all" }
-                ]
+                pageLength: 5000, // Sayfa başına 5000 satır
+                lengthMenu: [[10, 25, 50, 100, 500, 1000, 5000, -1], [10, 25, 50, 100, 500, 1000, 5000, "Tümü"]], // Sayfa seçenekleri
+                buttons: [
+                    'copy',
+                    {
+                        extend: 'excel',
+                        text: 'Excel',
+                        customizeData: function (data) {
+                            // Tüm satırları döngüye al
+                            for (var i = 0; i < data.body.length; i++) {
+                                // **Tarih sütunlarını formatla**
+                                // Fatura Tarihi (2. sütun), Fatura Vade Tarihi (3. sütun), Fatura A. O. Ths. Tarih (6. sütun)
+                                [2, 3, 6].forEach(function (colIndex) {
+                                    if (data.body[i][colIndex]) {
+                                        data.body[i][colIndex] = formatDateForExcel(data.body[i][colIndex]);
+                                    }
+                                });
+
+                                // **Sayısal sütunları formatla**
+                                // Vade (Gün) (4. sütun), Borç Tutarı (5. sütun), Fatura A. O. Ths. Süresi (7. sütun),
+                                // Vadeden sapma (8. sütun), Fonlama Amaliyeti (9. sütun), Faiz Gider Geliri (10. sütun),
+                                // Ticari Kredi Faiz Oranı (11. sütun)
+                                [4, 5, 7, 8, 9, 10, 11].forEach(function (colIndex) {
+                                    if (data.body[i][colIndex]) {
+                                        // Türkçe formatındaki sayıyı Excel uyumlu hale getir
+                                        data.body[i][colIndex] = turkishToExcelNumber(data.body[i][colIndex]);
+                                    }
+                                });
+                            }
+                        },
+                        // Footer toplamlarını Excel'e dahil et
+                        footer: true
+                    },
+                    'pdf',
+                    'print'
+                ],
+                columnDefs: [
+                    { targets: "_all" }
+                ],
+                // Footer callback fonksiyonu - sadece Borç Tutarı ve Faiz Gider Geliri için toplam
+                footerCallback: function (row, data, start, end, display) {
+                    var api = this.api();
+                    var trCurrency = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' });
+
+                    // Sayısal değeri çıkarma fonksiyonu
+                    var intVal = function (i) {
+                        if (typeof i === 'string') {
+                            // Para birimi sembollerini ve formatları temizle
+                            var cleaned = i.replace(/[₺\s]/g, '')
+                                            .replace(/\./g, '')
+                                            .replace(/,/g, '.')
+                                            .replace(/%/g, '');
+                            return parseFloat(cleaned) || 0;
+                        }
+                        return typeof i === 'number' ? i : 0;
+                    };
+
+                    // Sadece Borç Tutarı (5. sütun) ve Faiz Gider Geliri (10. sütun) için toplam hesapla
+                    var columnsToSum = [5, 10]; // Borç Tutarı ve Faiz Gider Geliri
+
+                    columnsToSum.forEach(function(colIndex) {
+                        // Toplam hesapla (tüm sayfalar)
+                        var total = api
+                            .column(colIndex)
+                            .data()
+                            .reduce(function (a, b) {
+                                return intVal(a) + intVal(b);
+                            }, 0);
+
+                        // Görünen sayfadaki toplam
+                        var pageTotal = api
+                            .column(colIndex, { page: 'current' })
+                            .data()
+                            .reduce(function (a, b) {
+                                return intVal(a) + intVal(b);
+                            }, 0);
+
+                        // Footer'a toplamı yaz
+                        var footerText = trCurrency.format(pageTotal) + ' (' + trCurrency.format(total) + ')';
+                        $(api.column(colIndex).footer()).html(footerText);
+                    });
+
+                    // Diğer tüm sütunlar için boş değer
+                    [0, 1, 2, 3, 4, 6, 7, 8, 9, 11, 12].forEach(function(colIndex) {
+                        $(api.column(colIndex).footer()).html('');
+                    });
+                }
             });
 
+            // **Tarih formatını Excel uyumlu hale getirme**
+            function formatDateForExcel(dateStr) {
+                if (!dateStr) return dateStr;
 
+                // Eğer tarih dd.MM.yyyy formatındaysa
+                if (dateStr.includes('.')) {
+                    var parts = dateStr.split('.');
+                    if (parts.length === 3) {
+                        // dd.MM.yyyy formatını yyyy-MM-dd formatına çevir (Excel uyumlu)
+                        return parts[2] + '-' + parts[1] + '-' + parts[0];
+                    }
+                }
+
+                return dateStr; // Değilse olduğu gibi döndür
+            }
+
+            // **Türkçe sayıyı Excel uyumlu formata çevirme**
+            function turkishToExcelNumber(numberStr) {
+                if (!numberStr) return numberStr;
+
+                // Eğer % işareti varsa (faiz oranı için)
+                if (numberStr.toString().includes('%')) {
+                    var cleanedPercent = numberStr.toString()
+                        .replace('%', '')
+                        .replace(/\./g, '')  // Binlik ayraçlarını sil
+                        .replace(/,/g, '.'); // Ondalık ayracını nokta yap
+
+                    if (!isNaN(cleanedPercent)) {
+                        return parseFloat(cleanedPercent) / 100; // Excel'de yüzde olarak gösterebilmek için
+                    }
+                }
+
+                // Eğer para birimi işareti varsa (₺ veya TL)
+                if (numberStr.toString().includes('₺') || numberStr.toString().includes('TL')) {
+                    var cleanedCurrency = numberStr.toString()
+                        .replace(/₺/g, '')
+                        .replace(/TL/g, '')
+                        .replace(/\./g, '')  // Binlik ayraçlarını sil
+                        .replace(/,/g, '.') // Ondalık ayracını nokta yap
+                        .trim();
+
+                    if (!isNaN(cleanedCurrency)) {
+                        return parseFloat(cleanedCurrency);
+                    }
+                }
+
+                // Normal sayılar için
+                // 1. Binlik ayraçlarını (.) kaldır
+                // 2. Ondalık ayracını (,) noktaya (.) çevir
+                var cleanedNumber = numberStr.toString()
+                    .replace(/\./g, '')  // Binlik ayraçlarını sil
+                    .replace(/,/g, '.'); // Ondalık ayracını nokta yap
+
+                // Eğer sayıya çevrilebiliyorsa, float olarak döndür
+                if (!isNaN(cleanedNumber)) {
+                    return parseFloat(cleanedNumber);
+                }
+
+                return numberStr; // Değilse olduğu gibi döndür
+            }
 
             function loadModalContent(id) {
                 let content = document.getElementById('content-' + id).innerHTML;
                 document.querySelector('#detayModal .modal-body').innerHTML = content;
-                var myModal = new bootstrap.Modal(document.getElementById('detayModal'), { keyboard: true });
+
+                var myModal = new bootstrap.Modal(document.getElementById('detayModal'), {
+                    keyboard: true
+                });
                 myModal.show();
             }
 
             document.getElementById('detayModal').addEventListener('hidden.bs.modal', function () {
                 document.querySelector('.modal-backdrop').remove();
             });
+
         </script>
-
-
 
         <style>
             /* Length alanı için stiller */
@@ -332,6 +494,14 @@
                 justify-content: flex-end;
             }
 
+            /* Footer stilleri */
+            .dataTables_wrapper tfoot th {
+                text-align: center;
+                color: #162E54;
+                font-weight: bold;
+            }
+
         </style>
 
-
+    </div>
+</div>

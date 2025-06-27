@@ -53,14 +53,27 @@ namespace Deneme_proje.Controllers
 
 
 
-        public IActionResult TedarikciKapaliFatura(string cariKodu)
+        public IActionResult TedarikciKapaliFatura(string cariKodu, DateTime? vadeBaslangic, DateTime? vadeBitis)
         {
             float ticariFaiz = 66.24f;
 
-            // Cari kodu boş olsa bile tüm verileri getirin
-            var faturaData = _faturaRepository.GetTedarikciFaturaData(cariKodu, ticariFaiz);
+            // Eğer tarih girilmemişse, yılın başı ve sonu olarak ayarla
+            DateTime defaultBaslangic = new DateTime(DateTime.Now.Year, 1, 1);
+            DateTime defaultBitis = new DateTime(DateTime.Now.Year, 12, 31);
 
-            // Ensure the type here matches the view expectation
+            var baslangic = vadeBaslangic ?? defaultBaslangic;
+            var bitis = vadeBitis ?? defaultBitis;
+
+            // Tedarikçi fatura verilerini al ve tarih filtresi uygula
+            var faturaData = _faturaRepository.GetTedarikciFaturaData(cariKodu, ticariFaiz)
+                              .Where(x => x.FaturaVadeTarihi >= baslangic && x.FaturaVadeTarihi <= bitis)
+                              .ToList();
+
+            // ViewBag'e filtreleri aktar
+            ViewBag.CariKodu = cariKodu;
+            ViewBag.VadeBaslangic = baslangic.ToString("yyyy-MM-dd");
+            ViewBag.VadeBitis = bitis.ToString("yyyy-MM-dd");
+
             return View(faturaData);
         }
 
@@ -1094,6 +1107,30 @@ public IActionResult HataliUretimler(DateTime? baslangicTarihi = null, DateTime?
             {
                 _logger.LogError(ex, "Malzeme tüketimi sırasında hata oluştu. İş Emri: {IsEmriKodu}", isEmriKodu);
                 return Json(new { success = false, message = "Tüketim işlemi sırasında bir hata oluştu: " + ex.Message });
+            }
+        }
+        // FaturaController.cs içine eklenecek action metodu
+        [AllowAnonymous]
+        public IActionResult Tuketim()
+        {
+            try
+            {
+                // Aktif durumu 1 olan ve planlanan (planlanmış durum 0) iş emirlerini getir
+                var aktifIsEmirleri = _faturaRepository.GetIsEmirleri()
+                    .Where(ie => ie.is_EmriDurumu == 1 || ie.is_EmriDurumu == 0)  // Aktif durum
+                    .OrderBy(ie => ie.UrunAdi)
+                    .ToList();
+
+                // Üretim yetkisini ViewBag'e ekle
+                ViewBag.HasProductionPermission = _faturaRepository.HasProductionPermission();
+
+                return View(aktifIsEmirleri);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Tüketim sayfası yüklenirken hata oluştu");
+                TempData["ErrorMessage"] = "Tüketim sayfası yüklenirken bir hata oluştu.";
+                return View("Error");
             }
         }
     }

@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Fatura Raporu";
     Layout = "~/Views/Shared/_Layout.cshtml";
-  
+
 }
 <link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
 
@@ -21,7 +21,7 @@
                                 <i class="icofont icofont-home"></i>
                             </a>
                         </li>
-                        
+
                     </ol>
                 </div>
             </div>
@@ -197,7 +197,23 @@
                                                 </tr>
                     }
                                         </tbody>
-
+                                        <tfoot>
+                                            <tr style="background-color: #f8f9fa; font-weight: bold;">
+                                                <th></th> <!-- Evrak No -->
+                                                <th></th> <!-- Cari Unvanı -->
+                                                <th></th> <!-- Fatura Tarihi -->
+                                                <th></th> <!-- Fatura Vade Tarihi -->
+                                                <th></th> <!-- Vade (Gün) -->
+                                                <th></th> <!-- Borç Tutarı - Toplam buraya gelecek -->
+                                                <th></th> <!-- Fatura A. O. Ths. Tarih -->
+                                                <th></th> <!-- Fatura A. O. Ths. Süresi (Gün) -->
+                                                <th></th> <!-- Vadeden sapma (Gün) -->
+                                                <th></th> <!-- Fonlama Amaliyeti (Günlük %) -->
+                                                <th></th> <!-- Faiz Gider Geliri (TL) - Toplam buraya gelecek -->
+                                                <th></th> <!-- Ticari Kredi Faiz Oranı (Yıllık) -->
+                                                <th></th> <!-- İşlemler -->
+                                            </tr>
+                                        </tfoot>
                                     </table>
                                 </div>
                                 <div class="bottom">
@@ -271,18 +287,163 @@
 
         <script>
             $('#example').DataTable({
-                "dom": '<"row"<"col-sm-12"B>>' +
-                    '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
-                    't' +
-                    '<"row"<"col-sm-6"i><"col-sm-6"p>>',
-                "language": {
-                    "url": "/Content/DataTables/turkish.json"
+                dom: '<"row"<"col-sm-12"B>>' +
+                     '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+                     't' +
+                     '<"row"<"col-sm-6"i><"col-sm-6"p>>',
+                language: {
+                    url: "/Content/DataTables/turkish.json"
                 },
-                "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'], // Butonlar
-                "columnDefs": [
-                    { "targets": "_all" } // Kolon genişliklerini sabitleme
-                ]
+                pageLength: 5000, // Sayfa başına 5000 satır
+                lengthMenu: [[10, 25, 50, 100, 500, 1000, 5000, -1], [10, 25, 50, 100, 500, 1000, 5000, "Tümü"]], // Sayfa seçenekleri
+                buttons: [
+                    'copy',
+                    {
+                        extend: 'excel',
+                        text: 'Excel',
+                        customizeData: function (data) {
+                            // Tüm satırları döngüye al
+                            for (var i = 0; i < data.body.length; i++) {
+                                // **Tarih sütunlarını formatla**
+                                // Fatura Tarihi (2. sütun), Fatura Vade Tarihi (3. sütun), Fatura A. O. Ths. Tarih (6. sütun)
+                                [2, 3, 6].forEach(function (colIndex) {
+                                    if (data.body[i][colIndex]) {
+                                        data.body[i][colIndex] = formatDateForExcel(data.body[i][colIndex]);
+                                    }
+                                });
+
+                                // **Sayısal sütunları formatla**
+                                // Vade (Gün) (4. sütun), Borç Tutarı (5. sütun), Fatura A. O. Ths. Süresi (7. sütun),
+                                // Vadeden sapma (8. sütun), Fonlama Amaliyeti (9. sütun), Faiz Gider Geliri (10. sütun),
+                                // Ticari Kredi Faiz Oranı (11. sütun)
+                                [4, 5, 7, 8, 9, 10, 11].forEach(function (colIndex) {
+                                    if (data.body[i][colIndex]) {
+                                        // Türkçe formatındaki sayıyı Excel uyumlu hale getir
+                                        data.body[i][colIndex] = turkishToExcelNumber(data.body[i][colIndex]);
+                                    }
+                                });
+                            }
+                        },
+                        // Footer toplamlarını Excel'e dahil et
+                        footer: true
+                    },
+                    'pdf',
+                    'print'
+                ],
+                columnDefs: [
+                    { targets: "_all" }
+                ],
+                // Footer callback fonksiyonu - sadece Borç Tutarı ve Faiz Gider Geliri için toplam
+                footerCallback: function (row, data, start, end, display) {
+                    var api = this.api();
+                    var trCurrency = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' });
+
+                    // Sayısal değeri çıkarma fonksiyonu
+                    var intVal = function (i) {
+                        if (typeof i === 'string') {
+                            // Para birimi sembollerini ve formatları temizle
+                            var cleaned = i.replace(/[₺\s]/g, '')
+                                            .replace(/\./g, '')
+                                            .replace(/,/g, '.')
+                                            .replace(/%/g, '');
+                            return parseFloat(cleaned) || 0;
+                        }
+                        return typeof i === 'number' ? i : 0;
+                    };
+
+                    // Sadece Borç Tutarı (5. sütun) ve Faiz Gider Geliri (10. sütun) için toplam hesapla
+                    var columnsToSum = [5, 10]; // Borç Tutarı ve Faiz Gider Geliri
+
+                    columnsToSum.forEach(function(colIndex) {
+                        // Toplam hesapla (tüm sayfalar)
+                        var total = api
+                            .column(colIndex)
+                            .data()
+                            .reduce(function (a, b) {
+                                return intVal(a) + intVal(b);
+                            }, 0);
+
+                        // Görünen sayfadaki toplam
+                        var pageTotal = api
+                            .column(colIndex, { page: 'current' })
+                            .data()
+                            .reduce(function (a, b) {
+                                return intVal(a) + intVal(b);
+                            }, 0);
+
+                        // Footer'a toplamı yaz
+                        var footerText = trCurrency.format(pageTotal) + ' (' + trCurrency.format(total) + ')';
+                        $(api.column(colIndex).footer()).html(footerText);
+                    });
+
+                    // Diğer tüm sütunlar için boş değer
+                    [0, 1, 2, 3, 4, 6, 7, 8, 9, 11, 12].forEach(function(colIndex) {
+                        $(api.column(colIndex).footer()).html('');
+                    });
+                }
             });
+
+            // **Tarih formatını Excel uyumlu hale getirme**
+            function formatDateForExcel(dateStr) {
+                if (!dateStr) return dateStr;
+
+                // Eğer tarih dd.MM.yyyy formatındaysa
+                if (dateStr.includes('.')) {
+                    var parts = dateStr.split('.');
+                    if (parts.length === 3) {
+                        // dd.MM.yyyy formatını yyyy-MM-dd formatına çevir (Excel uyumlu)
+                        return parts[2] + '-' + parts[1] + '-' + parts[0];
+                    }
+                }
+
+                return dateStr; // Değilse olduğu gibi döndür
+            }
+
+            // **Türkçe sayıyı Excel uyumlu formata çevirme**
+            function turkishToExcelNumber(numberStr) {
+                if (!numberStr) return numberStr;
+
+                // Eğer % işareti varsa (faiz oranı için)
+                if (numberStr.toString().includes('%')) {
+                    var cleanedPercent = numberStr.toString()
+                        .replace('%', '')
+                        .replace(/\./g, '')  // Binlik ayraçlarını sil
+                        .replace(/,/g, '.'); // Ondalık ayracını nokta yap
+
+                    if (!isNaN(cleanedPercent)) {
+                        return parseFloat(cleanedPercent) / 100; // Excel'de yüzde olarak gösterebilmek için
+                    }
+                }
+
+                // Eğer para birimi işareti varsa (₺ veya TL)
+                if (numberStr.toString().includes('₺') || numberStr.toString().includes('TL')) {
+                    var cleanedCurrency = numberStr.toString()
+                        .replace(/₺/g, '')
+                        .replace(/TL/g, '')
+                        .replace(/\./g, '')  // Binlik ayraçlarını sil
+                        .replace(/,/g, '.') // Ondalık ayracını nokta yap
+                        .trim();
+
+                    if (!isNaN(cleanedCurrency)) {
+                        return parseFloat(cleanedCurrency);
+                    }
+                }
+
+                // Normal sayılar için
+                // 1. Binlik ayraçlarını (.) kaldır
+                // 2. Ondalık ayracını (,) noktaya (.) çevir
+                var cleanedNumber = numberStr.toString()
+                    .replace(/\./g, '')  // Binlik ayraçlarını sil
+                    .replace(/,/g, '.'); // Ondalık ayracını nokta yap
+
+                // Eğer sayıya çevrilebiliyorsa, float olarak döndür
+                if (!isNaN(cleanedNumber)) {
+                    return parseFloat(cleanedNumber);
+                }
+
+                return numberStr; // Değilse olduğu gibi döndür
+            }
+
             function loadModalContent(id) {
                 let content = document.getElementById('content-' + id).innerHTML;
                 document.querySelector('#detayModal .modal-body').innerHTML = content;
@@ -297,12 +458,75 @@
                 document.querySelector('.modal-backdrop').remove();
             });
 
-
-
         </script>
 
+        <style>
+            /* Length alanı için stiller */
+            .dataTables_length {
+                display: flex;
+                align-items: center;
+                margin-right: 10px;
+            }
 
+                .dataTables_length label {
+                    font-size: 14px;
+                    margin-right: 10px;
+                }
 
+                .dataTables_length select {
+                    border: 1px solid #ced4da;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    padding: 3px 8px;
+                    max-width: 80px;
+                }
 
+            /* Butonlar için stil */
+            .dt-button, .dt-button:hover {
+                background: #162E54;
+                color: #fff;
+                border: none;
+                padding: 5px 10px;
+                border-radius: 3px;
+                margin-left: 5px;
+            }
 
+            /* Arama alanı */
+            .dataTables_filter {
+                margin-top: 10px;
+                display: flex;
+                justify-content: flex-end;
+            }
 
+                .dataTables_filter input[type="search"] {
+                    border: 1px solid #ced4da;
+                    border-radius: 4px;
+                    padding: 5px 10px;
+                    font-size: 12px;
+                    width: 180px;
+                    outline: none;
+                }
+
+            /* Alt satırdaki bilgi ve sayfalama alanları */
+            .dataTables_wrapper .dataTables_info {
+                font-size: 12px;
+                color: #495057;
+                text-align: left;
+            }
+
+            .dataTables_wrapper .dataTables_paginate {
+                display: flex;
+                justify-content: flex-end;
+            }
+
+            /* Footer stilleri */
+            .dataTables_wrapper tfoot th {
+                text-align: center;
+                color: #162E54;
+                font-weight: bold;
+            }
+
+        </style>
+
+    </div>
+</div>

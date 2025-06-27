@@ -560,6 +560,8 @@ namespace Deneme_proje.Controllers
                 System.Net.ServicePointManager.ServerCertificateValidationCallback = null;
             }
         }
+        // IzinTalepPdfIndir metodundaki güncellemeler - işe giriş tarihi ve kalan izin hakkı eklendi
+
         [HttpGet]
         [Route("Hr/IzinTalepPdfIndir")]
         [AllowAnonymous]
@@ -567,12 +569,11 @@ namespace Deneme_proje.Controllers
         {
             try
             {
-                // GUID kontrolü
                 if (izinGuid == Guid.Empty)
                 {
                     return RedirectToAction("Izinlerim", new { error = "Geçersiz izin talebi." });
                 }
-                // İzin ve personel bilgilerini veritabanından al
+
                 string username = HttpContext.Session.GetString("Username");
                 string version = HttpContext.Session.GetString("SelectedVersion");
 
@@ -592,9 +593,11 @@ namespace Deneme_proje.Controllers
                 string personelGorev = "";
                 string personelBirim = "";
                 string personelTcNo = "";
-                string idariAmirKodu = ""; // İdari amir kodu için değişken
-                string idariAmirAdi = ""; // Amir adı için yeni değişken
-                string idariAmirSoyadi = ""; // Amir soyadı için yeni değişken
+                DateTime personelIseGirisTarihi = DateTime.Now;
+                decimal kalanIzinHakki = 0;
+                string idariAmirKodu = "";
+                string idariAmirAdi = "";
+                string idariAmirSoyadi = "";
                 string ikKodu = "";
                 string ikAdi = "";
                 string ikSoyadi = "";
@@ -644,15 +647,14 @@ namespace Deneme_proje.Controllers
                                         : 0;
                                 }
                             }
-                            // ÖNEMLİ: DataReader kapatıldı (using bloğu sayesinde)
                         }
                     }
 
                     // İşe başlama tarihini PERSONEL_IZIN_TALEPLERI_user tablosundan al
                     string iseBaslamaSorgusu = @"
-        SELECT IsbaslamaTarihi 
-        FROM PERSONEL_IZIN_TALEPLERI_user 
-        WHERE Record_uid = @izinGuid";
+                SELECT IsbaslamaTarihi 
+                FROM PERSONEL_IZIN_TALEPLERI_user 
+                WHERE Record_uid = @izinGuid";
 
                     using (SqlCommand iseBaslamaCommand = new SqlCommand(iseBaslamaSorgusu, connection))
                     {
@@ -665,24 +667,114 @@ namespace Deneme_proje.Controllers
                         }
                         else
                         {
-                            // Eğer veritabanında yoksa, bitiş tarihine bir gün ekle
                             iseBaslamaTarih = izinBitis.AddDays(1);
                         }
                     }
 
-                    // Personel bilgilerini ve İdari Amir Kodunu al
+                    // Personel bilgilerini ve kalan izin hakkını al
                     string personelQuery = @"
-            SELECT 
-                p.per_adi, 
-                p.per_soyadi, 
-                p.per_kim_gorev, 
-                d.pdp_adi, 
-                p.Per_TcKimlikNo,
-                p.per_IdariAmirKodu,
-                p.per_raporlama_yapacagi_per_kod
-            FROM PERSONELLER p
-            LEFT JOIN DEPARTMANLAR d ON p.per_dept_kod = d.pdp_kodu
-            WHERE p.per_kod = @personelKodu";
+DECLARE @Yil INT = YEAR(GETDATE());
+
+WITH PersonelBilgileri AS (
+    SELECT 
+        p.per_kod,
+        p.per_adi, 
+        p.per_soyadi, 
+        p.per_kim_gorev, 
+        d.pdp_adi as DepartmanAdi, 
+        p.Per_TcKimlikNo,
+        p.per_IdariAmirKodu,
+        p.per_raporlama_yapacagi_per_kod,
+        p.per_giris_tar,
+        CASE
+            WHEN DATEFROMPARTS(@Yil, MONTH(p.per_giris_tar), DAY(p.per_giris_tar)) <= GETDATE() THEN 
+                DATEDIFF(YEAR, p.per_giris_tar, GETDATE())
+            ELSE 
+                DATEDIFF(YEAR, p.per_giris_tar, GETDATE()) - 1
+        END AS CalismaSuresiYil,
+        CASE
+            WHEN DATEFROMPARTS(@Yil, MONTH(p.per_giris_tar), DAY(p.per_giris_tar)) <= GETDATE() THEN 1
+            ELSE 0
+        END AS YildonumuGectiMi
+    FROM PERSONELLER p
+    LEFT JOIN DEPARTMANLAR d ON p.per_dept_kod = d.pdp_kodu
+    WHERE p.per_kod = @personelKodu
+),
+IzinHaklari AS (
+    SELECT
+        per_kod,
+        per_adi,
+        per_soyadi,
+        per_kim_gorev,
+        DepartmanAdi,
+        Per_TcKimlikNo,
+        per_IdariAmirKodu,
+        per_raporlama_yapacagi_per_kod,
+        per_giris_tar,
+        CalismaSuresiYil,
+        YildonumuGectiMi,
+        CASE 
+            WHEN YildonumuGectiMi = 0 THEN 0
+            WHEN CalismaSuresiYil >= 15 THEN 26
+            WHEN CalismaSuresiYil > 5 THEN 20
+            WHEN CalismaSuresiYil >= 1 THEN 14
+            ELSE 0
+        END AS HakEdilenYillikIzin
+    FROM PersonelBilgileri
+),
+GecenYilDevredilen AS (
+    SELECT
+        IH.*,
+        ISNULL((SELECT SUM(pro_gecyil_devir_izin) 
+                FROM dbo.PERSONEL_TAHAKKUK_OZETLERI WITH (NOLOCK) 
+                WHERE pro_kodozet = IH.per_kod 
+                AND pro_ozetyili = @Yil), 0) AS GecenYilDevirIzinGun,
+        ISNULL((SELECT SUM(pro_gecyil_devir_saatlikizin) 
+                FROM dbo.PERSONEL_TAHAKKUK_OZETLERI WITH (NOLOCK) 
+                WHERE pro_kodozet = IH.per_kod 
+                AND pro_ozetyili = @Yil), 0) AS GecenYilDevirIzinSaat
+    FROM IzinHaklari IH
+),
+KullanilanIzinler AS (
+    SELECT
+        GYD.*,
+        ISNULL((
+            SELECT SUM(
+                CASE
+                    WHEN pz_saat IS NOT NULL AND pz_saat > 0 THEN
+                        CASE 
+                            WHEN pz_saat <= 4 THEN 0.5 + pz_gun_sayisi
+                            ELSE 1.0 + pz_gun_sayisi
+                        END
+                    ELSE pz_gun_sayisi
+                END
+            )
+            FROM PERSONEL_IZINLERI WITH (NOLOCK) 
+            WHERE pz_pers_kod = GYD.per_kod 
+            AND pz_izin_yil = @Yil
+            AND pz_izin_tipi = 0
+        ), 0) AS KullanilanIzinGun
+    FROM GecenYilDevredilen GYD
+)
+SELECT
+    per_kod,
+    per_adi,
+    per_soyadi,
+    per_kim_gorev,
+    DepartmanAdi,
+    Per_TcKimlikNo,
+    per_IdariAmirKodu,
+    per_raporlama_yapacagi_per_kod,
+    per_giris_tar,
+    CASE
+        WHEN GecenYilDevirIzinSaat IS NOT NULL AND GecenYilDevirIzinSaat > 0 THEN
+            CASE 
+                WHEN GecenYilDevirIzinSaat <= 4 THEN 0.5 + (GecenYilDevirIzinGun + HakEdilenYillikIzin - KullanilanIzinGun)
+                ELSE 1.0 + (GecenYilDevirIzinGun + HakEdilenYillikIzin - KullanilanIzinGun)
+            END
+        ELSE (GecenYilDevirIzinGun + HakEdilenYillikIzin - KullanilanIzinGun)
+    END AS KalanIzinBakiyesi
+FROM KullanilanIzinler";
 
                     using (SqlCommand command = new SqlCommand(personelQuery, connection))
                     {
@@ -694,24 +786,24 @@ namespace Deneme_proje.Controllers
                                 personelAdi = reader["per_adi"].ToString();
                                 personelSoyadi = reader["per_soyadi"].ToString();
                                 personelGorev = reader["per_kim_gorev"]?.ToString() ?? "";
-                                personelBirim = reader["pdp_adi"]?.ToString() ?? "";
+                                personelBirim = reader["DepartmanAdi"]?.ToString() ?? "";
                                 personelTcNo = reader["Per_TcKimlikNo"]?.ToString() ?? "";
+                                personelIseGirisTarihi = Convert.ToDateTime(reader["per_giris_tar"]);
+                                kalanIzinHakki = Convert.ToDecimal(reader["KalanIzinBakiyesi"]);
 
-                                // İdari amir kodu alındı
                                 idariAmirKodu = reader["per_IdariAmirKodu"]?.ToString();
                                 ikKodu = reader["per_raporlama_yapacagi_per_kod"]?.ToString();
                             }
                         }
-                        // ÖNEMLİ: DataReader kapatıldı (using bloğu sayesinde)
                     }
 
                     // İdari amir bilgilerini ayrı bir sorguda al
                     if (!string.IsNullOrEmpty(idariAmirKodu))
                     {
                         string amirSorgusu = @"
-                SELECT per_adi, per_soyadi
-                FROM PERSONELLER
-                WHERE per_kod = @amirKodu";
+                    SELECT per_adi, per_soyadi
+                    FROM PERSONELLER
+                    WHERE per_kod = @amirKodu";
 
                         using (SqlCommand amirCommand = new SqlCommand(amirSorgusu, connection))
                         {
@@ -725,16 +817,15 @@ namespace Deneme_proje.Controllers
                                     idariAmirSoyadi = amirReader["per_soyadi"].ToString();
                                 }
                             }
-                            // ÖNEMLİ: DataReader kapatıldı (using bloğu sayesinde)
                         }
                     }
 
                     if (!string.IsNullOrEmpty(ikKodu))
                     {
                         string ikSorgusu = @"
-                SELECT per_adi, per_soyadi
-                FROM PERSONELLER
-                WHERE per_kod = @ikKodu";
+                    SELECT per_adi, per_soyadi
+                    FROM PERSONELLER
+                    WHERE per_kod = @ikKodu";
 
                         using (SqlCommand amirCommand = new SqlCommand(ikSorgusu, connection))
                         {
@@ -748,7 +839,6 @@ namespace Deneme_proje.Controllers
                                     ikSoyadi = amirReader["per_soyadi"].ToString();
                                 }
                             }
-                            // ÖNEMLİ: DataReader kapatıldı (using bloğu sayesinde)
                         }
                     }
                 }
@@ -756,7 +846,6 @@ namespace Deneme_proje.Controllers
                 // PDF oluştur
                 using (MemoryStream ms = new MemoryStream())
                 {
-                    // Türkçe karakter desteği için BaseFont ayarı
                     BaseFont baseFont = BaseFont.CreateFont(BaseFont.HELVETICA, "Cp1254", BaseFont.NOT_EMBEDDED);
                     Font normalFont = new Font(baseFont, 10, Font.NORMAL);
                     Font boldFont = new Font(baseFont, 10, Font.BOLD);
@@ -811,10 +900,10 @@ namespace Deneme_proje.Controllers
 
                     document.Add(new Paragraph(" ")); // Boşluk
 
-                    // Personel Bilgileri Tablosu
-                    PdfPTable personelTable = new PdfPTable(5);
+                    // Personel Bilgileri Tablosu - Genişletilmiş
+                    PdfPTable personelTable = new PdfPTable(6); // 5'ten 6'ya çıkarıldı
                     personelTable.WidthPercentage = 100;
-                    personelTable.SetWidths(new float[] { 20f, 20f, 20f, 20f, 20f });
+                    personelTable.SetWidths(new float[] { 16f, 16f, 16f, 16f, 18f, 18f }); // Yeni sütun genişlikleri
 
                     // Başlık satırı
                     PdfPCell personelHeaderCell = new PdfPCell(new Phrase("PERSONELİN", boldFont));
@@ -828,7 +917,8 @@ namespace Deneme_proje.Controllers
                     AddHeaderCell(personelTable, "ADI SOYADI", boldFont);
                     AddHeaderCell(personelTable, "GÖREVİ", boldFont);
                     AddHeaderCell(personelTable, "BİRİMİ", boldFont);
-                    AddHeaderCell(personelTable, "T.C.SİCİL NO", boldFont);
+                    AddHeaderCell(personelTable, "İŞE GİRİŞ TARİHİ", boldFont);
+                    AddHeaderCell(personelTable, "KALAN İZİN HAKKI", boldFont);
 
                     // İçerik satırı
                     PdfPCell adSoyadCell = new PdfPCell(new Phrase(personelAdi + " " + personelSoyadi, normalFont));
@@ -846,20 +936,24 @@ namespace Deneme_proje.Controllers
                     birimCell.VerticalAlignment = Element.ALIGN_MIDDLE;
                     personelTable.AddCell(birimCell);
 
-                    PdfPCell tcNoCell = new PdfPCell(new Phrase(personelTcNo, normalFont));
-                    tcNoCell.HorizontalAlignment = Element.ALIGN_CENTER;
-                    tcNoCell.VerticalAlignment = Element.ALIGN_MIDDLE;
-                    personelTable.AddCell(tcNoCell);
+                    PdfPCell iseGirisCell = new PdfPCell(new Phrase(personelIseGirisTarihi.ToString("dd/MM/yyyy"), normalFont));
+                    iseGirisCell.HorizontalAlignment = Element.ALIGN_CENTER;
+                    iseGirisCell.VerticalAlignment = Element.ALIGN_MIDDLE;
+                    personelTable.AddCell(iseGirisCell);
+
+                    PdfPCell kalanIzinCell = new PdfPCell(new Phrase(kalanIzinHakki.ToString("F1") + " gün", normalFont));
+                    kalanIzinCell.HorizontalAlignment = Element.ALIGN_CENTER;
+                    kalanIzinCell.VerticalAlignment = Element.ALIGN_MIDDLE;
+                    personelTable.AddCell(kalanIzinCell);
 
                     document.Add(personelTable);
                     document.Add(new Paragraph(" ")); // Boşluk
 
-                    // İzin Türü Tablosu
+                    // İzin Türü Tablosu (aynı kalıyor)
                     PdfPTable izinTuruTable = new PdfPTable(8);
                     izinTuruTable.WidthPercentage = 100;
                     izinTuruTable.SetWidths(new float[] { 20f, 10f, 10f, 10f, 10f, 10f, 10f, 10f });
 
-                    // Başlık satırı
                     PdfPCell izinTuruHeaderCell = new PdfPCell(new Phrase("İSTENEN İZNİN NİTELİĞİ", boldFont));
                     izinTuruHeaderCell.BackgroundColor = new BaseColor(230, 230, 230);
                     izinTuruHeaderCell.Rowspan = 2;
@@ -867,7 +961,6 @@ namespace Deneme_proje.Controllers
                     izinTuruHeaderCell.VerticalAlignment = Element.ALIGN_MIDDLE;
                     izinTuruTable.AddCell(izinTuruHeaderCell);
 
-                    // Başlık hücreleri
                     AddHeaderCell(izinTuruTable, "YILLIK", boldFont);
                     AddHeaderCell(izinTuruTable, "DOĞUM", boldFont);
                     AddHeaderCell(izinTuruTable, "ÖLÜM", boldFont);
@@ -876,7 +969,7 @@ namespace Deneme_proje.Controllers
                     AddHeaderCell(izinTuruTable, "ÜCRETSİZ", boldFont);
                     AddHeaderCell(izinTuruTable, "DİĞER", boldFont);
 
-                    // İçerik satırı - checkbox'lar için izinTipi değerini kontrol et
+                    // İzin türü checkbox'ları
                     bool isYillikIzin = izinTipi == 0;
                     bool isDogumIzin = izinTipi == 11 || izinTipi == 12 || izinTipi == 13;
                     bool isOlumIzin = izinTipi == 14;
@@ -884,161 +977,27 @@ namespace Deneme_proje.Controllers
                     bool isevlilikIzin = izinTipi == 10;
                     bool isUcretsizIzin = izinTipi == 8;
                     bool isDigerIzin = izinTipi == 2 || izinTipi == 3 || izinTipi == 5 || izinTipi == 6 ||
-                                       izinTipi == 7 || izinTipi == 9 || izinTipi == 8 || izinTipi == 15;
+                                       izinTipi == 7 || izinTipi == 9 || izinTipi == 15;
 
-                    // Yeni bir font tanımlayalım (tüm izin tipleri için kullanılacak)
                     Font izinBilgiFont = new Font(baseFont, 12, Font.BOLD);
 
-                    // İzin Tipi Tablosu - İzin türü hücreleri için
-                    // Yıllık İzin
-                    PdfPCell yillikIzinCell = new PdfPCell();
-                    yillikIzinCell.HorizontalAlignment = Element.ALIGN_CENTER;
-                    yillikIzinCell.VerticalAlignment = Element.ALIGN_MIDDLE;
-                    yillikIzinCell.MinimumHeight = 30f;
-
-                    Paragraph yillikIzinPara = new Paragraph();
-                    if (isYillikIzin)
-                    {
-                        yillikIzinPara.Add(new Chunk("☑", new Font(Font.FontFamily.ZAPFDINGBATS, 12)));
-                        yillikIzinPara.Add(new Chunk("\n" + gunSayisi + " gün " + izinSaati + " saat", izinBilgiFont));
-                    }
-                    else
-                    {
-                        yillikIzinPara.Add(new Chunk("☐", new Font(Font.FontFamily.ZAPFDINGBATS, 12)));
-                    }
-                    yillikIzinPara.Alignment = Element.ALIGN_CENTER;
-                    yillikIzinCell.AddElement(yillikIzinPara);
-                    izinTuruTable.AddCell(yillikIzinCell);
-
-                    // Doğum İzni
-                    PdfPCell dogumIzinCell = new PdfPCell();
-                    dogumIzinCell.HorizontalAlignment = Element.ALIGN_CENTER;
-                    dogumIzinCell.VerticalAlignment = Element.ALIGN_MIDDLE;
-                    dogumIzinCell.MinimumHeight = 30f;
-
-                    Paragraph dogumIzinPara = new Paragraph();
-                    if (isDogumIzin)
-                    {
-                        dogumIzinPara.Add(new Chunk("☑", new Font(Font.FontFamily.ZAPFDINGBATS, 12)));
-                        dogumIzinPara.Add(new Chunk("\n" + gunSayisi + " gün " + izinSaati + " saat", izinBilgiFont));
-                    }
-                    else
-                    {
-                        dogumIzinPara.Add(new Chunk("☐", new Font(Font.FontFamily.ZAPFDINGBATS, 12)));
-                    }
-                    dogumIzinPara.Alignment = Element.ALIGN_CENTER;
-                    dogumIzinCell.AddElement(dogumIzinPara);
-                    izinTuruTable.AddCell(dogumIzinCell);
-
-                    // Ölüm İzni
-                    PdfPCell olumIzinCell = new PdfPCell();
-                    olumIzinCell.HorizontalAlignment = Element.ALIGN_CENTER;
-                    olumIzinCell.VerticalAlignment = Element.ALIGN_MIDDLE;
-                    olumIzinCell.MinimumHeight = 30f;
-
-                    Paragraph olumIzinPara = new Paragraph();
-                    if (isOlumIzin)
-                    {
-                        olumIzinPara.Add(new Chunk("☑", new Font(Font.FontFamily.ZAPFDINGBATS, 12)));
-                        olumIzinPara.Add(new Chunk("\n" + gunSayisi + " gün " + izinSaati + " saat", izinBilgiFont));
-                    }
-                    else
-                    {
-                        olumIzinPara.Add(new Chunk("☐", new Font(Font.FontFamily.ZAPFDINGBATS, 12)));
-                    }
-                    olumIzinPara.Alignment = Element.ALIGN_CENTER;
-                    olumIzinCell.AddElement(olumIzinPara);
-                    izinTuruTable.AddCell(olumIzinCell);
-
-                    // Mazeret İzni
-                    PdfPCell mazeretIzinCell = new PdfPCell();
-                    mazeretIzinCell.HorizontalAlignment = Element.ALIGN_CENTER;
-                    mazeretIzinCell.VerticalAlignment = Element.ALIGN_MIDDLE;
-                    mazeretIzinCell.MinimumHeight = 30f;
-
-                    Paragraph mazeretIzinPara = new Paragraph();
-                    if (isMazeretIzin)
-                    {
-                        mazeretIzinPara.Add(new Chunk("☑", new Font(Font.FontFamily.ZAPFDINGBATS, 12)));
-                        mazeretIzinPara.Add(new Chunk("\n" + gunSayisi + " gün " + izinSaati + " saat", izinBilgiFont));
-                    }
-                    else
-                    {
-                        mazeretIzinPara.Add(new Chunk("☐", new Font(Font.FontFamily.ZAPFDINGBATS, 12)));
-                    }
-                    mazeretIzinPara.Alignment = Element.ALIGN_CENTER;
-                    mazeretIzinCell.AddElement(mazeretIzinPara);
-                    izinTuruTable.AddCell(mazeretIzinCell);
-
-                    // Evlilik İzni
-                    PdfPCell evlilikIzinCell = new PdfPCell();
-                    evlilikIzinCell.HorizontalAlignment = Element.ALIGN_CENTER;
-                    evlilikIzinCell.VerticalAlignment = Element.ALIGN_MIDDLE;
-                    evlilikIzinCell.MinimumHeight = 30f;
-
-                    Paragraph evlilikIzinPara = new Paragraph();
-                    if (isevlilikIzin)
-                    {
-                        evlilikIzinPara.Add(new Chunk("☑", new Font(Font.FontFamily.ZAPFDINGBATS, 12)));
-                        evlilikIzinPara.Add(new Chunk("\n" + gunSayisi + " gün " + izinSaati + " saat", izinBilgiFont));
-                    }
-                    else
-                    {
-                        evlilikIzinPara.Add(new Chunk("☐", new Font(Font.FontFamily.ZAPFDINGBATS, 12)));
-                    }
-                    evlilikIzinPara.Alignment = Element.ALIGN_CENTER;
-                    evlilikIzinCell.AddElement(evlilikIzinPara);
-                    izinTuruTable.AddCell(evlilikIzinCell);
-
-                    // Ücretsiz İzin
-                    PdfPCell ucretsizIzinCell = new PdfPCell();
-                    ucretsizIzinCell.HorizontalAlignment = Element.ALIGN_CENTER;
-                    ucretsizIzinCell.VerticalAlignment = Element.ALIGN_MIDDLE;
-                    ucretsizIzinCell.MinimumHeight = 30f;
-
-                    Paragraph ucretsizIzinPara = new Paragraph();
-                    if (isUcretsizIzin)
-                    {
-                        ucretsizIzinPara.Add(new Chunk("☑", new Font(Font.FontFamily.ZAPFDINGBATS, 12)));
-                        ucretsizIzinPara.Add(new Chunk("\n" + gunSayisi + " gün " + izinSaati + " saat", izinBilgiFont));
-                    }
-                    else
-                    {
-                        ucretsizIzinPara.Add(new Chunk("☐", new Font(Font.FontFamily.ZAPFDINGBATS, 12)));
-                    }
-                    ucretsizIzinPara.Alignment = Element.ALIGN_CENTER;
-                    ucretsizIzinCell.AddElement(ucretsizIzinPara);
-                    izinTuruTable.AddCell(ucretsizIzinCell);
-
-                    // Diğer İzin
-                    PdfPCell digerIzinCell = new PdfPCell();
-                    digerIzinCell.HorizontalAlignment = Element.ALIGN_CENTER;
-                    digerIzinCell.VerticalAlignment = Element.ALIGN_MIDDLE;
-                    digerIzinCell.MinimumHeight = 30f;
-
-                    Paragraph digerIzinPara = new Paragraph();
-                    if (isDigerIzin)
-                    {
-                        digerIzinPara.Add(new Chunk("☑", new Font(Font.FontFamily.ZAPFDINGBATS, 12)));
-                        digerIzinPara.Add(new Chunk("\n" + gunSayisi + " gün " + izinSaati + " saat", izinBilgiFont));
-                    }
-                    else
-                    {
-                        digerIzinPara.Add(new Chunk("☐", new Font(Font.FontFamily.ZAPFDINGBATS, 12)));
-                    }
-                    digerIzinPara.Alignment = Element.ALIGN_CENTER;
-                    digerIzinCell.AddElement(digerIzinPara);
-                    izinTuruTable.AddCell(digerIzinCell);
+                    // Checkbox hücreleri ekle
+                    AddCheckboxCellWithInfo(izinTuruTable, isYillikIzin, gunSayisi, izinSaati, izinBilgiFont);
+                    AddCheckboxCellWithInfo(izinTuruTable, isDogumIzin, gunSayisi, izinSaati, izinBilgiFont);
+                    AddCheckboxCellWithInfo(izinTuruTable, isOlumIzin, gunSayisi, izinSaati, izinBilgiFont);
+                    AddCheckboxCellWithInfo(izinTuruTable, isMazeretIzin, gunSayisi, izinSaati, izinBilgiFont);
+                    AddCheckboxCellWithInfo(izinTuruTable, isevlilikIzin, gunSayisi, izinSaati, izinBilgiFont);
+                    AddCheckboxCellWithInfo(izinTuruTable, isUcretsizIzin, gunSayisi, izinSaati, izinBilgiFont);
+                    AddCheckboxCellWithInfo(izinTuruTable, isDigerIzin, gunSayisi, izinSaati, izinBilgiFont);
 
                     document.Add(izinTuruTable);
-                    document.Add(new Paragraph(" ")); // Boşluk
+                    document.Add(new Paragraph(" "));
 
                     // İzin Tarihleri Tablosu
                     PdfPTable tarihTable = new PdfPTable(3);
                     tarihTable.WidthPercentage = 100;
                     tarihTable.SetWidths(new float[] { 20f, 40f, 40f });
 
-                    // Başlık satırı
                     PdfPCell tarihHeaderCell = new PdfPCell(new Phrase("KULLANILACAK İZİNİN", boldFont));
                     tarihHeaderCell.BackgroundColor = new BaseColor(230, 230, 230);
                     tarihHeaderCell.Rowspan = 2;
@@ -1049,20 +1008,18 @@ namespace Deneme_proje.Controllers
                     AddHeaderCell(tarihTable, "İZİN BAŞLANGIÇ TARİHİ", boldFont);
                     AddHeaderCell(tarihTable, "İZİN DÖNÜŞÜ GÖREVE BAŞLAMA TARİHİ", boldFont);
 
-                    // İçerik satırı - tarihler
                     PdfPCell baslangicCell = new PdfPCell(new Phrase(izinBaslangic.ToString("dd/MM/yyyy"), normalFont));
                     baslangicCell.HorizontalAlignment = Element.ALIGN_CENTER;
                     baslangicCell.VerticalAlignment = Element.ALIGN_MIDDLE;
                     tarihTable.AddCell(baslangicCell);
 
-                    // Veritabanından alınan işe başlama tarihini kullan
                     PdfPCell iseBaslamaCell = new PdfPCell(new Phrase(iseBaslamaTarih.ToString("dd/MM/yyyy"), normalFont));
                     iseBaslamaCell.HorizontalAlignment = Element.ALIGN_CENTER;
                     iseBaslamaCell.VerticalAlignment = Element.ALIGN_MIDDLE;
                     tarihTable.AddCell(iseBaslamaCell);
 
                     document.Add(tarihTable);
-                    document.Add(new Paragraph(" ")); // Boşluk
+                    document.Add(new Paragraph(" "));
 
                     // Not bölümü
                     PdfPTable noteTable = new PdfPTable(1);
@@ -1078,7 +1035,7 @@ namespace Deneme_proje.Controllers
                     noteTable.AddCell(noteCell);
 
                     document.Add(noteTable);
-                    document.Add(new Paragraph(" ")); // Boşluk
+                    document.Add(new Paragraph(" "));
 
                     // İzin açıklaması
                     document.Add(new Paragraph("İzin Açıklaması:", boldFont));
@@ -1091,10 +1048,10 @@ namespace Deneme_proje.Controllers
                     adresTable.AddCell(adresCell);
 
                     document.Add(adresTable);
-                    document.Add(new Paragraph(" ")); // Boşluk
+                    document.Add(new Paragraph(" "));
 
                     // İmza alanları
-                    PdfPTable signatureTable = new PdfPTable(3); // Changed from 2 to 3 columns
+                    PdfPTable signatureTable = new PdfPTable(3);
                     signatureTable.WidthPercentage = 100;
 
                     // Personel imza alanı
@@ -1129,7 +1086,6 @@ namespace Deneme_proje.Controllers
                     amirSignatureText.Alignment = Element.ALIGN_CENTER;
                     amirSignatureText.Add(new Chunk("BİRİM AMİRİNİN\n", boldFont));
 
-                    // Amir adını direkt olarak göster, eğer varsa
                     if (!string.IsNullOrEmpty(idariAmirAdi) && !string.IsNullOrEmpty(idariAmirSoyadi))
                     {
                         amirSignatureText.Add(new Chunk("ADI SOYADI: " + idariAmirAdi + " " + idariAmirSoyadi + "\n\n", normalFont));
@@ -1158,7 +1114,6 @@ namespace Deneme_proje.Controllers
                     ikSignatureText.Alignment = Element.ALIGN_CENTER;
                     ikSignatureText.Add(new Chunk("İNSAN KAYNAKLARI\n", boldFont));
 
-                    // İK personeli adını göster, eğer varsa
                     if (!string.IsNullOrEmpty(ikAdi) && !string.IsNullOrEmpty(ikSoyadi))
                     {
                         ikSignatureText.Add(new Chunk("ADI SOYADI: " + ikAdi + " " + ikSoyadi + "\n\n", normalFont));
@@ -1195,6 +1150,29 @@ namespace Deneme_proje.Controllers
             }
         }
 
+        // Yardımcı metot - checkbox ile bilgi gösteren hücre
+        private void AddCheckboxCellWithInfo(PdfPTable table, bool isChecked, byte gunSayisi, float izinSaati, Font izinBilgiFont)
+        {
+            PdfPCell cell = new PdfPCell();
+            cell.HorizontalAlignment = Element.ALIGN_CENTER;
+            cell.VerticalAlignment = Element.ALIGN_MIDDLE;
+            cell.MinimumHeight = 30f;
+
+            Paragraph para = new Paragraph();
+            if (isChecked)
+            {
+                para.Add(new Chunk("☑", new Font(Font.FontFamily.ZAPFDINGBATS, 12)));
+                para.Add(new Chunk("\n" + gunSayisi + " gün " + izinSaati + " saat", izinBilgiFont));
+            }
+            else
+            {
+                para.Add(new Chunk("☐", new Font(Font.FontFamily.ZAPFDINGBATS, 12)));
+            }
+            para.Alignment = Element.ALIGN_CENTER;
+            cell.AddElement(para);
+            table.AddCell(cell);
+        }
+
         // Yardımcı metotlar - bunları değiştirmeye gerek yok
         private void AddHeaderCell(PdfPTable table, string text, Font font)
         {
@@ -1229,6 +1207,303 @@ namespace Deneme_proje.Controllers
             table.AddCell(cell);
         }
 
+        // BeklemetIzinTalebi metodu - düzeltilmiş versiyon
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> BeklemetIzinTalebi(Guid guid, string personelKodu, DateTime talepTarihi)
+        {
+            try
+            {
+                string username = HttpContext.Session.GetString("Username");
+                string version = HttpContext.Session.GetString("SelectedVersion");
+
+                if (string.IsNullOrEmpty(username))
+                {
+                    return Json(new { success = false, message = "Kullanıcı oturumu bulunamadı." });
+                }
+
+                // MikroDB'den kullanıcı numarasını al
+                string mikroDbConnectionString = version == "V16"
+                    ? _configuration.GetConnectionString("MikroDB_V16")
+                    : _configuration.GetConnectionString("MikroDesktop");
+
+                short kullaniciNo;
+                using (SqlConnection mikroConnection = new SqlConnection(mikroDbConnectionString))
+                {
+                    await mikroConnection.OpenAsync();
+                    using SqlCommand userCommand = new SqlCommand("SELECT User_no FROM KULLANICILAR WHERE User_name = @username", mikroConnection);
+                    userCommand.Parameters.AddWithValue("@username", username);
+                    var result = await userCommand.ExecuteScalarAsync();
+
+                    if (result == null)
+                    {
+                        return Json(new { success = false, message = "Kullanıcı bilgileri bulunamadı." });
+                    }
+
+                    kullaniciNo = Convert.ToInt16(result);
+                }
+
+                // Ana veritabanı bağlantı dizesini al
+                string erpConnectionString = _dbSelectorService.GetConnectionString();
+
+                using (SqlConnection connection = new SqlConnection(erpConnectionString))
+                {
+                    await connection.OpenAsync();
+
+                    // İzin talebini beklemeye al (durum 1'den 0'a çevir) ve PERSONEL_IZINLERI'nden sil
+                    using (var transaction = connection.BeginTransaction())
+                    {
+                        try
+                        {
+                            // 1. Önce izin talebinin durumunu kontrol et
+                            string checkQuery = "SELECT pit_izin_durum FROM PERSONEL_IZIN_TALEPLERI WHERE pit_Guid = @guid";
+                            using (SqlCommand checkCommand = new SqlCommand(checkQuery, connection, transaction))
+                            {
+                                checkCommand.Parameters.AddWithValue("@guid", guid);
+                                var currentStatus = await checkCommand.ExecuteScalarAsync();
+
+                                if (currentStatus == null)
+                                {
+                                    transaction.Rollback();
+                                    return Json(new { success = false, message = "İzin talebi bulunamadı." });
+                                }
+
+                                int status = Convert.ToInt32(currentStatus);
+                                if (status != 1)
+                                {
+                                    transaction.Rollback();
+                                    return Json(new { success = false, message = "Bu izin talebi zaten işlenmiş veya onaylanmamış durumda." });
+                                }
+                            }
+
+                            // 2. PERSONEL_IZIN_TALEPLERI tablosunu güncelle
+                            string updateTalepQuery = @"
+                        UPDATE PERSONEL_IZIN_TALEPLERI 
+                        SET pit_izin_durum = 0, 
+                            pit_onaylayan_kullanici = 0,
+                            pit_lastup_user = @kullaniciNo,
+                            pit_lastup_date = GETDATE(),
+                            pit_degisti = 1,
+                            pit_aciklama1 = 'Onaylanmış izin iptal edildi ve beklemeye alındı.'
+                        WHERE pit_Guid = @guid 
+                        AND pit_izin_durum = 1";
+
+                            using (SqlCommand updateCommand = new SqlCommand(updateTalepQuery, connection, transaction))
+                            {
+                                updateCommand.Parameters.AddWithValue("@guid", guid);
+                                updateCommand.Parameters.AddWithValue("@kullaniciNo", kullaniciNo);
+
+                                int affectedRows = await updateCommand.ExecuteNonQueryAsync();
+
+                                if (affectedRows == 0)
+                                {
+                                    transaction.Rollback();
+                                    return Json(new { success = false, message = "İzin talebi güncellenemedi." });
+                                }
+                            }
+
+                            // 3. PERSONEL_IZINLERI tablosundan ilgili kaydı sil
+                            string deleteIzinQuery = @"
+                        DELETE FROM PERSONEL_IZINLERI 
+                        WHERE pz_bagli_talep_uid = @guid";
+
+                            using (SqlCommand deleteCommand = new SqlCommand(deleteIzinQuery, connection, transaction))
+                            {
+                                deleteCommand.Parameters.AddWithValue("@guid", guid);
+                                await deleteCommand.ExecuteNonQueryAsync();
+                            }
+
+                            transaction.Commit();
+
+                            // Personel e-posta adresini al ve bildirim gönder
+                            string personelEmail = await GetPersonelEmailAsync(personelKodu, connection);
+
+                            if (!string.IsNullOrEmpty(personelEmail))
+                            {
+                                // İzin talebi detaylarını çek
+                                var izinTalebi = await GetIzinTalebiDetaylariAsync(guid, connection);
+
+                                if (izinTalebi != null)
+                                {
+                                    izinTalebi.ReddetmeNedeni = "Onaylanmış izin iptal edildi ve beklemeye alındı.";
+
+                                    // Beklemeye alma bildirimi gönder
+                                    await SendLeaveStatusChangeNotificationAsync(
+                                        personelEmail,
+                                        "BEKLEMEYE_ALINDI",
+                                        izinTalebi
+                                    );
+                                }
+                            }
+
+                            return Json(new { success = true, message = "İzin talebi başarıyla beklemeye alındı." });
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            System.Diagnostics.Debug.WriteLine($"HATA (BeklemetIzinTalebi - Transaction): {ex.Message}");
+                            return Json(new { success = false, message = "İşlem sırasında bir hata oluştu: " + ex.Message });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"HATA (BeklemetIzinTalebi): {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
+                return Json(new { success = false, message = "Bir hata oluştu: " + ex.Message });
+            }
+        }
+
+        // ReddetIzinTalebi metodu - düzeltilmiş versiyon
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> ReddetIzinTalebi(Guid guid, string personelKodu, DateTime talepTarihi, string reddetmeNedeni)
+        {
+            try
+            {
+                string username = HttpContext.Session.GetString("Username");
+                string version = HttpContext.Session.GetString("SelectedVersion");
+
+                if (string.IsNullOrEmpty(username))
+                {
+                    return Json(new { success = false, message = "Kullanıcı oturumu bulunamadı." });
+                }
+
+                // MikroDB'den kullanıcı numarasını al
+                string mikroDbConnectionString = version == "V16"
+                    ? _configuration.GetConnectionString("MikroDB_V16")
+                    : _configuration.GetConnectionString("MikroDesktop");
+
+                short onaylayanKullaniciNo;
+                using (SqlConnection mikroConnection = new SqlConnection(mikroDbConnectionString))
+                {
+                    await mikroConnection.OpenAsync();
+                    using SqlCommand userCommand = new SqlCommand("SELECT User_no FROM KULLANICILAR WHERE User_name = @username", mikroConnection);
+                    userCommand.Parameters.AddWithValue("@username", username);
+                    var result = await userCommand.ExecuteScalarAsync();
+
+                    if (result == null)
+                    {
+                        return Json(new { success = false, message = "Kullanıcı bilgileri bulunamadı." });
+                    }
+
+                    onaylayanKullaniciNo = Convert.ToInt16(result);
+                }
+
+                // Ana veritabanı bağlantı dizesini al
+                string erpConnectionString = _dbSelectorService.GetConnectionString();
+
+                using (SqlConnection connection = new SqlConnection(erpConnectionString))
+                {
+                    await connection.OpenAsync();
+
+                    using (var transaction = connection.BeginTransaction())
+                    {
+                        try
+                        {
+                            // 1. Önce izin talebinin durumunu kontrol et
+                            string checkQuery = "SELECT pit_izin_durum FROM PERSONEL_IZIN_TALEPLERI WHERE pit_Guid = @guid";
+                            using (SqlCommand checkCommand = new SqlCommand(checkQuery, connection, transaction))
+                            {
+                                checkCommand.Parameters.AddWithValue("@guid", guid);
+                                var currentStatus = await checkCommand.ExecuteScalarAsync();
+
+                                if (currentStatus == null)
+                                {
+                                    transaction.Rollback();
+                                    return Json(new { success = false, message = "İzin talebi bulunamadı." });
+                                }
+
+                                int status = Convert.ToInt32(currentStatus);
+                                if (status != 1)
+                                {
+                                    transaction.Rollback();
+                                    return Json(new { success = false, message = "Bu izin talebi zaten işlenmiş veya onaylanmamış durumda." });
+                                }
+                            }
+
+                            // 2. Güncelleme sorgusu - izin durumunu 2 (Reddedildi) olarak ayarla ve reddetme nedenini ekle
+                            string updateQuery = @"
+                        UPDATE PERSONEL_IZIN_TALEPLERI 
+                        SET pit_izin_durum = 2, 
+                            pit_onaylayan_kullanici = @onaylayanKullaniciNo,
+                            pit_lastup_user = @onaylayanKullaniciNo,
+                            pit_lastup_date = GETDATE(),
+                            pit_degisti = 1,
+                            pit_aciklama1 = @reddetmeNedeni
+                        WHERE pit_Guid = @guid 
+                        AND pit_izin_durum = 1";
+
+                            using (SqlCommand command = new SqlCommand(updateQuery, connection, transaction))
+                            {
+                                command.Parameters.AddWithValue("@guid", guid);
+                                command.Parameters.AddWithValue("@onaylayanKullaniciNo", onaylayanKullaniciNo);
+                                command.Parameters.AddWithValue("@reddetmeNedeni", !string.IsNullOrEmpty(reddetmeNedeni) ? reddetmeNedeni : "");
+
+                                int affectedRows = await command.ExecuteNonQueryAsync();
+
+                                if (affectedRows == 0)
+                                {
+                                    transaction.Rollback();
+                                    return Json(new { success = false, message = "İzin talebi güncellenemedi." });
+                                }
+                            }
+
+                            // 3. PERSONEL_IZINLERI tablosundan ilgili kaydı sil (eğer varsa)
+                            string deleteIzinQuery = @"
+                        DELETE FROM PERSONEL_IZINLERI 
+                        WHERE pz_bagli_talep_uid = @guid";
+
+                            using (SqlCommand deleteCommand = new SqlCommand(deleteIzinQuery, connection, transaction))
+                            {
+                                deleteCommand.Parameters.AddWithValue("@guid", guid);
+                                await deleteCommand.ExecuteNonQueryAsync();
+                            }
+
+                            transaction.Commit();
+
+                            // Personel e-posta adresini al ve bildirim gönder
+                            string personelEmail = await GetPersonelEmailAsync(personelKodu, connection);
+
+                            if (!string.IsNullOrEmpty(personelEmail))
+                            {
+                                // İzin talebi detaylarını çek
+                                var izinTalebi = await GetIzinTalebiDetaylariAsync(guid, connection);
+
+                                if (izinTalebi != null)
+                                {
+                                    izinTalebi.ReddetmeNedeni = reddetmeNedeni;
+
+                                    // E-posta gönder
+                                    await _emailService.SendLeaveRequestNotificationAsync(
+                                        personelEmail,
+                                        false,  // Reddedildi
+                                        izinTalebi
+                                    );
+                                }
+                            }
+
+                            return Json(new { success = true, message = "İzin talebi başarıyla reddedildi." });
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            System.Diagnostics.Debug.WriteLine($"HATA (ReddetIzinTalebi - Transaction): {ex.Message}");
+                            return Json(new { success = false, message = "İşlem sırasında bir hata oluştu: " + ex.Message });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"HATA (ReddetIzinTalebi): {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
+                return Json(new { success = false, message = "Bir hata oluştu: " + ex.Message });
+            }
+        }
+
+        // Güncellenmiş IzinliPersonel metodu - kalan izin hakkı ve işe giriş tarihi ile
         public async Task<IActionResult> IzinliPersonel()
         {
             try
@@ -1442,6 +1717,143 @@ ORDER BY t.pit_baslangictarih DESC", erpConnection);
                 System.Diagnostics.Debug.WriteLine($"Unhandled exception: {ex.Message}");
                 System.Diagnostics.Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
                 return View(new List<IzinTalepModel>());
+            }
+        }
+
+        private async Task SendLeaveStatusChangeNotificationAsync(string email, string durumTipi, IzinTalepModel izinTalebi)
+        {
+            try
+            {
+                // SMTP ayarlarını konfigürasyondan al
+                var smtpServer = _configuration["EmailSettings:SmtpServer"];
+                var smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"]);
+                var senderEmail = _configuration["EmailSettings:SenderEmail"];
+                var senderPassword = _configuration["EmailSettings:SenderPassword"];
+                var senderDisplayName = _configuration["EmailSettings:SenderDisplayName"];
+
+                System.Net.ServicePointManager.SecurityProtocol =
+                    System.Net.SecurityProtocolType.Tls12 |
+                    System.Net.SecurityProtocolType.Tls11 |
+                    System.Net.SecurityProtocolType.Tls;
+
+                System.Net.ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+
+                // Durum tipine göre başlık ve içerik belirle
+                string subject = durumTipi switch
+                {
+                    "BEKLEMEYE_ALINDI" => $"İzin Talebiniz Beklemeye Alındı: {izinTalebi.PersonelAdSoyad}",
+                    _ => $"İzin Talebi Durum Değişikliği: {izinTalebi.PersonelAdSoyad}"
+                };
+
+                string durum = durumTipi switch
+                {
+                    "BEKLEMEYE_ALINDI" => "BEKLEMEYE ALINDI",
+                    _ => "GÜNCELLENDI"
+                };
+
+                string durumRenk = durumTipi switch
+                {
+                    "BEKLEMEYE_ALINDI" => "#ffc107", // Warning yellow
+                    _ => "#6c757d" // Secondary gray
+                };
+
+                // Türkçe tarih formatını ayarla
+                System.Globalization.CultureInfo trCulture = new System.Globalization.CultureInfo("tr-TR");
+                string talepTarihi = izinTalebi.TalepTarihi.ToString("dd.MM.yyyy", trCulture);
+                string baslangicTarihi = izinTalebi.BaslangicTarihi.ToString("dd.MM.yyyy", trCulture);
+                string bitisTarihi = izinTalebi.BitisTarihi.ToString("dd.MM.yyyy", trCulture);
+
+                // E-posta içeriği
+                string body = $@"
+<!DOCTYPE html>
+<html lang=""tr"">
+<head>
+    <meta charset=""UTF-8"">
+    <style>
+        body {{ font-family: Arial, sans-serif; margin: 0; padding: 0; }}
+        .container {{ width: 100%; max-width: 650px; margin: 0 auto; padding: 20px; }}
+        .header {{ background-color: {durumRenk}; padding: 15px; color: white; }}
+        .header h1 {{ color: white; margin: 0; }}
+        .content {{ padding: 20px 0; }}
+        .status-badge {{ display: inline-block; background-color: {durumRenk}; color: white; padding: 5px 10px; border-radius: 4px; font-weight: bold; }}
+        .details {{ background-color: #f8f9fa; padding: 15px; margin: 15px 0; border-left: 3px solid {durumRenk}; }}
+        .footer {{ font-size: 12px; color: #6c757d; margin-top: 30px; border-top: 1px solid #e9ecef; padding-top: 10px; }}
+    </style>
+</head>
+<body>
+    <div class=""container"">
+        <div class=""header"">
+            <h1>İzin Talebi Durum Değişikliği</h1>
+        </div>
+        <div class=""content"">
+            <p>Sayın <strong>{izinTalebi.PersonelAdSoyad}</strong>,</p>
+            
+            <p>İzin talebinizin durumu değiştirilmiştir.</p>
+            
+            <p><span class=""status-badge"">DURUM: {durum}</span></p>
+            
+            <div class=""details"">
+                <h3>İzin Talebi Detayları:</h3>
+                <p><strong>Talep Tarihi:</strong> {talepTarihi}</p>
+                <p><strong>İzin Başlangıç Tarihi:</strong> {baslangicTarihi}</p>
+                <p><strong>İzin Bitiş Tarihi:</strong> {bitisTarihi}</p>
+                <p><strong>İzin Günü Sayısı:</strong> {izinTalebi.GunSayisi}</p>
+                <p><strong>İzin Amacı:</strong> {izinTalebi.Amac ?? "Belirtilmemiş"}</p>";
+
+                if (!string.IsNullOrEmpty(izinTalebi.ReddetmeNedeni))
+                {
+                    body += $@"
+                <p><strong>Açıklama:</strong> {izinTalebi.ReddetmeNedeni}</p>";
+                }
+
+                body += $@"
+            </div>
+            
+            <p>Detaylar için İnsan Kaynakları portalını ziyaret edebilirsiniz.</p>
+            
+            <p>Bilgilerinize sunarız.</p>
+        </div>
+        <div class=""footer"">
+            <p>Bu e-posta otomatik olarak oluşturulmuştur. Lütfen yanıtlamayınız.</p>
+        </div>
+    </div>
+</body>
+</html>";
+
+                using (var client = new SmtpClient(smtpServer)
+                {
+                    Port = smtpPort,
+                    Credentials = new NetworkCredential(senderEmail, senderPassword),
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    Timeout = 20000
+                })
+                {
+                    using (var mailMessage = new MailMessage
+                    {
+                        From = new MailAddress(senderEmail, senderDisplayName),
+                        Subject = subject,
+                        Body = body,
+                        IsBodyHtml = true
+                    })
+                    {
+                        mailMessage.To.Add(email);
+                        await client.SendMailAsync(mailMessage);
+                        System.Diagnostics.Debug.WriteLine($"Durum değişikliği bildirimi gönderildi: {email}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Durum değişikliği e-posta gönderme hatası: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"İç Hata: {ex.InnerException.Message}");
+                }
+            }
+            finally
+            {
+                System.Net.ServicePointManager.ServerCertificateValidationCallback = null;
             }
         }
 
@@ -1957,10 +2369,10 @@ INSERT INTO PERSONEL_IZINLERI (
                         insertCommand.Parameters.AddWithValue("@izinAmac", izinTalebi["pit_amac"] == DBNull.Value ? (object)DBNull.Value : izinTalebi["pit_amac"]);
                         insertCommand.Parameters.AddWithValue("@bitisSaati", izinTalebi["pit_saat"]);
                         insertCommand.Parameters.AddWithValue("@baslamaSaati", izinTalebi["pit_BaslamaSaati"]);
-                       
+
 
                         // Adres ve iletişim bilgileri
-                  
+
 
                         await insertCommand.ExecuteNonQueryAsync();
                     }
@@ -2032,169 +2444,169 @@ INSERT INTO PERSONEL_IZINLERI (
                 return Json(new { success = false, message = "Bir hata oluştu. Lütfen sistem yöneticinize başvurun." });
             }
         }
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> ReddetIzinTalebi(Guid guid, string personelKodu, DateTime talepTarihi, string reddetmeNedeni)
-        {
-            try
-            {
-                string username = HttpContext.Session.GetString("Username");
-                string version = HttpContext.Session.GetString("SelectedVersion");
+        //[HttpPost]
+        //[AllowAnonymous]
+        //public async Task<IActionResult> ReddetIzinTalebi(Guid guid, string personelKodu, DateTime talepTarihi, string reddetmeNedeni)
+        //{
+        //    try
+        //    {
+        //        string username = HttpContext.Session.GetString("Username");
+        //        string version = HttpContext.Session.GetString("SelectedVersion");
 
-                if (string.IsNullOrEmpty(username))
-                {
-                    return Json(new { success = false, message = "Kullanıcı oturumu bulunamadı." });
-                }
+        //        if (string.IsNullOrEmpty(username))
+        //        {
+        //            return Json(new { success = false, message = "Kullanıcı oturumu bulunamadı." });
+        //        }
 
-                // MikroDB'den kullanıcı numarasını al
-                string mikroDbConnectionString = version == "V16"
-                    ? _configuration.GetConnectionString("MikroDB_V16")
-                    : _configuration.GetConnectionString("MikroDesktop");
+        //        // MikroDB'den kullanıcı numarasını al
+        //        string mikroDbConnectionString = version == "V16"
+        //            ? _configuration.GetConnectionString("MikroDB_V16")
+        //            : _configuration.GetConnectionString("MikroDesktop");
 
-                short onaylayanKullaniciNo;
-                using (SqlConnection mikroConnection = new SqlConnection(mikroDbConnectionString))
-                {
-                    await mikroConnection.OpenAsync();
-                    using SqlCommand userCommand = new SqlCommand("SELECT User_no FROM KULLANICILAR WHERE User_name = @username", mikroConnection);
-                    userCommand.Parameters.AddWithValue("@username", username);
-                    var result = await userCommand.ExecuteScalarAsync();
+        //        short onaylayanKullaniciNo;
+        //        using (SqlConnection mikroConnection = new SqlConnection(mikroDbConnectionString))
+        //        {
+        //            await mikroConnection.OpenAsync();
+        //            using SqlCommand userCommand = new SqlCommand("SELECT User_no FROM KULLANICILAR WHERE User_name = @username", mikroConnection);
+        //            userCommand.Parameters.AddWithValue("@username", username);
+        //            var result = await userCommand.ExecuteScalarAsync();
 
-                    if (result == null)
-                    {
-                        return Json(new { success = false, message = "Kullanıcı bilgileri bulunamadı." });
-                    }
+        //            if (result == null)
+        //            {
+        //                return Json(new { success = false, message = "Kullanıcı bilgileri bulunamadı." });
+        //            }
 
-                    onaylayanKullaniciNo = Convert.ToInt16(result);
-                }
+        //            onaylayanKullaniciNo = Convert.ToInt16(result);
+        //        }
 
-                // Ana veritabanı bağlantı dizesini al
-                string erpConnectionString = _dbSelectorService.GetConnectionString();
+        //        // Ana veritabanı bağlantı dizesini al
+        //        string erpConnectionString = _dbSelectorService.GetConnectionString();
 
-                using (SqlConnection connection = new SqlConnection(erpConnectionString))
-                {
-                    await connection.OpenAsync();
+        //        using (SqlConnection connection = new SqlConnection(erpConnectionString))
+        //        {
+        //            await connection.OpenAsync();
 
-                    // Güncelleme sorgusu - izin durumunu 2 (Reddedildi) olarak ayarla ve reddetme nedenini ekle
-                    string updateQuery = @"
-            UPDATE PERSONEL_IZIN_TALEPLERI 
-            SET pit_izin_durum = 2, 
-                pit_onaylayan_kullanici = @onaylayanKullaniciNo,
-                pit_lastup_user = @onaylayanKullaniciNo,
-                pit_lastup_date = GETDATE(),
-                pit_aciklama1 = @reddetmeNedeni
-            WHERE pit_Guid = @guid 
-            AND pit_izin_durum = 0";
+        //            // Güncelleme sorgusu - izin durumunu 2 (Reddedildi) olarak ayarla ve reddetme nedenini ekle
+        //            string updateQuery = @"
+        //    UPDATE PERSONEL_IZIN_TALEPLERI 
+        //    SET pit_izin_durum = 2, 
+        //        pit_onaylayan_kullanici = @onaylayanKullaniciNo,
+        //        pit_lastup_user = @onaylayanKullaniciNo,
+        //        pit_lastup_date = GETDATE(),
+        //        pit_aciklama1 = @reddetmeNedeni
+        //    WHERE pit_Guid = @guid 
+        //    AND pit_izin_durum = 0";
 
-                    using (SqlCommand command = new SqlCommand(updateQuery, connection))
-                    {
-                        command.Parameters.AddWithValue("@guid", guid);
-                        command.Parameters.AddWithValue("@personelKodu", personelKodu);
-                        command.Parameters.AddWithValue("@talepTarihi", talepTarihi);
-                        command.Parameters.AddWithValue("@onaylayanKullaniciNo", onaylayanKullaniciNo);
-                        command.Parameters.AddWithValue("@reddetmeNedeni", !string.IsNullOrEmpty(reddetmeNedeni) ? reddetmeNedeni : "");
+        //            using (SqlCommand command = new SqlCommand(updateQuery, connection))
+        //            {
+        //                command.Parameters.AddWithValue("@guid", guid);
+        //                command.Parameters.AddWithValue("@personelKodu", personelKodu);
+        //                command.Parameters.AddWithValue("@talepTarihi", talepTarihi);
+        //                command.Parameters.AddWithValue("@onaylayanKullaniciNo", onaylayanKullaniciNo);
+        //                command.Parameters.AddWithValue("@reddetmeNedeni", !string.IsNullOrEmpty(reddetmeNedeni) ? reddetmeNedeni : "");
 
-                        int affectedRows = await command.ExecuteNonQueryAsync();
+        //                int affectedRows = await command.ExecuteNonQueryAsync();
 
-                        if (affectedRows > 0)
-                        {
-                            // Personel e-posta adresini al
-                            string personelEmail = await GetPersonelEmailAsync(personelKodu, connection);
+        //                if (affectedRows > 0)
+        //                {
+        //                    // Personel e-posta adresini al
+        //                    string personelEmail = await GetPersonelEmailAsync(personelKodu, connection);
 
-                            if (!string.IsNullOrEmpty(personelEmail))
-                            {
-                                // İzin talebi detaylarını çek
-                                var izinTalebi = await GetIzinTalebiDetaylariAsync(guid, connection);
+        //                    if (!string.IsNullOrEmpty(personelEmail))
+        //                    {
+        //                        // İzin talebi detaylarını çek
+        //                        var izinTalebi = await GetIzinTalebiDetaylariAsync(guid, connection);
 
-                                if (izinTalebi != null)
-                                {
-                                    izinTalebi.ReddetmeNedeni = reddetmeNedeni;
+        //                        if (izinTalebi != null)
+        //                        {
+        //                            izinTalebi.ReddetmeNedeni = reddetmeNedeni;
 
-                                    // E-posta gönder
-                                    await _emailService.SendLeaveRequestNotificationAsync(
-                                        personelEmail,
-                                        false,  // Reddedildi
-                                        izinTalebi
-                                    );
-                                }
-                                else
-                                {
-                                    // İzin talebi detayları bulunamadı, manuel olarak oluşturalım
-                                    var manuelModel = new IzinTalepModel
-                                    {
-                                        PersonelKodu = personelKodu,
-                                        ReddetmeNedeni = reddetmeNedeni,
-                                        TalepTarihi = talepTarihi,
-                                        // Diğer bilgileri eklemek için ek sorgular gerekebilir
-                                    };
+        //                            // E-posta gönder
+        //                            await _emailService.SendLeaveRequestNotificationAsync(
+        //                                personelEmail,
+        //                                false,  // Reddedildi
+        //                                izinTalebi
+        //                            );
+        //                        }
+        //                        else
+        //                        {
+        //                            // İzin talebi detayları bulunamadı, manuel olarak oluşturalım
+        //                            var manuelModel = new IzinTalepModel
+        //                            {
+        //                                PersonelKodu = personelKodu,
+        //                                ReddetmeNedeni = reddetmeNedeni,
+        //                                TalepTarihi = talepTarihi,
+        //                                // Diğer bilgileri eklemek için ek sorgular gerekebilir
+        //                            };
 
-                                    // Personel adını almak için ek sorgu
-                                    string personelBilgiQuery = "SELECT per_adi + ' ' + per_soyadi as PersonelAdSoyad FROM PERSONELLER WHERE per_kod = @personelKodu";
-                                    using (SqlCommand personelBilgiCmd = new SqlCommand(personelBilgiQuery, connection))
-                                    {
-                                        personelBilgiCmd.Parameters.AddWithValue("@personelKodu", personelKodu);
-                                        var adSoyadResult = await personelBilgiCmd.ExecuteScalarAsync();
-                                        if (adSoyadResult != null)
-                                        {
-                                            manuelModel.PersonelAdSoyad = adSoyadResult.ToString();
-                                        }
-                                    }
+        //                            // Personel adını almak için ek sorgu
+        //                            string personelBilgiQuery = "SELECT per_adi + ' ' + per_soyadi as PersonelAdSoyad FROM PERSONELLER WHERE per_kod = @personelKodu";
+        //                            using (SqlCommand personelBilgiCmd = new SqlCommand(personelBilgiQuery, connection))
+        //                            {
+        //                                personelBilgiCmd.Parameters.AddWithValue("@personelKodu", personelKodu);
+        //                                var adSoyadResult = await personelBilgiCmd.ExecuteScalarAsync();
+        //                                if (adSoyadResult != null)
+        //                                {
+        //                                    manuelModel.PersonelAdSoyad = adSoyadResult.ToString();
+        //                                }
+        //                            }
 
-                                    // İzin talebinin diğer detaylarını al
-                                    string izinDetayQuery = @"
-        SELECT 
-            pit_baslangictarih, pit_BaslamaSaati, pit_gun_sayisi, pit_izin_tipi, pit_saat, pit_amac
-        FROM PERSONEL_IZIN_TALEPLERI 
-        WHERE pit_guid = @guid";
+        //                            // İzin talebinin diğer detaylarını al
+        //                            string izinDetayQuery = @"
+        //SELECT 
+        //    pit_baslangictarih, pit_BaslamaSaati, pit_gun_sayisi, pit_izin_tipi, pit_saat, pit_amac
+        //FROM PERSONEL_IZIN_TALEPLERI 
+        //WHERE pit_guid = @guid";
 
-                                    using (SqlCommand izinDetayCmd = new SqlCommand(izinDetayQuery, connection))
-                                    {
-                                        izinDetayCmd.Parameters.AddWithValue("@guid", guid);
-                                        using (SqlDataReader detayReader = await izinDetayCmd.ExecuteReaderAsync())
-                                        {
-                                            if (await detayReader.ReadAsync())
-                                            {
-                                                manuelModel.BaslangicTarihi = detayReader.GetDateTime(detayReader.GetOrdinal("pit_baslangictarih"));
-                                                manuelModel.BitisTarihi = detayReader.GetDateTime(detayReader.GetOrdinal("pit_BaslamaSaati"));
-                                                manuelModel.GunSayisi = detayReader.GetByte(detayReader.GetOrdinal("pit_gun_sayisi"));
-                                                manuelModel.IzinTipi = detayReader.GetByte(detayReader.GetOrdinal("pit_izin_tipi"));
+        //                            using (SqlCommand izinDetayCmd = new SqlCommand(izinDetayQuery, connection))
+        //                            {
+        //                                izinDetayCmd.Parameters.AddWithValue("@guid", guid);
+        //                                using (SqlDataReader detayReader = await izinDetayCmd.ExecuteReaderAsync())
+        //                                {
+        //                                    if (await detayReader.ReadAsync())
+        //                                    {
+        //                                        manuelModel.BaslangicTarihi = detayReader.GetDateTime(detayReader.GetOrdinal("pit_baslangictarih"));
+        //                                        manuelModel.BitisTarihi = detayReader.GetDateTime(detayReader.GetOrdinal("pit_BaslamaSaati"));
+        //                                        manuelModel.GunSayisi = detayReader.GetByte(detayReader.GetOrdinal("pit_gun_sayisi"));
+        //                                        manuelModel.IzinTipi = detayReader.GetByte(detayReader.GetOrdinal("pit_izin_tipi"));
 
-                                                if (!detayReader.IsDBNull(detayReader.GetOrdinal("pit_saat")))
-                                                    manuelModel.IzinSaat = Convert.ToSingle(detayReader.GetDouble(detayReader.GetOrdinal("pit_saat")));
+        //                                        if (!detayReader.IsDBNull(detayReader.GetOrdinal("pit_saat")))
+        //                                            manuelModel.IzinSaat = Convert.ToSingle(detayReader.GetDouble(detayReader.GetOrdinal("pit_saat")));
 
-                                                if (!detayReader.IsDBNull(detayReader.GetOrdinal("pit_amac")))
-                                                    manuelModel.Amac = detayReader.GetString(detayReader.GetOrdinal("pit_amac"));
-                                            }
-                                        }
-                                    }
+        //                                        if (!detayReader.IsDBNull(detayReader.GetOrdinal("pit_amac")))
+        //                                            manuelModel.Amac = detayReader.GetString(detayReader.GetOrdinal("pit_amac"));
+        //                                    }
+        //                                }
+        //                            }
 
-                                    await _emailService.SendLeaveRequestNotificationAsync(
-                                        personelEmail,
-                                        false,  // Reddedildi
-                                        manuelModel
-                                    );
-                                }
-                            }
+        //                            await _emailService.SendLeaveRequestNotificationAsync(
+        //                                personelEmail,
+        //                                false,  // Reddedildi
+        //                                manuelModel
+        //                            );
+        //                        }
+        //                    }
 
-                            return Json(new { success = true, message = "İzin talebi başarıyla reddedildi." });
-                        }
-                        else
-                        {
-                            System.Diagnostics.Debug.WriteLine($"İzin talebi reddedilemedi - Personel Kodu: {personelKodu}, Talep Tarihi: {talepTarihi}");
-                            return Json(new { success = false, message = "İzin talebi reddedilemedi. Lütfen tekrar deneyin." });
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                // Hatayı log'la
-                System.Diagnostics.Debug.WriteLine($"HATA (ReddetIzinTalebi): {ex.Message}");
-                System.Diagnostics.Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
+        //                    return Json(new { success = true, message = "İzin talebi başarıyla reddedildi." });
+        //                }
+        //                else
+        //                {
+        //                    System.Diagnostics.Debug.WriteLine($"İzin talebi reddedilemedi - Personel Kodu: {personelKodu}, Talep Tarihi: {talepTarihi}");
+        //                    return Json(new { success = false, message = "İzin talebi reddedilemedi. Lütfen tekrar deneyin." });
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Hatayı log'la
+        //        System.Diagnostics.Debug.WriteLine($"HATA (ReddetIzinTalebi): {ex.Message}");
+        //        System.Diagnostics.Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
 
-                // Hata yanıtını döndür
-                return Json(new { success = false, message = "Bir hata oluştu. Lütfen sistem yöneticinize başvurun." });
-            }
-        }
+        //        // Hata yanıtını döndür
+        //        return Json(new { success = false, message = "Bir hata oluştu. Lütfen sistem yöneticinize başvurun." });
+        //    }
+        //}
 
         public async Task<IActionResult> ReddedilenIzinler()
         {
@@ -2314,8 +2726,8 @@ ORDER BY t.pit_baslangictarih DESC", erpConnection);
                             // IzinTipiAdi artık kullanılmıyor
                             GunSayisi = reader.GetByte(reader.GetOrdinal("pit_gun_sayisi")),
                             BaslangicTarihi = reader.GetDateTime(reader.GetOrdinal("pit_baslangictarih")),
-                            
-                            
+
+
                             Amac = !reader.IsDBNull(reader.GetOrdinal("pit_amac")) ? reader.GetString(reader.GetOrdinal("pit_amac")) : string.Empty,
                             IzinDurumu = reader.GetByte(reader.GetOrdinal("pit_izin_durum")),
                             OlusturmaTarihi = reader.GetDateTime(reader.GetOrdinal("pit_create_date")),
@@ -2341,7 +2753,7 @@ ORDER BY t.pit_baslangictarih DESC", erpConnection);
         }
         [HttpGet]
         [AllowAnonymous]
-       
+
         public async Task<IActionResult> Izinlerim()
         {
             try
@@ -2883,7 +3295,7 @@ FROM KullanilanIzinler";
             }
             catch (Exception ex)
             {
-               
+
                 return Json(new
                 {
                     success = false,
