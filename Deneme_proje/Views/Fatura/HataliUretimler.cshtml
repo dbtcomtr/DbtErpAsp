@@ -121,6 +121,36 @@
                 vertical-align: middle;
             }
 
+        /* Sıralama özelliği için stiller */
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            padding-right: 25px !important;
+        }
+
+            .sortable::after {
+                content: '↕';
+                position: absolute;
+                right: 8px;
+                color: #999;
+                font-size: 12px;
+            }
+
+            .sortable.asc::after {
+                content: '↑';
+                color: #007bff;
+            }
+
+            .sortable.desc::after {
+                content: '↓';
+                color: #007bff;
+            }
+
+            .sortable:hover {
+                background-color: #f8f9fa;
+            }
+
         .action-buttons {
             position: sticky;
             bottom: 0;
@@ -137,18 +167,15 @@
         }
 
         @@keyframes fadeIn {
-            from
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
 
-        {
-            opacity: 0;
-            transform: scale(0.95);
-        }
-
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
-
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         .modal-header {
@@ -358,7 +385,7 @@
                                                                value="@stokArama"
                                                                autocomplete="off">
 
-                                                      @*   <!-- Stok Arama Modal Butonu -->
+                                                        @*   <!-- Stok Arama Modal Butonu -->
                                                         <div class="input-group-append">
                                                             <button class="btn btn-outline-secondary" type="button" onclick="openStokSearchModal()">
                                                                 <i class="fa fa-search"></i>
@@ -400,14 +427,14 @@
                                                         <label class="form-check-label" for="tumunuSec">Tümü</label>
                                                     </div>
                                                 </th>
-                                                <th>Stok Kodu</th>
-                                                <th>Stok Adı</th>
-                                                <th>Parti Kodu</th>
-                                                <th>Lot No</th>
-                                                <th>Miktar</th>
-                                                <th>Birim</th>
-                                                <th>İşlem Tarihi</th>
-                                                <th>İşlem Saati</th>
+                                                <th class="sortable" data-column="1" data-type="text">Stok Kodu</th>
+                                                <th class="sortable" data-column="2" data-type="text">Stok Adı</th>
+                                                <th class="sortable" data-column="3" data-type="text">Parti Kodu</th>
+                                                <th class="sortable" data-column="4" data-type="number">Lot No</th>
+                                                <th class="sortable" data-column="5" data-type="number">Miktar</th>
+                                                <th class="sortable" data-column="6" data-type="text">Birim</th>
+                                                <th class="sortable" data-column="7" data-type="date">İşlem Tarihi</th>
+                                                <th class="sortable" data-column="8" data-type="time">İşlem Saati</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -424,11 +451,11 @@
                                                         <td class="stok-kodu">@item.StokKodu</td>
                                                         <td class="stok-adi">@item.StokAdi</td>
                                                         <td>@item.PartiKodu</td>
-                                                        <td>@(item.LotNo.HasValue ? item.LotNo.Value.ToString() : "-")</td>
-                                                        <td class="text-right">@item.Miktar.ToString("N2")</td>
+                                                        <td data-sort="@(item.LotNo.HasValue ? item.LotNo.Value.ToString() : "0")">@(item.LotNo.HasValue ? item.LotNo.Value.ToString() : "-")</td>
+                                                        <td class="text-right" data-sort="@item.Miktar">@item.Miktar.ToString("N2")</td>
                                                         <td>@item.BirimAdi</td>
-                                                        <td>@item.IslemTarihi.ToString("dd.MM.yyyy")</td>
-                                                        <td>@item.IslemTarihi.ToString("HH:mm:ss")</td>
+                                                        <td data-sort="@item.IslemTarihi.ToString("yyyy-MM-dd")">@item.IslemTarihi.ToString("dd.MM.yyyy")</td>
+                                                        <td data-sort="@item.IslemTarihi.ToString("HH:mm:ss")">@item.IslemTarihi.ToString("HH:mm:ss")</td>
                                                     </tr>
                                                 }
                                             }
@@ -491,6 +518,103 @@
                 // İşlem durumunu takip etmek için değişken
                 var isProcessing = false;
                 var allStocks = []; // Tüm stokları saklamak için
+
+                // Sıralama fonksiyonları
+                var currentSort = {
+                    column: null,
+                    order: 'asc'
+                };
+
+                // Sıralama işlevi
+                function sortTable(columnIndex, dataType) {
+                    var tbody = $('#hataliUretimTable tbody');
+                    var rows = tbody.find('.data-row').toArray();
+
+                    // Mevcut sıralama durumunu kontrol et
+                    var order = 'asc';
+                    if (currentSort.column === columnIndex) {
+                        order = currentSort.order === 'asc' ? 'desc' : 'asc';
+                    }
+
+                    currentSort = {
+                        column: columnIndex,
+                        order: order
+                    };
+
+                    // Tüm header'lardan sıralama sınıflarını kaldır
+                    $('.sortable').removeClass('asc desc');
+
+                    // Aktif header'a sıralama sınıfını ekle
+                    $('.sortable[data-column="' + columnIndex + '"]').addClass(order);
+
+                    // Satırları sırala
+                    rows.sort(function(a, b) {
+                        var aVal = getCellValue(a, columnIndex, dataType);
+                        var bVal = getCellValue(b, columnIndex, dataType);
+
+                        var result = 0;
+
+                        if (dataType === 'number') {
+                            aVal = parseFloat(aVal) || 0;
+                            bVal = parseFloat(bVal) || 0;
+                            result = aVal - bVal;
+                        } else if (dataType === 'date') {
+                            aVal = new Date(aVal);
+                            bVal = new Date(bVal);
+                            result = aVal - bVal;
+                        } else if (dataType === 'time') {
+                            // Saat karşılaştırması için
+                            aVal = convertTimeToMinutes(aVal);
+                            bVal = convertTimeToMinutes(bVal);
+                            result = aVal - bVal;
+                        } else {
+                            // Text karşılaştırması
+                            aVal = aVal.toLowerCase();
+                            bVal = bVal.toLowerCase();
+                            result = aVal.localeCompare(bVal, 'tr');
+                        }
+
+                        return order === 'asc' ? result : -result;
+                    });
+
+                    // Sıralanmış satırları tabloya yerleştir
+                    tbody.empty();
+                    $.each(rows, function(index, row) {
+                        tbody.append(row);
+                    });
+
+                    // Checkbox durumlarını koru
+                    updateSelectAllCheckbox();
+                    updateSelectedCount();
+                }
+
+                // Hücre değerini al
+                function getCellValue(row, columnIndex, dataType) {
+                    var cell = $(row).find('td').eq(columnIndex);
+
+                    // Özel data-sort özelliği varsa onu kullan
+                    if (cell.attr('data-sort')) {
+                        return cell.attr('data-sort');
+                    }
+
+                    return cell.text().trim();
+                }
+
+                // Saati dakikaya çevir (sıralama için)
+                function convertTimeToMinutes(timeString) {
+                    var parts = timeString.split(':');
+                    if (parts.length >= 2) {
+                        return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+                    }
+                    return 0;
+                }
+
+                // Sıralanabilir başlıklara tıklama olayı
+                $(document).on('click', '.sortable', function() {
+                    var columnIndex = parseInt($(this).data('column'));
+                    var dataType = $(this).data('type');
+                    sortTable(columnIndex, dataType);
+                });
 
                 // Stok Arama Modal fonksiyonları
                 window.openStokSearchModal = function() {

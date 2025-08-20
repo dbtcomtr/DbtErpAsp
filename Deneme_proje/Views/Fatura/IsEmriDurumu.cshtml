@@ -6,8 +6,6 @@
 
 <link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
 
-
-
 <div class="main-content mt-5">
     <div class="px-lg-5 px-3">
         <div class="row">
@@ -30,8 +28,35 @@
                     <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
                         <h5 class="card-header-text text-white">İş Emri Operasyonu</h5>
                     </div>
+
+                    <!-- İş Merkezi Filtre Dropdown -->
+                    <div class="card-body" style="padding: 15px 20px;">
+                        <div class="row align-items-center">
+                            <div class="col-md-4">
+                                <label for="isMerkeziFilter" class="form-label">
+                                    <i class="icofont icofont-filter"></i> İş Merkezi Filtresi:
+                                </label>
+                                <select id="isMerkeziFilter" class="form-control">
+                                    <option value="">Tüm İş Merkezleri</option>
+                                    <!-- JavaScript ile doldurulacak -->
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button id="filterBtn" class="btn btn-primary" style="margin-top: 25px;">
+                                    <i class="icofont icofont-search"></i> Filtrele
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <div id="filterInfo" class="alert alert-info" style="margin-top: 10px; display: none;">
+                                    <i class="icofont icofont-info-circle"></i>
+                                    <span id="filterText"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
-                        <table class="table table-bordered table-striped">
+                        <table class="table table-bordered table-striped" id="isEmirleriTable">
                             <thead>
                                 <tr>
                                     <th>İş Emri Kodu</th>
@@ -43,10 +68,9 @@
                                     <th>İşlemler</th>
                                     <th>Miktar</th>
                                     <th>İş Merkezi</th>
-
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="isEmirleriTableBody">
                                 @foreach (var isEmri in Model)
                                 {
                                     <tr>
@@ -90,12 +114,9 @@
                                                     </button>
                                                 }
                                             </form>
-
-
                                         </td>
                                         <td>@(isEmri.Miktar?.ToString("N2"))</td>
                                         <td>@isEmri.IsMerkezi</td>
-
                                     </tr>
                                 }
                             </tbody>
@@ -107,8 +128,201 @@
     </div>
 </div>
 
-@section Scripts {
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        // Global değişkenler
+        var tumIsEmirleri = [];
+        var tumIsMerkezleri = [];
+        var aktifFiltre = "";
+
+        // Sayfa yüklendiğinde çalışacak fonksiyon
+        $(document).ready(function() {
+        
+
+            // İş merkezlerini ve iş emirlerini yükle
+            loadIsMerkezleri();
+            loadIsEmirleri();
+
+            // Filtre butonu click eventi
+            $('#filterBtn').click(function() {
+                var secilenMerkez = $('#isMerkeziFilter').val();
+                filterIsEmirleri(secilenMerkez);
+            });
+
+            // Dropdown değişikliği olduğunda otomatik filtrele
+            $('#isMerkeziFilter').change(function() {
+                var secilenMerkez = $(this).val();
+                filterIsEmirleri(secilenMerkez);
+            });
+        });
+
+        // İş merkezlerini yükle
+        function loadIsMerkezleri() {
+         
+
+            var url = '@Url.Action("GetIsMerkezleri", "Fatura")';
+ 
+
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                cache: false,
+                beforeSend: function() {
+      
+                },
+                success: function(response) {
+      
+
+                    if (response && response.success) {
+                        tumIsMerkezleri = response.isMerkezleri || [];
+                  
+                        populateIsMerkezleriDropdown();
+
+                        if (response.debug) {
+           
+                        }
+                    } else {
+                        console.error('İş merkezleri yüklenirken hata:', response.message || 'Bilinmeyen hata');
+                        alert('İş merkezleri yüklenirken hata: ' + (response.message || 'Bilinmeyen hata'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX hata detayları:');
+                    console.error('Status:', status);
+                    console.error('Error:', error);
+                    console.error('Response Text:', xhr.responseText);
+                    console.error('Status Code:', xhr.status);
+
+                    alert('İş merkezleri yüklenirken AJAX hatası: ' + error + ' (Status: ' + xhr.status + ')');
+                },
+                complete: function() {
+                    console.log("AJAX isteği tamamlandı");
+                }
+            });
+        }
+
+        // İş merkezleri dropdown'ını doldur
+        function populateIsMerkezleriDropdown() {
+
+
+            var dropdown = $('#isMerkeziFilter');
+            dropdown.empty();
+            dropdown.append('<option value="">Tüm İş Merkezleri</option>');
+
+            if (tumIsMerkezleri && tumIsMerkezleri.length > 0) {
+                tumIsMerkezleri.forEach(function(merkez) {
+                    var optionText = merkez.kod + ' - ' + merkez.aciklama;
+                    dropdown.append('<option value="' + merkez.kod + '">' + optionText + '</option>');
+       
+                });
+          
+            } else {
+                console.warn("İş merkezi listesi boş!");
+                dropdown.append('<option value="">İş merkezi bulunamadı</option>');
+            }
+        }
+
+        // İş emirlerini yükle
+        function loadIsEmirleri() {
+            $.ajax({
+                url: '@Url.Action("GetIsEmirleri", "Fatura")',
+                type: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        tumIsEmirleri = response.isEmirleri;
+                        displayIsEmirleri(tumIsEmirleri);
+                    } else {
+                        console.error('İş emirleri yüklenirken hata:', response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('İş emirleri yüklenirken hata:', error);
+                }
+            });
+        }
+
+        // İş emirlerini filtrele
+        function filterIsEmirleri(isMerkezi) {
+            var filtrelenmisDizi = tumIsEmirleri;
+
+            if (isMerkezi && isMerkezi !== '') {
+                filtrelenmisDizi = tumIsEmirleri.filter(function(isEmri) {
+                    return isEmri.IsMerkezi === isMerkezi;
+                });
+
+                // Filtre bilgisini göster
+                var merkezAdi = tumIsMerkezleri.find(m => m.kod === isMerkezi);
+                var filterText = 'Filtreleniyor: ' + isMerkezi;
+                if (merkezAdi) {
+                    filterText += ' - ' + merkezAdi.aciklama;
+                }
+                filterText += ' (' + filtrelenmisDizi.length + ' kayıt)';
+
+                $('#filterText').text(filterText);
+                $('#filterInfo').show();
+                aktifFiltre = isMerkezi;
+            } else {
+                // Tüm kayıtları göster
+                $('#filterInfo').hide();
+                aktifFiltre = "";
+            }
+
+            displayIsEmirleri(filtrelenmisDizi);
+        }
+
+        // İş emirlerini tabloda göster
+        function displayIsEmirleri(isEmirleri) {
+            var tbody = $('#isEmirleriTableBody');
+            tbody.empty();
+
+            if (isEmirleri.length === 0) {
+                tbody.append('<tr><td colspan="9" class="text-center text-muted">Gösterilecek iş emri bulunamadı.</td></tr>');
+                return;
+            }
+
+            isEmirleri.forEach(function(isEmri) {
+                var durumBadge = isEmri.is_EmriDurumu == 1
+                    ? '<span class="badge badge-success">Aktif</span>'
+                    : '<span class="badge badge-warning">Pasif</span>';
+
+                var hasProductionPermission = @Json.Serialize(ViewBag.HasProductionPermission ?? false);
+                var uretButton = hasProductionPermission
+                    ? `<button onclick="uretIsEmri('${isEmri.is_Kod}', '${isEmri.UrunKodu}', 3)" class="btn btn-primary btn-sm onay">Üret</button>`
+                    : '';
+
+                var updateButton = isEmri.is_EmriDurumu == 0
+                    ? `<form method="post" action="@Url.Action("UpdateIsEmriDurumu", "Fatura")" style="display:inline;">
+                            <input type="hidden" name="isEmriKodu" value="${isEmri.is_Kod}" />
+                            <input type="hidden" name="yeniDurum" value="1" />
+                            <button type="submit" class="btn btn-success btn-sm onay">Aktif Yap</button>
+                        </form>`
+                    : `<form method="post" action="@Url.Action("UpdateIsEmriDurumu", "Fatura")" style="display:inline;">
+                            <input type="hidden" name="isEmriKodu" value="${isEmri.is_Kod}" />
+                            <input type="hidden" name="yeniDurum" value="0" />
+                            <button type="submit" class="btn btn-warning btn-sm onay">Pasif Yap</button>
+                        </form>`;
+
+                var tarih = isEmri.is_BaslangicTarihi ? new Date(isEmri.is_BaslangicTarihi).toLocaleDateString('tr-TR') : '';
+                var miktar = isEmri.Miktar ? parseFloat(isEmri.Miktar).toFixed(2) : '';
+
+                var row = `<tr>
+                    <td>${isEmri.is_Kod}</td>
+                    <td>${durumBadge}</td>
+                    <td>${tarih}</td>
+                    <td>${isEmri.UrunKodu || ''}</td>
+                    <td>${uretButton}</td>
+                    <td>${isEmri.UrunAdi || ''}</td>
+                    <td>${updateButton}</td>
+                    <td>${miktar}</td>
+                    <td><span class="badge badge-info">${isEmri.IsMerkezi || ''}</span></td>
+                </tr>`;
+
+                tbody.append(row);
+            });
+        }
+
+        // Üretim fonksiyonu
         function uretIsEmri(isEmriKodu, urunKodu, depoNo) {
             $.ajax({
                 url: '@Url.Action("UretIsEmri", "Fatura")',
@@ -125,11 +339,14 @@
                             text: response.message,
                             icon: 'success',
                             confirmButtonText: 'Tamam'
+                        }).then((result) => {
+                            // Üretim sonrası verileri yenile
+                            loadIsEmirleri();
                         });
                     } else {
                         Swal.fire({
                             title: 'Hata!',
-                            text: 'Üretim yetkiniz blunmamaktadır.',
+                            text: 'Üretim yetkiniz bulunmamaktadır.',
                             icon: 'error',
                             confirmButtonText: 'Tamam'
                         });
@@ -145,89 +362,21 @@
                 }
             });
         }
-    </script>
-    <script>
-             function updateIsEmirleri() {
-            $.ajax({
-                url: '@Url.Action("GetIsEmirleri", "Fatura")',
-                type: 'GET',
-                success: function(response) {
-                    if (response.success && response.isEmirleri.length > 0) {
-                        var tbody = $("table tbody");
-                        tbody.empty(); // Eski verileri temizle
 
-                        // Debug - check what properties are actually in the response
-                        console.log("First item properties:", response.isEmirleri[0]);
-
-                        response.isEmirleri.forEach(function(isEmri) {
-                            var durumBadge = isEmri.is_EmriDurumu == 1
-                                ? '<span class="badge badge-success">Aktif</span>'
-                                : '<span class="badge badge-warning">Pasif</span>';
-
-                            var uretButton = response.hasProductionPermission
-                                ? `<button onclick="uretIsEmri('${isEmri.is_Kod}', '${isEmri.urunKodu || isEmri.UrunKodu}', 3)"
-                                        class="btn btn-primary btn-sm onay">Üret</button>`
-                                : '';
-
-                            var updateButton = isEmri.is_EmriDurumu == 0
-                                ? `<form method="post" action="@Url.Action("UpdateIsEmriDurumu", "Fatura")" style="display:inline;">
-                                        <input type="hidden" name="isEmriKodu" value="${isEmri.is_Kod}" />
-                                        <input type="hidden" name="yeniDurum" value="1" />
-                                        <button type="submit" class="btn btn-success btn-sm onay">Aktif Yap</button>
-                                    </form>`
-                                : `<form method="post" action="@Url.Action("UpdateIsEmriDurumu", "Fatura")" style="display:inline;">
-                                        <input type="hidden" name="isEmriKodu" value="${isEmri.is_Kod}" />
-                                        <input type="hidden" name="yeniDurum" value="0" />
-                                        <button type="submit" class="btn btn-warning btn-sm onay">Pasif Yap</button>
-                                    </form>`;
-
-                            // Try both camelCase and PascalCase property names
-                            var urunKodu = isEmri.urunKodu || isEmri.UrunKodu || '';
-                            var urunAdi = isEmri.urunAdi || isEmri.UrunAdi || '';
-                            var miktar = isEmri.miktar || isEmri.Miktar || '';
-                            var isMerkezi = isEmri.isMerkezi || isEmri.IsMerkezi || '';
-
-                            var row = `<tr>
-                                <td>${isEmri.is_Kod}</td>
-                                <td>${durumBadge}</td>
-                                <td>${isEmri.is_BaslangicTarihi ? new Date(isEmri.is_BaslangicTarihi).toLocaleDateString() : ''}</td>
-                                <td>${urunKodu}</td>
-                                <td>${uretButton}</td>
-                                <td>${urunAdi}</td>
-                                <td>${updateButton}</td>
-                                <td>${miktar ? parseFloat(miktar).toFixed(2) : ''}</td>
-                                <td>${isMerkezi}</td>
-                            </tr>`;
-
-                            tbody.append(row);
-                        });
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error("İş emirleri güncellenirken hata oluştu:", error);
-                    console.log("XHR:", xhr.responseText);
-                }
-            });
-        }
-
-        // 5 saniyede bir verileri yenile
-        setInterval(updateIsEmirleri, 5000);
-
-        // Sayfa yüklendiğinde ilk veriyi al
-        $(document).ready(function() {
-            updateIsEmirleri();
-        });
+        // Otomatik yenileme - 30 saniyede bir
+        setInterval(function() {
+            loadIsEmirleri();
+        }, 30000);
     </script>
 
-}
 
 <style>
     .onay {
         width: 67px;
         font-size: 9px;
         justify-content: center;
-        display: inline-flex; /* Changed from flex to inline-flex */
-        margin: 0 3px; /* Changed from margin: 0 auto to add horizontal spacing */
+        display: inline-flex;
+        margin: 0 3px;
     }
 
     .table {
@@ -266,4 +415,69 @@
         .card:hover, .accordion-content:hover {
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
+
+    /* Dropdown ve filtre stilleri */
+    .form-label {
+        font-weight: 600;
+        color: #1D3A67;
+        margin-bottom: 5px;
+    }
+
+    .form-control {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+
+        .form-control:focus {
+            border-color: #0076a8;
+            box-shadow: 0 0 0 0.2rem rgba(0, 118, 168, 0.25);
+        }
+
+    .alert-info {
+        background-color: #e3f2fd;
+        border-color: #0076a8;
+        color: #0076a8;
+        border-radius: 4px;
+        padding: 10px 15px;
+        margin-bottom: 0;
+    }
+
+    .badge-info {
+        background-color: #17a2b8;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 3px;
+        font-size: 10px;
+    }
+
+    #filterBtn {
+        background: linear-gradient(135deg, #0076a8 0%, #162e54 100%);
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+        #filterBtn:hover {
+            background: linear-gradient(135deg, #005a7d 0%, #0f1f3a 100%);
+            transform: translateY(-1px);
+        }
+
+    /* Responsive tasarım */
+    @@media (max-width: 768px) {
+        .col-md-4, .col-md-2, .col-md-6
+
+    {
+        margin-bottom: 10px;
+    }
+
+    #filterBtn {
+        margin-top: 10px !important;
+        width: 100%;
+    }
+
+    }
 </style>

@@ -6,6 +6,7 @@ using static Deneme_proje.Models.CrmEntities;
 
 namespace Deneme_proje.Controllers
 {
+    [AllowAnonymous]
     public class CrmController : BaseController
 	{
         private readonly IConfiguration _configuration;
@@ -20,6 +21,9 @@ namespace Deneme_proje.Controllers
             _logger = logger;
         }
         public IActionResult Dashboard()
+        {
+            return View();
+        }        public IActionResult FiyatTeklif()
         {
             return View();
         }

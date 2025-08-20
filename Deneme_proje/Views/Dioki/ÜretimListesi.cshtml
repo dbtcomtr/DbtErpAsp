@@ -1,434 +1,297 @@
 ﻿@model IEnumerable<Deneme_proje.Repository.DiokiRepository.GenisletilmisBarkodTanimi>
-@{
-	ViewData["Title"] = "Üretim Listesi";
-	Layout = "~/Views/Shared/_Layout.cshtml";
-}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link href="~/content/assets/css/site.css" rel="stylesheet" />
 
 <style>
-	.ellipsis::after {
-		display: none
-	}
+    /* Genel Stil */
+    .main-content {
+        margin-top: 50px;
+        padding: 20px;
+    }
 
-	body {
-		font-size: 11px;
-	}
+    /* Sağ Üst İş Merkezi Alanı */
+    .business-unit-container {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 10px 20px;
+        color: #fff;
+        background-color: #1E3559;
+        border-radius: 0 0 0 8px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+    }
 
-	.modal {
-		z-index: 1050;
-	}
+        .business-unit-container select {
+            background-color: #fff;
+            color: #333;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
 
-	.modal-backdrop {
-		z-index: 1040;
-	}
+            .business-unit-container select:focus {
+                outline: none;
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            }
 
-	.btn-sm {
-		padding: 8px 14px;
-		line-height: 16px;
-		font-size: 16px;
-	}
+    /* Kart Stili */
+    .card {
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
 
-	.tablo-icerik-yazi {
-		font-size: 28px;
-	}
+    .card-header {
+        background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%);
+        padding: 15px 20px;
+        border-radius: 8px 8px 0 0;
+    }
 
-	.modal-dialog {
-		position: fixed;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%) !important;
-		margin: 0;
-		width: 100%;
-		max-width: 600px;
-	}
+    .card-header-text {
+        color: #fff;
+        font-size: 18px;
+        font-weight: bold;
+        margin: 0;
+    }
 
-	.modal-backdrop {
-		position: fixed;
-	}
+    /* Tablo Stili */
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
 
-	.modal-body {
-		max-height: 400px;
-		overflow-y: auto;
-	}
+        .table th, .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
 
-	.text-ellipsis {
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		max-width: 200px;
-		vertical-align: middle;
-	}
+        .table th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+            color: #333;
+        }
 
-	thead th {
-		background-color: #f8f9fa !important;
-		color: #343a40 !important;
-		font-weight: bold !important;
-		text-align: center !important;
-		padding: 10px !important;
-		white-space: nowrap !important;
-		border-bottom: 2px solid #dee2e6 !important;
-	}
+        .table tbody tr:hover {
+            background-color: #f9f9f9;
+        }
 
-	.th-content {
-		display: flex;
-		justify-content: flex-start;
-		align-items: center;
-		gap: 5px;
-		white-space: nowrap;
-		margin-right: 20px;
-	}
+    /* Buton Stili */
+    .barkod-button-yeni {
+        padding: 8px 15px;
+        background-color: #28A745;
+        color: white;
+        font-weight: bold;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: background-color 0.3s;
+    }
 
-	table {
-		width: 100% !important;
-		border-collapse: collapse !important;
-	}
+        .barkod-button-yeni:hover {
+            background-color: #218838;
+        }
 
-		table th, table td {
-			padding: 10px 5px !important;
-			border-bottom: 1px solid #dee2e6 !important;
-		}
+    /* Hata ve Uyarı Mesajları */
+    .error-message {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 10px 0;
+        font-weight: bold;
+    }
 
-	[data-toggle="tooltip"] {
-		cursor: pointer !important;
-	}
+    .success-message {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 10px 0;
+        font-weight: bold;
+    }
 
-	.dataTables_filter {
-		display: flex;
-		align-items: center;
-		justify-content: flex-end;
-		margin-bottom: 20px;
-	}
+    /* Hatalı Durum Stili */
+    .faulty-status {
+        color: #dc3545; /* Kırmızı renk */
+        font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
 
-		.dataTables_filter input[type="search"] {
-			border: 1px solid #ced4da;
-			border-radius: 4px;
-			padding: 3px 10px;
-			font-size: 1Ypx;
-			width: 200px;
-			margin-left: 10px;
-			outline: none;
-			box-shadow: none;
-		}
-
-	table.dataTable tbody th, table.dataTable tbody td {
-		padding: 5px 4px !important;
-		font-size: 20px;
-	}
-	.dataTables_length {
-		display: flex;
-		align-items: center;
-		margin-top: 12px;
-	}
-
-		.dataTables_length label {
-			font-size: 20px;
-			margin-right: 10px;
-		}
-
-		.dataTables_length select {
-			border: 1px solid #ced4da !important;
-			border-radius: 4px !important;
-			font-size: 14px;
-			background-color: #ffffff !important;
-			color: #495057;
-			outline: none;
-			box-shadow: none;
-			max-width: 150px;
-		}
-
-			.dataTables_length select:focus {
-				border-color: #80bdff !important;
-				box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25);
-			}
-
-	.dataTables_wrapper .dataTables_info {
-		font-size: 20px;
-		color: #495057;
-		margin-top: 10px;
-		margin-bottom: 10px;
-		text-align: left;
-	}
-
-	.dataTables_wrapper .dataTables_paginate {
-		display: flex;
-		justify-content: flex-end;
-		margin: 10px;
-	}
-
-		.dataTables_wrapper .dataTables_paginate .paginate_button {
-			padding: 6px 12px;
-			border: 1px solid #dee2e6 !important;
-			margin: 0 2px;
-			background-color: #ffffff;
-			color: #007bff;
-			border-radius: 4px;
-			cursor: pointer;
-			transition: background-color 0.2s ease;
-			font-size: 20px;
-		}
-
-			.dataTables_wrapper .dataTables_paginate .paginate_button:focus {
-				outline: none;
-				box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-			}
-
-	.git-btn {
-		padding: .2rem .5rem !important;
-	}
-
-	table.dataTable tbody th, table.dataTable tbody td {
-		padding: 5px 4px !important;
-	}
-
-	.btn-hatali {
-		background-color: #dc3545;
-		color: white;
-		border-color: #dc3545;
-	}
-
-		.btn-hatali:hover {
-			background-color: #c82333;
-			border-color: #bd2130;
-		}
-
-	.hatali-durum {
-		color: #dc3545;
-		font-weight: bold;
-	}
-	@@media (min-width: 544px) {
-		.col-sm-12
-
-	{
-		float: left;
-		width: 100%;
-		font-size: 17px;
-	}
-
-	}
+        .faulty-status i {
+            font-size: 14px;
+        }
 </style>
 
-<div class="main-content mt-5 pt-5">
-	<div class="container-fluid">
-		<div class="row">
-			<div class="col-sm-12 p-0">
-				<div class="main-header">
-					<h4>Üretim Listesi</h4>
-					<ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
-						<li class="breadcrumb-item">
-							<a href="/Home/Index">
-								<i class="icofont icofont-home"></i>
-							</a>
-						</li>
-					</ol>
-				</div>
-			</div>
-		</div>
+<div class="main-content">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <h4>Üretim Listesi</h4>
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow"></ol>
+                </div>
+            </div>
+        </div>
+        <div class="business-unit-container">
+            @if (ViewBag.BusinessUnits != null && ViewBag.BusinessUnits.Count > 0)
+            {
+                @if (ViewBag.BusinessUnits.Count == 1)
+                {
+                    <span>Bu iş merkezinde üretim yapmaktasınız: @ViewBag.SelectedBusinessUnit</span>
+                }
+                else
+                {
+                    <select id="businessUnitSelector" onchange="selectBusinessUnit()">
+                        @foreach (var unit in ViewBag.BusinessUnits)
+                        {
+                            if (unit == ViewBag.SelectedBusinessUnit)
+                            {
+                                <option value="@unit" selected>@unit</option>
+                            }
+                            else
+                            {
+                                <option value="@unit">@unit</option>
+                            }
+                        }
+                    </select>
+                }
+            }
+            else
+            {
+                <span>İş merkezi tanımlı değil</span>
+            }
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-header-text">Üretim Listesi</h5>
+                    </div>
+                    <div class="card-block">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Barkod Kodu</th>
+                                    <th>Stok Kodu</th>
+                                    <th>Parti Kodu</th>
+                                    <th>Lot No</th>
+                                    <th>Kullanıcı</th>
+                                    <th>İş Merkezi</th>
+                                    <th>Hatalı Durum</th>
+                                    <th>İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.bar_kodu</td>
+                                        <td>@item.bar_stokkodu</td>
+                                        <td>@item.bar_partikodu</td>
+                                        <td>@item.bar_lotno</td>
+                                        <td>@(string.IsNullOrEmpty(item.PersonelAdi) ? "-" : $"{item.PersonelAdi} {item.PersonelSoyadi}")</td>
+                                        <td>@(string.IsNullOrEmpty(item.IsMerkezi) ? "-" : item.IsMerkezi)</td>
+                                        <td>
+                                            @if (item.HataliDurum == "001")
+                                            {
+                                                <span class="faulty-status">
+                                                    Hatalı <i class="fas fa-exclamation-circle"></i>
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span>Normal</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.HataliDurum != "001")
+                                            {
+                                                <button class="barkod-button-yeni" onclick="markAsFaulty('@item.bar_kodu')">
+                                                    <i class="fas fa-exclamation-triangle"></i> Hatalı İşaretle
+                                                </button>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="outputMessage"></div>
+    </div>
+</div>
 
-		<div class="row">
-			<div class="col-sm-12">
-				<div class="card">
-					<div class="card-block accordion-block">
-						<div class="col-md-12">
-							<div id="example_wrapper" class="dataTables_wrapper">
-								<div class="dataTables_length" id="example_length"></div>
-								<div class="dataTables_filter" id="example_filter"></div>
-								<div id="example_wrapper">
-									<table id="example" class="display dataTable" style="width:100%">
-										<thead>
-											<tr class="tablo-icerik-yazi">
-												<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-													<div class="th-content">
-														<span>Barkod<span>
-													</div>
-												</th>
-												<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-													<div class="th-content">
-														<span>Stok Kodu<span>
-													</div>
-												</th>
-												<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-													<div class="th-content">
-														<span>Parti Kodu</span>
-													</div>
-												</th>
-												<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-													<div class="th-content">
-														<span>Lot Numarası</span>
-													</div>
-												</th>
-												<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 150px;">
-													<div class="th-content">
-														<span>Üreten Personel</span>
-													</div>
-												</th>
-												<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-													<div class="th-content">
-														<span>Durum</span>
-													</div>
-												</th>
-												<th class="sorting text-center" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-													<div class="th-content">
-														<span>İşlemler</span>
-													</div>
-												</th>
-											</tr>
-										</thead>
-										<tbody>
-											@foreach (var item in Model)
-											{
-												<tr>
-													<td>@item.bar_kodu</td>
-													<td>@item.bar_stokkodu</td>
-													<td>@item.bar_partikodu</td>
-													<td>@item.bar_lotno</td>
-													<td>
-														@if (string.IsNullOrEmpty(item.KullaniciNo))
-														{
-															<span>-</span>
-														}
-														else if (!string.IsNullOrEmpty(item.PersonelAdi) && !string.IsNullOrEmpty(item.PersonelSoyadi))
-														{
-															@(item.PersonelAdi + " " + item.PersonelSoyadi)
-														}
-														else
-														{
-															<span>Bilinmeyen Kullanıcı (@item.KullaniciNo)</span>
-														}
-													</td>
-													<td>
-														@if (item.HataliDurum == "HATALI" || item.HataliDurum == "001")
-														{
-															<span class="hatali-durum">HATALI ÜRETİM</span>
-														}
-														else
-														{
-															<span>Normal</span>
-														}
-													</td>
-													<td class="text-center">
-														@if (item.HataliDurum != "HATALI" && item.HataliDurum != "001")
-														{
-															<button type="button" class="btn btn-sm btn-danger hatali-uretim-btn" data-barkod="@item.bar_kodu">
-																Hatalı Üretim
-															</button>
-														}
-														else
-														{
-															<span>İşaretlendi</span>
-														}
-													</td>
-												</tr>
-											}
-										</tbody>
-									</table>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function selectBusinessUnit() {
+        const selectedUnit = $('#businessUnitSelector').val();
+        $.ajax({
+            type: 'POST',
+            url: '/Dioki/SelectBusinessUnit',
+            data: { businessUnit: selectedUnit },
+            success: function (response) {
+                if (response.success) {
+                    location.reload();
+                } else {
+                    $('#outputMessage').html(`
+                        <div class="error-message">
+                            <strong>Hata:</strong> ${response.message}
+                        </div>`);
+                }
+            },
+            error: function () {
+                $('#outputMessage').html(`
+                    <div class="error-message">
+                        <strong>Hata:</strong> İş merkezi seçimi sırasında bir hata oluştu.
+                    </div>`);
+            }
+        });
+    }
 
-	<!-- Modal -->
-	<div class="modal fade" id="hataliUretimModal" tabindex="-1" role="dialog" aria-labelledby="hataliUretimModalLabel" aria-hidden="true">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" style="font-size:20px;" id="hataliUretimModalLabel">Hatalı Üretim Onayı</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<p style="font-size:20px;">Bu üretimi hatalı olarak işaretlemek istediğinize emin misiniz?</p>
-					<p style="font-size:20px;">Barkod: <strong id="modalBarkod"></strong></p>
-				</div>
-				<div class="modal-footer">
-					<button type="button" style="font-size:20px;" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-					<button type="button"  style="font-size:20px;" class="btn btn-danger" id="hataliUretimOnayBtn">Hatalı Olarak İşaretle</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<script src="/Content/assets/plugins/jquery/dist/jquery.min.js"></script>
-	<script src="/Content/assets/plugins/jquery-ui/jquery-ui.min.js"></script>
-	<script src="/Content/assets/plugins/tether/dist/js/tether.min.js"></script>
-
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-
-	<script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
-	<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.flash.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-	<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
-	<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
-
-	<script src="/Content/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-	<script src="/Content/assets/plugins/Waves/waves.min.js"></script>
-	<script src="/Content/assets/plugins/jquery-slimscroll/jquery.slimscroll.js"></script>
-	<script src="/Content/assets/plugins/jquery.nicescroll/jquery.nicescroll.min.js"></script>
-	<script src="/Content/assets/plugins/classie/classie.js"></script>
-	<script src="/Content/assets/plugins/notification/js/bootstrap-growl.min.js"></script>
-	<script type="text/javascript" src="/Content/assets/js/main.min.js"></script>
-	<script type="text/javascript" src="/Content/assets/pages/elements.js"></script>
-	<script src="/Content/assets/js/menu.min.js"></script>
-
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-	<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
-	<script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
-
-
-	<script>
-		document.addEventListener('DOMContentLoaded', function () {
-			let table = new DataTable('#example');
-
-			// Hatalı üretim butonlarına tıklama işlemi
-			$('.hatali-uretim-btn').on('click', function() {
-				const barkod = $(this).data('barkod');
-				$('#modalBarkod').text(barkod);
-				$('#hataliUretimModal').modal('show');
-			});
-
-			// Onay butonuna tıklama işlemi
-			$('#hataliUretimOnayBtn').on('click', function() {
-				const barkod = $('#modalBarkod').text();
-
-				// AJAX ile hatalı olarak işaretle
-				$.ajax({
-					url: '/Dioki/UretimiHataliOlarakIsaretle',
-					type: 'POST',
-					data: { barkod: barkod },
-					success: function(response) {
-						if (response.success) {
-							// Modal'ı kapat
-							$('#hataliUretimModal').modal('hide');
-
-							// Başarılı mesajını göster
-							alert('Üretim hatalı olarak işaretlendi.');
-
-							// Sayfayı yenile
-							location.reload();
-						} else {
-							alert('Hata: ' + response.message);
-						}
-					},
-					error: function() {
-						alert('İşlem sırasında bir hata oluştu.');
-					}
-				});
-			});
-		});
-	</script>
-
-	<script>
-		$('#example').dataTable({
-			"dom": '<"row"<"col-sm-12"B>>' +
-				'<"row"<"col-sm-6"l><"col-sm-6"f>>' +
-				't' +
-				'<"row"<"col-sm-6"i><"col-sm-6"p>>',
-			"language": {
-				"url": "/Content/DataTables/turkish.json"
-			},
-			"buttons": ['copy', 'csv', 'excel', 'pdf', 'print'], // Butonlar
-			"pageLength": 5000, // Varsayılan olarak 5000 gösterim
-			"lengthMenu": [[10, 25, 50, 100, 5000], [10, 25, 50, 100, "5000"]] // Kullanıcıya seçim için seçenekler
-		});
-	</script>
+    function markAsFaulty(barkod) {
+        if (confirm('Bu barkodu hatalı olarak işaretlemek istediğinize emin misiniz?')) {
+            $.ajax({
+                type: 'POST',
+                url: '/Dioki/UretimiHataliOlarakIsaretle',
+                data: { barkod: barkod },
+                success: function (response) {
+                    if (response.success) {
+                        $('#outputMessage').html(`
+                            <div class="success-message">
+                                <strong>Başarılı:</strong> ${response.message}
+                            </div>`);
+                        setTimeout(() => location.reload(), 2000);
+                    } else {
+                        $('#outputMessage').html(`
+                            <div class="error-message">
+                                <strong>Hata:</strong> ${response.message}
+                            </div>`);
+                    }
+                },
+                error: function () {
+                    $('#outputMessage').html(`
+                        <div class="error-message">
+                            <strong>Hata:</strong> Barkod hatalı olarak işaretlenirken bir hata oluştu.
+                        </div>`);
+                }
+            });
+        }
+    }
+</script>

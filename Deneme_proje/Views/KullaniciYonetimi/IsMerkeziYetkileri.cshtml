@@ -1,0 +1,525 @@
+﻿@model Deneme_proje.Models.YonetimEntities.KullaniciIsMerkeziYetkiViewModel
+
+@{
+    ViewData["Title"] = "İş Merkezi Yetkileri";
+}
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <!-- Breadcrumb -->
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="@Url.Action("Index", "KullaniciYonetimi")">Kullanıcı Yönetimi</a>
+                        </li>
+                        <li class="breadcrumb-item active">İş Merkezi Yetkileri</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">
+                            <i class="fa fa-industry"></i> İş Merkezi Yetkileri - @Model.LongName (@Model.UserName)
+                        </h5>
+                    </div>
+                    <div class="card-block p-4">
+
+                        <!-- Kullanıcı Bilgileri -->
+                        <div class="user-info mb-4">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="info-item">
+                                        <i class="fa fa-hashtag text-primary"></i>
+                                        <strong>Kullanıcı No:</strong> @Model.UserNo
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="info-item">
+                                        <i class="fa fa-user text-primary"></i>
+                                        <strong>Kullanıcı Adı:</strong> @Model.UserName
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="info-item">
+                                        <i class="fa fa-id-card text-primary"></i>
+                                        <strong>Ad Soyad:</strong> @Model.LongName
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <!-- İş Merkezi Seçim Formu -->
+                        <form id="isMerkeziForm" method="post" action="@Url.Action("IsMerkeziYetkiKaydet", "KullaniciYonetimi")">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="UserNo" value="@Model.UserNo" />
+
+                            <!-- Form Header -->
+                            <div class="form-header mb-4">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                    <h6 class="mb-0">
+                                        <i class="fa fa-industry"></i> İş Merkezi Yetkileri
+                                        <small class="text-muted">(@Model.TumIsMerkezleri.Count toplam iş merkezi)</small>
+                                    </h6>
+                                    <div class="btn-toolbar" role="toolbar">
+                                        <div class="btn-group me-2" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-success" onclick="tumunuSec()">
+                                                <i class="fa fa-check-square"></i> Tümünü Seç
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-warning" onclick="tumunuKaldir()">
+                                                <i class="fa fa-square-o"></i> Tümünü Kaldır
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- İş Merkezi Grid -->
+                            <div class="form-group mb-4">
+                                @if (Model.TumIsMerkezleri != null && Model.TumIsMerkezleri.Any())
+                                {
+                                    <div class="is-merkezi-grid">
+                                        @foreach (var isMerkezi in Model.TumIsMerkezleri)
+                                        {
+                                            <div class="form-check is-merkezi-item @(isMerkezi.IsSelected ? "selected" : "")">
+                                                <input type="checkbox"
+                                                       class="form-check-input is-merkezi-checkbox"
+                                                       name="IsMerkezleri"
+                                                       value="@isMerkezi.IsM_Kodu"
+                                                       id="merkez_@isMerkezi.IsM_Kodu"
+                                                @(isMerkezi.IsSelected ? "checked" : "") />
+                                                <label class="form-check-label" for="merkez_@isMerkezi.IsM_Kodu">
+                                                    <div class="merkez-info">
+                                                        <div class="merkez-kod">@isMerkezi.IsM_Kodu</div>
+                                                        <div class="merkez-aciklama">@isMerkezi.IsM_Aciklama</div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-info">
+                                        <i class="fa fa-info-circle"></i> Sisterde tanımlı iş merkezi bulunamadı.
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Seçili İş Merkezleri Önizleme -->
+                            <div class="selected-preview p-3 bg-light border rounded mb-4">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fa fa-eye text-info me-2"></i>
+                                    <small class="text-muted"><strong>Seçili İş Merkezleri:</strong></small>
+                                </div>
+                                <div id="selectedPreview" class="preview-content">
+                                    <!-- JavaScript ile doldurulacak -->
+                                </div>
+                            </div>
+
+                            <!-- Form Buttons -->
+                            <div class="form-actions">
+                                <div class="d-flex justify-content-between flex-wrap gap-2">
+                                    <a href="@Url.Action("Index", "KullaniciYonetimi")" class="btn btn-secondary">
+                                        <i class="fa fa-arrow-left"></i> Geri Dön
+                                    </a>
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-outline-danger" onclick="formuSifirla()">
+                                            <i class="fa fa-refresh"></i> Sıfırla
+                                        </button>
+                                        <button type="submit" class="btn btn-primary" id="kaydetBtn">
+                                            <i class="fa fa-save"></i> Kaydet
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .user-info {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+        .info-item i {
+            width: 20px;
+        }
+
+    .form-header {
+        border-bottom: 2px solid #dee2e6;
+        padding-bottom: 15px;
+    }
+
+    .is-merkezi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 15px;
+        max-height: 500px;
+        overflow-y: auto;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    }
+
+    .is-merkezi-item {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 15px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+    }
+
+        .is-merkezi-item:hover {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.15);
+        }
+
+        .is-merkezi-item.selected {
+            background: #e8f5e8;
+            border-color: #4caf50;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+        }
+
+        .is-merkezi-item input[type="checkbox"] {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            transform: scale(1.2);
+        }
+
+    .form-check-label {
+        cursor: pointer;
+        margin-left: 0;
+        font-size: 14px;
+        width: 100%;
+        padding-right: 30px;
+    }
+
+    .merkez-info {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .merkez-kod {
+        font-weight: bold;
+        font-size: 16px;
+        color: #1976d2;
+    }
+
+    .merkez-aciklama {
+        color: #666;
+        font-size: 13px;
+        line-height: 1.3;
+    }
+
+    .selected-preview {
+        min-height: 60px;
+        border: 2px dashed #dee2e6 !important;
+    }
+
+    .preview-content {
+        min-height: 30px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        align-items: center;
+    }
+
+    .preview-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: 500;
+        margin: 2px;
+        box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+    }
+
+    .form-actions {
+        border-top: 2px solid #dee2e6;
+        padding-top: 20px;
+        margin-top: 20px;
+    }
+
+    .btn {
+        border-radius: 6px;
+        font-weight: 500;
+        padding: 8px 16px;
+        transition: all 0.3s ease;
+    }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+    .card {
+        border: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        border-radius: 12px;
+    }
+
+    .card-header {
+        border-radius: 12px 12px 0 0;
+        border: none;
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .is-merkezi-grid
+
+    {
+        grid-template-columns: 1fr;
+        max-height: 400px;
+        padding: 15px;
+    }
+
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .btn-toolbar {
+        width: 100%;
+    }
+
+    .btn-group {
+        width: 100%;
+    }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+
+    .form-actions .d-flex {
+        flex-direction: column;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    .user-info .row .col-md-4 {
+        margin-bottom: 15px;
+    }
+
+    .px-lg-5 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    }
+
+    @@media (max-width: 576px) {
+        .card
+
+    {
+        margin: 0 -10px;
+        border-radius: 0;
+    }
+
+    .is-merkezi-item {
+        padding: 12px;
+    }
+
+    .merkez-kod {
+        font-size: 14px;
+    }
+
+    .merkez-aciklama {
+        font-size: 12px;
+    }
+
+    }
+</style>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            updatePreview();
+            updateItemStates();
+
+            // Checkbox değişikliklerini dinle
+            $('.is-merkezi-checkbox').change(function() {
+                updatePreview();
+                updateItemStates();
+            });
+        });
+
+        function tumunuSec() {
+            $('.is-merkezi-checkbox').prop('checked', true);
+            updatePreview();
+            updateItemStates();
+        }
+
+        function tumunuKaldir() {
+            $('.is-merkezi-checkbox').prop('checked', false);
+            updatePreview();
+            updateItemStates();
+        }
+
+        function formuSifirla() {
+            if (confirm('Tüm seçimler sıfırlanacak. Devam etmek istiyor musunuz?')) {
+                tumunuKaldir();
+            }
+        }
+
+        function updatePreview() {
+            var selected = [];
+            $('.is-merkezi-checkbox:checked').each(function() {
+                var value = $(this).val();
+                var label = $(this).next('label').find('.merkez-kod').text().trim();
+                selected.push({
+                    code: value,
+                    label: label
+                });
+            });
+
+            var previewHtml = '';
+            if (selected.length > 0) {
+                selected.forEach(function(item) {
+                    previewHtml += '<span class="preview-badge">' + item.code + '</span>';
+                });
+                previewHtml += '<small class="text-muted ms-2">(' + selected.length + ' adet seçili)</small>';
+            } else {
+                previewHtml = '<span class="text-muted"><i class="fa fa-info-circle"></i> Hiç iş merkezi seçilmedi</span>';
+            }
+
+            $('#selectedPreview').html(previewHtml);
+        }
+
+        function updateItemStates() {
+            $('.is-merkezi-item').each(function() {
+                var checkbox = $(this).find('.is-merkezi-checkbox');
+                if (checkbox.is(':checked')) {
+                    $(this).addClass('selected');
+                } else {
+                    $(this).removeClass('selected');
+                }
+            });
+        }
+
+        // Form gönderilmeden önce kontrol
+        $('#isMerkeziForm').submit(function(e) {
+            var selectedCount = $('.is-merkezi-checkbox:checked').length;
+            var totalCount = $('.is-merkezi-checkbox').length;
+
+            var kaydetBtn = $('#kaydetBtn');
+            var originalText = kaydetBtn.html();
+
+            if (selectedCount === 0) {
+                if (!confirm('Hiç iş merkezi seçilmedi. Bu kullanıcının tüm iş merkezi yetkileri kaldırılacak ve kullanıcı hiçbir iş emrini göremeyecek. Devam etmek istiyor musunuz?')) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+
+            // Butonu devre dışı bırak ve loading göster
+            kaydetBtn.prop('disabled', true);
+            kaydetBtn.html('<i class="fa fa-spinner fa-spin"></i> Kaydediliyor...');
+
+            // Eğer form hatalı ise butonu eski haline getir
+            setTimeout(function() {
+                if (kaydetBtn.prop('disabled')) {
+                    kaydetBtn.prop('disabled', false);
+                    kaydetBtn.html(originalText);
+                }
+            }, 5000);
+
+            return true;
+        });
+
+        // Item'lara tıklama olayı ekle
+        $('.is-merkezi-item').click(function(e) {
+            if (e.target.type !== 'checkbox') {
+                var checkbox = $(this).find('.is-merkezi-checkbox');
+                checkbox.prop('checked', !checkbox.prop('checked'));
+                updatePreview();
+                updateItemStates();
+            }
+        });
+
+        // Klavye desteği
+        $(document).keydown(function(e) {
+            if (e.ctrlKey) {
+                switch(e.which) {
+                    case 65: // Ctrl+A - Tümünü seç
+                        e.preventDefault();
+                        tumunuSec();
+                        break;
+                    case 68: // Ctrl+D - Tümünü kaldır
+                        e.preventDefault();
+                        tumunuKaldir();
+                        break;
+                    case 83: // Ctrl+S - Kaydet
+                        e.preventDefault();
+                        $('#isMerkeziForm').submit();
+                        break;
+                }
+            }
+        });
+
+        // Scroll animasyonu
+        $('.is-merkezi-grid').on('scroll', function() {
+            var scrollTop = $(this).scrollTop();
+            var maxScroll = $(this)[0].scrollHeight - $(this).height();
+            var scrollPercent = (scrollTop / maxScroll) * 100;
+
+            // Scroll pozisyonuna göre background gradient değiştir
+            if (scrollPercent > 50) {
+                $(this).css('background', 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)');
+            } else {
+                $(this).css('background', 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)');
+            }
+        });
+
+        // Sayfa yüklendiğinde animasyon
+        $('.is-merkezi-item').each(function(index) {
+            $(this).css('opacity', '0');
+            $(this).animate({
+                opacity: 1
+            }, 200 + (index * 50));
+        });
+
+        // Tooltip ekleme
+        $('[title]').tooltip();
+    </script>
+}

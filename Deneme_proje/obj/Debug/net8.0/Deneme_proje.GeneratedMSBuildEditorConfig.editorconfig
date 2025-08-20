@@ -68,6 +68,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3JtXEZpcnNhdGxhci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Crm/FiyatTeklif.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3JtXEZpeWF0VGVrbGlmLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Crm/MusteriEkle.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3JtXE11c3RlcmlFa2xlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -344,6 +348,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS3VsbGFuaWNpWW9uZXRpbWlcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/KullaniciYonetimi/IsMerkeziYetkileri.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS3VsbGFuaWNpWW9uZXRpbWlcSXNNZXJrZXppWWV0a2lsZXJpLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Login/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -362,6 +370,18 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/MenuYonetimi/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVlvbmV0aW1pXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Menu/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Menu/Siparisler.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVxTaXBhcmlzbGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Menu/YeniSiparis.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVxZZW5pU2lwYXJpcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Profil/Index.cshtml]

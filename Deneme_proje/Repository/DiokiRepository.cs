@@ -11,47 +11,47 @@ namespace Deneme_proje.Repository
 {
     public class DiokiRepository
     {
-		private readonly DatabaseSelectorService _dbSelectorService;
-		private readonly ILogger<DiokiRepository> _logger;
+        private readonly DatabaseSelectorService _dbSelectorService;
+        private readonly ILogger<DiokiRepository> _logger;
 
-		public DiokiRepository(DatabaseSelectorService dbSelectorService, ILogger<DiokiRepository> logger)
-		{
-			_dbSelectorService = dbSelectorService;
-			_logger = logger;
-		}
+        public DiokiRepository(DatabaseSelectorService dbSelectorService, ILogger<DiokiRepository> logger)
+        {
+            _dbSelectorService = dbSelectorService;
+            _logger = logger;
+        }
 
 
-		// Örnek bir method: Markaları getiren bir sorgu
-		public IEnumerable<string> GetMarkalar()
-		{
-			var connectionString = _dbSelectorService.GetConnectionString();
+        // Örnek bir method: Markaları getiren bir sorgu
+        public IEnumerable<string> GetMarkalar()
+        {
+            var connectionString = _dbSelectorService.GetConnectionString();
 
-			using (var connection = new SqlConnection(connectionString))
-			{
-				var sqlQuery = @"
+            using (var connection = new SqlConnection(connectionString))
+            {
+                var sqlQuery = @"
         SELECT DISTINCT sto_marka_kodu
         FROM STOKLAR
         WHERE sto_cins = 4 AND TRIM(sto_marka_kodu) <> ''";
 
-				try
-				{
-					// Burada connection doğru şekilde kullanılıyor
-					return connection.Query<string>(sqlQuery);
-				}
-				catch (Exception ex)
-				{
-					_logger.LogError(ex, "An error occurred while retrieving Marka data.");
-					throw;
-				}
-			}
-		}
+                try
+                {
+                    // Burada connection doğru şekilde kullanılıyor
+                    return connection.Query<string>(sqlQuery);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "An error occurred while retrieving Marka data.");
+                    throw;
+                }
+            }
+        }
 
-		public IEnumerable<string> GetModeller(string markaKodu)
+        public IEnumerable<string> GetModeller(string markaKodu)
         {
-			var connectionString = _dbSelectorService.GetConnectionString();
+            var connectionString = _dbSelectorService.GetConnectionString();
 
-			using (var connection = new SqlConnection(connectionString))
-			{
+            using (var connection = new SqlConnection(connectionString))
+            {
                 var sqlQuery = @"
 		SELECT DISTINCT sto_model_kodu
 		FROM STOKLAR
@@ -72,10 +72,10 @@ namespace Deneme_proje.Repository
         }
         public IEnumerable<string> GetAmbalajKodlari(string markaKodu, string modelKodu)
         {
-			var connectionString = _dbSelectorService.GetConnectionString();
+            var connectionString = _dbSelectorService.GetConnectionString();
 
-			using (var connection = new SqlConnection(connectionString))
-			{
+            using (var connection = new SqlConnection(connectionString))
+            {
                 var sqlQuery = @"
             SELECT DISTINCT sto_ambalaj_kodu
             FROM STOKLAR
@@ -100,10 +100,10 @@ AND sto_pasif_fl=0
         }
         public IEnumerable<string> GetKisaIsimler(string markaKodu, string modelKodu, string ambalajKodu)
         {
-			var connectionString = _dbSelectorService.GetConnectionString();
+            var connectionString = _dbSelectorService.GetConnectionString();
 
-			using (var connection = new SqlConnection(connectionString))
-			{
+            using (var connection = new SqlConnection(connectionString))
+            {
                 var sqlQuery = @"
             SELECT DISTINCT sto_kisa_ismi
             FROM STOKLAR
@@ -134,10 +134,10 @@ AND sto_pasif_fl=0
 
         public string GetStokKodByKisaIsim(string kisaIsim)
         {
-			var connectionString = _dbSelectorService.GetConnectionString();
+            var connectionString = _dbSelectorService.GetConnectionString();
 
-			using (var connection = new SqlConnection(connectionString))
-			{
+            using (var connection = new SqlConnection(connectionString))
+            {
                 var sqlQuery = @"
 		SELECT sto_kod
 		FROM STOKLAR
@@ -331,16 +331,15 @@ AND sto_pasif_fl=0
             }
         }
 
-        // Genişletilmiş Barkod Tanımı sınıfı
         public class GenisletilmisBarkodTanimi : BarkodTanimi
         {
             public string KullaniciNo { get; set; }
             public string PersonelAdi { get; set; }
             public string PersonelSoyadi { get; set; }
             public string HataliDurum { get; set; }
+            public string IsMerkezi { get; set; } // Added for business unit
         }
 
-        // Barkod tanımlarını kullanıcı bilgileriyle birlikte getir
         public IEnumerable<GenisletilmisBarkodTanimi> KullaniciBilgisiyleBarkodTanimlariniGetir()
         {
             var connectionString = _dbSelectorService.GetConnectionString();
@@ -349,25 +348,30 @@ AND sto_pasif_fl=0
             {
                 var sqlQuery = @"
             SELECT 
-    b.bar_kodu, 
-    b.bar_stokkodu, 
-    b.bar_partikodu, 
-    b.bar_lotno,
-    b.bar_special2 AS KullaniciNo,
-    b.bar_special3 AS HataliDurum,
-    p.per_adi AS PersonelAdi,
-    p.per_soyadi AS PersonelSoyadi
-FROM BARKOD_TANIMLARI b
-LEFT JOIN PERSONELLER p ON b.bar_special2 = p.per_userno AND b.bar_special2 <> ''
-GROUP BY 
-    b.bar_kodu, 
-    b.bar_stokkodu, 
-    b.bar_partikodu, 
-    b.bar_lotno,
-    b.bar_special2,
-    b.bar_special3,
-    p.per_adi,
-    p.per_soyadi";
+                b.bar_kodu, 
+                b.bar_stokkodu, 
+                b.bar_partikodu, 
+                b.bar_lotno,
+                b.bar_special2 AS KullaniciNo,
+                b.bar_special3 AS HataliDurum,
+                p.per_adi AS PersonelAdi,
+                p.per_soyadi AS PersonelSoyadi,
+                ISNULL(rtp.RtP_PlanlananIsMerkezi, '') AS IsMerkezi
+            FROM BARKOD_TANIMLARI b
+            LEFT JOIN PERSONELLER p ON b.bar_special2 = p.per_userno AND b.bar_special2 <> ''
+            LEFT JOIN URETIM_ROTA_PLANLARI rtp ON b.bar_stokkodu = rtp.RtP_UrunKodu 
+                AND rtp.RtP_SatirNo = 0
+            LEFT JOIN [DBT_ERP].dbo.KullaniciYonetimi ky ON b.bar_special2 = ky.User_no
+            GROUP BY 
+                b.bar_kodu, 
+                b.bar_stokkodu, 
+                b.bar_partikodu, 
+                b.bar_lotno,
+                b.bar_special2,
+                b.bar_special3,
+                p.per_adi,
+                p.per_soyadi,
+                rtp.RtP_PlanlananIsMerkezi";
 
                 try
                 {
@@ -382,10 +386,10 @@ GROUP BY
         }
         public IEnumerable<BarkodTanimi> GetBarkodTanimi()
         {
-			var connectionString = _dbSelectorService.GetConnectionString();
+            var connectionString = _dbSelectorService.GetConnectionString();
 
-			using (var connection = new SqlConnection(connectionString))
-			{
+            using (var connection = new SqlConnection(connectionString))
+            {
                 var sqlQuery = @"
             SELECT bar_kodu, bar_stokkodu, bar_partikodu, bar_lotno
             FROM BARKOD_TANIMLARI";
@@ -401,8 +405,163 @@ GROUP BY
                 }
             }
         }
+
+        // DiokiRepository.cs dosyasına eklenecek metodlar
+
+        // Kullanıcının yetkili olduğu iş merkezlerini getir
+        public List<string> GetKullaniciIsMerkezleri(string userNo)
+        {
+            if (string.IsNullOrEmpty(userNo))
+            {
+                _logger.LogWarning("GetKullaniciIsMerkezleri: UserNo boş veya null");
+                return new List<string>();
+            }
+
+            try
+            {
+                // ERP veritabanına bağlanarak kullanıcının iş merkezi yetkilerini al
+                var erpConnectionString = _dbSelectorService.GetERPConnectionString();
+
+                if (string.IsNullOrEmpty(erpConnectionString))
+                {
+                    _logger.LogError("ERPDatabase connection string bulunamadı");
+                    return new List<string>();
+                }
+
+                using (var connection = new SqlConnection(erpConnectionString))
+                {
+                    connection.Open();
+                    var query = @"
+                SELECT IsMerkezleri 
+                FROM KullaniciYonetimi 
+                WHERE User_no = @UserNo";
+
+                    var isMerkezleriStr = connection.QueryFirstOrDefault<string>(query, new { UserNo = userNo });
+
+                    if (string.IsNullOrEmpty(isMerkezleriStr))
+                    {
+                        _logger.LogInformation($"Kullanıcı {userNo} için iş merkezi yetkisi bulunamadı");
+                        return new List<string>();
+                    }
+
+                    var result = isMerkezleriStr.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(x => x.Trim())
+                        .Where(x => !string.IsNullOrEmpty(x))
+                        .ToList();
+
+                    _logger.LogInformation($"Kullanıcı {userNo} için {result.Count} iş merkezi yetkisi bulundu: {string.Join(", ", result)}");
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Kullanıcı {userNo} için iş merkezi yetkileri alınırken hata oluştu");
+                return new List<string>();
+            }
+        }
+
+        // İş emrinin hangi iş merkezine ait olduğunu getir
+        public string GetIsEmriIsMerkezi(string isEmriKodu, string stokKodu)
+        {
+            var connectionString = _dbSelectorService.GetConnectionString();
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                var query = @"
+            SELECT TOP 1 rtp.RtP_PlanlananIsMerkezi
+            FROM URETIM_ROTA_PLANLARI rtp
+            WHERE rtp.RtP_IsEmriKodu = @IsEmriKodu 
+                AND rtp.RtP_UrunKodu = @StokKodu 
+                AND rtp.RtP_SatirNo = 0";
+
+                try
+                {
+                    var isMerkezi = connection.QueryFirstOrDefault<string>(query,
+                        new { IsEmriKodu = isEmriKodu, StokKodu = stokKodu });
+
+                    _logger.LogInformation($"İş emri {isEmriKodu} - Stok {stokKodu} için iş merkezi: {isMerkezi ?? "Bulunamadı"}");
+                    return isMerkezi ?? string.Empty;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"İş emri {isEmriKodu} için iş merkezi alınırken hata oluştu");
+                    return string.Empty;
+                }
+            }
+        }
+
+        // Kullanıcının belirli iş merkezinde yetki kontrolü
+        public bool KullaniciIsMerkeziYetkisiVarMi(string userNo, string isMerkezi)
+        {
+            if (string.IsNullOrEmpty(userNo) || string.IsNullOrEmpty(isMerkezi))
+            {
+                return false;
+            }
+
+            var yetkiliIsMerkezleri = GetKullaniciIsMerkezleri(userNo);
+
+            // Eğer kullanıcının hiç iş merkezi yetkisi yoksa, tüm iş merkezlerine erişimi var demektir
+            if (!yetkiliIsMerkezleri.Any())
+            {
+                return true;
+            }
+
+            return yetkiliIsMerkezleri.Contains(isMerkezi);
+        }
+
+        // Yetkili olunan iş merkezlerindeki ürünleri filtrelemek için marka listesini getir
+        public IEnumerable<string> GetMarkalarWithIsMerkeziFilter(string userNo)
+        {
+            var connectionString = _dbSelectorService.GetConnectionString();
+            var yetkiliIsMerkezleri = GetKullaniciIsMerkezleri(userNo);
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                string sqlQuery;
+                object parameters;
+
+                if (yetkiliIsMerkezleri.Any())
+                {
+                    // Sadece yetkili olunan iş merkezlerindeki ürünleri getir
+                    sqlQuery = @"
+                SELECT DISTINCT s.sto_marka_kodu
+                FROM STOKLAR s
+                INNER JOIN URETIM_MALZEME_PLANLAMA upl ON s.sto_kod = upl.upl_kodu
+                INNER JOIN ISEMIRLERI ie ON upl.upl_isemri = ie.is_Kod
+                INNER JOIN URETIM_ROTA_PLANLARI rtp ON rtp.RtP_IsEmriKodu = ie.is_Kod 
+                    AND rtp.RtP_UrunKodu = s.sto_kod 
+                    AND rtp.RtP_SatirNo = 0
+                WHERE s.sto_cins = 4 
+                    AND TRIM(s.sto_marka_kodu) <> '' 
+                    AND ie.is_EmriDurumu IN (0, 1)
+                    AND rtp.RtP_PlanlananIsMerkezi IN @IsMerkezleri";
+
+                    parameters = new { IsMerkezleri = yetkiliIsMerkezleri };
+                }
+                else
+                {
+                    // Tüm markaları getir (eski kod)
+                    sqlQuery = @"
+                SELECT DISTINCT sto_marka_kodu
+                FROM STOKLAR
+                WHERE sto_cins = 4 AND TRIM(sto_marka_kodu) <> ''";
+
+                    parameters = new { };
+                }
+
+                try
+                {
+                    return connection.Query<string>(sqlQuery, parameters);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "İş merkezi filtreli marka listesi alınırken hata oluştu.");
+                    throw;
+                }
+            }
+        }
     }
 }
 
-        
+
 

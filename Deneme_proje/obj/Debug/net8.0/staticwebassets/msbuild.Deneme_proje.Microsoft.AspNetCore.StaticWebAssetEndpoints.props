@@ -1,5 +1,17 @@
 ﻿<Project>
   <ItemGroup>
+    <StaticWebAssetEndpoint Include="_content/Deneme_proje/1.n7kqyaivwm.pdf">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\1.pdf'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"n7kqyaivwm"},{"Name":"integrity","Value":"sha256-05KlA0ESnXdL\u002BOL5ZH2OQPwCXprPiJgWlMgO9V0yQxI="},{"Name":"label","Value":"_content/Deneme_proje/1.pdf"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"446320"},{"Name":"Content-Type","Value":"application/pdf"},{"Name":"ETag","Value":"\u002205KlA0ESnXdL\u002BOL5ZH2OQPwCXprPiJgWlMgO9V0yQxI=\u0022"},{"Name":"Last-Modified","Value":"Wed, 13 Aug 2025 10:21:15 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/Deneme_proje/1.pdf">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\1.pdf'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-05KlA0ESnXdL\u002BOL5ZH2OQPwCXprPiJgWlMgO9V0yQxI="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"446320"},{"Name":"Content-Type","Value":"application/pdf"},{"Name":"ETag","Value":"\u002205KlA0ESnXdL\u002BOL5ZH2OQPwCXprPiJgWlMgO9V0yQxI=\u0022"},{"Name":"Last-Modified","Value":"Wed, 13 Aug 2025 10:21:15 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/Deneme_proje/BahceLogo.50hatxl9ps.png">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\BahceLogo.png'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>

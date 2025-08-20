@@ -10,6 +10,7 @@ using static Deneme_proje.Models.SirketDurumuEntites;
 
 using Deneme_proje.Helpers;
 using System.Configuration;
+using static Deneme_proje.Models.YonetimEntities;
 namespace Deneme_proje.Repository
 
 {
@@ -1003,34 +1004,267 @@ ORDER BY krsoztaksit_vade -- Vadeye göre sıralama
         }
 
         // İş emri durumunu güncelleyen metod
-        private string GetCurrentUserNo()
-        {
-            // Öncelikle session'dan kullanıcı numarasını almayı deneyin
-            var userNo = _httpContextAccessor.HttpContext?.Session.GetString("UserNo");
 
-            if (string.IsNullOrEmpty(userNo))
-            {
-                // Eğer session'da yoksa, kimlik adını kullanın
-                userNo = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
-            }
-
-            _logger.LogInformation($"Mevcut Kullanıcı Numarası: {userNo}");
-            return userNo ?? string.Empty;
-        }
 
         // Mevcut GetIsEmirleri metodunu güncelle
+
+        // Kullanıcının yetkili olduğu iş merkezlerini getir
+        // FaturaRepository.cs içindeki GetKullaniciIsMerkezleri metodunu bu şekilde değiştirin
+
+        // FaturaRepository.cs içindeki GetKullaniciIsMerkezleri metodunu bu şekilde değiştirin
+
+        public List<string> GetKullaniciIsMerkezleri(string userNo)
+        {
+            // UserNo null veya boş ise boş liste döndür
+            if (string.IsNullOrEmpty(userNo))
+            {
+                _logger.LogWarning("GetKullaniciIsMerkezleri: UserNo boş veya null");
+                return new List<string>();
+            }
+
+            try
+            {
+                // DatabaseSelectorService üzerinden ERP connection string'i al
+                var erpConnectionString = _dbSelectorService.GetERPConnectionString();
+
+                if (string.IsNullOrEmpty(erpConnectionString))
+                {
+                    _logger.LogError("ERPDatabase connection string bulunamadı");
+                    return new List<string>();
+                }
+
+                _logger.LogInformation($"ERP bağlantısı kullanılıyor: {erpConnectionString.Substring(0, Math.Min(30, erpConnectionString.Length))}...");
+
+                using (var connection = new SqlConnection(erpConnectionString))
+                {
+                    connection.Open();
+                    var query = @"
+                SELECT IsMerkezleri 
+                FROM KullaniciYonetimi 
+                WHERE User_no = @UserNo";
+
+                    var isMerkezleriStr = connection.QueryFirstOrDefault<string>(query, new { UserNo = userNo });
+
+                    _logger.LogInformation($"Kullanıcı {userNo} için sorgu sonucu: '{isMerkezleriStr ?? "NULL"}'");
+
+                    if (string.IsNullOrEmpty(isMerkezleriStr))
+                    {
+                        _logger.LogInformation($"Kullanıcı {userNo} için iş merkezi yetkisi bulunamadı - tüm iş merkezleri gösterilecek");
+                        return new List<string>();
+                    }
+
+                    var result = isMerkezleriStr.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(x => x.Trim())
+                        .Where(x => !string.IsNullOrEmpty(x))
+                        .ToList();
+
+                    _logger.LogInformation($"Kullanıcı {userNo} için {result.Count} iş merkezi yetkisi bulundu: {string.Join(", ", result)}");
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Kullanıcı {userNo} için iş merkezi yetkileri alınırken hata oluştu: {ex.Message}");
+                return new List<string>();
+            }
+        }
+
+        // GetTumIsMerkezleri metodunu da güncelleyin
+        public List<IsMerkezi> GetTumIsMerkezleri()
+        {
+            var connectionString = _dbSelectorService.GetConnectionString(); // Mikro DB bağlantısı
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    _logger.LogInformation($"İş merkezleri için MikroDB bağlantısı: {connectionString.Substring(0, Math.Min(50, connectionString.Length))}...");
+
+                    var query = @"
+                SELECT 
+                    IsM_Kodu,
+                    IsM_Aciklama
+                FROM IS_MERKEZLERI
+                WHERE IsM_iptal = 0 OR IsM_iptal IS NULL
+                ORDER BY IsM_Kodu";
+
+                    var result = connection.Query<IsMerkezi>(query).ToList();
+                    _logger.LogInformation($"Toplam {result.Count} iş merkezi bulundu");
+
+                    if (result.Any())
+                    {
+                        var ilkBes = result.Take(5);
+                        foreach (var im in ilkBes)
+                        {
+                            _logger.LogInformation($"İş Merkezi: {im.IsM_Kodu} - {im.IsM_Aciklama}");
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Hiç iş merkezi bulunamadı! IS_MERKEZLERI tablosunu kontrol edin.");
+                    }
+
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Tüm iş merkezleri alınırken hata oluştu: {ex.Message}");
+                    return new List<IsMerkezi>();
+                }
+            }
+        }
+
+        // KullaniciIsMerkeziYetkiKaydet metodunu da güncelleyin
+        public bool KullaniciIsMerkeziYetkiKaydet(string userNo, List<string> isMerkezleri)
+        {
+            if (string.IsNullOrEmpty(userNo))
+            {
+                _logger.LogError("KullaniciIsMerkeziYetkiKaydet: UserNo boş veya null");
+                return false;
+            }
+
+            try
+            {
+                // DatabaseSelectorService üzerinden ERP connection string'i al
+                var erpConnectionString = _dbSelectorService.GetERPConnectionString();
+
+                if (string.IsNullOrEmpty(erpConnectionString))
+                {
+                    _logger.LogError("ERPDatabase connection string bulunamadı");
+                    return false;
+                }
+
+                using (var connection = new SqlConnection(erpConnectionString))
+                {
+                    connection.Open();
+
+                    var isMerkezleriStr = isMerkezleri != null && isMerkezleri.Any()
+                        ? string.Join(",", isMerkezleri)
+                        : "";
+
+                    var query = @"
+                IF EXISTS (SELECT 1 FROM KullaniciYonetimi WHERE User_no = @UserNo)
+                    UPDATE KullaniciYonetimi 
+                    SET IsMerkezleri = @IsMerkezleri 
+                    WHERE User_no = @UserNo
+                ELSE
+                    INSERT INTO KullaniciYonetimi (User_no, GirisYetkisi, IsMerkezleri) 
+                    VALUES (@UserNo, 1, @IsMerkezleri)";
+
+                    var result = connection.Execute(query, new
+                    {
+                        UserNo = userNo,
+                        IsMerkezleri = isMerkezleriStr
+                    });
+
+                    _logger.LogInformation($"Kullanıcı {userNo} için iş merkezi yetkileri güncellendi: '{isMerkezleriStr}'");
+                    return result > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Kullanıcı {userNo} için iş merkezi yetkileri kaydedilirken hata oluştu: {ex.Message}");
+                return false;
+            }
+        }
+
+        // GetCurrentUserNo metodunu güvenli hale getir
+        private string GetCurrentUserNo()
+        {
+            try
+            {
+                string userNo = null;
+
+                // 1. Session'dan almayı dene
+                if (_httpContextAccessor.HttpContext?.Session != null)
+                {
+                    userNo = _httpContextAccessor.HttpContext.Session.GetString("UserNo");
+                    if (!string.IsNullOrEmpty(userNo))
+                    {
+                        _logger.LogDebug($"Kullanıcı no Session'dan alındı: {userNo}");
+                        return userNo;
+                    }
+                }
+
+                // 2. Claims'den almayı dene
+                if (_httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true)
+                {
+                    var userNoClaim = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserNo");
+                    if (userNoClaim != null && !string.IsNullOrEmpty(userNoClaim.Value))
+                    {
+                        userNo = userNoClaim.Value;
+                        _logger.LogDebug($"Kullanıcı no Claims'den alındı: {userNo}");
+                        return userNo;
+                    }
+                }
+
+                // 3. Identity Name'i kullan
+                var identityName = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
+                if (!string.IsNullOrEmpty(identityName))
+                {
+                    userNo = identityName;
+                    _logger.LogDebug($"Kullanıcı no Identity.Name'den alındı: {userNo}");
+                    return userNo;
+                }
+
+                _logger.LogWarning("Kullanıcı numarası hiçbir yöntemle alınamadı");
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Kullanıcı numarası alınırken hata oluştu");
+                return string.Empty;
+            }
+        }
+
+        // GetIsEmirleri metodunu tamamen yeniden yaz
         public IEnumerable<IsEmriModel> GetIsEmirleri()
         {
             var connectionString = _dbSelectorService.GetConnectionString();
+            var currentUserNo = GetCurrentUserNo();
+
+            _logger.LogInformation($"GetIsEmirleri çağrıldı. Mevcut kullanıcı: '{currentUserNo}'");
+
             using (var connection = new SqlConnection(connectionString))
             {
-                string query = HasProductionPermission()
-                    ? GetFullProductionQuery()
-                    : GetLimitedProductionQuery();
-
                 try
                 {
-                    return connection.Query<IsEmriModel>(query);
+                    string baseQuery = HasProductionPermission()
+                        ? GetFullProductionQueryWithFilter()
+                        : GetLimitedProductionQueryWithFilter();
+
+                    string finalQuery = baseQuery;
+
+                    // Kullanıcı numarası varsa iş merkezi filtresi uygula
+                    if (!string.IsNullOrEmpty(currentUserNo))
+                    {
+                        var yetkiliIsMerkezleri = GetKullaniciIsMerkezleri(currentUserNo);
+
+                        if (yetkiliIsMerkezleri.Any())
+                        {
+                            string isMerkezleriFilter = string.Join(",", yetkiliIsMerkezleri.Select(x => $"'{x}'"));
+                            finalQuery = baseQuery.Replace("{IS_MERKEZI_FILTER}",
+                                $"AND rtp.RtP_PlanlananIsMerkezi IN ({isMerkezleriFilter})");
+
+                            _logger.LogInformation($"İş emirleri {yetkiliIsMerkezleri.Count} iş merkezine göre filtrelendi: {string.Join(", ", yetkiliIsMerkezleri)}");
+                        }
+                        else
+                        {
+                            _logger.LogWarning($"Kullanıcı {currentUserNo} için iş merkezi yetkisi bulunamadı - boş sonuç döndürülüyor");
+                            return new List<IsEmriModel>();
+                        }
+                    }
+                    else
+                    {
+                        // Kullanıcı numarası yoksa filtre uygulanmaz
+                        finalQuery = baseQuery.Replace("{IS_MERKEZI_FILTER}", "");
+                        _logger.LogWarning("Kullanıcı numarası bulunamadı - tüm iş emirleri gösteriliyor");
+                    }
+
+                    var result = connection.Query<IsEmriModel>(finalQuery).ToList();
+                    _logger.LogInformation($"Toplam {result.Count} iş emri bulundu");
+                    return result;
                 }
                 catch (Exception ex)
                 {
@@ -1038,6 +1272,85 @@ ORDER BY krsoztaksit_vade -- Vadeye göre sıralama
                     throw;
                 }
             }
+        }
+
+        // Filtreli sorgu metotları
+        private string GetFullProductionQueryWithFilter()
+        {
+            return @"
+SELECT 
+      i.is_Guid,
+      i.is_Kod,
+      i.is_Ismi,
+      i.is_EmriDurumu,
+      i.is_BaslangicTarihi,
+      i.is_Emri_PlanBitisTarihi,
+      rtp.RtP_PlanlananIsMerkezi AS IsMerkezi,
+      im.IsM_Aciklama AS IsMerkeziAciklama,
+      upl.upl_kodu AS UrunKodu,
+      s.sto_isim AS UrunAdi,
+      s.sto_yabanci_isim AS YabanciIsim,
+      s.sto_kisa_ismi AS KisaIsim,
+      s.sto_birim1_ad AS Birim1Ad,
+      s.sto_birim2_ad AS Birim2Ad,
+      s.sto_birim2_katsayi AS Birim2Katsayi,
+      upl.upl_miktar AS Miktar
+  FROM ISEMIRLERI i 
+  LEFT JOIN URETIM_MALZEME_PLANLAMA upl 
+      ON upl.upl_isemri = i.is_Kod 
+      AND upl.upl_uretim_tuket = 1
+  LEFT JOIN STOKLAR s 
+      ON s.sto_kod = upl.upl_kodu
+  LEFT JOIN URETIM_ROTA_PLANLARI rtp
+      ON rtp.RtP_IsEmriKodu = i.is_Kod 
+      AND rtp.RtP_UrunKodu = upl.upl_kodu 
+      AND rtp.RtP_SatirNo = 0
+  LEFT JOIN IS_MERKEZLERI im
+      ON im.IsM_Kodu = rtp.RtP_PlanlananIsMerkezi
+  WHERE i.is_EmriDurumu IN (0, 1)
+      AND upl.upl_kodu IS NOT NULL
+      AND i.is_Emri_PlanBitisTarihi >= CAST(GETDATE() AS DATE)
+      {IS_MERKEZI_FILTER}
+  ORDER BY upl.upl_kodu ASC, i.is_BaslangicTarihi DESC";
+        }
+
+        private string GetLimitedProductionQueryWithFilter()
+        {
+            return @"
+SELECT 
+      i.is_Guid,
+      i.is_Kod,
+      i.is_Ismi,
+      i.is_EmriDurumu,
+      i.is_BaslangicTarihi,
+      i.is_Emri_PlanBitisTarihi,
+      rtp.RtP_PlanlananIsMerkezi AS IsMerkezi,
+      im.IsM_Aciklama AS IsMerkeziAciklama,
+      upl.upl_kodu AS UrunKodu,
+      s.sto_isim AS UrunAdi,
+      s.sto_yabanci_isim AS YabanciIsim,
+      s.sto_kisa_ismi AS KisaIsim,
+      s.sto_birim1_ad AS Birim1Ad,
+      s.sto_birim2_ad AS Birim2Ad,
+      s.sto_birim2_katsayi AS Birim2Katsayi,
+      upl.upl_miktar AS Miktar
+  FROM ISEMIRLERI i 
+  LEFT JOIN URETIM_MALZEME_PLANLAMA upl 
+      ON upl.upl_isemri = i.is_Kod 
+      AND upl.upl_uretim_tuket = 1
+  LEFT JOIN STOKLAR s 
+      ON s.sto_kod = upl.upl_kodu
+  LEFT JOIN URETIM_ROTA_PLANLARI rtp
+      ON rtp.RtP_IsEmriKodu = i.is_Kod 
+      AND rtp.RtP_UrunKodu = upl.upl_kodu 
+      AND rtp.RtP_SatirNo = 0
+  LEFT JOIN IS_MERKEZLERI im
+      ON im.IsM_Kodu = rtp.RtP_PlanlananIsMerkezi
+  WHERE i.is_EmriDurumu IN (0, 1)
+      AND upl.upl_kodu IS NOT NULL
+      AND i.is_Emri_PlanBitisTarihi >= CAST(GETDATE() AS DATE)
+      {IS_MERKEZI_FILTER}
+  ORDER BY upl.upl_kodu ASC, i.is_BaslangicTarihi DESC";
         }
 
         public bool HasProductionPermission()
@@ -3775,8 +4088,8 @@ ORDER BY sh.sth_create_date DESC";
             }
         }
 
-        // Malzeme tüketimi yap
-        public string MalzemeTuketimi(string isEmriKodu, List<TuketimItem> tuketimListesi)
+        // MalzemeTuketimi metodunu güncelle
+        public string MalzemeTuketimi(string isEmriKodu, List<TuketimItem> tuketimListesi, List<TuketimItem> eklenenMalzemeler = null)
         {
             var connectionString = _dbSelectorService.GetConnectionString();
             using (var connection = new SqlConnection(connectionString))
@@ -3786,13 +4099,30 @@ ORDER BY sh.sth_create_date DESC";
                 {
                     command.CommandType = CommandType.StoredProcedure;
 
-                    // JSON formatına çevir
+                    // Normal malzemeler JSON'u
                     var jsonListesi = System.Text.Json.JsonSerializer.Serialize(
-                        tuketimListesi.Select(t => new { stokKodu = t.StokKodu, miktar = t.Miktar })
+                        tuketimListesi.Select(t => new {
+                            stokKodu = t.StokKodu,
+                            miktar = t.Miktar,
+                            eklenmisMalzeme = false
+                        })
                     );
+
+                    // Eklenen malzemeler JSON'u
+                    string eklenenJson = null;
+                    if (eklenenMalzemeler != null && eklenenMalzemeler.Any())
+                    {
+                        eklenenJson = System.Text.Json.JsonSerializer.Serialize(
+                            eklenenMalzemeler.Select(t => new {
+                                stokKodu = t.StokKodu,
+                                miktar = t.Miktar
+                            })
+                        );
+                    }
 
                     command.Parameters.AddWithValue("@isemri", isEmriKodu);
                     command.Parameters.AddWithValue("@tuketim_listesi", jsonListesi);
+                    command.Parameters.AddWithValue("@eklenen_malzemeler", (object)eklenenJson ?? DBNull.Value);
 
                     using (var reader = command.ExecuteReader())
                     {
@@ -3810,7 +4140,7 @@ ORDER BY sh.sth_create_date DESC";
             }
         }
 
-     
+
         public class MusteriAcikFaturaViewModel
         {
             public string MusteriKodu { get; set; }

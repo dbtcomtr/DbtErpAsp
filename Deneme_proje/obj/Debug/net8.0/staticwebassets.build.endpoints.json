@@ -3,6 +3,88 @@
   "ManifestType": "Build",
   "Endpoints": [
     {
+      "Route": "1.n7kqyaivwm.pdf",
+      "AssetFile": "1.pdf",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "446320"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/pdf"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"05KlA0ESnXdL+OL5ZH2OQPwCXprPiJgWlMgO9V0yQxI=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 13 Aug 2025 10:21:15 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "n7kqyaivwm"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-05KlA0ESnXdL+OL5ZH2OQPwCXprPiJgWlMgO9V0yQxI="
+        },
+        {
+          "Name": "label",
+          "Value": "1.pdf"
+        }
+      ]
+    },
+    {
+      "Route": "1.pdf",
+      "AssetFile": "1.pdf",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "446320"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/pdf"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"05KlA0ESnXdL+OL5ZH2OQPwCXprPiJgWlMgO9V0yQxI=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 13 Aug 2025 10:21:15 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-05KlA0ESnXdL+OL5ZH2OQPwCXprPiJgWlMgO9V0yQxI="
+        }
+      ]
+    },
+    {
       "Route": "BahceLogo.50hatxl9ps.png",
       "AssetFile": "BahceLogo.png",
       "Selectors": [],

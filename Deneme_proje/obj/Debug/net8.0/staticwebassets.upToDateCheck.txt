@@ -1,3 +1,4 @@
+wwwroot\1.pdf
 wwwroot\BahceLogo.png
 wwwroot\Content\assets\css\bahcepinar.css
 wwwroot\Content\assets\css\basarili-odeme.css

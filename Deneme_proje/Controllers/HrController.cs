@@ -1402,28 +1402,7 @@ FROM KullanilanIzinler";
                     {
                         try
                         {
-                            // 1. Önce izin talebinin durumunu kontrol et
-                            string checkQuery = "SELECT pit_izin_durum FROM PERSONEL_IZIN_TALEPLERI WHERE pit_Guid = @guid";
-                            using (SqlCommand checkCommand = new SqlCommand(checkQuery, connection, transaction))
-                            {
-                                checkCommand.Parameters.AddWithValue("@guid", guid);
-                                var currentStatus = await checkCommand.ExecuteScalarAsync();
-
-                                if (currentStatus == null)
-                                {
-                                    transaction.Rollback();
-                                    return Json(new { success = false, message = "İzin talebi bulunamadı." });
-                                }
-
-                                int status = Convert.ToInt32(currentStatus);
-                                if (status != 1)
-                                {
-                                    transaction.Rollback();
-                                    return Json(new { success = false, message = "Bu izin talebi zaten işlenmiş veya onaylanmamış durumda." });
-                                }
-                            }
-
-                            // 2. Güncelleme sorgusu - izin durumunu 2 (Reddedildi) olarak ayarla ve reddetme nedenini ekle
+                            // İzin talebini reddet - sadece bekleyen (0) durumundaki talepleri güncelle
                             string updateQuery = @"
                         UPDATE PERSONEL_IZIN_TALEPLERI 
                         SET pit_izin_durum = 2, 
@@ -1433,7 +1412,7 @@ FROM KullanilanIzinler";
                             pit_degisti = 1,
                             pit_aciklama1 = @reddetmeNedeni
                         WHERE pit_Guid = @guid 
-                        AND pit_izin_durum = 1";
+                        AND pit_izin_durum = 0";
 
                             using (SqlCommand command = new SqlCommand(updateQuery, connection, transaction))
                             {
@@ -1446,11 +1425,11 @@ FROM KullanilanIzinler";
                                 if (affectedRows == 0)
                                 {
                                     transaction.Rollback();
-                                    return Json(new { success = false, message = "İzin talebi güncellenemedi." });
+                                    return Json(new { success = false, message = "İzin talebi reddedilemedi. Talep bulunamadı veya zaten işlenmiş." });
                                 }
                             }
 
-                            // 3. PERSONEL_IZINLERI tablosundan ilgili kaydı sil (eğer varsa)
+                            // PERSONEL_IZINLERI tablosundan ilgili kaydı sil (eğer varsa)
                             string deleteIzinQuery = @"
                         DELETE FROM PERSONEL_IZINLERI 
                         WHERE pz_bagli_talep_uid = @guid";

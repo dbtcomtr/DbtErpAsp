@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "c7clZyB3GuzjgWvptnordWoX7Ie5NlVne/k3OJioc7k=",
+  "Hash": "rDh4ZPstLIaYmvw57T+nfQ8k5yHBixwbX8GFflcmxMU=",
   "Source": "Deneme_proje",
   "BasePath": "_content/Deneme_proje",
   "Mode": "Default",
@@ -57,6 +57,27 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\Deneme_proje.bundle.scp.css"
+    },
+    {
+      "Identity": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\1.pdf",
+      "SourceId": "Deneme_proje",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\",
+      "BasePath": "_content/Deneme_proje",
+      "RelativePath": "1#[.{fingerprint}]?.pdf",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "n7kqyaivwm",
+      "Integrity": "05KlA0ESnXdL+OL5ZH2OQPwCXprPiJgWlMgO9V0yQxI=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\1.pdf"
     },
     {
       "Identity": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\BahceLogo.png",
@@ -32169,6 +32190,88 @@
     }
   ],
   "Endpoints": [
+    {
+      "Route": "1.n7kqyaivwm.pdf",
+      "AssetFile": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\1.pdf",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "446320"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/pdf"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"05KlA0ESnXdL+OL5ZH2OQPwCXprPiJgWlMgO9V0yQxI=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 13 Aug 2025 10:21:15 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "n7kqyaivwm"
+        },
+        {
+          "Name": "label",
+          "Value": "1.pdf"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-05KlA0ESnXdL+OL5ZH2OQPwCXprPiJgWlMgO9V0yQxI="
+        }
+      ]
+    },
+    {
+      "Route": "1.pdf",
+      "AssetFile": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\1.pdf",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "446320"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/pdf"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"05KlA0ESnXdL+OL5ZH2OQPwCXprPiJgWlMgO9V0yQxI=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 13 Aug 2025 10:21:15 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-05KlA0ESnXdL+OL5ZH2OQPwCXprPiJgWlMgO9V0yQxI="
+        }
+      ]
+    },
     {
       "Route": "BahceLogo.50hatxl9ps.png",
       "AssetFile": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\BahceLogo.png",

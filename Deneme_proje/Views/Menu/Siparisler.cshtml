@@ -1,0 +1,579 @@
+﻿@model List<Deneme_proje.Controllers.SiparisModel>
+@{
+	ViewData["Title"] = "Satış Siparişleri";
+}
+
+<style>
+	* {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+	}
+
+	body {
+		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+		background-color: #f5f6fa;
+		color: #2c3e50;
+	}
+
+	.main-content {
+		padding: 20px;
+	}
+
+	.breadcrumb-custom {
+		background: none;
+		padding: 0;
+		margin-bottom: 20px;
+		font-size: 0.9rem;
+		color: #6c757d;
+	}
+
+		.breadcrumb-custom a {
+			color: #6c757d;
+			text-decoration: none;
+		}
+
+			.breadcrumb-custom a:hover {
+				color: #2c3e50;
+			}
+
+		.breadcrumb-custom .active {
+			color: #2c3e50;
+			font-weight: 600;
+		}
+
+	.page-container {
+		background: white;
+		border: 1px solid #e0e6ed;
+		border-radius: 8px;
+		overflow: hidden;
+		margin: 0 auto;
+		box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+	}
+
+	.page-header {
+		background: #34495e;
+		color: white;
+		padding: 20px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		border-bottom: 3px solid #2c3e50;
+	}
+
+	.page-title {
+		font-size: 1.3rem;
+		font-weight: 600;
+		margin: 0;
+	}
+
+	.header-actions {
+		display: flex;
+		gap: 10px;
+		align-items: center;
+		font-size: 0.9rem;
+	}
+
+	.filter-section {
+		background: #f8f9fa;
+		padding: 25px;
+		border-bottom: 1px solid #e0e6ed;
+		border-left: 4px solid #34495e;
+	}
+
+	.filter-header {
+		font-weight: 600;
+		color: #2c3e50;
+		font-size: 1rem;
+		margin-bottom: 20px;
+	}
+
+	.filter-row {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		gap: 20px;
+		align-items: end;
+	}
+
+	.filter-item {
+		display: flex;
+		flex-direction: column;
+	}
+
+		.filter-item label {
+			font-weight: 600;
+			color: #2c3e50;
+			margin-bottom: 5px;
+			font-size: 0.9rem;
+		}
+
+		.filter-item input,
+		.filter-item select {
+			padding: 12px 15px;
+			border: 1px solid #e0e6ed;
+			border-radius: 4px;
+			font-size: 0.9rem;
+			transition: all 0.2s ease;
+			background: white;
+		}
+
+			.filter-item input:focus,
+			.filter-item select:focus {
+				outline: none;
+				border-color: #2c3e50;
+				box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.1);
+			}
+
+	.filter-actions {
+		display: flex;
+		gap: 10px;
+		align-items: center;
+	}
+
+	.btn {
+		padding: 12px 20px;
+		border: 1px solid transparent;
+		border-radius: 4px;
+		font-weight: 600;
+		cursor: pointer;
+		text-decoration: none;
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		transition: all 0.2s ease;
+		font-size: 0.9rem;
+	}
+
+	.btn-primary {
+		background: #2c3e50;
+		color: white;
+		border-color: #2c3e50;
+	}
+
+		.btn-primary:hover {
+			background: #34495e;
+			border-color: #34495e;
+		}
+
+	.btn-secondary {
+		background: #95a5a6;
+		color: white;
+		border-color: #95a5a6;
+	}
+
+		.btn-secondary:hover {
+			background: #7f8c8d;
+			border-color: #7f8c8d;
+		}
+
+	.btn-success {
+		background: #27ae60;
+		color: white;
+		border-color: #27ae60;
+	}
+
+		.btn-success:hover {
+			background: #229954;
+			border-color: #229954;
+		}
+
+	.btn-info {
+		background: #3498db;
+		color: white;
+		border-color: #3498db;
+	}
+
+		.btn-info:hover {
+			background: #2980b9;
+			border-color: #2980b9;
+		}
+
+	.table-section {
+		padding: 25px;
+	}
+
+	.table-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 20px;
+		padding-bottom: 15px;
+		border-bottom: 2px solid #34495e;
+	}
+
+	.table-title {
+		color: #2c3e50;
+		font-size: 1.1rem;
+		font-weight: 600;
+		margin: 0;
+	}
+
+	.table-actions {
+		display: flex;
+		gap: 10px;
+	}
+
+	.action-btn {
+		background: none;
+		border: 1px solid #e0e6ed;
+		color: #6c757d;
+		cursor: pointer;
+		padding: 8px 12px;
+		border-radius: 4px;
+		transition: all 0.2s ease;
+		font-size: 0.9rem;
+	}
+
+		.action-btn:hover {
+			background: #f8f9fa;
+			color: #2c3e50;
+			border-color: #2c3e50;
+		}
+
+	.table-container {
+		overflow-x: auto;
+		border: 1px solid #e0e6ed;
+		border-radius: 4px;
+	}
+
+	.data-table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.9rem;
+		min-width: 1600px;
+	}
+
+		.data-table th {
+			background: #34495e;
+			color: white;
+			padding: 12px 10px;
+			text-align: left;
+			font-weight: 600;
+			font-size: 0.85rem;
+			white-space: nowrap;
+			border-right: 1px solid #2c3e50;
+		}
+
+			.data-table th:last-child {
+				border-right: none;
+			}
+
+		.data-table td {
+			padding: 12px 10px;
+			border: 1px solid #e0e6ed;
+			vertical-align: middle;
+			white-space: nowrap;
+		}
+
+		.data-table tbody tr:hover {
+			background-color: #f8f9ff;
+		}
+
+		.data-table tbody tr:nth-child(even) {
+			background-color: #fafbfc;
+		}
+
+			.data-table tbody tr:nth-child(even):hover {
+				background-color: #f8f9ff;
+			}
+
+	.status-badge {
+		padding: 4px 12px;
+		border-radius: 20px;
+		font-size: 0.8rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		display: inline-block;
+	}
+
+	.status-yeni {
+		background: #e3f2fd;
+		color: #1565c0;
+	}
+
+	.status-onaylandi {
+		background: #e8f5e8;
+		color: #2e7d32;
+	}
+
+	.status-beklemede {
+		background: #fff3e0;
+		color: #f57c00;
+	}
+
+	.status-hazirlaniyor {
+		background: #f3e5f5;
+		color: #7b1fa2;
+	}
+
+	.status-tamamlandi {
+		background: #e0f2f1;
+		color: #00695c;
+	}
+
+	.amount {
+		font-weight: 600;
+		color: #27ae60;
+		text-align: right;
+	}
+
+	.table-footer {
+		background: #f8f9fa;
+		padding: 15px 25px;
+		border-top: 1px solid #e0e6ed;
+		font-size: 0.9rem;
+		color: #6c757d;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.empty-state {
+		text-align: center;
+		padding: 60px 40px;
+		color: #6c757d;
+	}
+
+		.empty-state h4 {
+			color: #2c3e50;
+			margin-bottom: 15px;
+		}
+
+		.empty-state p {
+			margin-bottom: 20px;
+		}
+
+	/* Responsive */
+	@@media (max-width: 1200px) {
+		.filter-row
+
+	{
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	}
+
+	@@media (max-width: 768px) {
+		.filter-row
+
+	{
+		grid-template-columns: repeat(2, 1fr);
+		gap: 15px;
+	}
+
+	.page-header {
+		flex-direction: column;
+		gap: 15px;
+		align-items: stretch;
+	}
+
+	.table-header {
+		flex-direction: column;
+		gap: 15px;
+		align-items: stretch;
+	}
+
+	.table-footer {
+		flex-direction: column;
+		gap: 10px;
+		align-items: stretch;
+	}
+
+	.filter-actions {
+		justify-content: center;
+	}
+
+	}
+
+	@@media (max-width: 480px) {
+		.filter-row
+
+	{
+		grid-template-columns: 1fr;
+	}
+
+	.filter-actions {
+		flex-direction: column;
+	}
+
+	}
+</style>
+
+<div class="main-content mt-5">
+	<div class="px-lg-5 px-3">
+		<!-- Breadcrumb -->
+		<nav class="breadcrumb-custom">
+			<a href="/Menu/Index">Ana Menü</a> >
+			<a href="/Menu/">Satış</a> >
+			<span class="active">Satış Siparişleri</span>
+		</nav>
+
+		<div class="page-container">
+			<!-- Page Header -->
+			<div class="page-header">
+				<h2 class="page-title">📋 Satış Siparişleri</h2>
+				<div class="header-actions">
+					<span>💼 Satış Yönetimi</span>
+					<span>📊 Raporlama</span>
+				</div>
+			</div>
+
+			<!-- Filtre Bölümü -->
+			<div class="filter-section">
+				<div class="filter-header">🔍 Arama ve Filtreleme</div>
+				<div class="filter-row">
+					<div class="filter-item">
+						<label>Genel Arama</label>
+						<input type="text" placeholder="Sipariş no, müşteri adı..." />
+					</div>
+				
+					<div class="filter-item">
+						<label>Süreç Durumu</label>
+						<select>
+							<option>Tümü</option>
+							<option>Yeni</option>
+							<option>Onaylandı</option>
+							<option>Beklemede</option>
+							<option>Hazırlanıyor</option>
+							<option>Tamamlandı</option>
+						</select>
+					</div>
+					<div class="filter-item">
+						<label>Sıralama</label>
+						<select>
+							<option>Sipariş Tarihine Göre (Yeni → Eski)</option>
+							<option>Sipariş Tarihine Göre (Eski → Yeni)</option>
+							<option>Tutara Göre (Yüksek → Düşük)</option>
+							<option>Tutara Göre (Düşük → Yüksek)</option>
+							<option>Müşteri Adına Göre (A → Z)</option>
+						</select>
+					</div>
+					<div class="filter-item">
+						<label>Gösterim Sayısı</label>
+						<select>
+							<option>20</option>
+							<option>50</option>
+							<option>100</option>
+							<option>Tümü</option>
+						</select>
+					</div>
+					<div class="filter-actions">
+						<button class="btn btn-info">🔍 Ara</button>
+					
+						<a href="/Menu/YeniSiparis" class="btn btn-success">➕ Yeni Sipariş</a>
+					</div>
+				</div>
+			</div>
+
+			<!-- Tablo Bölümü -->
+			<div class="table-section">
+				<div class="table-header">
+					<h3 class="table-title">📋 Sipariş Listesi</h3>
+					<div class="table-actions">
+						<button class="action-btn">📊 Rapor</button>
+						<button class="action-btn">📤 Dışa Aktar</button>
+						<button class="action-btn">🔄 Yenile</button>
+						<button class="action-btn">⚙️ Ayarlar</button>
+					</div>
+				</div>
+
+				<div class="table-container">
+					<table class="data-table">
+						<thead>
+							<tr>
+								<th>Sıra</th>
+								<th>Sipariş No</th>
+								<th>Sipariş Tarihi</th>
+								<th>Teslim Tarihi</th>
+								<th>Şube</th>
+								<th>Depo - Lokasyon</th>
+								<th>Konu/Açıklama</th>
+								<th>Müşteri - Yetkili</th>
+								<th>Kayıt Tarihi</th>
+								<th>Satış Yapan</th>
+								<th>Süreç Durumu</th>
+								<th>Proje</th>
+								<th>KDV'siz Tutar</th>
+								<th>KDV'li Tutar</th>
+								<th>Para Birimi</th>
+								<th>KDV'siz Döviz</th>
+								<th>KDV'li Döviz</th>
+								<th>Döviz Birimi</th>
+								<th>Özel Tanım</th>
+								<th>Ödeme Yöntemi</th>
+							</tr>
+						</thead>
+						<tbody>
+							@if (Model != null && Model.Any())
+							{
+								@for (int i = 0; i < Model.Count; i++)
+								{
+									var siparis = Model[i];
+									<tr>
+										<td>@(i + 1)</td>
+										<td><strong>@siparis.SiparisNo</strong></td>
+										<td>@siparis.Tarih.ToString("dd/MM/yyyy")</td>
+										<td>@siparis.Tarih.AddDays(7).ToString("dd/MM/yyyy")</td>
+										<td>Ana Şube</td>
+										<td>Merkez Depo</td>
+										<td>@siparis.Aciklama</td>
+										<td>
+											<strong>@siparis.MusteriAdi</strong><br>
+											<small style="color: #6c757d;">Yetkili Kişi</small>
+										</td>
+										<td>@siparis.Tarih.ToString("dd/MM/yyyy")</td>
+										<td>Satış Temsilcisi</td>
+										<td>
+											@{
+												var statusClass = siparis.Durum.ToLower() switch
+												{
+													"yeni" => "status-yeni",
+													"onaylandı" => "status-onaylandi",
+													"beklemede" => "status-beklemede",
+													"hazırlanıyor" => "status-hazirlaniyor",
+													"tamamlandı" => "status-tamamlandi",
+													_ => "status-yeni"
+												};
+											}
+											<span class="status-badge @statusClass">@siparis.Durum</span>
+										</td>
+										<td>Proje Adı</td>
+										<td class="amount">@((siparis.Tutar * 0.82m).ToString("N2")) ₺</td>
+										<td class="amount">@siparis.Tutar.ToString("N2") ₺</td>
+										<td>TL</td>
+										<td class="amount">@((siparis.Tutar / 30 * 0.82m).ToString("N2")) $</td>
+										<td class="amount">@((siparis.Tutar / 30).ToString("N2")) $</td>
+										<td>USD</td>
+										<td>Özel Tanım</td>
+										<td>Kredi Kartı</td>
+									</tr>
+								}
+							}
+							else
+							{
+								<tr>
+									<td colspan="20">
+										<div class="empty-state">
+											<h4>📭 Henüz Sipariş Bulunmuyor</h4>
+											<p>Henüz sisteme kayıtlı bir sipariş bulunmamaktadır.</p>
+											<a href="/Menu/YeniSiparis" class="btn btn-success">➕ İlk Siparişinizi Oluşturun</a>
+										</div>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+
+				<div class="table-footer">
+					<div>
+						<strong>Toplam Kayıt:</strong> @(Model?.Count ?? 0) sipariş
+					</div>
+					<div>
+						<strong>Toplam Tutar:</strong> @(Model?.Sum(x => x.Tutar).ToString("N2") ?? "0,00") ₺
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -17,6 +17,18 @@ public class DatabaseSelectorService
         _logger = logger;
     }
 
+    // Bu metodu ekleyin
+    public IConfiguration GetConfiguration()
+    {
+        return _configuration;
+    }
+
+    // ERPDatabase connection string'ini döndüren yeni metot
+    public string GetERPConnectionString()
+    {
+        return _configuration.GetConnectionString("ERPDatabase");
+    }
+
     public string GetDefaultDatabase(string version, string username)
     {
         try

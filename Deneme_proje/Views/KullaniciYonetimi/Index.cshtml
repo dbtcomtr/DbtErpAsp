@@ -6,6 +6,7 @@
 
 <div class="main-content mt-5">
     <div class="px-lg-5 px-3">
+        <!-- Breadcrumb -->
         <div class="row">
             <div class="col-sm-12 p-0">
                 <div class="main-header">
@@ -15,60 +16,140 @@
                                 <i class="icofont icofont-home"></i>
                             </a>
                         </li>
+                        <li class="breadcrumb-item active">Kullanıcı Yönetimi</li>
                     </ol>
                 </div>
             </div>
         </div>
 
+        <!-- Success/Error Messages -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+
+        <!-- Main Content -->
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
-                        <h5 class="card-header-text text-white">Kullanıcı Yönetimi</h5>
+                        <h5 class="card-header-text text-white">
+                            <i class="fa fa-users"></i> Kullanıcı Yönetimi
+                        </h5>
                     </div>
                     <div class="card-block px-0 py-0">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Kullanıcı No</th>
-                                    <th>Kullanıcı Adı</th>
-                                    <th>Ad Soyad</th>
-                                    <th>E-posta</th>
-                                    <th>Giriş Yetkisi</th>
-                                    <th>İşlemler</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var kullanici in Model)
-                                {
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
                                     <tr>
-                                        <td>@kullanici.UserNo</td>
-                                        <td>@kullanici.UserName</td>
-                                        <td>@kullanici.LongName</td>
-                                        <td>@kullanici.Email</td>
-                                        <td>
-                                            <span class="badge @(kullanici.GirisYetkisi ? "bg-success" : "bg-danger")">
-                                                @(kullanici.GirisYetkisi ? "Aktif" : "Pasif")
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <button type="button"
-                                                    class="btn btn-sm @(kullanici.GirisYetkisi ? "btn-danger" : "btn-success")"
-                                                    data-user-no="@kullanici.UserNo"
-                                                    data-yetki="@(!kullanici.GirisYetkisi)"
-                                                    onclick="updateYetki(this)">
-                                                @(kullanici.GirisYetkisi ? "Pasif Yap" : "Aktif Yap")
-                                            </button>
-                                            <a href="/MenuYonetimi/Index?userNo=@kullanici.UserNo"
-                                               class="btn btn-sm btn-info">
-                                                Düzenle
-                                            </a>
-                                        </td>
+                                        <th><i class="fa fa-hashtag"></i> Kullanıcı No</th>
+                                        <th><i class="fa fa-user"></i> Kullanıcı Adı</th>
+                                        <th><i class="fa fa-id-card"></i> Ad Soyad</th>
+                                        <th><i class="fa fa-envelope"></i> E-posta</th>
+                                        <th><i class="fa fa-key"></i> Giriş Yetkisi</th>
+                                        <th><i class="fa fa-industry"></i> İş Merkezleri</th>
+                                        <th><i class="fa fa-cogs"></i> İşlemler</th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @if (Model != null && Model.Any())
+                                    {
+                                        @foreach (var kullanici in Model)
+                                        {
+                                            <tr>
+                                                <td><strong>@kullanici.UserNo</strong></td>
+                                                <td>@kullanici.UserName</td>
+                                                <td>@kullanici.LongName</td>
+                                                <td>
+                                                    @if (!string.IsNullOrEmpty(kullanici.Email))
+                                                    {
+                                                        <a href="mailto:@kullanici.Email">@kullanici.Email</a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">-</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <span class="badge @(kullanici.GirisYetkisi ? "badge-success" : "badge-danger")">
+                                                        <i class="fa @(kullanici.GirisYetkisi ? "fa-check" : "fa-times")"></i>
+                                                        @(kullanici.GirisYetkisi ? "Aktif" : "Pasif")
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    @if (kullanici.IsMerkeziListesi.Any())
+                                                    {
+                                                        <div class="is-merkezi-container">
+                                                            @foreach (var merkez in kullanici.IsMerkeziListesi)
+                                                            {
+                                                                <span class="badge badge-info me-1">@merkez</span>
+                                                            }
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">
+                                                            <i class="fa fa-exclamation-triangle"></i> Yetki yok
+                                                        </span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group" role="group">
+                                                        <!-- Giriş Yetkisi Toggle -->
+                                                        <button type="button"
+                                                                class="btn btn-sm @(kullanici.GirisYetkisi ? "btn-outline-danger" : "btn-outline-success")"
+                                                                data-user-no="@kullanici.UserNo"
+                                                                data-yetki="@(!kullanici.GirisYetkisi)"
+                                                                onclick="updateYetki(this)"
+                                                                title="@(kullanici.GirisYetkisi ? "Pasif Yap" : "Aktif Yap")">
+                                                            <i class="fa @(kullanici.GirisYetkisi ? "fa-times" : "fa-check")"></i>
+                                                            @(kullanici.GirisYetkisi ? "Pasif" : "Aktif")
+                                                        </button>
 
+                                                        <!-- İş Merkezi Yetkileri -->
+                                                        <a href="@Url.Action("IsMerkeziYetkileri", new { userNo = kullanici.UserNo })"
+                                                           class="btn btn-sm btn-outline-warning"
+                                                           title="İş Merkezi Yetkileri">
+                                                            <i class="fa fa-industry"></i> İş Merkezi
+                                                        </a>
+
+                                                        <!-- Menü Yetkileri -->
+                                                        <a href="@Url.Action("Index", "MenuYonetimi", new { userNo = kullanici.UserNo })"
+                                                           class="btn btn-sm btn-outline-info"
+                                                           title="Menü Yetkileri">
+                                                            <i class="fa fa-list"></i> Menü
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted">
+                                                <i class="fa fa-info-circle"></i> Kullanıcı bulunamadı
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -77,6 +158,24 @@
 </div>
 
 <style>
+    .is-merkezi-container {
+        max-width: 200px;
+        word-wrap: break-word;
+    }
+
+    .btn-group .btn {
+        font-size: 11px;
+        padding: 4px 8px;
+        margin: 1px;
+        border-radius: 3px;
+    }
+
+    .badge {
+        font-size: 10px;
+        padding: 4px 8px;
+        margin: 1px 2px;
+    }
+
     .table {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
@@ -102,77 +201,107 @@
             border-radius: 4px;
         }
 
+        .table th {
+            background-color: #1D3A67;
+            color: white;
+            font-weight: 600;
+            border: none;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .table td {
+            vertical-align: middle;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .alert {
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-radius: 8px;
+    }
+
+    .card-header {
+        border-radius: 8px 8px 0 0;
+        border: none;
+    }
+
     @@media screen and (max-width: 768px) {
-        .table {
-            position: relative !important;
-            display: block !important;
+        .table-responsive
+
+    {
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+    }
+
+    .btn-group {
+        flex-direction: column !important;
+        width: 100%;
+    }
+
+        .btn-group .btn {
             width: 100% !important;
-            -webkit-overflow-scrolling: touch !important;
+            margin: 1px 0 !important;
+            border-radius: 3px !important;
         }
 
-        .table-mobile-container {
-            overflow-x: auto !important;
-            max-width: 100% !important;
-            position: relative !important;
-            -webkit-overflow-scrolling: touch !important;
-        }
-
-        .table thead th {
-            position: sticky !important;
-            top: 0 !important;
-            z-index: 10 !important;
-            background-color: #f8f9fa !important;
-            white-space: nowrap !important;
-            min-width: 120px !important;
-            padding: 10px !important;
-            font-size: 14px !important;
-            box-shadow: inset 0 1px 0 #dee2e6, inset 0 -1px 0 #dee2e6 !important;
-        }
-
-        .table tbody td {
-            white-space: nowrap !important;
-            min-width: 120px !important;
-            padding: 10px !important;
-            font-size: 14px !important;
-            vertical-align: middle !important;
-        }
-
-        .card {
-            margin: 0 -15px !important;
-            border-radius: 0 !important;
-        }
-
-        .px-lg-5 {
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
-        }
+    .is-merkezi-container {
+        max-width: 120px;
     }
 
-    .table-mobile-container::-webkit-scrollbar {
-        width: 8px !important;
-        height: 8px !important;
+    .badge {
+        font-size: 9px;
+        padding: 2px 4px;
     }
 
-    .table-mobile-container::-webkit-scrollbar-track {
-        background: #f0f0f0 !important;
-        border-radius: 4px !important;
+    .table th, .table td {
+        font-size: 12px;
+        padding: 8px 4px;
     }
 
-    .table-mobile-container::-webkit-scrollbar-thumb {
-        background: #1D3A67 !important;
-        border-radius: 4px !important;
+    }
+
+    @@media screen and (max-width: 576px) {
+        .px-lg-5
+
+    {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+
+    .card {
+        margin: 0 -10px;
+        border-radius: 0;
+    }
+
     }
 </style>
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        function updateYetki(button) {
+                   function updateYetki(button) {
             var userNo = $(button).data('user-no');
-            var girisYetkisi = $(button).data('yetki') === 'True';
+            var yetkiData = $(button).data('yetki');
+            var girisYetkisi = yetkiData === 'True' || yetkiData === true;
 
             console.log('UserNo:', userNo);
+            console.log('Yetki Data:', yetkiData);
             console.log('GirisYetkisi:', girisYetkisi);
+
+            $(button).prop('disabled', true);
+            var originalText = $(button).html();
+            $(button).html('<i class="fa fa-spinner fa-spin"></i> İşleniyor...');
 
             $.ajax({
                 url: '/KullaniciYonetimi/UpdateYetki',
@@ -186,10 +315,14 @@
                         location.reload();
                     } else {
                         alert('İşlem sırasında bir hata oluştu: ' + response.message);
+                        $(button).prop('disabled', false);
+                        $(button).html(originalText);
                     }
                 },
                 error: function() {
                     alert('İşlem sırasında bir hata oluştu.');
+                    $(button).prop('disabled', false);
+                    $(button).html(originalText);
                 }
             });
         }
