@@ -35,11 +35,66 @@ namespace Deneme_proje.Repository
 
             using (var connection = new SqlConnection(connectionString))
             {
-                string storedProcedure = "[dbo].[DBT_LOJISTIK_FirmaCekleri_TariheGore]";
+                string storedProcedure = "[dbo].[DBT_FirmaCekleri_TariheGore]";
 
                 var parameters = new { BaslamaTarihi = baslamaTarihi, BitisTarihi = bitisTarihi };
 
                 return connection.Query<Deneme_proje.Models.DenizlerEntities.FirmaCekleri>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
+            }
+        }
+        public IEnumerable<BankaOdemeOzeti> GetBankaOdemeOzeti(DateTime baslamaTarihi, DateTime bitisTarihi)
+        {
+            var connectionString = _dbSelectorService.GetConnectionString();
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                string storedProcedure = "[dbo].[DBt_FirmaCekleri_TariheGore]";
+
+                var parameters = new { BaslamaTarihi = baslamaTarihi, BitisTarihi = bitisTarihi };
+
+                var tumCekler = connection.Query<Deneme_proje.Models.DenizlerEntities.FirmaCekleri>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
+
+                // Sahip Cari Kodu'na göre gruplama
+                var bankaOzetleri = tumCekler
+                    .GroupBy(c => new { c.SahipCariKodu, c.SahipCariAdi })
+                    .Select(g => new BankaOdemeOzeti
+                    {
+                        BankaKodu = g.Key.SahipCariKodu,
+                        BankaAdi = g.Key.SahipCariAdi,
+                        ToplamKalan = g.Sum(c => c.Kalan),
+                        CekSayisi = g.Count()
+                    })
+                    .OrderByDescending(b => b.ToplamKalan);
+
+                return bankaOzetleri;
+            }
+        }
+
+        public IEnumerable<BankaOdemeOzeti> GetBankaOdemeOzetiMusteri(DateTime baslamaTarihi, DateTime bitisTarihi)
+        {
+            var connectionString = _dbSelectorService.GetConnectionString();
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                string storedProcedure = "[dbo].[DBt_MusteriCekleri_TariheGore]";
+
+                var parameters = new { BaslamaTarihi = baslamaTarihi, BitisTarihi = bitisTarihi };
+
+                var tumCekler = connection.Query<Deneme_proje.Models.DenizlerEntities.FirmaCekleri>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
+
+                // Sahip Cari Kodu'na göre gruplama
+                var bankaOzetleri = tumCekler
+                    .GroupBy(c => new { c.SahipCariKodu, c.SahipCariAdi })
+                    .Select(g => new BankaOdemeOzeti
+                    {
+                        BankaKodu = g.Key.SahipCariKodu,
+                        BankaAdi = g.Key.SahipCariAdi,
+                        ToplamKalan = g.Sum(c => c.Kalan),
+                        CekSayisi = g.Count()
+                    })
+                    .OrderByDescending(b => b.ToplamKalan);
+
+                return bankaOzetleri;
             }
         }
         public IEnumerable<Deneme_proje.Models.DenizlerEntities.MusteriCekleri> GetMusteriCekleri(DateTime baslamaTarihi, DateTime bitisTarihi)
@@ -48,7 +103,7 @@ namespace Deneme_proje.Repository
 
             using (var connection = new SqlConnection(connectionString))
             {
-                string storedProcedure = "[dbo].[DBT_LOJISTIK_MusteriCekleri_TariheGore]";
+                string storedProcedure = "[dbo].[DBT_MusteriCekleri_TariheGore]";
 
                 var parameters = new { BaslamaTarihi = baslamaTarihi, BitisTarihi = bitisTarihi };
 

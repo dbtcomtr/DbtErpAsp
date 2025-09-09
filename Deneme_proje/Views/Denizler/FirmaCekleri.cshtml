@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<Deneme_proje.Models.DenizlerEntities.FirmaCekleri>
 @{
-	ViewData["Title"] = "FirmaCekleri";
+	ViewData["Title"] = "Firma Çekleri";
 	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -10,50 +10,139 @@
 		<div class="row">
 			<div class="col-sm-12 p-0">
 				<div class="main-header">
-			
+					<h4>Firma Çekleri Analizi</h4>
 					<ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
 						<li class="breadcrumb-item">
 							<a href="/Home/Index">
 								<i class="icofont icofont-home"></i>
 							</a>
 						</li>
-					
 					</ol>
 				</div>
 			</div>
 		</div>
-		<div class="row mb-lg-5 mb-1">
-			<div class="col-lg-4">
-				<form asp-action="FirmaCekleri" method="get" class="mb-4 px-5 pt-5">
-					<div class="row d-flex align-items-center" style="width:max-content;">
-						<div class="form-group col-md-4">
-							<label for="baslamaTarihi">Başlama Tarihi:</label>
-							<input type="date" id="baslamaTarihi" name="baslamaTarihi" class="form-control" required value="@ViewBag.BaslamaTarihi" />
-						</div>
-						<div class="form-group col-md-4">
-							<label for="bitisTarihi">Bitiş Tarihi:</label>
-							<input type="date" id="bitisTarihi" name="bitisTarihi" class="form-control" required value="@ViewBag.BitisTarihi" />
-						</div>
-						<div class="form-group col-md-3 m-0">
-							<button type="submit" class="btn btn-primary">Ara</button>
-						</div>
+
+		<!-- Üst Panel: Tarih Filtresi ve Banka Özeti -->
+		<div class="row mb-4">
+			<!-- Tarih Filtresi -->
+			<div class="col-lg-6 col-md-12 mb-3">
+				<div class="card">
+					<div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 15px 20px;">
+						<h5 class="card-header-text text-white mb-0">Tarih Filtresi</h5>
 					</div>
-				</form>
+					<div class="card-block" style="padding: 20px;">
+						<form asp-action="FirmaCekleri" method="get">
+							<div class="row">
+								<div class="form-group col-md-5">
+									<label for="baslamaTarihi" class="form-label">Başlama Tarihi:</label>
+									<input type="date" id="baslamaTarihi" name="baslamaTarihi" class="form-control" required value="@ViewBag.BaslamaTarihi" />
+								</div>
+								<div class="form-group col-md-5">
+									<label for="bitisTarihi" class="form-label">Bitiş Tarihi:</label>
+									<input type="date" id="bitisTarihi" name="bitisTarihi" class="form-control" required value="@ViewBag.BitisTarihi" />
+								</div>
+								<div class="form-group col-md-2 d-flex align-items-end">
+									<button type="submit" class="btn btn-primary btn-block">
+										<i class="icofont icofont-search mr-1"></i>Ara
+									</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+
+			<!-- Banka Özeti -->
+			<div class="col-lg-6 col-md-12 mb-3">
+				<div class="card">
+					<div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 15px 20px;">
+						<h5 class="card-header-text text-white mb-0">Banka Bazında Çek Özeti</h5>
+					</div>
+					<div class="card-block" style="padding: 15px;">
+						@if (ViewBag.BankaOzetleri != null)
+						{
+							<div class="table-responsive">
+								<table class="table table-sm table-hover mb-0">
+									<thead>
+										<tr class="tablo-icerik-yazi">
+											<th style="font-size: 12px; font-weight: 600;">Banka</th>
+											<th class="text-center" style="font-size: 12px; font-weight: 600;">Çek Sayısı</th>
+											<th class="text-right" style="font-size: 12px; font-weight: 600;">Toplam Kalan</th>
+										</tr>
+									</thead>
+									<tbody>
+										@foreach (var banka in ViewBag.BankaOzetleri)
+										{
+											<tr>
+												<td style="font-size: 11px; padding: 8px;">
+													<div>
+														<strong>@banka.BankaKodu</strong><br>
+														<span class="text-muted">@banka.BankaAdi</span>
+													</div>
+												</td>
+												<td class="text-center" style="font-size: 11px; padding: 8px;">
+													<span class="badge badge-info">@banka.CekSayisi</span>
+												</td>
+												<td class="text-right" style="font-size: 11px; padding: 8px;">
+													<strong style="color: #d9534f;">@string.Format("{0:N2}", banka.ToplamKalan)</strong>
+												</td>
+											</tr>
+										}
+									</tbody>
+									<!-- DIP TOPLAM SATIRI EKLENDİ -->
+									@{
+										var bankaOzetleri = ViewBag.BankaOzetleri as IEnumerable<dynamic>;
+										int toplamCekSayisi = 0;
+										decimal toplamKalan = 0;
+
+										if (bankaOzetleri != null)
+										{
+											foreach (var banka in bankaOzetleri)
+											{
+												toplamCekSayisi += (int)banka.CekSayisi;
+												toplamKalan += (decimal)banka.ToplamKalan;
+											}
+										}
+									}
+									<tfoot>
+										<tr style="background-color: #f8f9fa; border-top: 2px solid #007ba7; font-weight: bold;">
+											<td style="font-size: 12px; padding: 10px;">
+												<strong>GENEL TOPLAM</strong>
+											</td>
+											<td class="text-center" style="font-size: 12px; padding: 10px;">
+												<span class="badge badge-primary">@toplamCekSayisi</span>
+											</td>
+											<td class="text-right" style="font-size: 12px; padding: 10px; color: #d9534f;">
+												<strong>@string.Format("{0:N2}", toplamKalan)</strong>
+											</td>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+						}
+						else
+						{
+							<div class="text-center text-muted py-3">
+								<i class="icofont icofont-info-circle mr-2"></i>
+								Veri bulunamadı
+							</div>
+						}
+					</div>
+				</div>
 			</div>
 		</div>
 
-
+		<!-- Ana Çek Listesi Tablosu -->
 		<div class="card">
-			<div class="card-header" style=" background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;"
-				 ">
-				<h5 class="card-header-text text-white">Firma  Çekleri</h5>
+			<div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 15px 20px;">
+				<h5 class="card-header-text text-white mb-0">
+					<i class="icofont icofont-list mr-2"></i>Firma Çekleri Listesi
+				</h5>
 			</div>
 			<div class="card-block accordion-block">
 				<div class="col-md-12">
-
-						@if (Model != null && Model.Any())
+					@if (Model != null && Model.Any())
 					{
-
 						<div id="example_wrapper" class="dataTables_wrapper py-lg-3">
 							<div class="dataTables_length" id="example_length"></div>
 							<div class="dataTables_filter" id="example_filter"></div>
@@ -61,91 +150,92 @@
 								<table id="example" class="display dataTable" style="width:100%">
 									<thead>
 										<tr class="tablo-icerik-yazi">
-											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+											<th class="sorting text-left" style="width: 120px;">
 												<div class="th-content">
-													<span>Sahip Cari Kodu<span>
+													<span>Sahip Cari Kodu</span>
 												</div>
 											</th>
-											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+											<th class="sorting text-left" style="width: 150px;">
 												<div class="th-content">
 													<span>Sahip Cari Adı</span>
 												</div>
 											</th>
-											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+											<th class="sorting text-left" style="width: 120px;">
 												<div class="th-content">
 													<span>Nerede Cari Kodu</span>
 												</div>
 											</th>
-											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+											<th class="sorting text-left" style="width: 150px;">
 												<div class="th-content">
 													<span>Nerede Cari Adı</span>
 												</div>
 											</th>
-											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+											<th class="sorting text-left" style="width: 100px;">
 												<div class="th-content">
 													<span>Ref No</span>
 												</div>
 											</th>
-											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+											<th class="sorting text-center" style="width: 80px;">
 												<div class="th-content">
-													<span>Pozisyonu</span>
+													<span>Pozisyon</span>
 												</div>
 											</th>
-											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+											<th class="sorting text-center" style="width: 100px;">
 												<div class="th-content">
 													<span>Tarih</span>
 												</div>
 											</th>
-											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+											<th class="sorting text-center" style="width: 100px;">
 												<div class="th-content">
 													<span>Vade</span>
 												</div>
 											</th>
-											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+											<th class="sorting text-right" style="width: 100px;">
 												<div class="th-content">
 													<span>Tutar</span>
 												</div>
 											</th>
-											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+											<th class="sorting text-right" style="width: 100px;">
 												<div class="th-content">
 													<span>Ödenen</span>
 												</div>
 											</th>
-											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+											<th class="sorting text-right" style="width: 100px;">
 												<div class="th-content">
 													<span>Kalan</span>
 												</div>
 											</th>
-											<th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
+											<th class="sorting text-center" style="width: 60px;">
 												<div class="th-content">
 													<span>PB</span>
 												</div>
 											</th>
-
 										</tr>
 									</thead>
 									<tbody>
-								@foreach (var cek in Model)
-								{
+										@foreach (var cek in Model)
+										{
+											var tr = new System.Globalization.CultureInfo("tr-TR");
 											<tr>
-												<td>@cek.SahipCariKodu</td>
-												<td>@cek.SahipCariAdi</td>
-												<td>@cek.NeredeCariKodu</td>
-												<td>@cek.NeredeCariAdi</td>
-												<td>@cek.RefNo</td>
-												<td>@cek.Pozisyonu</td>
-												<td>@cek.Tarih.ToString("dd.MM.yyyy")</td>
-												<td>@cek.Vade.ToString("dd.MM.yyyy")</td>
-												<td class="right-align">@string.Format("{0:N2}", @cek.Tutar)</td>
-												<td class="right-align">@string.Format("{0:N2}", @cek.Odenen)</td>
-												<td class="right-align">@string.Format("{0:N2}", @cek.Kalan)</td>
-												<td>@cek.PB</td>
+												<td style="font-size: 12px;">@cek.SahipCariKodu</td>
+												<td style="font-size: 12px;" class="cari-unvani-cell" data-bs-toggle="tooltip" title="@cek.SahipCariAdi">@cek.SahipCariAdi</td>
+												<td style="font-size: 12px;">@cek.NeredeCariKodu</td>
+												<td style="font-size: 12px;" class="cari-unvani-cell" data-bs-toggle="tooltip" title="@cek.NeredeCariAdi">@cek.NeredeCariAdi</td>
+												<td style="font-size: 12px;">@cek.RefNo</td>
+												<td class="text-center" style="font-size: 12px;">
+													<span class="badge badge-secondary">@cek.Pozisyonu</span>
+												</td>
+												<td class="text-center" style="font-size: 12px;">@cek.Tarih.ToString("dd.MM.yyyy")</td>
+												<td class="text-center" style="font-size: 12px;">@cek.Vade.ToString("dd.MM.yyyy")</td>
+												<td class="text-right" style="font-size: 12px; font-weight: 600;">@cek.Tutar.ToString("N2", tr)</td>
+												<td class="text-right" style="font-size: 12px; font-weight: 600;">@cek.Odenen.ToString("N2", tr)</td>
+												<td class="text-right" style="font-size: 12px; font-weight: 600; color: #d9534f;">@cek.Kalan.ToString("N2", tr)</td>
+												<td class="text-center" style="font-size: 12px;">@cek.PB</td>
 											</tr>
-								}
+										}
 									</tbody>
 									<tfoot>
-										<tr>
-											<th>Toplam</th>
+										<tr style="background-color: #f8f9fa; font-weight: bold;">
 											<th></th>
 											<th></th>
 											<th></th>
@@ -153,9 +243,10 @@
 											<th></th>
 											<th></th>
 											<th></th>
-											<th class="right-align"></th> <!-- Tutar toplamı için -->
-											<th class="right-align"></th> <!-- Ödenen toplamı için -->
-											<th class="right-align"></th> <!-- Kalan toplamı için -->
+											<th></th>
+											<th class="text-right"></th>
+											<th class="text-right"></th>
+											<th class="text-right"></th>
 											<th></th>
 										</tr>
 									</tfoot>
@@ -166,30 +257,26 @@
 								<div class="dataTables_paginate" id="example_paginate"></div>
 							</div>
 						</div>
-
-
-
-
-			}
-
-					
+					}
+					else
+					{
+						<div class="text-center py-5">
+							<div class="alert alert-info" role="alert">
+								<i class="icofont icofont-info-circle mr-2"></i>
+								<strong>Bilgi:</strong> Seçilen tarih aralığında çek kaydı bulunamadı.
+							</div>
 						</div>
-					
-				
+					}
 				</div>
 			</div>
 		</div>
 	</div>
-	
-
-</div>
 </div>
 
+<!-- Scripts -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
 <script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
-
-
 
 <script>
 	document.addEventListener('DOMContentLoaded', function () {
@@ -197,83 +284,228 @@
 	});
 </script>
 
-
 <script>
-				$('#example').dataTable({
-		"dom": '<"row"<"col-sm-12"B>>' +
+	$('#example').DataTable({
+		dom: '<"row"<"col-sm-12"B>>' +
 			'<"row"<"col-sm-6"l><"col-sm-6"f>>' +
 			't' +
 			'<"row"<"col-sm-6"i><"col-sm-6"p>>',
-		"language": {
-			"url": "/Content/DataTables/turkish.json"
+		language: {
+			url: "/Content/DataTables/turkish.json"
 		},
-		"buttons": ['copy', 'csv', 'excel', 'pdf', 'print'], // Butonlar
-		"pageLength": 5000, // Varsayılan olarak 5000 gösterim
-		"lengthMenu": [[10, 25, 50, 100, 5000], [10, 25, 50, 100, "5000"]], // Kullanıcıya seçim için seçenekler
-		"columnDefs": [
+		pageLength: 50000,
+		lengthMenu: [[10, 25, 50, 100, 500, 1000, 5000, -1], [10, 25, 50, 100, 500, 1000, 50000, "Tümü"]],
+		buttons: [
+			'copy',
 			{
-				"targets": [8, 9, 10], // Tutar, Ödenen, Kalan sütunları
-				"render": function (data, type, row) {
-					if (type === 'display' || type === 'filter') {
-						// Virgülle ayırarak ve 2 ondalık basamakla formatla
-						return parseFloat(data).toLocaleString('tr-TR', {
-							minimumFractionDigits: 2,
-							maximumFractionDigits: 2
+				extend: 'excel',
+				text: 'Excel',
+				customizeData: function (data) {
+					for (var i = 0; i < data.body.length; i++) {
+						// Tarih sütunlarını formatla (6. ve 7. sütun - Tarih ve Vade)
+						[6, 7].forEach(function (colIndex) {
+							if (data.body[i][colIndex]) {
+								data.body[i][colIndex] = formatDateForExcel(data.body[i][colIndex]);
+							}
+						});
+
+						// Sayısal sütunları formatla (8, 9, 10. sütunlar - Tutar, Ödenen, Kalan)
+						[8, 9, 10].forEach(function (colIndex) {
+							if (data.body[i][colIndex]) {
+								data.body[i][colIndex] = turkishToExcelNumber(data.body[i][colIndex]);
+							}
 						});
 					}
-					return parseFloat(data);
-				}
-			}
+				},
+				footer: true
+			},
+			'pdf',
+			'print'
 		],
-		"footerCallback": function (row, data, start, end, display) {
+		order: [[6, "desc"]], // Tarihe göre azalan sıralama
+		footerCallback: function (row, data, start, end, display) {
 			var api = this.api();
+			var tr = new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-			// Toplam sütunların indexleri (Tutar, Ödenen, Kalan)
-			var tutarIndex = 8;
-			var odenenIndex = 9;
-			var kalanIndex = 10;
+			// Sayısal değeri çıkarma fonksiyonu
+			var intVal = function (i) {
+				if (typeof i === 'string') {
+					var cleaned = i.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.-]/g, '');
+					return parseFloat(cleaned) || 0;
+				}
+				return typeof i === 'number' ? i : 0;
+			};
 
-			// Toplam hesaplama - parseFloat kullanarak kesin hesaplama
-			var tutarToplam = api
-				.column(tutarIndex, { page: 'current' })
-				.data()
-				.reduce(function (a, b) {
-					return parseFloat(a.toString().replace(',', '.')) + parseFloat(b.toString().replace(',', '.'));
-				}, 0);
+			// Para sütunları (8: Tutar, 9: Ödenen, 10: Kalan)
+			var columnsToSum = [8, 9, 10];
 
-			var odenenToplam = api
-				.column(odenenIndex, { page: 'current' })
-				.data()
-				.reduce(function (a, b) {
-					return parseFloat(a.toString().replace(',', '.')) + parseFloat(b.toString().replace(',', '.'));
-				}, 0);
+			columnsToSum.forEach(function(colIndex) {
+				// Toplam hesapla (tüm veriler)
+				var total = api
+					.column(colIndex)
+					.data()
+					.reduce(function (a, b) {
+						return intVal(a) + intVal(b);
+					}, 0);
 
-			var kalanToplam = api
-				.column(kalanIndex, { page: 'current' })
-				.data()
-				.reduce(function (a, b) {
-					return parseFloat(a.toString().replace(',', '.')) + parseFloat(b.toString().replace(',', '.'));
-				}, 0);
+				// Görünen sayfadaki toplam
+				var pageTotal = api
+					.column(colIndex, { page: 'current' })
+					.data()
+					.reduce(function (a, b) {
+						return intVal(a) + intVal(b);
+					}, 0);
 
-			// Toplamları Türkçe formatında gösterme
-			var formattedTutarToplam = tutarToplam.toLocaleString('tr-TR', {
-				minimumFractionDigits: 2,
-				maximumFractionDigits: 2
-			});
-			var formattedOdenenToplam = odenenToplam.toLocaleString('tr-TR', {
-				minimumFractionDigits: 2,
-				maximumFractionDigits: 2
-			});
-			var formattedKalanToplam = kalanToplam.toLocaleString('tr-TR', {
-				minimumFractionDigits: 2,
-				maximumFractionDigits: 2
+				// Footer'a toplamı yaz
+				var footerText = tr.format(pageTotal) + ' (' + tr.format(total) + ')';
+				$(api.column(colIndex).footer()).html('<strong>' + footerText + '</strong>');
 			});
 
-			// Toplam satırı footer'a ekleme
-			$(api.column(0).footer()).html('Toplam');
-			$(api.column(tutarIndex).footer()).html(formattedTutarToplam);
-			$(api.column(odenenIndex).footer()).html(formattedOdenenToplam);
-			$(api.column(kalanIndex).footer()).html(formattedKalanToplam);
+			// Diğer sütunlar için boş değer
+			[0, 1, 2, 3, 4, 5, 6, 7, 11].forEach(function(colIndex) {
+				$(api.column(colIndex).footer()).html('');
+			});
 		}
 	});
+
+	// Tarih formatını Excel uyumlu hale getirme
+	function formatDateForExcel(dateStr) {
+		if (!dateStr) return dateStr;
+
+		if (dateStr.includes('.')) {
+			var parts = dateStr.split('.');
+			if (parts.length === 3) {
+				return parts[2] + '-' + parts[1] + '-' + parts[0];
+			}
+		}
+		return dateStr;
+	}
+
+	// Türkçe sayıyı Excel uyumlu formata çevirme
+	function turkishToExcelNumber(numberStr) {
+		if (!numberStr) return numberStr;
+
+		var cleanedNumber = numberStr.toString()
+			.replace(/\./g, '')  // Binlik ayraçlarını sil
+			.replace(/,/g, '.'); // Ondalık ayracını nokta yap
+
+		if (!isNaN(cleanedNumber)) {
+			return parseFloat(cleanedNumber);
+		}
+		return numberStr;
+	}
 </script>
+
+<style>
+	.badge {
+		font-size: 10px;
+		padding: 4px 8px;
+	}
+
+	.table-hover tbody tr:hover {
+		background-color: rgba(0, 123, 255, 0.05);
+	}
+
+	.card-block {
+		padding: 20px;
+	}
+
+	.form-label {
+		font-weight: 600;
+		margin-bottom: 5px;
+		font-size: 13px;
+		color: #495057;
+	}
+
+	.btn-primary {
+		background-color: #007ba7;
+		border-color: #007ba7;
+		transition: all 0.3s ease;
+	}
+
+		.btn-primary:hover {
+			background-color: #162e54;
+			border-color: #162e54;
+			transform: translateY(-1px);
+		}
+
+	.alert-info {
+		border-left: 4px solid #007ba7;
+		background-color: rgba(0, 123, 168, 0.05);
+	}
+
+	/* DataTables stilleri */
+	.dataTables_length {
+		display: flex;
+		align-items: center;
+		margin-right: 10px;
+	}
+
+		.dataTables_length label {
+			font-size: 14px;
+			margin-right: 10px;
+		}
+
+		.dataTables_length select {
+			border: 1px solid #ced4da;
+			border-radius: 4px;
+			font-size: 12px;
+			padding: 3px 8px;
+			max-width: 80px;
+		}
+
+	.dt-button, .dt-button:hover {
+		background: #162E54;
+		color: #fff;
+		border: none;
+		padding: 5px 10px;
+		border-radius: 3px;
+		margin-left: 5px;
+	}
+
+	.dataTables_filter {
+		margin-top: 10px;
+		display: flex;
+		justify-content: flex-end;
+	}
+
+		.dataTables_filter input[type="search"] {
+			border: 1px solid #ced4da;
+			border-radius: 4px;
+			padding: 5px 10px;
+			font-size: 12px;
+			width: 180px;
+			outline: none;
+		}
+
+	.dataTables_wrapper .dataTables_info {
+		font-size: 12px;
+		color: #495057;
+		text-align: left;
+	}
+
+	.dataTables_wrapper .dataTables_paginate {
+		display: flex;
+		justify-content: flex-end;
+	}
+
+	.dataTables_wrapper tfoot th {
+		text-align: center;
+		color: #162E54;
+		font-weight: bold;
+	}
+
+	/* Cari unvanı için tooltip */
+	.cari-unvani-cell {
+		max-width: 150px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		cursor: help;
+	}
+
+	/* Banka özeti dip toplam satırı için stil */
+	tfoot tr {
+		border-top: 2px solid #007ba7 !important;
+	}
+</style>

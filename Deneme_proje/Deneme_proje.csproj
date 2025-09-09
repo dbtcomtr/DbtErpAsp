@@ -19,6 +19,7 @@
     <PackageReference Include="Dapper" Version="2.1.35" />
     <PackageReference Include="EPPlus" Version="7.4.1" />
     <PackageReference Include="Extension.OfficeOpenXml" Version="1.1.0" />
+    <PackageReference Include="itext" Version="9.3.0" />
     <PackageReference Include="iTextSharp" Version="5.5.13.3" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />

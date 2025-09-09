@@ -1,545 +1,1283 @@
-﻿@{
-    ViewData["Title"] = "Rapor";
+﻿@model List<Deneme_proje.Models.CrmEntities.TeklifListeModel>
+@{
+    ViewData["Title"] = "Teklifler";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+<link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+
 <style>
-    .tablo {
-        padding: 0 20px;
+    :root {
+        --primary-blue: #2c5aa0;
+        --secondary-blue: #1e3d72;
+        --light-blue: #e8f2ff;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --success: #059669;
+        --warning: #d97706;
+        --danger: #dc2626;
     }
 
-    .dataTables_wrapper {
+    /* Dönüştürme kontrolları için CSS */
+    .sidebar-controls {
+        background: #f8f9fa;
+        padding: 15px 20px;
+        border-bottom: 2px solid #e9ecef;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .control-group {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .convert-dropdown-wrapper {
         position: relative;
-        clear: none;
+        min-width: 180px;
+        flex: 1;
     }
 
-    table.dataTable tbody td {
-        font-size: 12px;
-        word-wrap: break-word;
-        white-space: normal;
-    }
-
-    .metrics-container {
-        display: grid;
-        grid-template-columns: repeat(10, 1fr);
-        gap: 8px; /* Boşluğu azalttık */
-        margin-bottom: 15px; /* Margin'i azalttık */
-        padding: 0 15px; /* Yanlara padding ekledik */
-    }
-
-    .metric-card {
-        padding: 10px;
+    .convert-dropdown {
+        padding: 8px 12px;
+        border: 2px solid #28a745;
         border-radius: 6px;
-        text-align: center;
-        transition: transform 0.3s, box-shadow 0.3s;
-        width: 150px;
-        height: 70px;
+        background: white;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2328a745' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 16px;
+        padding-right: 32px;
+        width: 100%;
+        color: #28a745;
+        transition: all 0.2s ease;
     }
 
-    .metric-title {
-        font-size: 12px; /* Font boyutunu küçülttük */
-        margin-bottom: 6px;
+        .convert-dropdown:hover {
+            border-color: #218838;
+            color: #218838;
+        }
+
+        .convert-dropdown:focus {
+            outline: none;
+            border-color: #218838;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+        }
+
+    .convert-action-btn {
+        padding: 8px 16px;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        min-width: 100px;
     }
+
+        .convert-action-btn:hover {
+            background: #218838;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+        }
+
+        .convert-action-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+            transform: none;
+            box-shadow: none;
+        }
+
+    /* Responsive düzenlemeler */
+    @@media (max-width: 1200px) {
+        .control-group {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .convert-dropdown-wrapper,
+        .status-dropdown-wrapper {
+            min-width: auto;
+        }
+
+        .convert-action-btn,
+        .convert-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    /* Animasyon efektleri */
+    .control-group {
+        transition: all 0.3s ease;
+    }
+
+    #convertControls {
+        animation: slideDown 0.3s ease-out;
+    }
+
+    #normalControls.hiding {
+        opacity: 0.7;
+        transform: translateY(-5px);
+    }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .main-content {
+        margin-top: 15px;
+    }
+
+    .content-wrapper {
+        display: flex;
+        min-height: calc(100vh - 60px);
+        gap: 20px;
+        margin: 0 auto !important;
+    }
+
+    .main-container {
+        flex: 1;
+        padding: 20px;
+        background: var(--gray-50);
+        transition: flex 0.3s ease;
+    }
+
+    .sidebar {
+        width: 400px;
+        background: white;
+        border-left: 1px solid var(--gray-200);
+        transition: width 0.3s ease, transform 0.3s ease;
+        overflow-y: auto;
+        display: none;
+        transform: translateX(100%);
+    }
+
+        .sidebar.open {
+            display: block;
+            transform: translateX(0);
+        }
+
+    .main-card, .sidebar {
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+    }
+
+    /* Header */
+    .page-header {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid var(--gray-200);
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        margin: 0;
+    }
+
+    /* Metrics */
+    .metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .metric {
+        background: white;
+        padding: 15px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid var(--gray-200);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.2s ease;
+    }
+
+        .metric::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-blue);
+        }
+
+        .metric:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
 
     .metric-value {
-        font-size: 20px; /* Font boyutunu küçülttük */
-        font-weight: bold;
-        margin-bottom: 3px;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--gray-800);
     }
 
-    .metric-unit {
-        font-size: 10px; /* Font boyutunu küçülttük */
-    }
-
-    .blue-card {
-        background-color: #1E3559;
-        color: #fff;
-    }
-
-    .yellow-card {
-        background-color: #194181;
-        color: #fff;
-    }
-
-    .green-card {
-        background-color: #296299;
-        color: #fff;
-    }
-
-    .pink-card {
-        background-color: #4CA7E1;
-        color: #fff;
-    }
-
-    .purple-card {
-        background-color: #3B86A1;
-        color: #fff;
-    }
-
-    .orange-card {
-        background-color: #A13B47;
-        color: #fff;
-    }
-
-    /* Tab yapısı için stil */
-    .tab-container {
-        margin-bottom: 15px;
-    }
-
-    .tab-buttons {
-        display: flex;
-        border-bottom: 1px solid #dee2e6;
-    }
-
-    .tab-button {
-        padding: 10px 20px;
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-bottom: none;
-        border-radius: 5px 5px 0 0;
-        margin-right: 5px;
-        cursor: pointer;
+    .metric-label {
+        font-size: 0.875rem;
+        color: var(--gray-600);
+        margin-top: 5px;
         font-weight: 500;
-        color: #495057;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
     }
 
-        .tab-button.active {
-            background-color: #1E3559;
+    /* Card Header */
+    .card-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+        color: white;
+        padding: 15px 20px;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .new-btn {
+        background: var(--success);
+        color: white;
+        padding: 8px 15px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.7rem;
+        align-items: center;
+        gap: 5px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+        .new-btn:hover {
+            background: #047857;
             color: white;
-            border-color: #1E3559;
+            text-decoration: none;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+        }
+
+    /* Tabs */
+    .tabs {
+        background: var(--gray-50);
+        border-bottom: 1px solid var(--gray-200);
+        display: flex;
+    }
+
+    .tab {
+        padding: 12px 20px;
+        cursor: pointer;
+        border: none;
+        background: none;
+        color: var(--gray-600);
+        font-weight: 600;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s ease;
+    }
+
+        .tab.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+            background: white;
+        }
+
+        .tab:hover:not(.active) {
+            color: var(--gray-800);
         }
 
     .tab-content {
         display: none;
-        padding: 15px 0;
+        padding: 20px;
     }
 
         .tab-content.active {
             display: block;
         }
 
-    /* Pipeline görünümü için stiller */
-    .pipeline-container {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
+    /* Table */
+    .table-container {
         overflow-x: auto;
-        padding: 15px 5px;
+    }
+
+    .data-table {
+        width: 100%;
+        font-size: 0.9rem;
+    }
+
+        .data-table thead th {
+            background: #f8f9fa;
+            font-weight: 600;
+            padding: 12px 8px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .data-table tbody tr {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+            .data-table tbody tr:hover {
+                background-color: #e3f2fd;
+            }
+
+            .data-table tbody tr.selected {
+                background-color: #bbdefb !important;
+                border-left: 4px solid #3498db;
+            }
+
+        .data-table tbody td {
+            padding: 12px 8px;
+            vertical-align: middle;
+        }
+
+    .teklif-no {
+        font-weight: 600;
+        color: #3498db;
+    }
+
+    .amount {
+        font-weight: 600;
+        color: #27ae60;
+    }
+
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .status-taslak {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-gonderildi {
+        background: #cce5ff;
+        color: #004085;
+    }
+
+    .status-kazanildi {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-kaybedildi {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .status-ertelendi {
+        background: #e2e3e5;
+        color: #41464b;
+    }
+
+    .status-iptal {
+        background: #f1f3f4;
+        color: #6c757d;
+    }
+
+    .action-btn {
+        background: none;
+        border: 1px solid #dee2e6;
+        padding: 4px 6px;
+        margin: 0 2px;
+        border-radius: 4px;
+        cursor: pointer;
+        color: #6c757d;
+        font-size: 0.8rem;
+    }
+
+        .action-btn:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+    /* Pipeline */
+    .pipeline {
+        display: flex;
+        gap: 15px;
+        overflow-x: auto;
+        padding: 10px 0;
+        min-height: 500px;
     }
 
     .pipeline-column {
         min-width: 250px;
-        width: 19%;
-        background-color: #f9f9f9;
+        flex: 1;
+        background: #f8f9fa;
         border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        display: flex;
-        flex-direction: column;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
     }
 
+        .pipeline-column.drag-over {
+            background: #f0f8ff;
+            border: 2px dashed #007bff;
+            transform: scale(1.02);
+        }
+
     .column-header {
-        padding: 10px 15px;
+        padding: 12px 15px;
+        font-weight: 600;
         color: white;
-        border-radius: 8px 8px 0 0;
-        font-weight: bold;
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
 
     .column-count {
-        background-color: rgba(255,255,255,0.3);
+        background: rgba(255,255,255,0.3);
         padding: 2px 8px;
         border-radius: 10px;
-        font-size: 14px;
+        font-size: 0.8rem;
     }
 
     .column-body {
-        flex-grow: 1;
         padding: 10px;
-        min-height: 300px;
+        min-height: 400px;
+        position: relative;
     }
 
     .quote-card {
-        background-color: white;
-        border-radius: 6px;
+        background: white;
         padding: 12px;
-        margin-bottom: 10px;
+        border-radius: 6px;
+        margin-bottom: 8px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         cursor: grab;
-        transition: transform 0.2s, box-shadow 0.2s;
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+        user-select: none;
     }
 
         .quote-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
-        .quote-card:active {
+        .quote-card.selected {
+            background-color: #bbdefb !important;
+            border-left: 4px solid #3498db;
+        }
+
+        .quote-card.dragging {
+            opacity: 0.7;
             cursor: grabbing;
+            transform: rotate(2deg) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .quote-card.drag-over {
+            border-color: #007bff;
+            background: #f8f9ff;
         }
 
     .quote-id {
-        font-size: 14px;
-        font-weight: bold;
-        color: #1E3559;
-        margin-bottom: 5px;
+        font-weight: 600;
+        color: #3498db;
+        font-size: 0.9rem;
     }
 
     .quote-client {
-        font-size: 13px;
-        margin-bottom: 8px;
-    }
-
-    .quote-details {
-        display: flex;
-        justify-content: space-between;
-        font-size: 12px;
-        color: #666;
+        color: #2c3e50;
+        font-size: 0.85rem;
+        margin: 4px 0;
     }
 
     .quote-amount {
-        font-weight: bold;
-        color: #1E3559;
+        color: #27ae60;
+        font-weight: 600;
+        font-size: 0.85rem;
     }
 
-    /* Kartların renkleri */
-    .blue-column .column-header {
-        background-color: #1E3559;
+    /* Pipeline column colors */
+    .taslak .column-header {
+        background: #f39c12;
     }
 
-    .yellow-column .column-header {
-        background-color: #194181;
+    .gonderildi .column-header {
+        background: #3498db;
     }
 
-    .green-column .column-header {
-        background-color: #296299;
+    .kazanildi .column-header {
+        background: #27ae60;
     }
 
-    .pink-column .column-header {
-        background-color: #4CA7E1;
+    .kaybedildi .column-header {
+        background: #e74c3c;
     }
 
-    .purple-column .column-header {
-        background-color: #3B86A1;
+    .ertelendi .column-header {
+        background: #9b59b6;
     }
 
-    .orange-column .column-header {
-        background-color: #A13B47;
+    .iptal .column-header {
+        background: #95a5a6;
     }
 
-    /* Sürükle bırak için vurgulama */
-    .drop-highlight {
-        background-color: #e9f5ff;
-        border: 2px dashed #1E3559;
-    }
-
-    /* Mobil görünüm için düzenlemeler */
-    @@media (max-width: 992px) {
-        .pipeline-container
-
-    {
-        flex-direction: column;
+    /* Sidebar */
+    .sidebar-header {
+        background: #1e3d72;
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
         align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 1001;
     }
 
-    .pipeline-column {
+    .sidebar-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 4px;
+    }
+
+        .close-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+    /* Sidebar Controls */
+    .sidebar-controls {
+        background: #f8f9fa;
+        padding: 15px 20px;
+        border-bottom: 2px solid #e9ecef;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .status-dropdown-wrapper {
+        position: relative;
+        min-width: 120px;
+    }
+
+    .status-dropdown {
+        padding: 8px 12px;
+        border: 2px solid #dee2e6;
+        border-radius: 6px;
+        background: white;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 16px;
+        padding-right: 32px;
         width: 100%;
-        margin-bottom: 15px;
     }
 
-    .metrics-container {
-        grid-template-columns: repeat(3, 1fr);
+        .status-dropdown.kazanildi {
+            border-color: #28a745;
+            color: #28a745;
+        }
+
+        .status-dropdown.kaybedildi {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+    .convert-btn {
+        padding: 8px 16px;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
     }
 
+        .convert-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .convert-btn:not(:disabled):hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+    .other-actions-dropdown {
+        position: relative;
+        min-width: 100px;
     }
 
-    /* Metriklerin sayı değişiminde animasyon */
-    .metric-value {
+    .other-dropdown {
+        padding: 8px 12px;
+        border: 2px solid #6c757d;
+        border-radius: 6px;
+        background: white;
+        color: #6c757d;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 16px;
+        padding-right: 32px;
+        width: 100%;
+    }
+
+        .other-dropdown:hover {
+            border-color: #495057;
+        }
+
+    .sidebar-content {
+        padding: 20px;
+    }
+
+    .detail-section {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #f1f3f4;
+    }
+
+    .section-title {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        font-size: 0.85rem;
+    }
+
+    .detail-label {
+        color: #7f8c8d;
+        font-weight: 500;
+    }
+
+    .detail-value {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+        .detail-value.amount {
+            color: #27ae60;
+        }
+
+    .detail-urunler-list {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .detail-urun {
+        padding: 10px;
+        margin-bottom: 8px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .detail-urun-label {
+        font-weight: 600;
+        color: #2c3e50;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .detail-urun-value {
+        color: #7f8c8d;
+        font-size: 0.75rem;
+    }
+
+    .detail-urun-image {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+    }
+
+    .detail-urun-no-image {
+        width: 50px;
+        height: 50px;
+        background: #f8f9fa;
+        border: 1px dashed #dee2e6;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+
+    .sidebar-actions {
+        padding: 15px;
+        border-top: 1px solid #f1f3f4;
+        background: #f8f9fa;
+        display: flex;
+        gap: 10px;
+        position: sticky;
+        bottom: 0;
+    }
+
+    .btn-outline {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #dee2e6;
+        background: white;
+        color: #6c757d;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+
+    .btn-primary {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #3498db;
+        background: #3498db;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+
+    .btn-outline:hover {
+        background: #f8f9fa;
+        color: #495057;
+    }
+
+    .btn-primary:hover {
+        background: #2980b9;
+    }
+
+    /* Loading & Status Messages */
+    .updating {
+        opacity: 0.7;
+        pointer-events: none;
+    }
+
+    .status-message {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 6px;
+        color: white;
+        font-weight: 500;
+        z-index: 1000;
+        opacity: 0;
+        transform: translateX(100%);
         transition: all 0.3s ease;
     }
 
-    .value-change {
-        animation: pulse 0.5s ease;
+        .status-message.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .status-message.success {
+            background: #28a745;
+        }
+
+        .status-message.error {
+            background: #dc3545;
+        }
+
+    /* Responsive */
+    @@media (max-width: 1200px) {
+        .content-wrapper {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+        }
+
+        .main-container {
+            flex: 1;
+        }
+
+        .sidebar-controls {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+            .sidebar-controls > * {
+                width: 100%;
+            }
     }
 
-    @@keyframes pulse {
-        0%
-
-    {
-        transform: scale(1);
+    /* Dropdown durum renkleri */
+    .status-dropdown.taslak {
+        border-color: #f39c12;
+        color: #f39c12;
     }
 
-    50% {
-        transform: scale(1.1);
+    .status-dropdown.gonderildi {
+        border-color: #3498db;
+        color: #3498db;
     }
 
-    100% {
-        transform: scale(1);
+    .status-dropdown.kazanildi {
+        border-color: #28a745;
+        color: #28a745;
     }
 
+    .status-dropdown.kaybedildi {
+        border-color: #dc3545;
+        color: #dc3545;
+    }
+
+    .status-dropdown.ertelendi {
+        border-color: #9b59b6;
+        color: #9b59b6;
+    }
+
+    .status-dropdown.iptal {
+        border-color: #95a5a6;
+        color: #95a5a6;
+    }
+
+    .convert-btn:not(:disabled) {
+        background: #007bff;
+    }
+
+        .convert-btn:not(:disabled):hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+    @@media (max-width: 768px) {
+        .metrics {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .pipeline {
+            flex-direction: column;
+        }
+
+        .pipeline-column {
+            min-width: auto;
+            width: 100%;
+        }
     }
 </style>
 
 <div class="main-content mt-5">
-    <div class="px-lg-5 px-3">
-        <div class="row">
-            <div class="col-sm-12 p-0">
-                <div class="main-header">
-                    <div class="metrics-container">
-                        <div class="metric-card blue-card" id="total-quotes">
-                            <div class="metric-title">Teklif</div>
-                            <div class="metric-value">10</div>
-                            <div class="metric-unit">Adet</div>
+    <div class="px-lg-5 py-3">
+        <div class="col-12">
+            <div class="content-wrapper">
+                <div class="main-container" id="mainContainer">
+                    <!-- Metrics -->
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-value">@Model.Count</div>
+                            <div class="metric-label">Toplam</div>
                         </div>
-                        <div class="metric-card yellow-card" id="open-quotes">
-                            <div class="metric-title">Açık Teklifler</div>
-                            <div class="metric-value">1</div>
-                            <div class="metric-unit">Adet</div>
+                        <div class="metric">
+                            <div class="metric-value">@Model.Count(t => t.Durum == "Taslak" || string.IsNullOrEmpty(t.Durum))</div>
+                            <div class="metric-label">Taslak</div>
                         </div>
-                        <div class="metric-card green-card" id="won-quotes">
-                            <div class="metric-title">Kazanılan Teklifler</div>
-                            <div class="metric-value">3</div>
-                            <div class="metric-unit">Adet</div>
+                        <div class="metric">
+                            <div class="metric-value">@Model.Count(t => t.Durum == "Gönderildi")</div>
+                            <div class="metric-label">Gönderildi</div>
                         </div>
-                        <div class="metric-card pink-card" id="lost-quotes">
-                            <div class="metric-title">Kaybedilen Teklifler</div>
-                            <div class="metric-value">1</div>
-                            <div class="metric-unit">Adet</div>
+                        <div class="metric">
+                            <div class="metric-value">@Model.Count(t => t.Durum == "Kazanıldı")</div>
+                            <div class="metric-label">Kazanılan</div>
                         </div>
-                        <div class="metric-card purple-card" id="postponed-quotes">
-                            <div class="metric-title">Ertelenen Teklifler</div>
-                            <div class="metric-value">1</div>
-                            <div class="metric-unit">Adet</div>
+                        <div class="metric">
+                            <div class="metric-value">@Model.Count(t => t.Durum == "Kaybedildi")</div>
+                            <div class="metric-label">Kaybedilen</div>
                         </div>
-                        <div class="metric-card orange-card" id="canceled-quotes">
-                            <div class="metric-title">İptal Edilen Teklifler</div>
-                            <div class="metric-value">2</div>
-                            <div class="metric-unit">Adet</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row tablo">
-            <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
-                        <h5 class="card-header-text text-white">Teklifler</h5>
-                    </div>
-
-                    <div class="mt-2 mx-3 mb-2">
-                        <button class="btn btn-primary my-2 mx-2" onclick="window.location.href='/crm/yeniteklif';">Yeni Teklif</button>
-                    </div>
-
-                    <!-- Tab Butonları -->
-                    <div class="tab-container mx-3">
-                        <div class="tab-buttons">
-                            <button class="tab-button active" onclick="openTab('list-tab')">Liste Görünümü</button>
-                            <button class="tab-button" onclick="openTab('pipeline-tab')">Pipeline Görünümü</button>
+                        <div class="metric">
+                            <div class="metric-value">@Model.Count(t => t.Durum == "Ertelendi")</div>
+                            <div class="metric-label">Ertelenen</div>
                         </div>
                     </div>
 
-                    <!-- Tab İçerikleri -->
-                    <!-- Liste Görünümü Tabı -->
-                    <div id="list-tab" class="tab-content active">
-                        <div id="example_wrapper" class="dataTables_wrapper tablo">
-                            <div class="dataTables_length" id="example_length"></div>
-                            <div class="dataTables_filter" id="example_filter"></div>
-                            <div id="example_wrapper">
-                                <table id="example" class="display dataTable" style="width:100%">
+                    <!-- Main Card -->
+                    <div class="main-card">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-6 d-flex justify-content-start">
+                                    <h3 class="card-title">Teklif Yönetimi</h3>
+                                </div>
+                                <div class="col-md-6 d-flex justify-content-end">
+                                    <a href="/crm/fiyatteklif" class="new-btn">
+                                        <i class="fas fa-plus"></i>
+                                        Yeni Teklif
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tabs -->
+                        <div class="tabs">
+                            <button class="tab active" onclick="switchTab('list')">
+                                <i class="fas fa-list"></i> Liste
+                            </button>
+                            <button class="tab" onclick="switchTab('pipeline')">
+                                <i class="fas fa-columns"></i> Pipeline
+                            </button>
+                        </div>
+
+                        <!-- List View -->
+                        <div id="list-content" class="tab-content active">
+                            <div class="table-container">
+                                <table class="data-table table" id="teklifTable">
                                     <thead>
-                                        <tr class="tablo-icerik-yazi">
-                                            <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                <div class="th-content">
-                                                    <span># Teklif</span>
-                                                </div>
-                                            </th>
-                                            <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                <div class="th-content">
-                                                    <span>Konu</span>
-                                                </div>
-                                            </th>
-                                            <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                <div class="th-content">
-                                                    <span>Kime</span>
-                                                </div>
-                                            </th>
-                                            <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                <div class="th-content">
-                                                    <span>Toplam</span>
-                                                </div>
-                                            </th>
-                                            <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                <div class="th-content">
-                                                    <span>Tarih</span>
-                                                </div>
-                                            </th>
-                                            <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                <div class="th-content">
-                                                    <span>Geçerlilik Tarihi</span>
-                                                </div>
-                                            </th>
-                                            <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                <div class="th-content">
-                                                    <span>Etiketler</span>
-                                                </div>
-                                            </th>
-                                            <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                <div class="th-content">
-                                                    <span>Oluşturma Tarihi</span>
-                                                </div>
-                                            </th>
-                                            <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                <div class="th-content">
-                                                    <span>Durum</span>
-                                                </div>
-                                            </th>
-                                            <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                <div class="th-content">
-                                                    <span>Teklif Konusu</span>
-                                                </div>
-                                            </th>
+                                        <tr>
+                                            <th>Teklif No</th>
+                                            <th>Firma</th>
+                                            <th>Konu</th>
+                                            <th>Tutar</th>
+                                            <th>Tarih</th>
+                                            <th>Durum</th>
+                                            <th>İşlemler</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>DBT-20000341</td>
-                                            <td>DBT Dora Bilişim</td>
-                                            <td>DBT Dora Bilişim</td>
-                                            <td>48.000,00TL</td>
-                                            <td>2024-12-14</td>
-                                            <td>2024-12-21</td>
-                                            <td></td>
-                                            <td>2024-12-14 20:34:29</td>
-                                            <td>Taslak</td>
-                                            <td></td>
-                                        </tr>
+                                        @foreach (var teklif in Model)
+                                        {
+                                            <tr onclick="showDetail('@teklif.TeklifNo', '@Html.Raw(teklif.Kime)', '@Html.Raw(teklif.Konu)', '@teklif.ToplamFormatted', '@teklif.TarihFormatted', '@(string.IsNullOrEmpty(teklif.Durum) ? "Taslak" : teklif.Durum)')">
+                                                <td><span class="teklif-no">@teklif.TeklifNo</span></td>
+                                                <td>@teklif.Kime</td>
+                                                <td>@teklif.Konu</td>
+                                                <td><span class="amount">@teklif.ToplamFormatted</span></td>
+                                                <td>@teklif.TarihFormatted</td>
+                                                <td>
+                                                    <span class="status-badge status-@(GetStatusClass(teklif.Durum))">
+                                                        @(string.IsNullOrEmpty(teklif.Durum) ? "Taslak" : teklif.Durum)
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <button class="action-btn"
+                                                            onclick="event.stopPropagation(); editTeklif('@teklif.TeklifNo')"
+                                                            title="Düzenle">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="action-btn" onclick="event.stopPropagation(); printTeklif('@teklif.TeklifNo')" title="Yazdır">
+                                                        <i class="fas fa-print"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Pipeline Görünümü Tabı -->
-                    <div id="pipeline-tab" class="tab-content">
-                        <div class="pipeline-container">
-                            <!-- Açık Teklifler -->
-                            <div class="pipeline-column yellow-column" id="open">
-                                <div class="column-header">
-                                    <span>Açık Teklifler</span>
-                                    <span class="column-count">1</span>
-                                </div>
-                                <div class="column-body" ondragover="allowDrop(event)" ondrop="drop(event, 'open')">
-                                    <div class="quote-card" draggable="true" ondragstart="drag(event)" id="quote-1" data-status="open">
-                                        <div class="quote-id">DBT-20000341</div>
-                                        <div class="quote-client">DBT Dora Bilişim</div>
-                                        <div class="quote-details">
-                                            <span>14.12.2024</span>
-                                            <span class="quote-amount">48.000,00 TL</span>
-                                        </div>
+                        <!-- Pipeline View -->
+                        <div id="pipeline-content" class="tab-content">
+                            <div class="pipeline">
+                                <!-- Taslak -->
+                                <div class="pipeline-column taslak" data-status="Taslak">
+                                    <div class="column-header">
+                                        <span>Taslak</span>
+                                        <span class="column-count">@Model.Count(t => t.Durum == "Taslak" || string.IsNullOrEmpty(t.Durum))</span>
+                                    </div>
+                                    <div class="column-body" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                                        @foreach (var teklif in Model.Where(t => t.Durum == "Taslak" || string.IsNullOrEmpty(t.Durum)))
+                                        {
+                                            <div class="quote-card"
+                                                 draggable="true"
+                                                 ondragstart="drag(event)"
+                                                 data-teklif-id="@teklif.TeklifNo"
+                                                 data-status="Taslak"
+                                                 onclick="showDetail('@teklif.TeklifNo', '@Html.Raw(teklif.Kime)', '@Html.Raw(teklif.Konu)', '@teklif.ToplamFormatted', '@teklif.TarihFormatted', 'Taslak')">
+                                                <div class="quote-id">@teklif.TeklifNo</div>
+                                                <div class="quote-client">@teklif.Kime</div>
+                                                <div class="quote-amount">@teklif.ToplamFormatted</div>
+                                            </div>
+                                        }
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Kazanılan Teklifler -->
-                            <div class="pipeline-column green-column" id="won">
-                                <div class="column-header">
-                                    <span>Kazanılan Teklifler</span>
-                                    <span class="column-count">3</span>
-                                </div>
-                                <div class="column-body" ondragover="allowDrop(event)" ondrop="drop(event, 'won')">
-                                    <div class="quote-card" draggable="true" ondragstart="drag(event)" id="quote-2" data-status="won">
-                                        <div class="quote-id">DBT-20000322</div>
-                                        <div class="quote-client">Megatek Ltd.</div>
-                                        <div class="quote-details">
-                                            <span>10.12.2024</span>
-                                            <span class="quote-amount">75.500,00 TL</span>
-                                        </div>
+                                <!-- Gönderildi -->
+                                <div class="pipeline-column gonderildi" data-status="Gönderildi">
+                                    <div class="column-header">
+                                        <span>Gönderildi</span>
+                                        <span class="column-count">@Model.Count(t => t.Durum == "Gönderildi")</span>
                                     </div>
-                                    <div class="quote-card" draggable="true" ondragstart="drag(event)" id="quote-3" data-status="won">
-                                        <div class="quote-id">DBT-20000315</div>
-                                        <div class="quote-client">Teknosa A.Ş.</div>
-                                        <div class="quote-details">
-                                            <span>05.12.2024</span>
-                                            <span class="quote-amount">34.250,00 TL</span>
-                                        </div>
-                                    </div>
-                                    <div class="quote-card" draggable="true" ondragstart="drag(event)" id="quote-6" data-status="won">
-                                        <div class="quote-id">DBT-20000301</div>
-                                        <div class="quote-client">Ankara Belediyesi</div>
-                                        <div class="quote-details">
-                                            <span>02.12.2024</span>
-                                            <span class="quote-amount">92.300,00 TL</span>
-                                        </div>
+                                    <div class="column-body" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                                        @foreach (var teklif in Model.Where(t => t.Durum == "Gönderildi"))
+                                        {
+                                            <div class="quote-card"
+                                                 draggable="true"
+                                                 ondragstart="drag(event)"
+                                                 data-teklif-id="@teklif.TeklifNo"
+                                                 data-status="Gönderildi"
+                                                 onclick="showDetail('@teklif.TeklifNo', '@Html.Raw(teklif.Kime)', '@Html.Raw(teklif.Konu)', '@teklif.ToplamFormatted', '@teklif.TarihFormatted', 'Gönderildi')">
+                                                <div class="quote-id">@teklif.TeklifNo</div>
+                                                <div class="quote-client">@teklif.Kime</div>
+                                                <div class="quote-amount">@teklif.ToplamFormatted</div>
+                                            </div>
+                                        }
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Kaybedilen Teklifler -->
-                            <div class="pipeline-column pink-column" id="lost">
-                                <div class="column-header">
-                                    <span>Kaybedilen Teklifler</span>
-                                    <span class="column-count">1</span>
-                                </div>
-                                <div class="column-body" ondragover="allowDrop(event)" ondrop="drop(event, 'lost')">
-                                    <div class="quote-card" draggable="true" ondragstart="drag(event)" id="quote-4" data-status="lost">
-                                        <div class="quote-id">DBT-20000299</div>
-                                        <div class="quote-client">İzmir Holding</div>
-                                        <div class="quote-details">
-                                            <span>29.11.2024</span>
-                                            <span class="quote-amount">28.750,00 TL</span>
-                                        </div>
+                                <!-- Kazanıldı -->
+                                <div class="pipeline-column kazanildi" data-status="Kazanıldı">
+                                    <div class="column-header">
+                                        <span>Kazanıldı</span>
+                                        <span class="column-count">@Model.Count(t => t.Durum == "Kazanıldı")</span>
+                                    </div>
+                                    <div class="column-body" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                                        @foreach (var teklif in Model.Where(t => t.Durum == "Kazanıldı"))
+                                        {
+                                            <div class="quote-card"
+                                                 draggable="true"
+                                                 ondragstart="drag(event)"
+                                                 data-teklif-id="@teklif.TeklifNo"
+                                                 data-status="Kazanıldı"
+                                                 onclick="showDetail('@teklif.TeklifNo', '@Html.Raw(teklif.Kime)', '@Html.Raw(teklif.Konu)', '@teklif.ToplamFormatted', '@teklif.TarihFormatted', 'Kazanıldı')">
+                                                <div class="quote-id">@teklif.TeklifNo</div>
+                                                <div class="quote-client">@teklif.Kime</div>
+                                                <div class="quote-amount">@teklif.ToplamFormatted</div>
+                                            </div>
+                                        }
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Ertelenen Teklifler -->
-                            <div class="pipeline-column purple-column" id="postponed">
-                                <div class="column-header">
-                                    <span>Ertelenen Teklifler</span>
-                                    <span class="column-count">1</span>
-                                </div>
-                                <div class="column-body" ondragover="allowDrop(event)" ondrop="drop(event, 'postponed')">
-                                    <div class="quote-card" draggable="true" ondragstart="drag(event)" id="quote-5" data-status="postponed">
-                                        <div class="quote-id">DBT-20000305</div>
-                                        <div class="quote-client">Marmara Üniversitesi</div>
-                                        <div class="quote-details">
-                                            <span>04.12.2024</span>
-                                            <span class="quote-amount">52.800,00 TL</span>
-                                        </div>
+                                <!-- Kaybedildi -->
+                                <div class="pipeline-column kaybedildi" data-status="Kaybedildi">
+                                    <div class="column-header">
+                                        <span>Kaybedildi</span>
+                                        <span class="column-count">@Model.Count(t => t.Durum == "Kaybedildi")</span>
+                                    </div>
+                                    <div class="column-body" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                                        @foreach (var teklif in Model.Where(t => t.Durum == "Kaybedildi"))
+                                        {
+                                            <div class="quote-card"
+                                                 draggable="true"
+                                                 ondragstart="drag(event)"
+                                                 data-teklif-id="@teklif.TeklifNo"
+                                                 data-status="Kaybedildi"
+                                                 onclick="showDetail('@teklif.TeklifNo', '@Html.Raw(teklif.Kime)', '@Html.Raw(teklif.Konu)', '@teklif.ToplamFormatted', '@teklif.TarihFormatted', 'Kaybedildi')">
+                                                <div class="quote-id">@teklif.TeklifNo</div>
+                                                <div class="quote-client">@teklif.Kime</div>
+                                                <div class="quote-amount">@teklif.ToplamFormatted</div>
+                                            </div>
+                                        }
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- İptal Edilen Teklifler -->
-                            <div class="pipeline-column orange-column" id="canceled">
-                                <div class="column-header">
-                                    <span>İptal Edilen Teklifler</span>
-                                    <span class="column-count">2</span>
-                                </div>
-                                <div class="column-body" ondragover="allowDrop(event)" ondrop="drop(event, 'canceled')">
-                                    <div class="quote-card" draggable="true" ondragstart="drag(event)" id="quote-7" data-status="canceled">
-                                        <div class="quote-id">DBT-20000287</div>
-                                        <div class="quote-client">Finansbank</div>
-                                        <div class="quote-details">
-                                            <span>25.11.2024</span>
-                                            <span class="quote-amount">18.500,00 TL</span>
-                                        </div>
+                                <!-- Ertelendi -->
+                                <div class="pipeline-column ertelendi" data-status="Ertelendi">
+                                    <div class="column-header">
+                                        <span>Ertelendi</span>
+                                        <span class="column-count">@Model.Count(t => t.Durum == "Ertelendi")</span>
                                     </div>
-                                    <div class="quote-card" draggable="true" ondragstart="drag(event)" id="quote-8" data-status="canceled">
-                                        <div class="quote-id">DBT-20000265</div>
-                                        <div class="quote-client">Bahçeşehir Koleji</div>
-                                        <div class="quote-details">
-                                            <span>18.11.2024</span>
-                                            <span class="quote-amount">15.750,00 TL</span>
-                                        </div>
+                                    <div class="column-body" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                                        @foreach (var teklif in Model.Where(t => t.Durum == "Ertelendi"))
+                                        {
+                                            <div class="quote-card"
+                                                 draggable="true"
+                                                 ondragstart="drag(event)"
+                                                 data-teklif-id="@teklif.TeklifNo"
+                                                 data-status="Ertelendi"
+                                                 onclick="showDetail('@teklif.TeklifNo', '@Html.Raw(teklif.Kime)', '@Html.Raw(teklif.Konu)', '@teklif.ToplamFormatted', '@teklif.TarihFormatted', 'Ertelendi')">
+                                                <div class="quote-id">@teklif.TeklifNo</div>
+                                                <div class="quote-client">@teklif.Kime</div>
+                                                <div class="quote-amount">@teklif.ToplamFormatted</div>
+                                            </div>
+                                        }
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="sidebar" id="sidebar">
+                    <div class="sidebar-header">
+                        <h4 class="sidebar-title">Teklif Detayı</h4>
+                        <button class="close-btn" onclick="closeSidebar()">×</button>
+                    </div>
+
+                    <!-- Sidebar Controls -->
+                    <div class="sidebar-controls">
+                        <!-- Normal durum güncelleme kontrolü -->
+                        <div id="normalControls" class="control-group">
+                            <div class="status-dropdown-wrapper">
+                                <select id="statusDropdown" class="status-dropdown" onchange="updateConvertButton()">
+                                    <option value="">Durum Seç</option>
+                                    <option value="taslak">Taslak</option>
+                                    <option value="gonderildi">Gönderildi</option>
+                                    <option value="kazanildi">Kazanıldı</option>
+                                    <option value="kaybedildi">Kaybedildi</option>
+                                    <option value="ertelendi">Ertelendi</option>
+                                    <option value="iptal">İptal Edildi</option>
+                                </select>
+                            </div>
+
+                            <button id="convertBtn" class="convert-btn" disabled onclick="convertTeklif()">
+                                <i class="fas fa-sync-alt"></i>
+                                Güncelle
+                            </button>
+                        </div>
+
+                        <!-- Kazanıldı durumu için özel dönüştürme kontrolü -->
+                        <div id="convertControls" class="control-group" style="display: none;">
+                            <div class="convert-dropdown-wrapper">
+                                <select id="convertTypeDropdown" class="convert-dropdown">
+                                    <option value="">Dönüştür</option>
+                                    <option value="proforma">Proformaya Dönüştür</option>
+                                    <option value="siparis">Siparişe Dönüştür</option>
+                                </select>
+                            </div>
+
+                            <button id="executeConvertBtn" class="convert-action-btn" onclick="executeConvert()">
+                                <i class="fas fa-arrow-right"></i>
+                                Dönüştür
+                            </button>
+                        </div>
+
+                        <!-- Diğer işlemler -->
+                        <div class="other-actions-dropdown">
+                            <select id="otherActions" class="other-dropdown" onchange="handleOtherAction()">
+                                <option value="">Diğer</option>
+                                <option value="pdf">PDF İndir</option>
+                                <option value="print">Yazdır</option>
+                                <option value="copy">Kopyala</option>
+                                <option value="delete">Sil</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-content">
+                        <!-- Temel Bilgiler -->
+                        <div class="detail-section">
+                            <div class="section-title">Temel Bilgiler</div>
+                            <div class="detail-row">
+                                <span class="detail-label">Teklif No:</span>
+                                <span class="detail-value" id="detail-no"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Firma:</span>
+                                <span class="detail-value" id="detail-firma"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Konu:</span>
+                                <span class="detail-value" id="detail-konu"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Durum:</span>
+                                <span class="detail-value" id="detail-durum"></span>
+                            </div>
+                        </div>
+
+                        <!-- Mali Bilgiler -->
+                        <div class="detail-section">
+                            <div class="section-title">Mali Bilgiler</div>
+                            <div class="detail-row">
+                                <span class="detail-label">Tutar:</span>
+                                <span class="detail-value amount" id="detail-tutar"></span>
+                            </div>
+                        
+                            <div class="detail-row">
+                                <span class="detail-label">Toplam:</span>
+                                <span class="detail-value amount" id="detail-toplam"></span>
+                            </div>
+                        </div>
+
+                        <!-- Tarih Bilgileri -->
+                        <div class="detail-section">
+                            <div class="section-title">Tarih Bilgileri</div>
+                            <div class="detail-row">
+                                <span class="detail-label">Tarih:</span>
+                                <span class="detail-value" id="detail-tarih"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Oluşturma:</span>
+                                <span class="detail-value" id="detail-olusturma">Bugün</span>
+                            </div>
+                        </div>
+
+                        <!-- Satır Bilgileri -->
+                        <div class="detail-section">
+                            <div class="section-title">Satır Bilgileri</div>
+                            <div id="detail-satirlar" class="detail-urunler-list"></div>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-actions">
+                        <button class="btn-outline" id="btnEdit">
+                            <i class="fas fa-edit"></i> Düzenle
+                        </button>
+                        <button class="btn-primary" id="btnPrint">
+                            <i class="fas fa-print"></i> Yazdır
+                        </button>
                     </div>
                 </div>
             </div>
@@ -547,186 +1285,886 @@
     </div>
 </div>
 
-<!-- Scriptler -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
-<script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
+<!-- Status Message -->
+<div id="statusMessage" class="status-message"></div>
 
+@functions {
+    string GetStatusClass(string durum)
+    {
+        return durum switch
+        {
+            "Taslak" or "" or null => "taslak",
+            "Gönderildi" => "gonderildi",
+            "Kazanıldı" => "kazanildi",
+            "Kaybedildi" => "kaybedildi",
+            "Ertelendi" => "ertelendi",
+            "İptal Edildi" => "iptal",
+            _ => "taslak"
+        };
+    }
+}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        let table = new DataTable('#example');
+        $(document).ready(function() {
+        $('#teklifTable').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/tr.json"
+            },
+            "order": [[4, "desc"]],
+            "pageLength": 25,
+            "columnDefs": [
+                { "orderable": false, "targets": 6 }
+            ]
+        });
 
-        // Sayfa yüklendiğinde metrik kartlarını güncelle
-        updateMetricCards();
+        closeSidebar();
     });
-</script>
 
-<script>
-    $('#example').DataTable({
-        "dom": '<"row"<"col-sm-12"B>>' +
-            '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
-            't' +
-            '<"row"<"col-sm-6"i><"col-sm-6"p>>',
-        "language": {
-            "url": "/Content/DataTables/turkish.json"
-        },
-        "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'], // Butonlar
-        "columnDefs": [
-            { "targets": "_all" } // Kolon genişliklerini sabitleme
-        ]
-    });
-</script>
+    // Tab Switching
+    function switchTab(tab) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
-<!-- Tab fonksiyonları için script -->
-<script>
-    function openTab(tabId) {
-        // Tüm tab içeriklerini gizle
-        let tabContents = document.getElementsByClassName('tab-content');
-        for (let i = 0; i < tabContents.length; i++) {
-            tabContents[i].classList.remove('active');
-        }
-
-        // Tüm tab butonlarının active class'ını kaldır
-        let tabButtons = document.getElementsByClassName('tab-button');
-        for (let i = 0; i < tabButtons.length; i++) {
-            tabButtons[i].classList.remove('active');
-        }
-
-        // Seçilen tab'ı ve butonunu aktifleştir
-        document.getElementById(tabId).classList.add('active');
-
-        // Tıklanan butonu bul ve aktifleştir
-        let clickedButton;
-        if (tabId === 'list-tab') {
-            clickedButton = document.getElementsByClassName('tab-button')[0];
-        } else {
-            clickedButton = document.getElementsByClassName('tab-button')[1];
-        }
-        clickedButton.classList.add('active');
+        event.target.classList.add('active');
+        document.getElementById(tab + '-content').classList.add('active');
     }
 
-    // Sürükleme işlemleri için değişkenler
-    let draggedElementOldStatus = '';
+    // Sidebar Controls
+    function updateConvertButton() {
+        const statusDropdown = document.getElementById('statusDropdown');
+        const convertBtn = document.getElementById('convertBtn');
 
-    // Sürükle bırak fonksiyonları
+        if (statusDropdown.value && currentTeklifNo) {
+            convertBtn.disabled = false;
+            convertBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Güncelle';
+        } else {
+            convertBtn.disabled = true;
+            convertBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Güncelle';
+        }
+
+        statusDropdown.className = 'status-dropdown ' + (statusDropdown.value || '');
+    }
+
+    function convertTeklif() {
+        if (!currentTeklifNo || !document.getElementById('statusDropdown').value) {
+            showStatusMessage('Lütfen bir durum seçin', 'error');
+            return;
+        }
+
+        const yeniDurum = document.getElementById('statusDropdown').value;
+        const teklifNo = currentTeklifNo;
+
+        const durumMapping = {
+            'taslak': 'Taslak',
+            'gonderildi': 'Gönderildi',
+            'kazanildi': 'Kazanıldı',
+            'kaybedildi': 'Kaybedildi',
+            'ertelendi': 'Ertelendi',
+            'iptal': 'İptal Edildi'
+        };
+
+        const yeniDurumText = durumMapping[yeniDurum] || yeniDurum;
+
+        if (!confirm(`Teklif durumunu "${yeniDurumText}" olarak güncellemek istediğinizden emin misiniz?`)) {
+            return;
+        }
+
+        const convertBtn = document.getElementById('convertBtn');
+        const originalText = convertBtn.innerHTML;
+        convertBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Güncelleniyor...';
+        convertBtn.disabled = true;
+
+        $.ajax({
+            url: '/crm/TeklifDurumGuncelle',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                teklifId: teklifNo,
+                yeniDurum: yeniDurumText
+            }),
+            success: function(response) {
+                if (response.success) {
+                    showStatusMessage('Teklif durumu başarıyla güncellendi', 'success');
+
+                    // UI'yi dinamik olarak güncelle
+                    updateUIAfterStatusChange(teklifNo, yeniDurumText);
+
+                    // Sidebar'daki durum bilgisini güncelle
+                    document.getElementById('detail-durum').innerHTML =
+                        `<span class="status-badge status-${getStatusClass(yeniDurumText)}">${yeniDurumText}</span>`;
+
+                    // Dropdown'ı temizle
+                    document.getElementById('statusDropdown').value = '';
+                    updateConvertButton();
+
+                } else {
+                    showStatusMessage('Hata: ' + response.message, 'error');
+                }
+            },
+            error: function() {
+                showStatusMessage('Durum güncellenirken bir hata oluştu', 'error');
+            },
+            complete: function() {
+                convertBtn.innerHTML = originalText;
+                convertBtn.disabled = false;
+            }
+        });
+    }
+
+    function executeConvert() {
+        const convertType = document.getElementById('convertTypeDropdown').value;
+
+        if (!convertType || !currentTeklifNo) {
+            showStatusMessage('Lütfen dönüştürme türünü seçin', 'error');
+            return;
+        }
+
+        const convertText = convertType === 'proforma' ? 'Proformaya' : 'Siparişe';
+
+        if (!confirm(`Bu teklifi ${convertText.toLowerCase()} dönüştürmek istediğinizden emin misiniz?`)) {
+            return;
+        }
+
+        const convertBtn = document.getElementById('executeConvertBtn');
+        const originalText = convertBtn.innerHTML;
+        convertBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Dönüştürülüyor...';
+        convertBtn.disabled = true;
+
+        $.ajax({
+            url: '/crm/TeklifDonustur',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                teklifId: currentTeklifNo,
+                donusturTuru: convertType
+            }),
+            success: function(response) {
+                if (response.success) {
+                    showStatusMessage(`Teklif başarıyla ${convertText.toLowerCase()} dönüştürüldü`, 'success');
+                    showConversionSuccess(convertType, response.yeniEvrakId);
+                    document.getElementById('convertTypeDropdown').value = '';
+                } else {
+                    showStatusMessage('Hata: ' + response.message, 'error');
+                }
+            },
+            error: function() {
+                showStatusMessage('Dönüştürme işleminde bir hata oluştu', 'error');
+            },
+            complete: function() {
+                convertBtn.innerHTML = originalText;
+                convertBtn.disabled = false;
+            }
+        });
+    }
+
+    function showConversionSuccess(convertType, yeniEvrakId) {
+        const convertText = convertType === 'proforma' ? 'Proforma' : 'Sipariş';
+        const targetPage = convertType === 'proforma' ? 'proforma' : 'siparis';
+
+        const dialog = document.createElement('div');
+        dialog.className = 'conversion-success-dialog';
+        dialog.innerHTML = `
+            <div class="dialog-content">
+                <div class="dialog-header">
+                    <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                    <h4>Dönüştürme Başarılı!</h4>
+                </div>
+                <div class="dialog-body">
+                    <p>${convertText} başarıyla oluşturuldu.</p>
+                    <p><strong>Belge No:</strong> ${yeniEvrakId}</p>
+                </div>
+                <div class="dialog-actions">
+                    <button class="btn-secondary" onclick="closeConversionDialog()">Kapat</button>
+                    <button class="btn-primary" onclick="openNewDocument('/${targetPage}/${yeniEvrakId}')">
+                        <i class="fas fa-external-link-alt"></i> Belgeyi Görüntüle
+                    </button>
+                </div>
+            </div>
+        `;
+
+        if (!document.getElementById('conversion-dialog-styles')) {
+            const styles = document.createElement('style');
+            styles.id = 'conversion-dialog-styles';
+            styles.textContent = `
+                .conversion-success-dialog {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0,0,0,0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 10000;
+                    animation: fadeIn 0.3s ease;
+                }
+
+                .dialog-content {
+                    background: white;
+                    border-radius: 12px;
+                    padding: 0;
+                    max-width: 400px;
+                    width: 90%;
+                    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+                    animation: slideUp 0.3s ease;
+                }
+
+                .dialog-header {
+                    padding: 20px;
+                    border-bottom: 1px solid #e9ecef;
+                    text-align: center;
+                }
+
+                .dialog-header i {
+                    font-size: 2rem;
+                    margin-bottom: 10px;
+                }
+
+                .dialog-header h4 {
+                    margin: 0;
+                    color: #333;
+                }
+
+                .dialog-body {
+                    padding: 20px;
+                    text-align: center;
+                }
+
+                .dialog-actions {
+                    padding: 15px 20px;
+                    border-top: 1px solid #e9ecef;
+                    display: flex;
+                    gap: 10px;
+                    justify-content: flex-end;
+                }
+
+                .btn-secondary, .btn-primary {
+                    padding: 8px 16px;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-size: 0.9rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                }
+
+                .btn-secondary {
+                    background: #6c757d;
+                    color: white;
+                }
+
+                .btn-primary {
+                    background: #007bff;
+                    color: white;
+                }
+
+                @@keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+
+                @@keyframes slideUp {
+                    from { transform: translateY(30px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(styles);
+        }
+
+        document.body.appendChild(dialog);
+    }
+
+    function closeConversionDialog() {
+        const dialog = document.querySelector('.conversion-success-dialog');
+        if (dialog) {
+            dialog.remove();
+        }
+    }
+
+    function openNewDocument(url) {
+        window.open(url, '_blank');
+        closeConversionDialog();
+    }
+
+    function handleOtherAction() {
+        const action = document.getElementById('otherActions').value;
+
+        if (!action || !currentTeklifNo) return;
+
+        switch(action) {
+            case 'pdf':
+                window.open(`/crm/teklifyazdir/${currentTeklifNo}?format=pdf`, '_blank');
+                break;
+            case 'print':
+                window.open(`/crm/teklifyazdir/${currentTeklifNo}`, '_blank');
+                break;
+            case 'copy':
+                window.location.href = `/crm/fiyatteklif?copy=${currentTeklifNo}`;
+                break;
+            case 'delete':
+                if (confirm('Bu teklifi silmek istediğinizden emin misiniz?')) {
+                    deleteTeklif(currentTeklifNo);
+                }
+                break;
+        }
+
+        document.getElementById('otherActions').value = '';
+    }
+
+    function deleteTeklif(teklifNo) {
+        $.ajax({
+            url: `/crm/teklif/${teklifNo}`,
+            method: 'DELETE',
+            success: function(response) {
+                if (response.success) {
+                    showStatusMessage('Teklif başarıyla silindi', 'success');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    showStatusMessage('Hata: ' + response.message, 'error');
+                }
+            },
+            error: function() {
+                showStatusMessage('Teklif silinirken bir hata oluştu', 'error');
+            }
+        });
+    }
+
+    // Drag and Drop Functions
     function allowDrop(ev) {
         ev.preventDefault();
-        // Bırakma alanını vurgula
-        ev.currentTarget.classList.add('drop-highlight');
-    }
 
-    function drag(ev) {
-        // Sürüklenen elemanın önceki durumunu kaydet
-        draggedElementOldStatus = ev.target.getAttribute('data-status');
-        ev.dataTransfer.setData("text", ev.target.id);
-        // Sürükleme efekti
-        ev.target.style.opacity = "0.4";
-    }
-
-    function drop(ev, targetStatus) {
-        ev.preventDefault();
-        const data = ev.dataTransfer.getData("text");
-        const draggedElement = document.getElementById(data);
-
-        // Elemanın önceki durumunu kaydet
-        const oldStatus = draggedElement.getAttribute('data-status');
-
-        // Elemanı orijinal konumundan kaldır
-        draggedElement.parentNode.removeChild(draggedElement);
-
-        // Elemanı yeni konuma ekle
-        ev.currentTarget.appendChild(draggedElement);
-
-        // Opacity'yi sıfırla
-        draggedElement.style.opacity = "1";
-
-        // Vurgulamayı kaldır
-        ev.currentTarget.classList.remove('drop-highlight');
-
-        // Durumu güncelle
-        draggedElement.setAttribute('data-status', targetStatus);
-
-        // Sayaçları güncelle
-        updateCounters();
-
-        // Metrik kartlarını güncelle
-        updateMetricCards(oldStatus, targetStatus);
-
-        // Normalde burada veritabanını güncellemek için AJAX isteği gönderilebilir
-        console.log(`Teklif ${data} durumu '${oldStatus}' -> '${targetStatus}' olarak güncellendi`);
+        const column = ev.currentTarget.closest('.pipeline-column');
+        if (!column.classList.contains('drag-over')) {
+            column.classList.add('drag-over');
+        }
     }
 
     function dragLeave(ev) {
-        // Sürükleme alanından çıkıldığında vurgulamayı kaldır
-        ev.currentTarget.classList.remove('drop-highlight');
-    }
-
-    function updateCounters() {
-        // Tüm pipeline sütunlarını al
-        const columns = document.querySelectorAll('.pipeline-column');
-
-        // Her sütun için sayacı güncelle
-        columns.forEach(column => {
-            const cards = column.querySelectorAll('.quote-card').length;
-            const counter = column.querySelector('.column-count');
-            counter.textContent = cards;
-        });
-    }
-
-    function updateMetricCards(oldStatus, newStatus) {
-        // Pipeline kolonlarındaki toplam teklif sayılarını al
-        const openQuotes = document.querySelectorAll('#open .quote-card').length;
-        const wonQuotes = document.querySelectorAll('#won .quote-card').length;
-        const lostQuotes = document.querySelectorAll('#lost .quote-card').length;
-        const postponedQuotes = document.querySelectorAll('#postponed .quote-card').length;
-        const canceledQuotes = document.querySelectorAll('#canceled .quote-card').length;
-        const totalQuotes = openQuotes + wonQuotes + lostQuotes + postponedQuotes + canceledQuotes;
-
-        // Metrik kartlarını güncelle
-        updateMetricValue('total-quotes', totalQuotes);
-        updateMetricValue('open-quotes', openQuotes);
-        updateMetricValue('won-quotes', wonQuotes);
-        updateMetricValue('lost-quotes', lostQuotes);
-        updateMetricValue('postponed-quotes', postponedQuotes);
-        updateMetricValue('canceled-quotes', canceledQuotes);
-
-        // Değişen metrik kartlarına animasyon ekle
-        if (oldStatus && newStatus && oldStatus !== newStatus) {
-            const oldCard = document.getElementById(`${oldStatus}-quotes`);
-            const newCard = document.getElementById(`${newStatus}-quotes`);
-
-            if (oldCard) {
-                const valueElement = oldCard.querySelector('.metric-value');
-                valueElement.classList.add('value-change');
-                setTimeout(() => {
-                    valueElement.classList.remove('value-change');
-                }, 500);
-            }
-
-            if (newCard) {
-                const valueElement = newCard.querySelector('.metric-value');
-                valueElement.classList.add('value-change');
-                setTimeout(() => {
-                    valueElement.classList.remove('value-change');
-                }, 500);
-            }
+        const column = ev.currentTarget.closest('.pipeline-column');
+        if (!column.contains(ev.relatedTarget)) {
+            column.classList.remove('drag-over');
         }
     }
 
-    function updateMetricValue(cardId, value) {
-        const valueElement = document.querySelector(`#${cardId} .metric-value`);
-        if (valueElement) {
-            valueElement.textContent = value;
-        }
+    function drag(ev) {
+        draggedElement = ev.target;
+        ev.target.classList.add('dragging');
+        ev.dataTransfer.setData("text", ev.target.getAttribute('data-teklif-id'));
+        ev.dataTransfer.effectAllowed = "move";
     }
 
-    // Drag leave için event listener'ları ekle
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.column-body').forEach(column => {
-            column.addEventListener('dragleave', dragLeave);
+    function drop(ev) {
+        ev.preventDefault();
+
+        document.querySelectorAll('.pipeline-column').forEach(col => {
+            col.classList.remove('drag-over');
         });
 
-        // Sayfa yüklendiğinde metrik kartlarını güncelle
-        updateMetricCards();
+        const data = ev.dataTransfer.getData("text");
+        const draggedCard = document.querySelector(`[data-teklif-id="${data}"]`);
+        const targetColumn = ev.currentTarget.closest('.pipeline-column');
+        const newStatus = targetColumn.getAttribute('data-status');
+        const oldStatus = draggedCard.getAttribute('data-status');
+
+        if (newStatus === oldStatus) {
+            draggedCard.classList.remove('dragging');
+            return;
+        }
+
+        draggedCard.classList.add('updating');
+
+        updateTeklifStatusDragDrop(data, newStatus, draggedCard, targetColumn);
+    }
+
+    function updateTeklifStatusDragDrop(teklifId, yeniDurum, cardElement, targetColumn) {
+        $.ajax({
+            url: '/crm/TeklifDurumGuncelle',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                teklifId: teklifId,
+                yeniDurum: yeniDurum
+            }),
+            success: function(response) {
+                if (response.success) {
+                    targetColumn.querySelector('.column-body').appendChild(cardElement);
+                    cardElement.setAttribute('data-status', yeniDurum);
+                    cardElement.classList.remove('dragging', 'updating');
+                    updateColumnCounts();
+                    showStatusMessage('Teklif durumu güncellendi', 'success');
+                } else {
+                    cardElement.classList.remove('dragging', 'updating');
+                    showStatusMessage('Hata: ' + response.message, 'error');
+                }
+            },
+            error: function() {
+                cardElement.classList.remove('dragging', 'updating');
+                showStatusMessage('Durum güncellenirken bir hata oluştu', 'error');
+            }
+        });
+    }
+
+    function updateColumnCounts() {
+        document.querySelectorAll('.pipeline-column').forEach(column => {
+            const count = column.querySelectorAll('.quote-card').length;
+            const countElement = column.querySelector('.column-count');
+            if (countElement) {
+                // Sayı değişikliği animasyonu
+                countElement.style.transform = 'scale(1.3)';
+                countElement.style.backgroundColor = 'rgba(255,255,255,0.8)';
+                countElement.textContent = count;
+
+                setTimeout(() => {
+                    countElement.style.transform = '';
+                    countElement.style.backgroundColor = 'rgba(255,255,255,0.3)';
+                }, 300);
+            }
+        });
+    }
+
+    document.addEventListener('dragend', function(e) {
+        if (e.target.classList.contains('quote-card')) {
+            e.target.classList.remove('dragging');
+            document.querySelectorAll('.pipeline-column').forEach(col => {
+                col.classList.remove('drag-over');
+            });
+        }
     });
+
+    // Show Detail Function
+    function showDetail(no, firma, konu, tutar, tarih, durum) {
+        currentTeklifNo = no;
+        currentTeklifStatus = durum;
+
+        console.log('showDetail çağrıldı - TeklifNo:', no, 'Durum:', durum);
+
+        document.querySelectorAll('.data-table tbody tr, .quote-card').forEach(el => {
+            el.classList.remove('selected');
+        });
+        event.currentTarget.classList.add('selected');
+
+        const sidebar = document.getElementById('sidebar');
+        sidebar.style.display = 'block';
+        sidebar.classList.add('open');
+
+        document.getElementById('mainContainer').classList.add('sidebar-open');
+
+        document.getElementById('detail-no').textContent = no;
+        document.getElementById('detail-firma').textContent = firma;
+        document.getElementById('detail-konu').textContent = konu;
+        document.getElementById('detail-durum').innerHTML = `<span class="status-badge status-${getStatusClass(durum)}">${durum}</span>`;
+        document.getElementById('detail-tutar').textContent = tutar;
+        document.getElementById('detail-tarih').textContent = tarih;
+
+        const tutarSayi = parseFloat(tutar.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+
+        const toplam = tutarSayi ;
+
+
+        document.getElementById('detail-toplam').textContent = formatCurrency(toplam);
+
+        setupSidebarControls(durum);
+
+        $.ajax({
+            url: `/crm/teklifdetay/${no}`,
+            method: 'GET',
+            success: function(response) {
+                if (response.success && response.data && response.data.length > 0) {
+                    let satirlarHtml = '<div class="detail-urunler-list">';
+                    response.data.forEach(satir => {
+                        satirlarHtml += `
+                            <div class="detail-urun">
+                                ${satir.imageData
+                                    ? `<img src="data:image/jpeg;base64,${satir.imageData}" class="detail-urun-image" alt="${satir.stokAdi}">`
+                                    : `<div class="detail-urun-no-image">Fotoğraf Yok</div>`}
+                                <div>
+                                    <span class="detail-urun-label">${satir.stokAdi || 'Bilinmeyen Ürün'}</span>
+                                    <span class="detail-urun-value">
+                                        ${satir.miktar} x ${formatCurrency(satir.birimFiyat)} = ${formatCurrency(satir.toplam)}
+                                        ${satir.aciklama ? '<br><small>' + satir.aciklama + '</small>' : ''}
+                                    </span>
+                                </div>
+                            </div>`;
+                    });
+                    satirlarHtml += '</div>';
+                    document.getElementById('detail-satirlar').innerHTML = satirlarHtml;
+                } else {
+                    document.getElementById('detail-satirlar').innerHTML = '<div class="detail-urun">Satır bulunamadı.</div>';
+                }
+            },
+            error: function() {
+                document.getElementById('detail-satirlar').innerHTML = '<div class="detail-urun">Satır bilgileri yüklenirken hata oluştu.</div>';
+            }
+        });
+
+        document.getElementById('btnEdit').onclick = () => editTeklif(no);
+        document.getElementById('btnPrint').onclick = () => printTeklif(no);
+    }
+
+    function setupSidebarControls(durum) {
+        const normalControls = document.getElementById('normalControls');
+        const convertControls = document.getElementById('convertControls');
+        const statusDropdown = document.getElementById('statusDropdown');
+        const convertTypeDropdown = document.getElementById('convertTypeDropdown');
+
+        // Animasyonlu geçiş
+        if (durum === 'Kazanıldı') {
+            normalControls.style.opacity = '0';
+            setTimeout(() => {
+                normalControls.style.display = 'none';
+                convertControls.style.display = 'flex';
+                convertControls.style.opacity = '0';
+                setTimeout(() => {
+                    convertControls.style.opacity = '1';
+                }, 50);
+            }, 150);
+            convertTypeDropdown.value = '';
+        } else {
+            convertControls.style.opacity = '0';
+            setTimeout(() => {
+                convertControls.style.display = 'none';
+                normalControls.style.display = 'flex';
+                normalControls.style.opacity = '0';
+                setTimeout(() => {
+                    normalControls.style.opacity = '1';
+                }, 50);
+            }, 150);
+            statusDropdown.value = '';
+            updateConvertButton();
+        }
+    }
+    function updateMetrics(yeniDurum, eskiDurum) {
+        // Eski durumdan çıkar
+        if (eskiDurum && eskiDurum !== yeniDurum) {
+            decrementMetric(eskiDurum);
+        }
+
+        // Yeni duruma ekle
+        incrementMetric(yeniDurum);
+
+        // Animasyon efekti
+        const metrics = document.querySelectorAll('.metric');
+        metrics.forEach(metric => {
+            metric.style.transform = 'scale(1.05)';
+            metric.style.transition = 'transform 0.2s ease';
+            setTimeout(() => {
+                metric.style.transform = '';
+            }, 200);
+        });
+    }
+
+    function incrementMetric(durum) {
+        const metricSelectors = {
+            'Taslak': '.metric:nth-child(2) .metric-value',
+            'Gönderildi': '.metric:nth-child(3) .metric-value',
+            'Kazanıldı': '.metric:nth-child(4) .metric-value',
+            'Kaybedildi': '.metric:nth-child(5) .metric-value',
+            'Ertelendi': '.metric:nth-child(6) .metric-value'
+        };
+
+        const selector = metricSelectors[durum];
+        if (selector) {
+            const element = document.querySelector(selector);
+            if (element) {
+                const currentValue = parseInt(element.textContent);
+                element.textContent = currentValue + 1;
+
+                // Artış animasyonu
+                element.style.color = '#28a745';
+                element.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    element.style.color = '';
+                    element.style.transform = '';
+                }, 500);
+            }
+        }
+    }
+
+    function decrementMetric(durum) {
+        const metricSelectors = {
+            'Taslak': '.metric:nth-child(2) .metric-value',
+            'Gönderildi': '.metric:nth-child(3) .metric-value',
+            'Kazanıldı': '.metric:nth-child(4) .metric-value',
+            'Kaybedildi': '.metric:nth-child(5) .metric-value',
+            'Ertelendi': '.metric:nth-child(6) .metric-value'
+        };
+
+        const selector = metricSelectors[durum];
+        if (selector) {
+            const element = document.querySelector(selector);
+            if (element) {
+                const currentValue = parseInt(element.textContent);
+                if (currentValue > 0) {
+                    element.textContent = currentValue - 1;
+
+                    // Azalış animasyonu
+                    element.style.color = '#dc3545';
+                    element.style.transform = 'scale(0.8)';
+                    setTimeout(() => {
+                        element.style.color = '';
+                        element.style.transform = '';
+                    }, 500);
+                }
+            }
+        }
+    }
+
+    function updateUIAfterStatusChange(teklifNo, yeniDurum) {
+        const eskiDurum = currentTeklifStatus;
+
+        // Liste görünümünde güncelle
+        const listRow = document.querySelector(`tr[onclick*="${teklifNo}"]`);
+        if (listRow) {
+            const statusCell = listRow.querySelector('.status-badge');
+            if (statusCell) {
+                statusCell.className = `status-badge status-${getStatusClass(yeniDurum)}`;
+                statusCell.textContent = yeniDurum;
+                listRow.style.backgroundColor = '#e8f5e8';
+                setTimeout(() => {
+                    listRow.style.backgroundColor = '';
+                }, 2000);
+            }
+
+            // onclick attributunu güncelle
+            const onclick = listRow.getAttribute('onclick');
+            const updatedOnclick = onclick.replace(
+                new RegExp(`'${eskiDurum}'`),
+                `'${yeniDurum}'`
+            );
+            listRow.setAttribute('onclick', updatedOnclick);
+        }
+
+        // Pipeline görünümünde güncelle
+        const pipelineCard = document.querySelector(`[data-teklif-id="${teklifNo}"]`);
+        if (pipelineCard) {
+            const oldColumn = pipelineCard.closest('.pipeline-column');
+            const newColumn = document.querySelector(`[data-status="${yeniDurum}"]`);
+
+            if (newColumn && oldColumn !== newColumn) {
+                // Kartı animasyonla taşı
+                pipelineCard.style.transform = 'scale(0.9)';
+                pipelineCard.style.opacity = '0.7';
+
+                setTimeout(() => {
+                    const newColumnBody = newColumn.querySelector('.column-body');
+                    newColumnBody.appendChild(pipelineCard);
+                    pipelineCard.setAttribute('data-status', yeniDurum);
+
+                    // onclick attributunu güncelle
+                    const onclick = pipelineCard.getAttribute('onclick');
+                    if (onclick) {
+                        const updatedOnclick = onclick.replace(
+                            new RegExp(`'${eskiDurum}'`),
+                            `'${yeniDurum}'`
+                        );
+                        pipelineCard.setAttribute('onclick', updatedOnclick);
+                    }
+
+                    pipelineCard.style.transform = '';
+                    pipelineCard.style.opacity = '';
+                    pipelineCard.style.backgroundColor = '#e8f5e8';
+                    setTimeout(() => {
+                        pipelineCard.style.backgroundColor = '';
+                    }, 2000);
+                }, 300);
+            }
+        }
+
+        // Metrikleri güncelle
+        updateMetrics(yeniDurum, eskiDurum);
+
+        // Pipeline sütun sayılarını güncelle
+        updateColumnCounts();
+
+        // Sidebar kontrollerini yeniden düzenle
+        setupSidebarControls(yeniDurum);
+
+        // Global değişkeni güncelle
+        currentTeklifStatus = yeniDurum;
+    }
+
+    function editTeklif(teklifNo) {
+        console.log('editTeklif çağrıldı - TeklifNo:', teklifNo);
+        if (!teklifNo || teklifNo === 'undefined' || teklifNo === 'null') {
+            console.error('Geçersiz teklif numarası:', teklifNo);
+            alert('Teklif numarası bulunamadı. Lütfen sayfayı yenileyin ve tekrar deneyin.');
+            return;
+        }
+
+        window.location.href = `/crm/teklifduzenle/${String(teklifNo)}`;
+    }
+
+    function printTeklif(teklifNo) {
+        console.log('printTeklif çağrıldı - TeklifNo:', teklifNo);
+        if (!teklifNo) {
+            alert('Teklif numarası bulunamadı');
+            return;
+        }
+        window.open(`/crm/teklifyazdir/${teklifNo}`, '_blank');
+    }
+
+    function getStatusClass(durum) {
+        switch (durum) {
+            case 'Taslak': return 'taslak';
+            case 'Gönderildi': return 'gonderildi';
+            case 'Kazanıldı': return 'kazanildi';
+            case 'Kaybedildi': return 'kaybedildi';
+            case 'Ertelendi': return 'ertelendi';
+            case 'İptal Edildi': return 'iptal';
+            default: return 'taslak';
+        }
+    }
+
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('tr-TR', {
+            style: 'currency',
+            currency: 'TRY'
+        }).format(amount || 0);
+    }
+
+    function showStatusMessage(message, type) {
+        const messageEl = document.getElementById('statusMessage');
+        messageEl.textContent = message;
+        messageEl.className = `status-message ${type}`;
+        messageEl.classList.add('show');
+
+        const autoCloseTime = type === 'success' ? 3000 : 5000;
+
+        setTimeout(() => {
+            messageEl.classList.remove('show');
+        }, autoCloseTime);
+    }
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeSidebar();
+        }
+    });
+
+    document.addEventListener('click', function(event) {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar.classList.contains('open') &&
+            !sidebar.contains(event.target) &&
+            !event.target.closest('.data-table tbody tr') &&
+            !event.target.closest('.quote-card')) {
+            closeSidebar();
+        }
+    });
+
+    function closeSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContainer = document.getElementById('mainContainer');
+
+        sidebar.classList.remove('open');
+        mainContainer.classList.remove('sidebar-open');
+
+        setTimeout(() => {
+            if (!sidebar.classList.contains('open')) {
+                sidebar.style.display = 'none';
+            }
+        }, 300);
+
+        document.querySelectorAll('.data-table tbody tr, .quote-card').forEach(el => {
+            el.classList.remove('selected');
+        });
+
+        currentTeklifNo = null;
+        currentTeklifStatus = null;
+    }
+
+    let currentTeklifNo = null;
+    let currentTeklifStatus = null;
+    let draggedElement = null;
+
+    window.debugTeklif = {
+        checkGlobals: function() {
+            console.log('=== GLOBAL DEĞİŞKENLER ===');
+            console.log('currentTeklifNo:', currentTeklifNo);
+            console.log('currentTeklifStatus:', currentTeklifStatus);
+            console.log('draggedElement:', draggedElement);
+        },
+
+        checkTableData: function() {
+            console.log('=== TABLO VERİLERİ ===');
+            const rows = document.querySelectorAll('.data-table tbody tr');
+            rows.forEach((row, index) => {
+                const onclick = row.getAttribute('onclick');
+                const teklifNo = row.querySelector('.teklif-no').textContent;
+                console.log(`Satır ${index + 1}: TeklifNo=${teklifNo}, onclick=${onclick}`);
+            });
+        },
+
+        checkPipelineData: function() {
+            console.log('=== PİPELİNE VERİLERİ ===');
+            const cards = document.querySelectorAll('.quote-card');
+            cards.forEach((card, index) => {
+                const teklifId = card.getAttribute('data-teklif-id');
+                const onclick = card.getAttribute('onclick');
+                console.log(`Kart ${index + 1}: TeklifId=${teklifId}, onclick=${onclick}`);
+            });
+        },
+
+        testEdit: function(teklifNo) {
+            console.log(`=== EDİT TEST: ${teklifNo} ===`);
+            console.log('TeklifNo tipi:', typeof teklifNo);
+            console.log('TeklifNo değeri:', teklifNo);
+
+            if (teklifNo) {
+                const url = `/crm/teklifduzenle/${teklifNo}`;
+                console.log('Oluşturulan URL:', url);
+                console.log('Test URL\'ini yeni sekmede açıyorum...');
+                window.open(url, '_blank');
+            } else {
+                console.error('TeklifNo boş veya undefined!');
+            }
+        },
+
+        testSidebarButtons: function() {
+            console.log('=== SİDEBAR BUTTON TEST ===');
+            const editBtn = document.getElementById('btnEdit');
+            const printBtn = document.getElementById('btnPrint');
+
+            console.log('Edit Button:', editBtn);
+            console.log('Edit Button onclick:', editBtn ? editBtn.onclick : 'Bulunamadı');
+            console.log('Print Button:', printBtn);
+            console.log('Print Button onclick:', printBtn ? printBtn.onclick : 'Bulunamadı');
+
+            console.log('currentTeklifNo:', currentTeklifNo);
+        },
+
+        testRoute: function(teklifNo) {
+            console.log('=== ROUTE TEST ===');
+            const testUrl = `/crm/teklifduzenle/${teklifNo}`;
+            console.log('Test URL:', testUrl);
+
+            $.ajax({
+                url: testUrl,
+                method: 'GET',
+                success: function(response) {
+                    console.log('Route başarılı - Response alındı');
+                    console.log('Response tipi:', typeof response);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Route hatası:');
+                    console.error('Status:', status);
+                    console.error('Error:', error);
+                    console.error('ResponseText:', xhr.responseText);
+                }
+            });
+        },
+
+        runAll: function() {
+            this.checkGlobals();
+            this.checkTableData();
+            this.checkPipelineData();
+            this.testSidebarButtons();
+        }
+    };
 </script>

@@ -965,147 +965,8 @@ public IActionResult HataliUretimler(DateTime? baslangicTarihi = null, DateTime?
             }
         }
 
-        [HttpPost]
-        [AllowAnonymous]
-        public JsonResult MalzemeTuketimi(string isEmriKodu, List<TuketimItem> tuketimListesi)
-        {
-            try
-            {
-                // Yetki kontrolü
-                if (!_faturaRepository.HasProductionPermission())
-                {
-                    return Json(new { success = false, message = "Tüketim yetkiniz bulunmamaktadır." });
-                }
-
-                // Boş liste kontrolü
-                if (tuketimListesi == null || !tuketimListesi.Any(t => t.Miktar > 0))
-                {
-                    return Json(new { success = false, message = "Tüketilecek malzeme seçilmedi." });
-                }
-
-                var sonuc = _faturaRepository.MalzemeTuketimi(isEmriKodu, tuketimListesi);
-                return Json(new { success = true, message = sonuc });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Malzeme tüketimi sırasında hata oluştu. İş Emri: {IsEmriKodu}", isEmriKodu);
-                return Json(new { success = false, message = "Tüketim işlemi sırasında bir hata oluştu: " + ex.Message });
-            }
-        }
-        // FaturaController.cs içine eklenecek action metodu
+    
    
-        public IActionResult Tuketim()
-        {
-            try
-            {
-                // Aktif durumu 1 olan ve planlanan (planlanmış durum 0) iş emirlerini getir
-                var aktifIsEmirleri = _faturaRepository.GetIsEmirleri()
-                    .Where(ie => ie.is_EmriDurumu == 1 || ie.is_EmriDurumu == 0)  // Aktif durum
-                    .OrderBy(ie => ie.UrunAdi)
-                    .ToList();
-
-                // Üretim yetkisini ViewBag'e ekle
-                ViewBag.HasProductionPermission = _faturaRepository.HasProductionPermission();
-
-                return View(aktifIsEmirleri);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Tüketim sayfası yüklenirken hata oluştu");
-                TempData["ErrorMessage"] = "Tüketim sayfası yüklenirken bir hata oluştu.";
-                return View("Error");
-            }
-        }
-
-        [AllowAnonymous]
-        public IActionResult GetIsEmirleri()
-        {
-            try
-            {
-                _logger.LogInformation("GetIsEmirleri API çağrıldı");
-
-                var isEmirleri = _faturaRepository.GetIsEmirleri();
-                var hasProductionPermission = _faturaRepository.HasProductionPermission();
-
-                var result = new
-                {
-                    success = true,
-                    isEmirleri = isEmirleri.Select(e => new
-                    {
-                        e.is_Guid,
-                        e.is_Kod,
-                        e.is_Ismi,
-                        e.is_EmriDurumu,
-                        e.is_BaslangicTarihi,
-                        UrunKodu = e.UrunKodu,
-                        UrunAdi = e.UrunAdi,
-                        Miktar = e.Miktar,
-                        IsMerkezi = e.IsMerkezi,
-                        
-                    }),
-                    hasProductionPermission
-                };
-
-                _logger.LogInformation($"GetIsEmirleri: {isEmirleri.Count()} iş emri döndürüldü");
-
-                return Json(result, new System.Text.Json.JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = null
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "İş emirleri listelenirken hata oluştu");
-                return Json(new
-                {
-                    success = false,
-                    message = "Veriler getirilirken hata oluştu.",
-                    error = ex.Message
-                });
-            }
-        }
-
-        public IActionResult IsEmirleri()
-        {
-            try
-            {
-                _logger.LogInformation("IsEmirleri sayfası açıldı");
-
-                var isEmirleri = _faturaRepository.GetIsEmirleri();
-                ViewBag.HasProductionPermission = _faturaRepository.HasProductionPermission();
-
-                _logger.LogInformation($"IsEmirleri sayfası: {isEmirleri.Count()} iş emri gösteriliyor");
-
-                return View(isEmirleri);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "İş emirleri listelenirken hata oluştu");
-                TempData["ErrorMessage"] = "İş emirleri listelenirken bir hata oluştu: " + ex.Message;
-                return View("Error");
-            }
-        }
-
-        public IActionResult IsEmriDurumu()
-        {
-            try
-            {
-                _logger.LogInformation("IsEmriDurumu sayfası açıldı");
-
-                var isEmirleri = _faturaRepository.GetIsEmirleri();
-                ViewBag.HasProductionPermission = _faturaRepository.HasProductionPermission();
-
-                _logger.LogInformation($"IsEmriDurumu sayfası: {isEmirleri.Count()} iş emri gösteriliyor");
-
-                return View(isEmirleri);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "İş emirleri listelenirken hata oluştu");
-                TempData["ErrorMessage"] = "İş emirleri listelenirken bir hata oluştu: " + ex.Message;
-                return View("Error");
-            }
-        }
 
         [HttpPost]
         public JsonResult UretIsEmri(string isEmriKodu, string urunKodu, int depoNo)
@@ -1304,67 +1165,7 @@ public IActionResult HataliUretimler(DateTime? baslangicTarihi = null, DateTime?
         }
 
         // İş emirlerini belirli iş merkezlerine göre filtreleyip getiren metot
-        [AllowAnonymous]
-        public IActionResult GetIsEmirleriByMerkezler(string isMerkezleri)
-        {
-            try
-            {
-                _logger.LogInformation($"GetIsEmirleriByMerkezler API çağrıldı - İş Merkezleri: {isMerkezleri}");
 
-                var isEmirleri = _faturaRepository.GetIsEmirleri();
-                var hasProductionPermission = _faturaRepository.HasProductionPermission();
-
-                // İş merkezi filtresi uygulanacaksa
-                if (!string.IsNullOrEmpty(isMerkezleri))
-                {
-                    var seciliMerkezler = isMerkezleri.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                                                     .Select(x => x.Trim())
-                                                     .Where(x => !string.IsNullOrEmpty(x))
-                                                     .ToList();
-
-                    if (seciliMerkezler.Any())
-                    {
-                        isEmirleri = isEmirleri.Where(ie => seciliMerkezler.Contains(ie.IsMerkezi));
-                    }
-                }
-
-                var result = new
-                {
-                    success = true,
-                    isEmirleri = isEmirleri.Select(e => new
-                    {
-                        e.is_Guid,
-                        e.is_Kod,
-                        e.is_Ismi,
-                        e.is_EmriDurumu,
-                        e.is_BaslangicTarihi,
-                        UrunKodu = e.UrunKodu,
-                        UrunAdi = e.UrunAdi,
-                        Miktar = e.Miktar,
-                        IsMerkezi = e.IsMerkezi,
-                     
-                    }),
-                    hasProductionPermission
-                };
-
-                _logger.LogInformation($"GetIsEmirleriByMerkezler: {isEmirleri.Count()} iş emri döndürüldü");
-
-                return Json(result, new System.Text.Json.JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = null
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Filtrelenmiş iş emirleri listelenirken hata oluştu");
-                return Json(new
-                {
-                    success = false,
-                    message = "Veriler getirilirken hata oluştu.",
-                    error = ex.Message
-                });
-            }
-        }
 
         [HttpGet]
         [AllowAnonymous]
@@ -1395,22 +1196,23 @@ public IActionResult HataliUretimler(DateTime? baslangicTarihi = null, DateTime?
                     {
                         // Arama metni varsa stok ismi ve kodu ile ara
                         query = @"
-                    SELECT 
-                        sto_kod AS StokKodu,
-                        sto_isim AS StokAdi,
-                        sto_birim1_ad AS BirimAdi
-                    FROM STOKLAR 
-                    WHERE (sto_isim LIKE @Arama OR sto_kod LIKE @Arama)
-                      AND sto_kod IS NOT NULL 
-                      AND sto_isim IS NOT NULL
-                    ORDER BY 
-                        CASE 
-                            WHEN sto_isim LIKE @AramaBaslangic THEN 1
-                            WHEN sto_kod LIKE @AramaBaslangic THEN 2
-                            WHEN sto_isim LIKE @Arama THEN 3
-                            ELSE 4
-                        END,
-                        sto_isim";
+                   SELECT 
+     sto_kod AS StokKodu,
+     sto_isim AS StokAdi,
+     sto_birim1_ad AS BirimAdi
+FROM STOKLAR 
+WHERE (sto_isim LIKE @Arama OR sto_kod LIKE @Arama)
+  AND sto_kod IS NOT NULL 
+  AND sto_isim IS NOT NULL
+  AND sto_cins IN (1,2,3,4,5,6,7,11)
+ORDER BY 
+     CASE 
+         WHEN sto_isim LIKE @AramaBaslangic THEN 1
+         WHEN sto_kod LIKE @AramaBaslangic THEN 2
+         WHEN sto_isim LIKE @Arama THEN 3
+         ELSE 4
+     END,
+     sto_isim";
                         parameters = new
                         {
                             Arama = "%" + arama + "%",
@@ -1469,36 +1271,305 @@ public IActionResult HataliUretimler(DateTime? baslangicTarihi = null, DateTime?
             }
         }
 
-        // MalzemeTuketimi metodunu güncelle
+        // ESKİ METODU SİLİN veya yorum satırı yapın
+        /*
         [HttpPost]
         [AllowAnonymous]
         public JsonResult MalzemeTuketimi(string isEmriKodu, List<TuketimItem> tuketimListesi, List<TuketimItem> eklenenMalzemeler = null)
         {
+            // Bu eski metod - silin
+        }
+        */
+
+        // SADECE BU METODU KULLANIN
+        // FaturaController.cs içindeki MalzemeTuketimi metodunu değiştirin
+
+        public IActionResult Tuketim()
+        {
             try
             {
-                // Yetki kontrolü
-                if (!_faturaRepository.HasProductionPermission())
+                // Aktif durumu 1 veya 0 olan iş emirlerini getir
+                var aktifIsEmirleri = _faturaRepository.GetIsEmirleri()
+                    .Where(ie => ie.is_EmriDurumu == 1 )  // Aktif durum
+                    .OrderBy(ie => ie.UrunAdi)
+                    .ToList();
+
+                // ViewBag.HasProductionPermission kaldırıldı
+                _logger.LogInformation($"Tuketim sayfası: {aktifIsEmirleri.Count} iş emri gösteriliyor");
+
+                return View(aktifIsEmirleri);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Tüketim sayfası yüklenirken hata oluştu");
+                TempData["ErrorMessage"] = "Tüketim sayfası yüklenirken bir hata oluştu.";
+                return View("Error");
+            }
+        }
+
+        [AllowAnonymous]
+        public IActionResult GetIsEmirleri()
+        {
+            try
+            {
+                _logger.LogInformation("GetIsEmirleri API çağrıldı");
+
+                var isEmirleri = _faturaRepository.GetIsEmirleri();
+
+                var result = new
                 {
-                    return Json(new { success = false, message = "Tüketim yetkiniz bulunmamaktadır." });
+                    success = true,
+                    isEmirleri = isEmirleri.Select(e => new
+                    {
+                        e.is_Guid,
+                        e.is_Kod,
+                        e.is_Ismi,
+                        e.is_EmriDurumu,
+                        e.is_BaslangicTarihi,
+                        UrunKodu = e.UrunKodu,
+                        UrunAdi = e.UrunAdi,
+                        Miktar = e.Miktar,
+                        IsMerkezi = e.IsMerkezi,
+                    })
+                };
+
+                _logger.LogInformation($"GetIsEmirleri: {isEmirleri.Count()} iş emri döndürüldü");
+
+                return Json(result, new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = null
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "İş emirleri listelenirken hata oluştu");
+                return Json(new
+                {
+                    success = false,
+                    message = "Veriler getirilirken hata oluştu.",
+                    error = ex.Message
+                });
+            }
+        }
+        public IActionResult IsEmirleri()
+        {
+            try
+            {
+                _logger.LogInformation("IsEmirleri sayfası açıldı");
+
+                var isEmirleri = _faturaRepository.GetIsEmirleri();
+
+                _logger.LogInformation($"IsEmirleri sayfası: {isEmirleri.Count()} iş emri gösteriliyor");
+
+                return View(isEmirleri);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "İş emirleri listelenirken hata oluştu");
+                TempData["ErrorMessage"] = "İş emirleri listelenirken bir hata oluştu: " + ex.Message;
+                return View("Error");
+            }
+        }
+
+        public IActionResult IsEmriDurumu()
+        {
+            try
+            {
+                _logger.LogInformation("IsEmriDurumu sayfası açıldı");
+
+                var isEmirleri = _faturaRepository.GetIsEmirleri();
+
+                _logger.LogInformation($"IsEmriDurumu sayfası: {isEmirleri.Count()} iş emri gösteriliyor");
+
+                return View(isEmirleri);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "İş emirleri listelenirken hata oluştu");
+                TempData["ErrorMessage"] = "İş emirleri listelenirken bir hata oluştu: " + ex.Message;
+                return View("Error");
+            }
+        }
+
+        [AllowAnonymous]
+        public IActionResult GetIsEmirleriByMerkezler(string isMerkezleri)
+        {
+            try
+            {
+                _logger.LogInformation($"GetIsEmirleriByMerkezler API çağrıldı - İş Merkezleri: {isMerkezleri}");
+
+                var isEmirleri = _faturaRepository.GetIsEmirleri();
+
+                // İş merkezi filtresi uygulanacaksa
+                if (!string.IsNullOrEmpty(isMerkezleri))
+                {
+                    var seciliMerkezler = isMerkezleri.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                                     .Select(x => x.Trim())
+                                                     .Where(x => !string.IsNullOrEmpty(x))
+                                                     .ToList();
+
+                    if (seciliMerkezler.Any())
+                    {
+                        isEmirleri = isEmirleri.Where(ie => seciliMerkezler.Contains(ie.IsMerkezi));
+                    }
                 }
 
+                var result = new
+                {
+                    success = true,
+                    isEmirleri = isEmirleri.Select(e => new
+                    {
+                        e.is_Guid,
+                        e.is_Kod,
+                        e.is_Ismi,
+                        e.is_EmriDurumu,
+                        e.is_BaslangicTarihi,
+                        UrunKodu = e.UrunKodu,
+                        UrunAdi = e.UrunAdi,
+                        Miktar = e.Miktar,
+                        IsMerkezi = e.IsMerkezi,
+                    })
+                };
+
+                _logger.LogInformation($"GetIsEmirleriByMerkezler: {isEmirleri.Count()} iş emri döndürüldü");
+
+                return Json(result, new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = null
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Filtrelenmiş iş emirleri listelenirken hata oluştu");
+                return Json(new
+                {
+                    success = false,
+                    message = "Veriler getirilirken hata oluştu.",
+                    error = ex.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public JsonResult MalzemeTuketimi([FromBody] MalzemeTuketimRequest request)
+        {
+            try
+            {
+                _logger.LogInformation($"MalzemeTuketimi çağrıldı - İş Emri: {request.IsEmriKodu}, Üretim Miktarı: {request.UretimMiktari}");
+
+                if (request == null)
+                {
+                    return Json(new { success = false, message = "Geçersiz istek verisi." });
+                }
+
+                // Null kontrolü
+                var tuketimListesi = request.TuketimListesi ?? new List<TuketimItem>();
+                var eklenenMalzemeler = request.EklenenMalzemeler ?? new List<TuketimItem>();
+
+                _logger.LogInformation($"Planlanan malzeme sayısı: {tuketimListesi.Count}, Eklenen malzeme sayısı: {eklenenMalzemeler.Count}");
+
                 // Boş liste kontrolü
-                if ((tuketimListesi == null || !tuketimListesi.Any(t => t.Miktar > 0)) &&
-                    (eklenenMalzemeler == null || !eklenenMalzemeler.Any(t => t.Miktar > 0)))
+                var planliTuketim = tuketimListesi.Where(t => t != null && t.Miktar > 0).ToList();
+                var eklenenTuketim = eklenenMalzemeler.Where(t => t != null && t.Miktar > 0).ToList();
+
+                if (!planliTuketim.Any() && !eklenenTuketim.Any())
                 {
                     return Json(new { success = false, message = "Tüketilecek malzeme seçilmedi." });
                 }
 
-                var sonuc = _faturaRepository.MalzemeTuketimi(isEmriKodu, tuketimListesi, eklenenMalzemeler);
+                // Üretim miktarı kontrolü
+                if (request.UretimMiktari.HasValue && request.UretimMiktari.Value <= 0)
+                {
+                    return Json(new { success = false, message = "Üretim miktarı 0'dan büyük olmalıdır." });
+                }
+
+                // Repository metodunu çağır
+                var sonuc = _faturaRepository.MalzemeTuketimi(
+                    request.IsEmriKodu,
+                    planliTuketim,
+                    eklenenTuketim,
+                    request.UretimMiktari
+                );
+
+                _logger.LogInformation($"Tüketim ve üretim başarılı: {sonuc}");
                 return Json(new { success = true, message = sonuc });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Malzeme tüketimi sırasında hata oluştu. İş Emri: {IsEmriKodu}", isEmriKodu);
-                return Json(new { success = false, message = "Tüketim işlemi sırasında bir hata oluştu: " + ex.Message });
+                _logger.LogError(ex, "Malzeme tüketimi ve üretim sırasında hata oluştu. İş Emri: {IsEmriKodu}", request?.IsEmriKodu);
+                return Json(new { success = false, message = "İşlem sırasında bir hata oluştu: " + ex.Message });
             }
         }
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult GetStokDepodakiMiktar(string stokKodu, int depoNo = 1)
+        {
+            try
+            {
+                var connectionString = _dbSelectorService.GetConnectionString();
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    var query = "SELECT dbo.fn_DepodakiMiktar(@StokKodu, @DepoNo, GETDATE()) AS DepodakiMiktar";
 
+                    var miktar = connection.QueryFirstOrDefault<decimal?>(query, new { StokKodu = stokKodu, DepoNo = depoNo }) ?? 0;
+
+                    return Json(new { success = true, miktar = miktar });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Depodaki miktar alınırken hata oluştu. Stok: {StokKodu}, Depo: {DepoNo}", stokKodu, depoNo);
+                return Json(new { success = false, message = "Depodaki miktar alınamadı.", miktar = 0 });
+            }
+        }
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult GetPartiKodlari(string stokKodu)
+        {
+            try
+            {
+                _logger.LogInformation($"GetPartiKodlari API çağrıldı - Stok Kodu: {stokKodu}");
+
+                if (string.IsNullOrEmpty(stokKodu))
+                {
+                    return Json(new { success = false, message = "Stok kodu belirtilmedi." });
+                }
+
+                var partiKodlari = _faturaRepository.GetPartiKodlari(stokKodu);
+
+                // DEBUG: Repository'den dönen veri logunu ekle
+                _logger.LogInformation($"Repository'den dönen parti sayısı: {partiKodlari?.Count() ?? 0}");
+
+                var result = new
+                {
+                    success = true,
+                    partiKodlari = partiKodlari?.Select(p => new
+                    {
+                        p.StokKodu,
+                        p.PartiKodu,
+                        p.LotNo,
+                        p.Miktar
+                    }) ?? Enumerable.Empty<object>()
+                };
+
+                _logger.LogInformation($"GetPartiKodlari: {result.partiKodlari.Count()} parti kodu döndürüldü");
+                return Json(result, new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = null
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Parti kodları listelenirken hata oluştu. Stok Kodu: {StokKodu}", stokKodu);
+                return Json(new
+                {
+                    success = false,
+                    message = "Parti kodları getirilirken hata oluştu.",
+                    error = ex.Message
+                });
+            }
+        }
     }
 }
 

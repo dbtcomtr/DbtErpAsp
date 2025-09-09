@@ -20,6 +20,18 @@ C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Extension.OfficeOpenXml.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Extension.Utilities.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Humanizer.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\itext.barcodes.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\itext.bouncy-castle-connector.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\itext.forms.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\itext.io.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\itext.kernel.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\itext.layout.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\itext.pdfa.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\itext.pdfua.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\itext.sign.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\itext.styledxmlparser.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\itext.svg.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\itext.commons.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\itextsharp.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.AspNetCore.Razor.Language.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.Bcl.AsyncInterfaces.dll
@@ -37,6 +49,7 @@ C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.CodeAnalysis.Workspaces.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.Data.SqlClient.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.DiaSymReader.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.DotNet.PlatformAbstractions.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.DotNet.Scaffolding.Shared.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.Extensions.Configuration.FileExtensions.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.Extensions.Configuration.Json.dll
@@ -89,11 +102,14 @@ C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\System.Private.Windows.Core.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\System.IdentityModel.Tokens.Jwt.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\System.IO.Packaging.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\System.IO.Pipelines.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\System.Memory.Data.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\System.Reflection.MetadataLoadContext.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\System.Runtime.Caching.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\System.Security.Cryptography.Pkcs.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\System.Security.Cryptography.ProtectedData.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\System.Text.Encodings.Web.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\System.Text.Json.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\zxing.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\af\Humanizer.resources.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\ar\Humanizer.resources.dll
@@ -258,3 +274,4 @@ C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\runtimes\win\lib\net8.0\System.Runtime.Caching.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll

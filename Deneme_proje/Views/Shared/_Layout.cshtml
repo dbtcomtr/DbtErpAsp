@@ -300,12 +300,12 @@
                                 <span>Anasayfa V1</span>
                             </a>
                         </li>
-                        <li>
+                    @*     <li>
                             <a href="/Menu/Index" class="waves-effect">
                                 <i class="mdi mdi-view-dashboard"></i>
                                 <span>Anasayfa V2</span>
                             </a>
-                        </li>
+                        </li> *@
 
                         @* Şirket Durumu Menüsü *@
                         @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "Index", userNo) ||
@@ -447,9 +447,7 @@
 
                             </li>
                         }
-                        @* CRM Menüsü *@
-                      
-                     @*    
+                   
                             <li>
                                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                                     <i class="mdi mdi-account-group"></i>
@@ -504,10 +502,10 @@
                                 
                                 </ul>
                             </li>
-                         *@
+                        
 
 
-                        @* CRM Menüsü *@
+                        @* CRM Menüsü *
                         @if (
                         MenuHelper.KullaniciYetkisiVarMi("CRM", "AktiviteEkle", userNo) ||
                         MenuHelper.KullaniciYetkisiVarMi("CRM", "Aktiviteler", userNo) ||

@@ -116,35 +116,48 @@ namespace Deneme_proje.Controllers
             return View(viewModel);
         }
 
-		public IActionResult FirmaCekleri(DateTime? baslamaTarihi, DateTime? bitisTarihi)
-		{
-			// Tarihler null ise bugünün tarihini atayın
-			var currentBaslamaTarihi = baslamaTarihi ?? DateTime.Now.AddMonths(-1); // Son 1 ay varsayılan tarih
-			var currentBitisTarihi = bitisTarihi ?? DateTime.Now;
-
-			var cekler = _denizlerRepository.GetDenizlerFirmaCekleri(currentBaslamaTarihi, currentBitisTarihi);
-
-			// View'e tarihleri gönder
-			ViewBag.BaslamaTarihi = currentBaslamaTarihi.ToString("yyyy-MM-dd");
-			ViewBag.BitisTarihi = currentBitisTarihi.ToString("yyyy-MM-dd");
-
-			return View(cekler);
-		}
-
-		public IActionResult MusteriCekleri(DateTime? baslamaTarihi, DateTime? bitisTarihi)
+        public IActionResult FirmaCekleri(DateTime? baslamaTarihi, DateTime? bitisTarihi)
         {
-            // Tarihler null ise bugünün tarihini atayın
-            var currentBaslamaTarihi = baslamaTarihi ?? DateTime.Now.AddMonths(-1); // Son 1 ay varsayılan tarih
+            var currentBaslamaTarihi = baslamaTarihi ?? DateTime.Now.AddMonths(-1);
+            var currentBitisTarihi = bitisTarihi ?? DateTime.Now;
+
+            var cekler = _denizlerRepository.GetDenizlerFirmaCekleri(currentBaslamaTarihi, currentBitisTarihi);
+            var bankaOzetleri = _denizlerRepository.GetBankaOdemeOzeti(currentBaslamaTarihi, currentBitisTarihi);
+
+            ViewBag.BaslamaTarihi = currentBaslamaTarihi.ToString("yyyy-MM-dd");
+            ViewBag.BitisTarihi = currentBitisTarihi.ToString("yyyy-MM-dd");
+            ViewBag.BankaOzetleri = bankaOzetleri;
+
+            return View(cekler);
+        }   public IActionResult MusteriCekleri(DateTime? baslamaTarihi, DateTime? bitisTarihi)
+        {
+            var currentBaslamaTarihi = baslamaTarihi ?? DateTime.Now.AddMonths(-1);
             var currentBitisTarihi = bitisTarihi ?? DateTime.Now;
 
             var cekler = _denizlerRepository.GetMusteriCekleri(currentBaslamaTarihi, currentBitisTarihi);
+            var bankaOzetleri = _denizlerRepository.GetBankaOdemeOzetiMusteri(currentBaslamaTarihi, currentBitisTarihi);
 
-            // View'e tarihleri gönder
             ViewBag.BaslamaTarihi = currentBaslamaTarihi.ToString("yyyy-MM-dd");
             ViewBag.BitisTarihi = currentBitisTarihi.ToString("yyyy-MM-dd");
+            ViewBag.BankaOzetleri = bankaOzetleri;
 
             return View(cekler);
         }
+
+        //public IActionResult MusteriCekleri(DateTime? baslamaTarihi, DateTime? bitisTarihi)
+        //{
+        //    // Tarihler null ise bugünün tarihini atayın
+        //    var currentBaslamaTarihi = baslamaTarihi ?? DateTime.Now.AddMonths(-1); // Son 1 ay varsayılan tarih
+        //    var currentBitisTarihi = bitisTarihi ?? DateTime.Now;
+
+        //    var cekler = _denizlerRepository.GetMusteriCekleri(currentBaslamaTarihi, currentBitisTarihi);
+
+        //    // View'e tarihleri gönder
+        //    ViewBag.BaslamaTarihi = currentBaslamaTarihi.ToString("yyyy-MM-dd");
+        //    ViewBag.BitisTarihi = currentBitisTarihi.ToString("yyyy-MM-dd");
+
+        //    return View(cekler);
+        //}
 
 
         public IActionResult AracKmYakitBilgileri(DateTime? baslamaTarihi, DateTime? bitisTarihi)
@@ -181,10 +194,14 @@ namespace Deneme_proje.Controllers
 
         public IActionResult KrediSozlesmeleri(DateTime? baslamaTarihi, DateTime? bitisTarihi, string durum)
         {
-            if (baslamaTarihi == null || bitisTarihi == null)
+            // Otomatik tarihler: Yıl başı - Yıl sonu
+            var currentYear = DateTime.Now.Year;
+            baslamaTarihi ??= new DateTime(currentYear, 1, 1); // Yıl başı
+            bitisTarihi ??= new DateTime(currentYear, 12, 31); // Yıl sonu
+
+            if (string.IsNullOrEmpty(durum))
             {
-                ModelState.AddModelError("", "Lütfen geçerli bir tarih aralığı giriniz.");
-                return View();
+                durum = "Kapalı"; // Varsayılan durum
             }
 
             ViewBag.BaslamaTarihi = baslamaTarihi?.ToString("yyyy-MM-dd");
@@ -193,6 +210,22 @@ namespace Deneme_proje.Controllers
 
             var result = _denizlerRepository.GetKrediSozlesmeleri(baslamaTarihi.Value, bitisTarihi.Value)
                         .Where(x => x.Durum == durum).ToList();
+
+            // Banka özeti oluştur
+            var bankaOzetleri = result
+                .GroupBy(k => new { k.BankaKodu, k.BankaAdi })
+                .Select(g => new
+                {
+                    BankaKodu = g.Key.BankaKodu,
+                    BankaAdi = g.Key.BankaAdi,
+                    SozlesmeSayisi = g.Count(),
+                    ToplamTutar = g.Sum(k => k.KrediTutari),
+                    KalanTutar = g.Sum(k => k.KalanTaksitTutari)
+                })
+                .OrderByDescending(b => b.ToplamTutar)
+                .ToList();
+
+            ViewBag.BankaOzetleri = bankaOzetleri;
 
             return View(result);
         }

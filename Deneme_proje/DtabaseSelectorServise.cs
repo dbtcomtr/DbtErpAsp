@@ -7,6 +7,11 @@ public class DatabaseSelectorService
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ILogger<DatabaseSelectorService> _logger;
 
+    // Cache değişkenleri
+    private static string _cachedConnectionString;
+    private static string _lastDatabaseName;
+    private static readonly object _lockObject = new object();
+
     public DatabaseSelectorService(
         IConfiguration configuration,
         IHttpContextAccessor httpContextAccessor,
@@ -17,13 +22,93 @@ public class DatabaseSelectorService
         _logger = logger;
     }
 
-    // Bu metodu ekleyin
+    public string GetConnectionString()
+    {
+        var username = _httpContextAccessor.HttpContext.Session.GetString("Username");
+        var version = _httpContextAccessor.HttpContext.Session.GetString("SelectedVersion") ?? "V16";
+        var databaseName = _httpContextAccessor.HttpContext.Session.GetString("SelectedDatabase");
+
+        if (string.IsNullOrEmpty(databaseName))
+        {
+            databaseName = GetDefaultDatabase(version, username);
+            _httpContextAccessor.HttpContext.Session.SetString("SelectedDatabase", databaseName);
+        }
+
+        string fullDatabaseName = version == "V16"
+            ? $"MikroDB_V16_{databaseName}"
+            : $"MikroDesktop_{databaseName}";
+
+        // Cache kontrolü - eğer aynı database ise dosya işlemi yapma
+        lock (_lockObject)
+        {
+            if (_lastDatabaseName == fullDatabaseName && !string.IsNullOrEmpty(_cachedConnectionString))
+            {
+                return _cachedConnectionString;
+            }
+
+            var baseConnectionString = _configuration.GetConnectionString("DynamicDatabase");
+            var connectionString = AddOrUpdateDatabaseInConnectionString(baseConnectionString, fullDatabaseName);
+
+            // Sadece database değiştiyse dosyayı güncelle
+            if (_lastDatabaseName != fullDatabaseName)
+            {
+                try
+                {
+                    UpdateAppSettings(connectionString);
+                    _cachedConnectionString = connectionString;
+                    _lastDatabaseName = fullDatabaseName;
+                }
+                catch (IOException ex) when (ex.Message.Contains("being used by another process"))
+                {
+                    // Dosya kilitlendiyse cache'den dön (eğer varsa)
+                    if (!string.IsNullOrEmpty(_cachedConnectionString))
+                    {
+                        _logger.LogWarning("appsettings.json dosya kilidi, cache'den connection string dönülüyor");
+                        return _cachedConnectionString;
+                    }
+
+                    // Cache yoksa bekleyip tekrar dene
+                    Thread.Sleep(50);
+                    UpdateAppSettings(connectionString);
+                    _cachedConnectionString = connectionString;
+                    _lastDatabaseName = fullDatabaseName;
+                }
+            }
+
+            return connectionString;
+        }
+    }
+
+    private void UpdateAppSettings(string connectionString)
+    {
+        var appSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json");
+
+        // Retry mekanizması
+        int maxRetries = 3;
+        for (int i = 0; i < maxRetries; i++)
+        {
+            try
+            {
+                var json = File.ReadAllText(appSettingsPath);
+                dynamic jsonObj = JsonConvert.DeserializeObject(json);
+                jsonObj["ConnectionStrings"]["DynamicDatabase"] = connectionString;
+                string output = JsonConvert.SerializeObject(jsonObj, Formatting.Indented);
+                File.WriteAllText(appSettingsPath, output);
+                break; // Başarılı olursa döngüden çık
+            }
+            catch (IOException) when (i < maxRetries - 1)
+            {
+                Thread.Sleep(100 * (i + 1)); // Her denemede daha uzun bekle
+            }
+        }
+    }
+
+    // Diğer metodlarınız aynı kalır...
     public IConfiguration GetConfiguration()
     {
         return _configuration;
     }
 
-    // ERPDatabase connection string'ini döndüren yeni metot
     public string GetERPConnectionString()
     {
         return _configuration.GetConnectionString("ERPDatabase");
@@ -50,7 +135,6 @@ public class DatabaseSelectorService
 
                     if (string.IsNullOrEmpty(defaultDb))
                     {
-                        // Varsayılan veritabanı yoksa, ilk veritabanını al
                         defaultDb = GetFirstAvailableDatabase(version);
                     }
 
@@ -61,8 +145,6 @@ public class DatabaseSelectorService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Varsayılan veritabanı alınırken hata oluştu");
-
-            // Hata durumunda ilk veritabanını al
             return GetFirstAvailableDatabase(version);
         }
     }
@@ -100,53 +182,14 @@ public class DatabaseSelectorService
         }
     }
 
-    public string GetConnectionString()
-    {
-        // Oturumdan kullanıcı adını al
-        var username = _httpContextAccessor.HttpContext.Session.GetString("Username");
-
-        // Oturumdan versiyon bilgisini al
-        var version = _httpContextAccessor.HttpContext.Session.GetString("SelectedVersion") ?? "V16";
-
-        // Varsayılan veritabanını al
-        var databaseName = _httpContextAccessor.HttpContext.Session.GetString("SelectedDatabase");
-
-        // Eğer veritabanı seçili değilse, varsayılan veya ilk veritabanını al
-        if (string.IsNullOrEmpty(databaseName))
-        {
-            databaseName = GetDefaultDatabase(version, username);
-
-            // Seçilen veritabanını oturuma kaydet
-            _httpContextAccessor.HttpContext.Session.SetString("SelectedDatabase", databaseName);
-        }
-
-        // Versiyona göre veritabanı adını güncelle
-        string fullDatabaseName = version == "V16"
-            ? $"MikroDB_V16_{databaseName}"
-            : $"MikroDesktop_{databaseName}";
-
-        // Dinamik bağlantı dizesini al
-        var baseConnectionString = _configuration.GetConnectionString("DynamicDatabase");
-
-        // Bağlantı dizesini güncelle
-        var connectionString = AddOrUpdateDatabaseInConnectionString(baseConnectionString, fullDatabaseName);
-
-        // appsettings.json'ı güncelle
-        UpdateAppSettings(connectionString);
-
-        return connectionString;
-    }
-    // Connection string'e Database parametresini ekleme/güncelleme metodu
     private string AddOrUpdateDatabaseInConnectionString(string connectionString, string databaseName)
     {
         if (!connectionString.Contains("Database="))
         {
-            // Eğer Database parametresi yoksa, ekle
             connectionString += $";Database={databaseName}";
         }
         else
         {
-            // Eğer Database parametresi varsa, güncelle
             connectionString = System.Text.RegularExpressions.Regex.Replace(
                 connectionString,
                 @"Database=[^;]*",
@@ -154,18 +197,5 @@ public class DatabaseSelectorService
             );
         }
         return connectionString;
-    }
-    private void UpdateAppSettings(string connectionString)
-    {
-        // appsettings.json dosyasının yolunu belirliyoruz
-        var appSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json");
-        // appsettings.json dosyasını okuyoruz
-        var json = File.ReadAllText(appSettingsPath);
-        dynamic jsonObj = JsonConvert.DeserializeObject(json);
-        // DynamicDatabase bağlantı dizgesini güncelliyoruz
-        jsonObj["ConnectionStrings"]["DynamicDatabase"] = connectionString;
-        // Güncellenmiş JSON'u dosyaya yazıyoruz
-        string output = JsonConvert.SerializeObject(jsonObj, Formatting.Indented);
-        File.WriteAllText(appSettingsPath, output);
     }
 }

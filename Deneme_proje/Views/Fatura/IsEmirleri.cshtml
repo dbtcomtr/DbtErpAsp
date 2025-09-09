@@ -17,23 +17,11 @@
                         <p><span>Planlanan Miktar:</span> @isEmri.Miktar</p>
                     </div>
                     <div class="button-container">
-                        @{
-                            var hasProductionPermission = ViewBag.HasProductionPermission ?? false;
-                        }
-
-                        @if (hasProductionPermission)
-                        {
-                            <button onclick="uretIsEmri('@isEmri.is_Kod', '@isEmri.UrunKodu', 3)"
-                                    class="btn uret @(isEmri.is_EmriDurumu == 1 ? "" : "darker")">
-                                Üret
-                            </button>
-
-                          @*   <button onclick="tuketimModalAc('@isEmri.is_Kod', '@isEmri.UrunKodu', @isEmri.Miktar)"
-                                    class="btn tuket @(isEmri.is_EmriDurumu == 1 ? "" : "darker")"
-                                    style="margin-left: 10px;">
-                                Tüket
-                            </button> *@
-                        }
+                        <!-- SADECE ÜRET BUTONU -->
+                        <button onclick="uretIsEmri('@isEmri.is_Kod', '@isEmri.UrunKodu', 3)"
+                                class="btn uret @(isEmri.is_EmriDurumu == 1 ? "" : "darker")">
+                            Üret
+                        </button>
                     </div>
                 </div>
             }
@@ -41,302 +29,16 @@
     </div>
 </div>
 
-<!-- MODAL -->
-<div id="tuketimModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999;">
-    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:20px; border-radius:10px; width:95%; max-width:1200px; max-height:90%; overflow-y:auto;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #ccc; padding-bottom:10px;">
-            <h3>Malzeme Tüketimi</h3>
-            <button onclick="modalKapat()" style="background:none; border:none; font-size:24px; cursor:pointer;">&times;</button>
-        </div>
+<!-- MODAL VE SCRIPT KODLARI KALDIRILDI - SADECE ÜRET BUTONU VAR -->
 
-        <div id="modal-content">
-            <div style="display:flex; gap:20px; margin-bottom:20px;">
-                <p><strong>İş Emri:</strong> <span id="modal-isemri"></span></p>
-                <p><strong>Ürün:</strong> <span id="modal-urun"></span></p>
-                <p><strong>Planlanan Miktar:</strong> <span id="modal-planlanan-miktar"></span></p>
-            </div>
-
-            <div id="loading" style="text-align:center; display:none;">
-                <p>Yükleniyor...</p>
-            </div>
-
-            <div id="malzeme-container" style="display:none;">
-                <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px; padding:10px; background:#f8f9fa; border-radius:5px;">
-                    <label for="hesapla-input" style="font-weight:bold;">Hesapla:</label>
-                    <input type="number" id="hesapla-input" min="0" step="0.01"
-                           style="width:120px; padding:8px; border:1px solid #ccc; border-radius:5px;"
-                           placeholder="Üretim miktarı">
-                    <button onclick="hesapla()" style="background:#007bff; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">
-                        Hesapla
-                    </button>
-            
-                    <button onclick="temizle()" style="background:#dc3545; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">
-                        Temizle
-                    </button>
-                </div>
-
-                <h4>Malzeme Listesi:</h4>
-
-                <div style="overflow-x:auto;">
-                    <table style="width:100%; border-collapse:collapse; margin:10px 0; min-width:800px;">
-                        <thead>
-                            <tr style="background:#f8f9fa;">
-                                <th style="border:1px solid #ddd; padding:8px; min-width:100px;">Stok Kodu</th>
-                                <th style="border:1px solid #ddd; padding:8px; min-width:200px;">Malzeme Adı</th>
-                                <th style="border:1px solid #ddd; padding:8px; min-width:60px;">Birim</th>
-                                <th style="border:1px solid #ddd; padding:8px; min-width:80px;">Planlanan</th>
-                                <th style="border:1px solid #ddd; padding:8px; min-width:80px;">Tüketilen</th>
-                                <th style="border:1px solid #ddd; padding:8px; min-width:80px;">Kalan</th>
-                                <th style="border:1px solid #ddd; padding:8px; min-width:100px; background:#e3f2fd;">Hesaplanan</th>
-                                <th style="border:1px solid #ddd; padding:8px; min-width:100px;">Tüketilecek</th>
-                            </tr>
-                        </thead>
-                        <tbody id="malzeme-tbody">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="error-msg" style="color:red; display:none;"></div>
-        </div>
-
-        <div style="text-align:right; margin-top:20px; border-top:1px solid #ccc; padding-top:10px;">
-            <button onclick="modalKapat()" style="background:#6c757d; color:white; border:none; padding:10px 20px; margin-right:10px; border-radius:5px; cursor:pointer;">İptal</button>
-            <button id="kaydet-btn" onclick="tuketimKaydet()" style="background:#28a745; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer;">Tüketimi Kaydet</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    // Değişkenler
-    var currentIsEmri = '';
-    var currentUrun = '';
-    var currentPlanlananMiktar = 0;
-    var malzemeListesi = [];
-
-    // Modal açma
-    function tuketimModalAc(isEmriKodu, urunKodu, planlananMiktar) {
-        console.log('Modal açılıyor:', isEmriKodu, urunKodu, planlananMiktar);
-        currentIsEmri = isEmriKodu;
-        currentUrun = urunKodu;
-        currentPlanlananMiktar = planlananMiktar;
-
-        document.getElementById('modal-isemri').textContent = isEmriKodu;
-        document.getElementById('modal-urun').textContent = urunKodu;
-        document.getElementById('modal-planlanan-miktar').textContent = planlananMiktar;
-        document.getElementById('tuketimModal').style.display = 'block';
-        document.getElementById('loading').style.display = 'block';
-        document.getElementById('malzeme-container').style.display = 'none';
-        document.getElementById('error-msg').style.display = 'none';
-
-        // Hesapla inputunu temizle
-        document.getElementById('hesapla-input').value = '';
-
-        // AJAX ile malzemeleri getir
-        fetch('@Url.Action("GetMalzemePlanlama", "Fatura")?isEmriKodu=' + encodeURIComponent(isEmriKodu))
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('loading').style.display = 'none';
-
-                if (data.success && data.data.length > 0) {
-                    malzemeListesi = data.data;
-                    malzemeTablosuOlustur(data.data);
-                    document.getElementById('malzeme-container').style.display = 'block';
-                } else {
-                    document.getElementById('error-msg').textContent = 'Malzeme planlaması bulunamadı.';
-                    document.getElementById('error-msg').style.display = 'block';
-                }
-            })
-            .catch(error => {
-                console.error('Hata:', error);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('error-msg').textContent = 'Veri yüklenirken hata oluştu.';
-                document.getElementById('error-msg').style.display = 'block';
-            });
-    }
-
-    // Modal kapatma
-    function modalKapat() {
-        document.getElementById('tuketimModal').style.display = 'none';
-        document.getElementById('malzeme-tbody').innerHTML = '';
-        malzemeListesi = [];
-    }
-
-    // Malzeme tablosu oluşturma
-    function malzemeTablosuOlustur(malzemeler) {
-        var tbody = document.getElementById('malzeme-tbody');
-        tbody.innerHTML = '';
-
-        malzemeler.forEach(function(malzeme, index) {
-            var row = tbody.insertRow();
-            row.innerHTML = `
-                <td style="border:1px solid #ddd; padding:8px;">${malzeme.stokKodu}</td>
-                <td style="border:1px solid #ddd; padding:8px;">${malzeme.stokAdi}</td>
-                <td style="border:1px solid #ddd; padding:8px;">${malzeme.birimAdi}</td>
-                <td style="border:1px solid #ddd; padding:8px; text-align:right;">${malzeme.planlananMiktar}</td>
-                <td style="border:1px solid #ddd; padding:8px; text-align:right;">${malzeme.tuketilenMiktar}</td>
-                <td style="border:1px solid #ddd; padding:8px; text-align:right;">${malzeme.kalanMiktar}</td>
-                <td style="border:1px solid #ddd; padding:8px; text-align:right; background:#f8f9fa;">
-                    <span class="hesaplanan-miktar" data-stok="${malzeme.stokKodu}">-</span>
-                </td>
-                <td style="border:1px solid #ddd; padding:8px;">
-                    <input type="number" class="tuketim-input" data-stok="${malzeme.stokKodu}"
-                           min="0" max="${malzeme.kalanMiktar}" step="0.01"
-                           style="width:100px; padding:5px; border:1px solid #ccc; border-radius:3px;">
-                </td>
-            `;
-        });
-    }
-
-    // Hesaplama fonksiyonu
-    function hesapla() {
-        var hedefMiktar = parseFloat(document.getElementById('hesapla-input').value);
-
-        if (!hedefMiktar || hedefMiktar <= 0) {
-            alert('Lütfen geçerli bir üretim miktarı girin.');
-            return;
-        }
-
-        // Oran hesaplama
-        var oran = hedefMiktar / currentPlanlananMiktar;
-
-        console.log('Hesaplama:', {
-            hedefMiktar: hedefMiktar,
-            planlananMiktar: currentPlanlananMiktar,
-            oran: oran
-        });
-
-        // Her malzeme için hesaplama yap
-        malzemeListesi.forEach(function(malzeme) {
-            var hesaplananMiktar = malzeme.planlananMiktar * oran;
-            var hesaplananSpan = document.querySelector(`[data-stok="${malzeme.stokKodu}"].hesaplanan-miktar`);
-            var tuketimInput = document.querySelector(`[data-stok="${malzeme.stokKodu}"].tuketim-input`);
-
-            if (hesaplananSpan) {
-                hesaplananSpan.textContent = hesaplananMiktar.toFixed(2);
-            }
-
-            // Hesaplanan miktarı tüketilecek kısmına da kopyala
-            if (tuketimInput) {
-                tuketimInput.value = hesaplananMiktar.toFixed(2);
-
-                // Kalan miktardan fazla ise kalan miktar ile sınırla
-                var maxMiktar = parseFloat(tuketimInput.getAttribute('max'));
-                if (hesaplananMiktar > maxMiktar) {
-                    tuketimInput.value = maxMiktar.toFixed(2);
-                    tuketimInput.style.borderColor = '#dc3545';
-                    tuketimInput.title = 'Hesaplanan miktar kalan miktardan fazla!';
-                } else {
-                    tuketimInput.style.borderColor = '#28a745';
-                    tuketimInput.title = '';
-                }
-            }
-        });
-    }
-
-    // Temizleme fonksiyonu
-    function temizle() {
-        document.getElementById('hesapla-input').value = '';
-
-        // Hesaplanan miktarları temizle
-        var hesaplananSpanlar = document.querySelectorAll('.hesaplanan-miktar');
-        hesaplananSpanlar.forEach(function(span) {
-            span.textContent = '-';
-        });
-
-        // Tüketim inputlarını temizle
-        var tuketimInputlar = document.querySelectorAll('.tuketim-input');
-        tuketimInputlar.forEach(function(input) {
-            input.value = '';
-            input.style.borderColor = '#ccc';
-            input.title = '';
-        });
-    }
-
-    // Örnek veri doldurma
-    function ornekVeriDoldur() {
-        var inputs = document.querySelectorAll('.tuketim-input');
-        inputs.forEach(function(input, index) {
-            if (index < 2) {
-                input.value = (index + 1) * 10;
-                input.style.borderColor = '#007bff';
-            }
-        });
-    }
-
-    // Tüketim kaydetme
-    function tuketimKaydet() {
-        var tuketimListesi = [];
-        var inputs = document.querySelectorAll('.tuketim-input');
-
-        console.log('Tüketim kontrolü başladı...');
-
-        inputs.forEach(function(input) {
-            var miktar = parseFloat(input.value) || 0;
-            var stokKodu = input.getAttribute('data-stok');
-
-            console.log('Input:', stokKodu, miktar);
-
-            if (miktar > 0) {
-                tuketimListesi.push({
-                    StokKodu: stokKodu,
-                    Miktar: miktar
-                });
-            }
-        });
-
-        console.log('Tüketim listesi:', tuketimListesi);
-
-        if (tuketimListesi.length === 0) {
-            alert('Tüketilecek malzeme seçilmedi. Lütfen miktar girin.');
-            return;
-        }
-
-        if (!confirm(`${tuketimListesi.length} adet malzeme tüketilecek. Devam edilsin mi?`)) {
-            return;
-        }
-
-        // Butonu devre dışı bırak
-        var btn = document.getElementById('kaydet-btn');
-        btn.disabled = true;
-        btn.textContent = 'Kaydediliyor...';
-
-        // AJAX ile kaydet
-        var formData = new FormData();
-        formData.append('isEmriKodu', currentIsEmri);
-
-        tuketimListesi.forEach(function(item, index) {
-            formData.append(`tuketimListesi[${index}].StokKodu`, item.StokKodu);
-            formData.append(`tuketimListesi[${index}].Miktar`, item.Miktar);
-        });
-
-        fetch('@Url.Action("MalzemeTuketimi", "Fatura")', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            btn.disabled = false;
-            btn.textContent = 'Tüketimi Kaydet';
-
-            if (data.success) {
-                alert('Başarılı: ' + data.message);
-                modalKapat();
-                location.reload();
-            } else {
-                alert('Hata: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('AJAX Hata:', error);
-            btn.disabled = false;
-            btn.textContent = 'Tüketimi Kaydet';
-            alert('Tüketim işlemi sırasında hata oluştu.');
-        });
-    }
-
-    // Üretim fonksiyonu
+ <script>
+    // Üretim fonksiyonu - Hiçbir onay mesajı yok, direkt yazdırma
     function uretIsEmri(isEmriKodu, urunKodu, depoNo) {
+        // Butonu disable et
+        var button = event.target;
+        button.disabled = true;
+        button.textContent = 'Üretiliyor...';
+
         fetch('@Url.Action("UretIsEmri", "Fatura")', {
             method: 'POST',
             headers: {
@@ -346,37 +48,59 @@
         })
         .then(response => response.json())
         .then(data => {
+            button.disabled = false;
+            button.textContent = 'Üret';
+
             if (data.success) {
+                // Barkodu al
                 var barkodMatch = data.message.match(/Barkod: ([^,]+)/);
                 var barkod = barkodMatch ? barkodMatch[1].trim() : isEmriKodu;
+
+                // DİREKT YAZDIR - Hiçbir mesaj yok
                 yazdirmaEkraniAc(isEmriKodu, urunKodu, barkod);
+
+                // 1 saniye sonra sayfayı yenile
+                setTimeout(function() {
+                    location.reload();
+                }, 1000);
             } else {
-                alert('Hata: Üretim yetkiniz bulunmamaktadır.');
+                alert('Hata: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Hata:', error);
+            button.disabled = false;
+            button.textContent = 'Üret';
             alert('İşlem sırasında bir hata oluştu.');
         });
     }
 
-    // Yazdırma fonksiyonu
+    // Yazdırma fonksiyonu - Sessiz yazdırma
     function yazdirmaEkraniAc(isEmriKodu, urunKodu, barkod) {
         var yazdirmaURL = '@Url.Action("YazdirIsEmri", "Fatura")' +
                           '?isEmriKodu=' + encodeURIComponent(isEmriKodu) +
                           '&urunKodu=' + encodeURIComponent(urunKodu) +
                           '&barkod=' + encodeURIComponent(barkod);
 
-        var yazdirmaPenceresi = window.open(yazdirmaURL, '_blank', 'width=800,height=600');
+        var yazdirmaPenceresi = window.open(yazdirmaURL, '_blank', 'width=800,height=600,scrollbars=yes');
+
         if (yazdirmaPenceresi) {
+            // Pencere yüklenince otomatik yazdır
             yazdirmaPenceresi.onload = function() {
-                yazdirmaPenceresi.print();
+                setTimeout(function() {
+                    yazdirmaPenceresi.print();
+
+                    // Yazdırma işlemi başlatıldıktan 2 saniye sonra pencereyi kapat
+                    setTimeout(function() {
+                        yazdirmaPenceresi.close();
+                    }, 2000);
+                }, 300);
             };
         }
     }
 </script>
 
-<style>
+ <style>
     p {
         font-size: 27px;
         font-weight: 400;
@@ -384,6 +108,7 @@
         color: #666;
         margin: 0;
     }
+
     .cards {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -443,26 +168,9 @@
         height: 60px;
     }
 
-    .tuket {
-        background-color: #ff6b35;
-        color: white;
-        font-weight: 900;
-        font-size: 18px;
-        padding: 12px;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        width: 120px;
-        height: 60px;
-    }
-
-    .uret.darker {
-        background-color: #f57c00;
-    }
-
-    .tuket.darker {
-        background-color: #cc5429;
-    }
+        .uret.darker {
+            background-color: #f57c00;
+        }
 
     @@media (max-width: 1200px) {
         .cards
@@ -476,7 +184,7 @@
         gap: 5px;
     }
 
-    .uret, .tuket {
+    .uret {
         width: 100%;
         margin: 0;
     }

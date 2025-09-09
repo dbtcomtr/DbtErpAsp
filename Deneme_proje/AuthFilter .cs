@@ -49,8 +49,6 @@ public class AuthFilter : ActionFilterAttribute
             return;
         }
 
-        // Buraya kadar geldiyse kullanıcı kimliği doğrulanmış demektir
-
         // UserNo değerini al
         var userNo = session.GetString("UserNo");
         if (string.IsNullOrEmpty(userNo))
@@ -123,24 +121,40 @@ public class AuthFilter : ActionFilterAttribute
                     return;
                 }
 
-                // Yetki "1" ise tüm kullanıcılara izin ver
-                if (yetkiDegeri == "1")
-                {
-                    base.OnActionExecuting(context);
-                    return;
-                }
+                // GÜVENLİ YETKİ KONTROLÜ - GÜNCELLENMIŞ BÖLÜM
+                bool yetkiVar = false;
 
-                // Yetki değeri, kullanıcı numarası listesi içeriyor mu kontrol et
-                bool yetkiVar = yetkiDegeri == userNo ||
-                       yetkiDegeri.StartsWith($"{userNo},") ||
-                       yetkiDegeri.Contains($",{userNo},") ||
-                       yetkiDegeri.EndsWith($",{userNo}");
+                if (!string.IsNullOrEmpty(yetkiDegeri) && !string.IsNullOrEmpty(userNo))
+                {
+                    // Özel durum: Yetki değeri "1" ise SADECE 1 numaralı kullanıcıya izin ver
+                    // (Eğer tüm kullanıcılara izin vermek istiyorsanız "ALL" gibi bir değer kullanın)
+                    if (yetkiDegeri.Trim() == "1")
+                    {
+                        yetkiVar = userNo.Trim() == "1";
+                    }
+                    else
+                    {
+                        // Yetki değerini virgül ile ayır ve trim et
+                        var yetkiliUserNolar = yetkiDegeri.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                                         .Select(x => x.Trim())
+                                                         .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+                        // Kullanıcı numarasının tam eşleşip eşleşmediğini kontrol et
+                        yetkiVar = yetkiliUserNolar.Contains(userNo.Trim());
+                    }
+                }
 
                 System.Diagnostics.Debug.WriteLine($"Controller: {controller}, Action: {action}, UserNo: {userNo}, Yetki: {yetkiDegeri}, YetkiVar: {yetkiVar}");
 
                 if (!yetkiVar)
                 {
-                    // Yetkisi yoksa Ana Sayfaya yönlendir
+                    // Yetkisi yoksa Ana Sayfaya yönlendir ve hata mesajı ekle
+                    System.Diagnostics.Debug.WriteLine($"YETKI REDDEDİLDİ - User: {userNo}, Controller: {controller}, Action: {action}");
+
+                    // TempData ile hata mesajı gönder
+                    context.HttpContext.Session.SetString("AccessDeniedMessage",
+                        $"Bu sayfaya erişim yetkiniz bulunmamaktadır. ({controller}/{action})");
+
                     context.Result = new RedirectToActionResult("Index", "Home", null);
                     return;
                 }
@@ -149,6 +163,7 @@ public class AuthFilter : ActionFilterAttribute
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Yetki kontrolü sırasında hata: {ex.Message}");
+            // Hata durumunda erişimi reddet
             context.Result = new RedirectToActionResult("Index", "Home", null);
             return;
         }

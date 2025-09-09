@@ -5,6 +5,13 @@ namespace Deneme_proje.Models
 {
     public class DenizlerEntities
     {
+        public class BankaOdemeOzeti
+        {
+            public string BankaKodu { get; set; }
+            public string BankaAdi { get; set; }
+            public decimal ToplamKalan { get; set; }
+            public int CekSayisi { get; set; }
+        }
         // Mevcut FirmaCekleri sınıfınız
         public class FirmaCekleri
         {

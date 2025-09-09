@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using static Deneme_proje.Models.Entities;
 using System.Text;
 using System.Configuration;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Deneme_proje.Controllers
 {
@@ -333,7 +334,7 @@ namespace Deneme_proje.Controllers
 
             return Json(cariList);
         }
-
+        [Authorize]
         public IActionResult CariHareket(int cariCins, string cariKod, string selectedCariText, DateTime? ilkTar, DateTime? sonTar)
         {
             string firmalar = "0";

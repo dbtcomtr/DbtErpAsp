@@ -59,6 +59,7 @@ builder.Services.AddScoped<FaturaRepository>();
 builder.Services.AddScoped<DenizlerRepository>();
 builder.Services.AddScoped<SirketDurumuRepository>();
 builder.Services.AddScoped<GunayRepository>();
+builder.Services.AddScoped<CrmRepository>();
 builder.Services.AddScoped<DiokiRepository>();
 builder.Services.AddScoped<EmailNotificationService>();
 
@@ -99,11 +100,33 @@ app.UseSession();
 
 app.UseEndpoints(endpoints =>
 {
+    endpoints.MapControllers(); // Attribute routing için gerekli
+
+    // PDF indirme route'ları - BUNLARI EKLEDİK
+    endpoints.MapControllerRoute(
+        name: "TeklifYazdir",
+        pattern: "crm/teklifyazdir/{teklifNo}",
+        defaults: new { controller = "Crm", action = "TeklifYazdir" }
+    );
+
+    endpoints.MapControllerRoute(
+        name: "TeklifYazdirCase",
+        pattern: "crm/TeklifYazdir/{teklifNo}",
+        defaults: new { controller = "Crm", action = "TeklifYazdir" }
+    );
+
+    // Mevcut route'lar
+    endpoints.MapControllerRoute(
+        name: "TeklifDuzenle",
+        pattern: "crm/teklifduzenle/{teklifNo}",
+        defaults: new { controller = "Crm", action = "TeklifDuzenle" }
+    );
+
+    // Default route en sonda olmalı
     endpoints.MapControllerRoute(
         name: "default",
         pattern: "{controller=Login}/{action=Index}/{id?}");
 
-    // Health check endpoint ekleyin
     endpoints.MapGet("/health", async context =>
     {
         await context.Response.WriteAsync("OK");

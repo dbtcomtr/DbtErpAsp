@@ -1230,10 +1230,7 @@ ORDER BY krsoztaksit_vade -- Vadeye göre sıralama
             {
                 try
                 {
-                    string baseQuery = HasProductionPermission()
-                        ? GetFullProductionQueryWithFilter()
-                        : GetLimitedProductionQueryWithFilter();
-
+                    string baseQuery = GetProductionQueryWithFilter();
                     string finalQuery = baseQuery;
 
                     // Kullanıcı numarası varsa iş merkezi filtresi uygula
@@ -1274,8 +1271,8 @@ ORDER BY krsoztaksit_vade -- Vadeye göre sıralama
             }
         }
 
-        // Filtreli sorgu metotları
-        private string GetFullProductionQueryWithFilter()
+        // Tek sorgu metodu
+        private string GetProductionQueryWithFilter()
         {
             return @"
 SELECT 
@@ -1312,132 +1309,6 @@ SELECT
       AND i.is_Emri_PlanBitisTarihi >= CAST(GETDATE() AS DATE)
       {IS_MERKEZI_FILTER}
   ORDER BY upl.upl_kodu ASC, i.is_BaslangicTarihi DESC";
-        }
-
-        private string GetLimitedProductionQueryWithFilter()
-        {
-            return @"
-SELECT 
-      i.is_Guid,
-      i.is_Kod,
-      i.is_Ismi,
-      i.is_EmriDurumu,
-      i.is_BaslangicTarihi,
-      i.is_Emri_PlanBitisTarihi,
-      rtp.RtP_PlanlananIsMerkezi AS IsMerkezi,
-      im.IsM_Aciklama AS IsMerkeziAciklama,
-      upl.upl_kodu AS UrunKodu,
-      s.sto_isim AS UrunAdi,
-      s.sto_yabanci_isim AS YabanciIsim,
-      s.sto_kisa_ismi AS KisaIsim,
-      s.sto_birim1_ad AS Birim1Ad,
-      s.sto_birim2_ad AS Birim2Ad,
-      s.sto_birim2_katsayi AS Birim2Katsayi,
-      upl.upl_miktar AS Miktar
-  FROM ISEMIRLERI i 
-  LEFT JOIN URETIM_MALZEME_PLANLAMA upl 
-      ON upl.upl_isemri = i.is_Kod 
-      AND upl.upl_uretim_tuket = 1
-  LEFT JOIN STOKLAR s 
-      ON s.sto_kod = upl.upl_kodu
-  LEFT JOIN URETIM_ROTA_PLANLARI rtp
-      ON rtp.RtP_IsEmriKodu = i.is_Kod 
-      AND rtp.RtP_UrunKodu = upl.upl_kodu 
-      AND rtp.RtP_SatirNo = 0
-  LEFT JOIN IS_MERKEZLERI im
-      ON im.IsM_Kodu = rtp.RtP_PlanlananIsMerkezi
-  WHERE i.is_EmriDurumu IN (0, 1)
-      AND upl.upl_kodu IS NOT NULL
-      AND i.is_Emri_PlanBitisTarihi >= CAST(GETDATE() AS DATE)
-      {IS_MERKEZI_FILTER}
-  ORDER BY upl.upl_kodu ASC, i.is_BaslangicTarihi DESC";
-        }
-
-        public bool HasProductionPermission()
-        {
-            var userNo = GetCurrentUserNo();
-            return MenuHelper.KullaniciYetkisiVarMi("Fatura", "UretIsEmri", userNo);
-        }
-
-        private string GetFullProductionQuery()
-        {
-            return @"
-SELECT 
-      i.is_Guid,
-      i.is_Kod,
-      i.is_Ismi,
-      i.is_EmriDurumu,
-      i.is_BaslangicTarihi,
-      i.is_Emri_PlanBitisTarihi,
-      rtp.RtP_PlanlananIsMerkezi AS IsMerkezi,
-      im.IsM_Aciklama AS IsMerkeziAciklama,
-      upl.upl_kodu AS UrunKodu,
-      s.sto_isim AS UrunAdi,
-      s.sto_yabanci_isim AS YabanciIsim,
-      s.sto_kisa_ismi AS KisaIsim,
-      s.sto_birim1_ad AS Birim1Ad,
-      s.sto_birim2_ad AS Birim2Ad,
-      s.sto_birim2_katsayi AS Birim2Katsayi,
-      upl.upl_miktar AS Miktar
-  FROM ISEMIRLERI i 
-  LEFT JOIN URETIM_MALZEME_PLANLAMA upl 
-      ON upl.upl_isemri = i.is_Kod 
-      AND upl.upl_uretim_tuket = 1
-  LEFT JOIN STOKLAR s 
-      ON s.sto_kod = upl.upl_kodu
-  LEFT JOIN URETIM_ROTA_PLANLARI rtp
-      ON rtp.RtP_IsEmriKodu = i.is_Kod 
-      AND rtp.RtP_UrunKodu = upl.upl_kodu 
-      AND rtp.RtP_SatirNo = 0
-  LEFT JOIN IS_MERKEZLERI im
-      ON im.IsM_Kodu = rtp.RtP_PlanlananIsMerkezi
-  WHERE i.is_EmriDurumu IN (0, 1)
-      AND upl.upl_kodu IS NOT NULL
-      AND i.is_Emri_PlanBitisTarihi >= CAST(GETDATE() AS DATE)
-  ORDER BY upl.upl_kodu ASC, i.is_BaslangicTarihi DESC;
-    ";
-        }
-
-
-        private string GetLimitedProductionQuery()
-        {
-            return @"
-SELECT 
-      i.is_Guid,
-      i.is_Kod,
-      i.is_Ismi,
-      i.is_EmriDurumu,
-      i.is_BaslangicTarihi,
-      i.is_Emri_PlanBitisTarihi,
-      rtp.RtP_PlanlananIsMerkezi AS IsMerkezi,
-      im.IsM_Aciklama AS IsMerkeziAciklama,
-      upl.upl_kodu AS UrunKodu,
-      s.sto_isim AS UrunAdi,
-      s.sto_yabanci_isim AS YabanciIsim,
-      s.sto_kisa_ismi AS KisaIsim,
-      s.sto_birim1_ad AS Birim1Ad,
-      s.sto_birim2_ad AS Birim2Ad,
-      s.sto_birim2_katsayi AS Birim2Katsayi,
-      upl.upl_miktar AS Miktar
-  FROM ISEMIRLERI i 
-  LEFT JOIN URETIM_MALZEME_PLANLAMA upl 
-      ON upl.upl_isemri = i.is_Kod 
-      AND upl.upl_uretim_tuket = 1
-  LEFT JOIN STOKLAR s 
-      ON s.sto_kod = upl.upl_kodu
-  LEFT JOIN URETIM_ROTA_PLANLARI rtp
-      ON rtp.RtP_IsEmriKodu = i.is_Kod 
-      AND rtp.RtP_UrunKodu = upl.upl_kodu 
-      AND rtp.RtP_SatirNo = 0
-  LEFT JOIN IS_MERKEZLERI im
-      ON im.IsM_Kodu = rtp.RtP_PlanlananIsMerkezi
-  WHERE i.is_EmriDurumu IN (0, 1)
-     AND rtp.RtP_PlanlananIsMerkezi = '010'
-      AND upl.upl_kodu IS NOT NULL
-      AND i.is_Emri_PlanBitisTarihi >= CAST(GETDATE() AS DATE)
-  ORDER BY upl.upl_kodu ASC, i.is_BaslangicTarihi DESC;
-
-    ";
         }
 
 
@@ -4041,6 +3912,8 @@ ORDER BY sh.sth_create_date DESC";
         // FaturaRepository.cs içine eklenecek metotlar
 
         // Malzeme planlamayı getir
+        // FaturaRepository.cs içindeki GetMalzemePlanlama metodunu aşağıdaki şekilde güncelleyin
+
         public IEnumerable<MalzemePlanlama> GetMalzemePlanlama(string isEmriKodu)
         {
             var connectionString = _dbSelectorService.GetConnectionString();
@@ -4069,7 +3942,9 @@ ORDER BY sh.sth_create_date DESC";
                 AND sh.sth_stok_kod = upl.upl_kodu 
                 AND sh.sth_tip = 1 
                 AND sh.sth_cins = 7
-            ), 0) AS KalanMiktar
+            ), 0) AS KalanMiktar,
+            -- Depodaki miktar (depo 1, günün tarihi)
+            dbo.fn_DepodakiMiktar(upl.upl_kodu, 2, GETDATE()) AS DepodakiMiktar
         FROM URETIM_MALZEME_PLANLAMA upl
         INNER JOIN STOKLAR s ON s.sto_kod = upl.upl_kodu
         WHERE upl.upl_isemri = @IsEmriKodu 
@@ -4088,59 +3963,184 @@ ORDER BY sh.sth_create_date DESC";
             }
         }
 
-        // MalzemeTuketimi metodunu güncelle
-        public string MalzemeTuketimi(string isEmriKodu, List<TuketimItem> tuketimListesi, List<TuketimItem> eklenenMalzemeler = null)
+
+        public string MalzemeTuketimi(string isEmriKodu, List<TuketimItem> tuketimListesi, List<TuketimItem> eklenenMalzemeler = null, decimal? uretimMiktari = null)
+        {
+            var connectionString = _dbSelectorService.GetConnectionString();
+
+            try
+            {
+                _logger.LogInformation($"MalzemeTuketimi repository başladı - İş Emri: {isEmriKodu}, Üretim Miktarı: {uretimMiktari}");
+
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand("MalzemeTuketimi", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.CommandTimeout = 120;
+
+                        // Normal malzemeler JSON'u
+                        string jsonListesi;
+                        if (tuketimListesi != null && tuketimListesi.Any())
+                        {
+                            var normalMalzemeler = tuketimListesi.Select(t => new
+                            {
+                                stokKodu = t.StokKodu ?? "",
+                                miktar = t.Miktar,
+                                eklenmisMalzeme = false,
+                                partiKodu = t.PartiKodu ?? "", // Parti kodu eklendi
+                                lotNo = 1 // lotNo sabit 1 olarak eklendi
+                            });
+                            jsonListesi = System.Text.Json.JsonSerializer.Serialize(normalMalzemeler);
+                        }
+                        else
+                        {
+                            jsonListesi = "[]";
+                        }
+
+                        // Eklenen malzemeler JSON'u
+                        string eklenenJson = null;
+                        if (eklenenMalzemeler != null && eklenenMalzemeler.Any())
+                        {
+                            var eklenenMalzemeObjeler = eklenenMalzemeler.Select(t => new
+                            {
+                                stokKodu = t.StokKodu ?? "",
+                                miktar = t.Miktar,
+                                partiKodu = t.PartiKodu ?? "", // Parti kodu eklendi
+                                lotNo = 1 // lotNo sabit 1 olarak eklendi
+                            });
+                            eklenenJson = System.Text.Json.JsonSerializer.Serialize(eklenenMalzemeObjeler);
+                        }
+
+                        _logger.LogInformation($"JSON Listesi: {jsonListesi}");
+                        _logger.LogInformation($"Eklenen JSON: {eklenenJson ?? "null"}");
+
+                        command.Parameters.AddWithValue("@isemri", isEmriKodu ?? "");
+                        command.Parameters.AddWithValue("@tuketim_listesi", jsonListesi);
+                        command.Parameters.AddWithValue("@eklenen_malzemeler", (object)eklenenJson ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@uretim_miktari", (object)uretimMiktari ?? DBNull.Value);
+
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                string durum = GetSafeString(reader, "durum");
+                                string evrakNo = GetSafeString(reader, "evrak_no");
+                                int malzemeSayisi = GetSafeInt(reader, "tuketilen_malzeme_sayisi");
+                                string barkod = GetSafeString(reader, "barkod");
+                                string makine = GetSafeString(reader, "makine");
+                                decimal uretilenMiktar = GetSafeDecimal(reader, "uretilen_miktar");
+                                decimal kalanPlanlananMiktar = GetSafeDecimal(reader, "kalan_planlanan_miktar");
+                                string isemriDurumu = GetSafeString(reader, "isemri_durumu");
+
+                                string sonuc = $"✅ TÜKETİM: {evrakNo} evrakıyla {malzemeSayisi} malzeme tüketildi";
+                                if (uretilenMiktar > 0)
+                                {
+                                    sonuc += $" | 🏭 ÜRETİM: {uretilenMiktar} adet üretildi";
+                                }
+                                if (!string.IsNullOrEmpty(barkod))
+                                {
+                                    sonuc += $", Barkod: {barkod}";
+                                }
+                                if (!string.IsNullOrEmpty(makine))
+                                {
+                                    sonuc += $", Makine: {makine}";
+                                }
+                                if (kalanPlanlananMiktar > 0)
+                                {
+                                    sonuc += $" | 📋 İŞ EMRİ: Kalan planlanan miktar {kalanPlanlananMiktar}";
+                                }
+                                else if (!string.IsNullOrEmpty(isemriDurumu))
+                                {
+                                    sonuc += $" | 🎯 İŞ EMRİ: {isemriDurumu}";
+                                }
+
+                                _logger.LogInformation($"İşlem başarılı: {sonuc}");
+                                return sonuc;
+                            }
+
+                            _logger.LogWarning("Stored procedure'den sonuç okunamadı");
+                            return "Tüketim ve üretim yapıldı fakat sonuç alınamadı.";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "MalzemeTuketimi repository hata: {Message}", ex.Message);
+                throw;
+            }
+        }
+        // Güvenli okuma metotları ekleyin
+        private string GetSafeString(SqlDataReader reader, string columnName)
+        {
+            try
+            {
+                var ordinal = reader.GetOrdinal(columnName);
+                return reader.IsDBNull(ordinal) ? "" : reader.GetString(ordinal);
+            }
+            catch (Exception)
+            {
+                return "";
+            }
+        }
+
+        private int GetSafeInt(SqlDataReader reader, string columnName)
+        {
+            try
+            {
+                var ordinal = reader.GetOrdinal(columnName);
+                return reader.IsDBNull(ordinal) ? 0 : reader.GetInt32(ordinal);
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+        }
+
+        private decimal GetSafeDecimal(SqlDataReader reader, string columnName)
+        {
+            try
+            {
+                var ordinal = reader.GetOrdinal(columnName);
+                return reader.IsDBNull(ordinal) ? 0 : reader.GetDecimal(ordinal);
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+        }
+        public IEnumerable<PartiKoduModel> GetPartiKodlari(string stokKodu)
         {
             var connectionString = _dbSelectorService.GetConnectionString();
             using (var connection = new SqlConnection(connectionString))
             {
-                connection.Open();
-                using (var command = new SqlCommand("MalzemeTuketimi", connection))
+                string query = @"
+        SELECT 
+            msg_S_0001 AS StokKodu,
+            msg_S_0342 AS PartiKodu,
+            msg_S_0222 AS LotNo,
+            msg_S_0165 AS Miktar
+        FROM PARTILOT_CHOOSE_2A 
+        WHERE msg_S_0001 = @StokKodu 
+            AND msg_S_0165 > 10
+        ORDER BY msg_S_0342 ASC";
+
+                try
                 {
-                    command.CommandType = CommandType.StoredProcedure;
-
-                    // Normal malzemeler JSON'u
-                    var jsonListesi = System.Text.Json.JsonSerializer.Serialize(
-                        tuketimListesi.Select(t => new {
-                            stokKodu = t.StokKodu,
-                            miktar = t.Miktar,
-                            eklenmisMalzeme = false
-                        })
-                    );
-
-                    // Eklenen malzemeler JSON'u
-                    string eklenenJson = null;
-                    if (eklenenMalzemeler != null && eklenenMalzemeler.Any())
-                    {
-                        eklenenJson = System.Text.Json.JsonSerializer.Serialize(
-                            eklenenMalzemeler.Select(t => new {
-                                stokKodu = t.StokKodu,
-                                miktar = t.Miktar
-                            })
-                        );
-                    }
-
-                    command.Parameters.AddWithValue("@isemri", isEmriKodu);
-                    command.Parameters.AddWithValue("@tuketim_listesi", jsonListesi);
-                    command.Parameters.AddWithValue("@eklenen_malzemeler", (object)eklenenJson ?? DBNull.Value);
-
-                    using (var reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            string durum = reader.GetString("durum");
-                            string evrakNo = reader.GetString("evrak_no");
-                            int malzemeSayisi = reader.GetInt32("tuketilen_malzeme_sayisi");
-
-                            return $"Tüketim başarılı! Evrak No: {evrakNo}, {malzemeSayisi} adet malzeme tüketildi.";
-                        }
-                        return "Tüketim yapıldı fakat sonuç alınamadı.";
-                    }
+                    _logger.LogInformation($"Parti sorgusu çalıştırılıyor: {stokKodu}");
+                    var result = connection.Query<PartiKoduModel>(query, new { StokKodu = stokKodu });
+                    _logger.LogInformation($"Sorgu sonucu: {result?.Count() ?? 0} kayıt");
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Parti kodları alınırken hata oluştu. Stok Kodu: {StokKodu}", stokKodu);
+                    throw;
                 }
             }
         }
-
-
         public class MusteriAcikFaturaViewModel
         {
             public string MusteriKodu { get; set; }

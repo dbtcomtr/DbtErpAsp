@@ -1,251 +1,287 @@
 ﻿@model IEnumerable<Deneme_proje.Models.DenizlerEntities.KrediSozlesmesi>
 
 @{
-    ViewData["Title"] = "Fatura Raporu";
+    ViewData["Title"] = "Kredi Sözleşmeleri";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
-
 
 <div class="main-content mt-5">
     <div class="px-lg-5 px-3">
         <div class="row">
             <div class="col-sm-12 p-0">
                 <div class="main-header">
-
                     <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
                         <li class="breadcrumb-item">
                             <a href="/Home/Index">
                                 <i class="icofont icofont-home"></i>
                             </a>
                         </li>
-
                     </ol>
                 </div>
             </div>
         </div>
-        <div class="row mb-lg-5 mb-1">
-            <div class="col-lg-4">
-                <form asp-action="KrediSozlesmeleri" method="get" class="mb-4 px-4 py-3">
-                    <div class="row d-flex align-items-center">
-                        <div class="form-group col-md-4">
-                            <label for="baslamaTarihi">Başlama Tarihi:</label>
-                            <input type="date" id="baslamaTarihi" name="baslamaTarihi" class="form-control"
-                                   required value="@ViewBag.BaslamaTarihi" />
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="bitisTarihi">Bitiş Tarihi:</label>
-                            <input type="date" id="bitisTarihi" name="bitisTarihi" class="form-control"
-                                   required value="@ViewBag.BitisTarihi" />
-                        </div>
-                        <div class="form-group col-md-2">
-                            <label>Durum:</label>
-                            <div>
-                                <input type="radio" id="acik" name="durum" value="Açık" @(ViewBag.Durum == "Açık" ? "checked" : "") />
-                                <label for="acik">Açık</label>
-                            </div>
-                            <div>
-                                <input type="radio" id="kapali" name="durum" value="Kapalı" @(ViewBag.Durum == "Kapalı" ? "checked" : "") />
-                                <label for="kapali">Kapalı</label>
-                            </div>
-                        </div>
-                        <div class="form-group col-md-2 text-right">
-                            <button type="submit" class="btn btn-primary mt-4">Ara</button>
-                        </div>
+
+        <!-- Üst Panel: Tarih Filtresi ve Banka Özeti -->
+        <div class="row mb-4">
+            <!-- Tarih Filtresi ve Durum -->
+            <div class="col-lg-6 col-md-12 mb-3">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 15px 20px;">
+                        <h5 class="card-header-text text-white mb-0">Filtreler</h5>
                     </div>
-                </form>
+                    <div class="card-block" style="padding: 20px;">
+                        <form asp-action="KrediSozlesmeleri" method="get">
+                            <div class="row">
+                                <div class="form-group col-md-5">
+                                    <label for="baslamaTarihi" class="form-label">Başlama Tarihi:</label>
+                                    <input type="date" id="baslamaTarihi" name="baslamaTarihi" class="form-control" required value="@ViewBag.BaslamaTarihi" />
+                                </div>
+                                <div class="form-group col-md-5">
+                                    <label for="bitisTarihi" class="form-label">Bitiş Tarihi:</label>
+                                    <input type="date" id="bitisTarihi" name="bitisTarihi" class="form-control" required value="@ViewBag.BitisTarihi" />
+                                </div>
+                                <div class="form-group col-md-2 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary btn-block">
+                                        <i class="icofont icofont-search mr-1"></i>Ara
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-12">
+                                    <label class="form-label">Durum:</label>
+                                    <div class="form-check-inline">
+                                        <input class="form-check-input" type="radio" id="acik" name="durum" value="Açık" @(ViewBag.Durum == "Açık" ? "checked" : "") />
+                                        <label class="form-check-label" for="acik">Açık</label>
+                                    </div>
+                                    <div class="form-check-inline ml-3">
+                                        <input class="form-check-input" type="radio" id="kapali" name="durum" value="Kapalı" @(ViewBag.Durum == "Kapalı" ? "checked" : "") />
+                                        <label class="form-check-label" for="kapali">Kapalı</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Banka Özeti -->
+            <div class="col-lg-6 col-md-12 mb-3">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 15px 20px;">
+                        <h5 class="card-header-text text-white mb-0">Banka Özeti</h5>
+                    </div>
+                    <div class="card-block" style="padding: 15px;">
+                        @if (ViewBag.BankaOzetleri != null)
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover mb-0">
+                                    <thead>
+                                        <tr class="tablo-icerik-yazi">
+                                            <th style="font-size: 12px; font-weight: 600;">Banka</th>
+                                            <th class="text-center" style="font-size: 12px; font-weight: 600;">Sözleşme Sayısı</th>
+                                            <th class="text-right" style="font-size: 12px; font-weight: 600;">Toplam Tutar</th>
+                                            <th class="text-right" style="font-size: 12px; font-weight: 600;">Kalan Taksit</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var banka in ViewBag.BankaOzetleri)
+                                        {
+                                            <tr>
+                                                <td style="font-size: 11px; padding: 8px;">
+                                                    <div>
+                                                        <strong>@banka.BankaKodu</strong><br>
+                                                        <span class="text-muted">@banka.BankaAdi</span>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center" style="font-size: 11px; padding: 8px;">
+                                                    <span class="badge badge-info">@banka.SozlesmeSayisi</span>
+                                                </td>
+                                                <td class="text-right" style="font-size: 11px; padding: 8px;">
+                                                    <strong style="color: #28a745;">@string.Format("{0:N2}", banka.ToplamTutar)</strong>
+                                                </td>
+                                                <td class="text-right" style="font-size: 11px; padding: 8px;">
+                                                    <strong style="color: #dc3545;">@string.Format("{0:N2}", banka.KalanTutar)</strong>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center text-muted py-3">
+                                <i class="icofont icofont-info-circle mr-2"></i>
+                                Veri bulunamadı
+                            </div>
+                        }
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-header" style=" background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;"
-                         ">
-                        <h5 class="card-header-text text-white">Kredi Sözleşmeleri</h5>
-                    </div>
-
-                    <div class="card-block accordion-block">
-
-                        <div class="col-md-12">
+        <!-- Ana Kredi Sözleşmeleri Tablosu -->
+        <div class="card">
+            <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 15px 20px;">
+                <h5 class="card-header-text text-white mb-0">
+                    <i class="icofont icofont-list mr-2"></i>Kredi Sözleşmeleri Listesi
+                </h5>
+            </div>
+            <div class="card-block accordion-block">
+                <div class="col-md-12">
                     @if (Model != null && Model.Any())
                     {
-                                <div id="example_wrapper" class="dataTables_wrapper py-lg-3">
-                                    <div class="dataTables_length" id="example_length"></div>
-                                    <div class="dataTables_filter" id="example_filter"></div>
-                                    <div id="example_wrapper" class="table-wrapper">
-                                        <table id="example" class="display dataTable" style="width:100%">
-                                            <thead>
-                                                <tr class="tablo-icerik-yazi">
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Sözleşme Kodu<span>
-                                                        </div>
-                                                    </th>
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Açıklama</span>
-                                                        </div>
-                                                    </th>
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Banka Kodu</span>
-                                                        </div>
-                                                    </th>
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Banka Adı</span>
-                                                        </div>
-                                                    </th>
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Kredi Tipi</span>
-                                                        </div>
-                                                    </th>
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Döviz Cinsi</span>
-                                                        </div>
-                                                    </th>
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Kapanış Tarihi</span>
-                                                        </div>
-                                                    </th>
-
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Durum</span>
-                                                        </div>
-                                                    </th>
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Kredi Tutarı</span>
-                                                        </div>
-                                                    </th>
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Taksit Sayısı</span>
-                                                        </div>
-                                                    </th>
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Taksit No</span>
-                                                        </div>
-                                                    </th>
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Vade Tarihi</span>
-                                                        </div>
-                                                    </th>
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Taksit Tutarı</span>
-                                                        </div>
-                                                    </th>
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Taksit Anapara</span>
-                                                        </div>
-                                                    </th>
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Taksit Fazi</span>
-                                                        </div>
-                                                    </th>
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Taksit BSMV</span>
-                                                        </div>
-                                                    </th>
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Taksit KKDF</span>
-                                                        </div>
-                                                    </th>
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Kalan Anapara</span>
-                                                        </div>
-                                                    </th>
-
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Ödeme Fiş Tarihi</span>
-                                                        </div>
-                                                    </th>
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Ödenen Taksit Tutarı</span>
-                                                        </div>
-                                                    </th>
-                                                    <th class="sorting text-left" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 100px;">
-                                                        <div class="th-content">
-                                                            <span>Kalan Taksit Tutarı</span>
-                                                        </div>
-                                                    </th>
-
-
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+                        <div id="example_wrapper" class="dataTables_wrapper py-lg-3">
+                            <div class="dataTables_length" id="example_length"></div>
+                            <div class="dataTables_filter" id="example_filter"></div>
+                            <div id="example_wrapper" class="table-wrapper">
+                                <table id="example" class="display dataTable" style="width:100%">
+                                    <thead>
+                                        <tr class="tablo-icerik-yazi">
+                                            <th class="sorting text-left" style="width: 80px;">
+                                                <div class="th-content"><span>Sözleşme Kodu</span></div>
+                                            </th>
+                                            <th class="sorting text-left" style="width: 120px;">
+                                                <div class="th-content"><span>Açıklama</span></div>
+                                            </th>
+                                            <th class="sorting text-left" style="width: 80px;">
+                                                <div class="th-content"><span>Banka Kodu</span></div>
+                                            </th>
+                                            <th class="sorting text-left" style="width: 120px;">
+                                                <div class="th-content"><span>Banka Adı</span></div>
+                                            </th>
+                                            <th class="sorting text-left" style="width: 80px;">
+                                                <div class="th-content"><span>Kredi Tipi</span></div>
+                                            </th>
+                                            <th class="sorting text-center" style="width: 60px;">
+                                                <div class="th-content"><span>Döviz</span></div>
+                                            </th>
+                                            <th class="sorting text-center" style="width: 90px;">
+                                                <div class="th-content"><span>Kapanış Tarihi</span></div>
+                                            </th>
+                                            <th class="sorting text-center" style="width: 60px;">
+                                                <div class="th-content"><span>Durum</span></div>
+                                            </th>
+                                            <th class="sorting text-right" style="width: 100px;">
+                                                <div class="th-content"><span>Kredi Tutarı</span></div>
+                                            </th>
+                                            <th class="sorting text-center" style="width: 60px;">
+                                                <div class="th-content"><span>Taksit Sayısı</span></div>
+                                            </th>
+                                            <th class="sorting text-center" style="width: 60px;">
+                                                <div class="th-content"><span>Taksit No</span></div>
+                                            </th>
+                                            <th class="sorting text-center" style="width: 90px;">
+                                                <div class="th-content"><span>Vade Tarihi</span></div>
+                                            </th>
+                                            <th class="sorting text-right" style="width: 90px;">
+                                                <div class="th-content"><span>Taksit Tutarı</span></div>
+                                            </th>
+                                            <th class="sorting text-right" style="width: 90px;">
+                                                <div class="th-content"><span>Taksit Anapara</span></div>
+                                            </th>
+                                            <th class="sorting text-right" style="width: 80px;">
+                                                <div class="th-content"><span>Taksit Faiz</span></div>
+                                            </th>
+                                            <th class="sorting text-right" style="width: 80px;">
+                                                <div class="th-content"><span>BSMV</span></div>
+                                            </th>
+                                            <th class="sorting text-right" style="width: 80px;">
+                                                <div class="th-content"><span>KKDF</span></div>
+                                            </th>
+                                            <th class="sorting text-right" style="width: 90px;">
+                                                <div class="th-content"><span>Kalan Anapara</span></div>
+                                            </th>
+                                            <th class="sorting text-center" style="width: 90px;">
+                                                <div class="th-content"><span>Ödeme Tarihi</span></div>
+                                            </th>
+                                            <th class="sorting text-right" style="width: 90px;">
+                                                <div class="th-content"><span>Ödenen Tutar</span></div>
+                                            </th>
+                                            <th class="sorting text-right" style="width: 90px;">
+                                                <div class="th-content"><span>Kalan Tutar</span></div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
                                         @foreach (var item in Model)
                                         {
-                                                    <tr>
-                                                        <td>@item.SozlesmeKodu</td>
-                                                        <td>@item.Aciklama</td>
-                                                        <td>@item.BankaKodu</td>
-                                                        <td>@item.BankaAdi</td>
-                                                        <td>@item.KrediTipi</td>
-                                                        <td>@item.DovizCinsi</td>
-                                                        <td>@item.KapanisTarihi</td>
-                                                        <td>@item.Durum</td>
-                                                        <td class="meblag-cell">@item.KrediTutari</td>
-                                                        <td>@item.TaksitSayisi</td>
-                                                        <td>@item.TaksitNo</td>
-                                                        <td>@item.VadeTarihi</td>
-                                                        <td class="meblag-cell">@item.TaksitTutari</td>
-                                                        <td class="meblag-cell">@item.TaksitAnapara</td>
-                                                        <td class="meblag-cell">@item.TaksitFaiz</td>
-                                                        <td class="meblag-cell">@item.TaksitBSMV</td>
-                                                        <td class="meblag-cell">@item.TaksitKKDF</td>
-                                                        <td class="meblag-cell">@item.KalanAnapara</td>
-                                                        <td>@item.OdemeFisTarihi</td>
-                                                        <td class="meblag-cell">@item.OdenenTaksitTutari</td>
-                                                        <td class="meblag-cell">@item.KalanTaksitTutari</td>
-                                                    </tr>
+                                            <tr>
+                                                <td style="font-size: 12px;">@item.SozlesmeKodu</td>
+                                                <td style="font-size: 12px;">@item.Aciklama</td>
+                                                <td style="font-size: 12px;">@item.BankaKodu</td>
+                                                <td style="font-size: 12px;">@item.BankaAdi</td>
+                                                <td style="font-size: 12px;">@item.KrediTipi</td>
+                                                <td class="text-center" style="font-size: 12px;">@item.DovizCinsi</td>
+                                                <td class="text-center" style="font-size: 12px;">@item.KapanisTarihi.ToString("dd.MM.yyyy")</td>
+                                                <td class="text-center" style="font-size: 12px;">
+                                                    <span class="badge @(item.Durum == "Açık" ? "badge-success" : "badge-secondary")">
+                                                        @item.Durum
+                                                    </span>
+                                                </td>
+                                                <td class="text-right" style="font-size: 12px; font-weight: 600;">@string.Format("{0:N2}", item.KrediTutari)</td>
+                                                <td class="text-center" style="font-size: 12px;">@item.TaksitSayisi</td>
+                                                <td class="text-center" style="font-size: 12px;">@item.TaksitNo</td>
+                                                <td class="text-center" style="font-size: 12px;">@item.VadeTarihi.ToString("dd.MM.yyyy")</td>
+                                                <td class="text-right" style="font-size: 12px; font-weight: 600;">@string.Format("{0:N2}", item.TaksitTutari)</td>
+                                                <td class="text-right" style="font-size: 12px; font-weight: 600;">@string.Format("{0:N2}", item.TaksitAnapara)</td>
+                                                <td class="text-right" style="font-size: 12px; font-weight: 600;">@string.Format("{0:N2}", item.TaksitFaiz)</td>
+                                                <td class="text-right" style="font-size: 12px; font-weight: 600;">@string.Format("{0:N2}", item.TaksitBSMV)</td>
+                                                <td class="text-right" style="font-size: 12px; font-weight: 600;">@string.Format("{0:N2}", item.TaksitKKDF)</td>
+                                                <td class="text-right" style="font-size: 12px; font-weight: 600; color: #dc3545;">@string.Format("{0:N2}", item.KalanAnapara)</td>
+                                                <td class="text-center" style="font-size: 12px;">@item.OdemeFisTarihi.ToString("dd.MM.yyyy")</td>
+                                                <td class="text-right" style="font-size: 12px; font-weight: 600;">@string.Format("{0:N2}", item.OdenenTaksitTutari)</td>
+                                                <td class="text-right" style="font-size: 12px; font-weight: 600; color: #dc3545;">@string.Format("{0:N2}", item.KalanTaksitTutari)</td>
+                                            </tr>
                                         }
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="bottom">
-                                        <div class="dataTables_info" id="example_info"></div>
-                                        <div class="dataTables_paginate" id="example_paginate"></div>
-                                    </div>
-                                </div>
-
+                                    </tbody>
+                                    <tfoot>
+                                        <tr style="background-color: #f8f9fa; font-weight: 600;">
+                                            <th colspan="8" class="text-left">TOPLAM</th>
+                                            <th class="text-right"></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th class="text-right"></th>
+                                            <th class="text-right"></th>
+                                            <th class="text-right"></th>
+                                            <th class="text-right"></th>
+                                            <th class="text-right"></th>
+                                            <th class="text-right"></th>
+                                            <th></th>
+                                            <th class="text-right"></th>
+                                            <th class="text-right"></th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <div class="bottom">
+                                <div class="dataTables_info" id="example_info"></div>
+                                <div class="dataTables_paginate" id="example_paginate"></div>
+                            </div>
+                        </div>
                     }
-
                     else
                     {
-                                <div class="alert alert-warning">Herhangi bir veri bulunamadı.</div>
-                    }
+                        <div class="text-center py-5">
+                            <div class="alert alert-info" role="alert">
+                                <i class="icofont icofont-info-circle mr-2"></i>
+                                <strong>Bilgi:</strong> Seçilen kriterlerde kredi sözleşmesi bulunamadı.
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-
-
-
+<!-- Scripts -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
 <script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
-
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -253,10 +289,8 @@
     });
 </script>
 
-
 <script>
     $('#example').dataTable({
-
         "dom": '<"row"<"col-sm-12"B>>' +
             '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
             't' +
@@ -264,12 +298,124 @@
         "language": {
             "url": "/Content/DataTables/turkish.json"
         },
-        "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'], // Butonlar
-        "pageLength": 5000, // Varsayılan olarak 5000 gösterim
-        "lengthMenu": [[10, 25, 50, 100, 5000], [10, 25, 50, 100, "5000"]] // Kullanıcıya seçim için seçenekler
-    });
+        "buttons": [
+            'copy',
+            'csv',
+            {
+                extend: 'excel',
+                footer: true,
+                title: 'Kredi Sözleşmeleri Raporu',
+                filename: 'KrediSozlesmeleri_' + new Date().toISOString().slice(0,10)
+            },
+            {
+                extend: 'pdf',
+                footer: true,
+                title: 'Kredi Sözleşmeleri Raporu'
+            },
+            'print'
+        ],
+        "pageLength": 50000,
+        "lengthMenu": [[10, 25, 50, 100, 500], [10, 25, 50, 100, "50000"]],
+        "order": [[11, "desc"]], // Vade tarihine göre azalan sıralama
+        "columnDefs": [
+            {
+                "targets": [8, 12, 13, 14, 15, 16, 17, 19, 20], // Para sütunları
+                "className": "text-right"
+            }
+        ],
+        "footerCallback": function (row, data, start, end, display) {
+            var api = this.api();
 
+            // Para sütunlarının indexleri
+            var paraSutunlari = [8, 12, 13, 14, 15, 16, 17, 19, 20];
+
+            // Sayısal değeri çıkarma fonksiyonu (Fatura sayfasındakiyle aynı)
+            var intVal = function (i) {
+                if (typeof i === 'string') {
+                    // Para birimi sembollerini ve formatları temizle
+                    var cleaned = i.replace(/[₺\s]/g, '')
+                                    .replace(/\./g, '')  // Binlik ayraçları
+                                    .replace(/,/g, '.')  // Ondalık ayraç
+                                    .replace(/%/g, '');
+                    return parseFloat(cleaned) || 0;
+                }
+                return typeof i === 'number' ? i : 0;
+            };
+
+            paraSutunlari.forEach(function(index) {
+                var toplam = api
+                    .column(index, { page: 'current' })
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+
+                // Footer'a toplamı yazdır
+                $(api.column(index).footer()).html(
+                    '<strong>' + toplam.toLocaleString('tr-TR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }) + '</strong>'
+                );
+            });
+        }
+    });
 </script>
 
+<style>
+    .badge {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
 
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+    }
 
+    .card-block {
+        padding: 20px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 5px;
+        font-size: 13px;
+        color: #495057;
+    }
+
+    .btn-primary {
+        background-color: #007ba7;
+        border-color: #007ba7;
+        transition: all 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #162e54;
+            border-color: #162e54;
+            transform: translateY(-1px);
+        }
+
+    .alert-info {
+        border-left: 4px solid #007ba7;
+        background-color: rgba(0, 123, 168, 0.05);
+    }
+
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter {
+        margin-bottom: 15px;
+    }
+
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_paginate {
+        margin-top: 15px;
+    }
+
+    .form-check-inline {
+        display: inline-block;
+        margin-right: 15px;
+    }
+
+    .form-check-input {
+        margin-right: 5px;
+    }
+</style>

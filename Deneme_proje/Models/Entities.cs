@@ -3,9 +3,31 @@
 namespace Deneme_proje.Models
 {
     public class Entities
-    {
-       
-        // Model sınıfları
+    {// Models klasörüne ekleyin
+        public class PartiKoduBilgisi
+        {
+            public string StokKodu { get; set; }
+            public string PartiKodu { get; set; }
+            public string LotNo { get; set; }
+            public decimal Miktar { get; set; }
+        }
+
+        public class TuketimKalemi
+        {
+            public string StokKodu { get; set; }
+            public decimal Miktar { get; set; }
+            public string PartiKodu { get; set; }
+            public int? LotNo { get; set; }
+        }
+
+        public class MalzemeTuketimTalebi
+        {
+            public string IsEmriKodu { get; set; }
+            public List<TuketimKalemi> TuketimListesi { get; set; }
+            public List<TuketimKalemi> EklenenMalzemeler { get; set; }
+            public decimal? UretimMiktari { get; set; }
+        }
+
         public class MalzemePlanlama
         {
             public string StokKodu { get; set; }
@@ -14,13 +36,48 @@ namespace Deneme_proje.Models
             public decimal PlanlananMiktar { get; set; }
             public decimal TuketilenMiktar { get; set; }
             public decimal KalanMiktar { get; set; }
+            public decimal DepodakiMiktar { get; set; }
+        }
+        public class MalzemeTuketimRequest
+        {
+            public string IsEmriKodu { get; set; }
+            public List<TuketimItem> TuketimListesi { get; set; }
+            public List<TuketimItem> EklenenMalzemeler { get; set; }
+            public decimal? UretimMiktari { get; set; } // YENİ ALAN
+        }
+        public class PartiKoduModel
+        {
+            public string StokKodu { get; set; }
+            public string PartiKodu { get; set; }
+            public string LotNo { get; set; }
+            public decimal Miktar { get; set; }
+        }
+        public class PartiBilgisi
+        {
+            public string StokKodu { get; set; }
+            public string PartiKodu { get; set; }
+            public string LotNo { get; set; }
+            public decimal Miktar { get; set; }
         }
 
+        // TuketimItem sınıfını güncelle - parti bilgileri eklendi
         public class TuketimItem
         {
             public string StokKodu { get; set; }
             public decimal Miktar { get; set; }
+            public string PartiKodu { get; set; }
+            public string LotNo { get; set; }
+            public string PartiTarihi { get; set; } // Yeni eklenen alan
         }
+
+        // Model sınıfları
+       
+
+        //public class TuketimItem
+        //{
+        //    public string StokKodu { get; set; }
+        //    public decimal Miktar { get; set; }
+        //}
         public class HataliUretimViewModel
         {
             public Guid StokHareketGuid { get; set; }
