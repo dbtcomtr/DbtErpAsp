@@ -15,8 +15,13 @@
     <title>Hatalı Üretimler</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- SheetJS kütüphanesi -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
             background-color: #f8f9fa;
@@ -72,14 +77,14 @@
                 border-color: #dc3545;
             }
 
-        .btn-primary, .btn-danger, .btn-info {
+        .btn-primary, .btn-danger, .btn-info, .btn-success {
             border-radius: 6px;
             padding: 0.5rem 1.25rem;
             font-weight: 500;
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
-            .btn-primary:hover, .btn-danger:hover, .btn-info:hover {
+            .btn-primary:hover, .btn-danger:hover, .btn-info:hover, .btn-success:hover {
                 transform: translateY(-2px);
             }
 
@@ -167,15 +172,18 @@
         }
 
         @@keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
+            from
 
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+        {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+
         }
 
         .modal-header {
@@ -302,6 +310,22 @@
             border-radius: 4px 0 0 4px;
         }
 
+        /* Excel export buton stilleri */
+        .export-buttons {
+            display: inline-block;
+            margin-left: 1rem;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+            .btn-success:hover {
+                background-color: #218838;
+                border-color: #1e7e34;
+            }
+
         @@media (max-width: 768px) {
             .main-content
 
@@ -317,10 +341,16 @@
             margin-bottom: 1rem;
         }
 
-        .btn-primary, .btn-danger, .btn-info {
+        .btn-primary, .btn-danger, .btn-info, .btn-success {
             padding: 0.5rem 1rem;
             font-size: 0.9rem;
             margin-bottom: 0.5rem;
+        }
+
+        .export-buttons {
+            margin-left: 0;
+            margin-top: 0.5rem;
+            display: block;
         }
 
         }
@@ -384,22 +414,7 @@
                                                                placeholder="Stok Kodu veya Adını Yazarak Arayın"
                                                                value="@stokArama"
                                                                autocomplete="off">
-
-                                                        @*   <!-- Stok Arama Modal Butonu -->
-                                                        <div class="input-group-append">
-                                                            <button class="btn btn-outline-secondary" type="button" onclick="openStokSearchModal()">
-                                                                <i class="fa fa-search"></i>
-                                                            </button>
-                                                        </div>
-
-                                                        <!-- Temizle Butonu -->
-                                                        <div class="input-group-append">
-                                                            <button class="btn btn-outline-secondary" type="button" onclick="clearStokSearch()">
-                                                                <i class="fa fa-times"></i>
-                                                            </button>
-                                                        </div> *@
                                                     </div>
-
                                                     <!-- Seçilen stok bilgisi için gizli alan -->
                                                     <input type="hidden" id="selectedStokText" name="selectedStokText" value="@stokArama" />
                                                 </div>
@@ -411,6 +426,14 @@
                                                         <span>Toplam @Model.Count kayıt bulundu</span>
                                                     }
                                                 </div>
+                                            </div>
+                                            <div class="col-md-3 d-flex align-items-end justify-content-end">
+                                                @if (Model != null && Model.Any())
+                                                {
+                                                    <button type="button" id="excelExportButton" class="btn btn-success">
+                                                        <i class="fas fa-file-excel"></i> Excel'e Aktar
+                                                    </button>
+                                                }
                                             </div>
                                         </div>
                                     </form>
@@ -476,6 +499,11 @@
                                         <button type="button" id="silButton" class="btn btn-danger">
                                             <i class="fas fa-trash"></i> Seçili Üretimleri Sil
                                         </button>
+                                        <div class="export-buttons">
+                                            <button type="button" id="selectedExcelExportButton" class="btn btn-success" disabled>
+                                                <i class="fas fa-file-excel"></i> Seçilileri Excel'e Aktar
+                                            </button>
+                                        </div>
                                     </div>
                                 }
                             </div>
@@ -524,6 +552,107 @@
                     column: null,
                     order: 'asc'
                 };
+
+                // Excel export fonksiyonları
+                function exportToExcel(onlySelected = false) {
+                    var data = [];
+                    var headers = ['Stok Kodu', 'Stok Adı', 'Parti Kodu', 'Lot No', 'Miktar', 'Birim', 'İşlem Tarihi', 'İşlem Saati'];
+
+                    data.push(headers);
+
+                    var rows;
+                    if (onlySelected) {
+                        rows = $('.data-row:visible').filter(function() {
+                            return $(this).find('.uretim-sec').is(':checked');
+                        });
+                    } else {
+                        rows = $('.data-row:visible');
+                    }
+
+                    if (rows.length === 0) {
+                        Swal.fire({
+                            title: 'Uyarı!',
+                            text: onlySelected ? 'Seçili kayıt bulunamadı.' : 'Aktarılacak kayıt bulunamadı.',
+                            icon: 'warning',
+                            confirmButtonText: 'Tamam'
+                        });
+                        return;
+                    }
+
+                    rows.each(function() {
+                        var row = $(this);
+                        var rowData = [
+                            row.find('td:eq(1)').text().trim(), // Stok Kodu
+                            row.find('td:eq(2)').text().trim(), // Stok Adı
+                            row.find('td:eq(3)').text().trim(), // Parti Kodu
+                            row.find('td:eq(4)').text().trim(), // Lot No
+                            row.find('td:eq(5)').text().trim().replace(/,/g, ''), // Miktar (virgülü kaldır)
+                            row.find('td:eq(6)').text().trim(), // Birim
+                            row.find('td:eq(7)').text().trim(), // İşlem Tarihi
+                            row.find('td:eq(8)').text().trim()  // İşlem Saati
+                        ];
+                        data.push(rowData);
+                    });
+
+                    // Excel dosyası oluştur
+                    var ws = XLSX.utils.aoa_to_sheet(data);
+
+                    // Sütun genişliklerini ayarla
+                    var colWidths = [
+                        { wch: 15 }, // Stok Kodu
+                        { wch: 30 }, // Stok Adı
+                        { wch: 15 }, // Parti Kodu
+                        { wch: 10 }, // Lot No
+                        { wch: 12 }, // Miktar
+                        { wch: 10 }, // Birim
+                        { wch: 12 }, // İşlem Tarihi
+                        { wch: 12 }  // İşlem Saati
+                    ];
+                    ws['!cols'] = colWidths;
+
+                    // Header stilini ayarla
+                    var range = XLSX.utils.decode_range(ws['!ref']);
+                    for (var C = range.s.c; C <= range.e.c; ++C) {
+                        var address = XLSX.utils.encode_cell({ r: 0, c: C });
+                        if (!ws[address]) continue;
+                        ws[address].s = {
+                            font: { bold: true, color: { rgb: "FFFFFF" } },
+                            fill: { bgColor: { indexed: 64 }, fgColor: { rgb: "366092" } },
+                            alignment: { horizontal: "center" }
+                        };
+                    }
+
+                    var wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "Hatalı Üretimler");
+
+                    // Dosya adını oluştur
+                    var today = new Date();
+                    var dateStr = today.getDate().toString().padStart(2, '0') + '-' +
+                                  (today.getMonth() + 1).toString().padStart(2, '0') + '-' +
+                                  today.getFullYear();
+                    var fileName = 'Hatali_Uretimler_' + dateStr + '.xlsx';
+
+                    // Dosyayı indir
+                    XLSX.writeFile(wb, fileName);
+
+                    // Başarı mesajı
+                    Swal.fire({
+                        title: 'Başarılı!',
+                        text: `${rows.length} kayıt Excel dosyasına aktarıldı.`,
+                        icon: 'success',
+                        confirmButtonText: 'Tamam',
+                        timer: 2000
+                    });
+                }
+
+                // Excel export buton olayları
+                $('#excelExportButton').click(function() {
+                    exportToExcel(false);
+                });
+
+                $('#selectedExcelExportButton').click(function() {
+                    exportToExcel(true);
+                });
 
                 // Sıralama işlevi
                 function sortTable(columnIndex, dataType) {
@@ -878,6 +1007,9 @@
                 function updateSelectedCount() {
                     var seciliSayisi = $(".uretim-sec:checked").length;
                     $("#seciliSayiGoster").text(seciliSayisi);
+
+                    // Seçili Excel export butonunu aktif/pasif yap
+                    $("#selectedExcelExportButton").prop('disabled', seciliSayisi === 0);
                 }
 
                 // Silme butonu

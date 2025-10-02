@@ -196,7 +196,7 @@
                                     <th>Stok Kodu</th>
                                     <th>Stok Adı</th>
                                     <th>Birim</th>
-                              
+
                                 </tr>
                             </thead>
                             <tbody id="stok-sonuclari-tbody">
@@ -224,7 +224,7 @@
     </div>
 </div>
 
-<script>
+ <script>
     // Global değişkenler
     let currentIsEmri = '';
     let currentUrun = '';
@@ -401,99 +401,6 @@
         }
     }
 
-    // Malzeme tablosu oluştur (düzeltilmiş)
-    function malzemeTablosuOlustur() {
-        console.log('Malzeme tablosu oluşturuluyor...');
-        const tbody = document.getElementById('malzeme-tbody');
-
-        // Mevcut hesaplanan değerleri ve input değerlerini sakla
-        const mevcutHesaplananlar = {};
-        const mevcutInputDegerleri = {};
-
-        document.querySelectorAll('.hesaplanan-miktar').forEach(span => {
-            const stokKodu = span.getAttribute('data-stok');
-            mevcutHesaplananlar[stokKodu] = span.textContent;
-        });
-
-        document.querySelectorAll('.tuketim-input[data-tip="planlanan"]').forEach(input => {
-            const stokKodu = input.getAttribute('data-stok');
-            if (input.value) {
-                mevcutInputDegerleri[stokKodu] = input.value;
-            }
-        });
-
-        tbody.innerHTML = '';
-
-        // Planlanan malzemeleri ekle
-        malzemeListesi.forEach(malzeme => {
-            const row = tbody.insertRow();
-            const depodakiMiktar = malzeme.depodakiMiktar || 0;
-            const planliMiktar = malzeme.planlananMiktar || 0;
-            const depoRenk = depodakiMiktar >= planliMiktar ? 'color: green; font-weight: bold;' : 'color: red; font-weight: bold;';
-
-            // Parti kodlarını miktara göre sırala (EN KÜÇÜK MİKTAR ÖNCE)
-            const siraliPartiKodlari = partiKodlari[malzeme.stokKodu]?.length
-                ? [...partiKodlari[malzeme.stokKodu]].sort((a, b) => a.Miktar - b.Miktar)
-                : [];
-
-            let partiSelect = createPartiSelectHtml(malzeme.stokKodu, siraliPartiKodlari);
-
-            // Saklanan değerleri geri yükle
-            const hesaplananDeger = mevcutHesaplananlar[malzeme.stokKodu] || '-';
-            const inputDeger = mevcutInputDegerleri[malzeme.stokKodu] || '';
-
-            row.innerHTML = `
-                <td><strong>${malzeme.stokKodu}</strong></td>
-                <td>${malzeme.stokAdi}</td>
-                <td class="text-center">${malzeme.birimAdi}</td>
-                <td class="text-end">${malzeme.planlananMiktar.toFixed(2)}</td>
-                <td class="text-end">${malzeme.tuketilenMiktar.toFixed(2)}</td>
-                <td class="text-end"><strong>${malzeme.kalanMiktar.toFixed(2)}</strong></td>
-                <td class="text-end" style="${depoRenk}">${depodakiMiktar.toFixed(2)}</td>
-                <td class="text-end" style="background-color: #f8f9fa;"><span class="hesaplanan-miktar" data-stok="${malzeme.stokKodu}">${hesaplananDeger}</span></td>
-                <td>${partiSelect}</td>
-                <td><input type="number" class="form-control tuketim-input" data-stok="${malzeme.stokKodu}" data-planlanan="${malzeme.planlananMiktar}" data-tip="planlanan" min="0" max="${malzeme.kalanMiktar}" step="0.01" onchange="tuketimMiktarKontrol(this)" style="width: 120px;" value="${inputDeger}"></td>
-                <td><span class="durum-badge" data-stok="${malzeme.stokKodu}"></span></td>
-                <td><span class="badge bg-primary">Planlanan</span></td>
-                <td>-</td>`;
-        });
-
-        // Eklenen malzemeleri ekle (her biri için benzersiz ID kullan)
-        eklenenMalzemeler.forEach((malzeme, index) => {
-            const row = tbody.insertRow();
-            const uniqueStokId = `${malzeme.stokKodu}_eklenen_${index}`; // Benzersiz ID
-
-            // Parti kodlarını EN KÜÇÜK MİKTARA göre sırala
-            const siraliPartiKodlari = partiKodlari[malzeme.stokKodu]?.length
-                ? [...partiKodlari[malzeme.stokKodu]].sort((a, b) => a.Miktar - b.Miktar)
-                : [];
-
-            let partiSelect = createPartiSelectHtml(uniqueStokId, siraliPartiKodlari);
-
-            row.innerHTML = `
-                <td><strong>${malzeme.stokKodu}</strong> <small class="text-muted">(#${index + 1})</small></td>
-                <td>${malzeme.stokAdi}</td>
-                <td class="text-center">${malzeme.birimAdi}</td>
-                <td class="text-end">-</td>
-                <td class="text-end">-</td>
-                <td class="text-end">-</td>
-                <td class="text-end" style="color: #888;">Parti'de</td>
-                <td class="text-end" style="background-color: #f8f9fa;">-</td>
-                <td>${partiSelect}</td>
-                <td><input type="number" class="form-control tuketim-input" data-stok="${uniqueStokId}" data-original-stok="${malzeme.stokKodu}" data-planlanan="0" data-tip="eklenen" data-index="${index}" value="${malzeme.miktar || ''}" min="0" step="0.01" onchange="tuketimMiktarKontrol(this)" style="width: 120px;"></td>
-                <td><span class="durum-badge" data-stok="${uniqueStokId}"></span></td>
-                <td><span class="badge bg-warning">Eklenen</span></td>
-                <td><button class="btn btn-sm btn-danger" onclick="eklenenMalzemeyiSil(${index})"><i class="fas fa-trash"></i></button></td>`;
-        });
-
-        // Tüketim miktarlarını kontrol et (saklanan değerler için)
-        setTimeout(() => {
-            document.querySelectorAll('.tuketim-input').forEach(input => {
-                if (input.value) tuketimMiktarKontrol(input);
-            });
-        }, 100);
-    }
-
     // Parti seçildiğinde
     function partiSecildi(selectElement) {
         const stokKodu = selectElement.getAttribute('data-stok');
@@ -504,74 +411,127 @@
         }
     }
 
-    // Tüketim miktar kontrolü
+
+    // Tüketim miktar kontrolü - Güncellenmiş versiyon
     function tuketimMiktarKontrol(input) {
-        const miktar = parseFloat(input.value) || 0;
-        const stokKodu = input.getAttribute('data-stok');
-        const originalStok = input.getAttribute('data-original-stok') || stokKodu;
-        const tip = input.getAttribute('data-tip');
-        const durumBadge = document.querySelector(`[data-stok="${stokKodu}"].durum-badge`);
+         const miktar = parseFloat(input.value) || 0;
+         const stokKodu = input.getAttribute('data-stok');
+         const originalStok = input.getAttribute('data-original-stok') || stokKodu;
+         const tip = input.getAttribute('data-tip');
+         const durumBadge = document.querySelector(`[data-stok="${stokKodu}"].durum-badge`);
 
-        // Parti bilgilerini al
-        const partiSelect = document.querySelector(`select.parti-select[data-stok="${stokKodu}"]`);
-        const selectedOption = partiSelect?.selectedOptions[0];
-        const partiMiktar = selectedOption ? parseFloat(selectedOption.getAttribute('data-miktar') || 0) : 0;
-        const partiKodu = selectedOption ? selectedOption.value : '';
+         // Parti bilgilerini al
+         const partiSelect = document.querySelector(`select.parti-select[data-stok="${stokKodu}"]`);
+         const selectedOption = partiSelect?.selectedOptions[0];
+         const partiMiktar = selectedOption ? parseFloat(selectedOption.getAttribute('data-miktar') || 0) : 0;
+         const partiKodu = selectedOption ? selectedOption.value : '';
 
-        input.classList.remove('is-invalid', 'is-valid', 'is-warning');
-        durumBadge.innerHTML = '';
+         // Hesaplanan miktarı al (tolerans kontrolü için)
+         const hesaplananSpan = document.querySelector(`[data-stok="${originalStok}"].hesaplanan-miktar`);
+         const hesaplananMiktar = hesaplananSpan ? parseFloat(hesaplananSpan.textContent) || 0 : 0;
 
-        if (tip === 'eklenen') {
-            // Eklenen malzemeler için parti miktar kontrolü
-            if (miktar <= 0) {
-                return;
-            }
+         input.classList.remove('is-invalid', 'is-valid', 'is-warning');
+         durumBadge.innerHTML = '';
 
-            if (!partiKodu) {
-                input.classList.add('is-warning');
-                durumBadge.innerHTML = '<span class="badge bg-warning">Parti seçin</span>';
-                return;
-            }
+         if (tip === 'eklenen') {
+             // Eklenen malzemeler için parti miktar kontrolü (değişiklik yok)
+             if (miktar <= 0) {
+                 return;
+             }
 
-            if (miktar > partiMiktar) {
-                input.classList.add('is-invalid');
-                durumBadge.innerHTML = '<span class="badge bg-danger">Partide yetersiz</span>';
-                return;
-            }
+             if (!partiKodu) {
+                 input.classList.add('is-warning');
+                 durumBadge.innerHTML = '<span class="badge bg-warning">Parti seçin</span>';
+                 return;
+             }
 
-            // Her şey uygunsa
-            input.classList.add('is-valid');
-            durumBadge.innerHTML = '<span class="badge bg-success">Uygun</span>';
+             if (miktar > partiMiktar) {
+                 input.classList.add('is-invalid');
+                 durumBadge.innerHTML = '<span class="badge bg-danger">Partide yetersiz</span>';
+                 return;
+             }
 
-            // Eklenen malzeme listesindeki miktarı güncelle
-            const index = parseInt(input.getAttribute('data-index'));
-            if (!isNaN(index) && eklenenMalzemeler[index]) {
-                eklenenMalzemeler[index].miktar = miktar;
-            }
+             input.classList.add('is-valid');
+             durumBadge.innerHTML = '<span class="badge bg-success">Uygun</span>';
 
-            return;
-        }
+             const index = parseInt(input.getAttribute('data-index'));
+             if (!isNaN(index) && eklenenMalzemeler[index]) {
+                 eklenenMalzemeler[index].miktar = miktar;
+             }
 
-        // Planlanan malzemeler için mevcut kontroller
-        const malzeme = malzemeListesi.find(m => m.stokKodu === originalStok);
-        const depodakiMiktar = malzeme?.depodakiMiktar || 0;
-        const maxMiktar = parseFloat(input.getAttribute('max'));
+             return;
+         }
 
-        if (miktar > maxMiktar) {
-            input.classList.add('is-invalid');
-            durumBadge.innerHTML = '<span class="badge bg-danger">Kalanı aşıyor</span>';
-        } else if (miktar > depodakiMiktar) {
-            input.classList.add('is-invalid');
-            durumBadge.innerHTML = '<span class="badge bg-danger">Depoda yetersiz</span>';
-        } else if (partiKodu && miktar > partiMiktar) {
-            input.classList.add('is-invalid');
-            durumBadge.innerHTML = '<span class="badge bg-danger">Partide yetersiz</span>';
-        } else if (miktar > 0 && partiKodu) {
-            input.classList.add('is-valid');
-            durumBadge.innerHTML = '<span class="badge bg-success">Uygun</span>';
-        } else if (miktar > 0 && !partiKodu) {
-            input.classList.add('is-warning');
-            durumBadge.innerHTML = '<span class="badge bg-warning">Parti seçin</span>';
+         // Planlanan malzemeler için kontroller - TOLERANS İLE GÜNCELLENDİ
+         const malzeme = malzemeListesi.find(m => m.stokKodu === originalStok);
+         const depodakiMiktar = malzeme?.depodakiMiktar || 0;
+         const kalanMiktar = malzeme?.kalanMiktar || 0;
+
+         // Tolerans hesaplamaları
+         const kalanToleransAlt = kalanMiktar * 0.9;  // Kalan miktar -10%
+         const kalanToleransUst = kalanMiktar * 1.1;  // Kalan miktar +10%
+         const hesaplananToleransAlt = hesaplananMiktar * 0.9;  // Hesaplanan -10%
+         const hesaplananToleransUst = hesaplananMiktar * 1.1;  // Hesaplanan +10%
+
+         // Miktar 0 ise kontrole gerek yok
+         if (miktar <= 0) {
+             return;
+         }
+
+         // Öncelik sırası: Depoda miktar > Parti miktar > Toleranslı kalan miktar > Toleranslı hesaplanan miktar
+         if (miktar > depodakiMiktar) {
+             input.classList.add('is-invalid');
+             durumBadge.innerHTML = '<span class="badge bg-danger">Depoda yetersiz</span>';
+         } else if (partiKodu && miktar > partiMiktar) {
+             input.classList.add('is-invalid');
+             durumBadge.innerHTML = '<span class="badge bg-danger">Partide yetersiz</span>';
+         } else if (miktar > kalanToleransUst) {
+             input.classList.add('is-invalid');
+             durumBadge.innerHTML = '<span class="badge bg-danger" title="Kalan miktarın %10 üzerinde">Kalan+%10 aşıyor</span>';
+         } else if (!partiKodu && partiKodlari[originalStok]?.length > 0) {
+             input.classList.add('is-warning');
+             durumBadge.innerHTML = '<span class="badge bg-warning">Parti seçin</span>';
+         } else {
+             // Tolerans aralıklarını kontrol et
+             if (hesaplananMiktar > 0) {
+                 if (miktar < hesaplananToleransAlt) {
+                     input.classList.add('is-warning');
+                     durumBadge.innerHTML = '<span class="badge bg-warning" title="Hesaplanan miktardan %10 düşük">Hesaplanan -10%</span>';
+                 } else if (miktar > hesaplananToleransUst) {
+                     input.classList.add('is-warning');
+                     durumBadge.innerHTML = '<span class="badge bg-warning" title="Hesaplanan miktardan %10 yüksek">Hesaplanan +10%</span>';
+                 } else if (miktar < kalanToleransAlt) {
+                     input.classList.add('is-warning');
+                     durumBadge.innerHTML = '<span class="badge bg-warning" title="Kalan miktardan %10 düşük">Kalan -10%</span>';
+                 } else if (miktar > kalanMiktar && miktar <= kalanToleransUst) {
+                     input.classList.add('is-warning');
+                     durumBadge.innerHTML = '<span class="badge bg-warning" title="Kalan miktarın %10 toleransında">Kalan +10% tol.</span>';
+                 } else {
+                     // Her şey normal aralıkta
+                     input.classList.add('is-valid');
+                     durumBadge.innerHTML = '<span class="badge bg-success">Uygun</span>';
+                 }
+             } else {
+                 // Hesaplanan miktar yoksa sadece kalan miktar toleransı
+                 if (miktar < kalanToleransAlt) {
+                     input.classList.add('is-warning');
+                     durumBadge.innerHTML = '<span class="badge bg-warning" title="Kalan miktardan %10 düşük">Kalan -10%</span>';
+                 } else if (miktar > kalanMiktar && miktar <= kalanToleransUst) {
+                     input.classList.add('is-warning');
+                     durumBadge.innerHTML = '<span class="badge bg-warning" title="Kalan miktarın %10 toleransında">Kalan +10% tol.</span>';
+                 } else {
+                     input.classList.add('is-valid');
+                     durumBadge.innerHTML = '<span class="badge bg-success">Uygun</span>';
+                 }
+             }
+         }
+     }
+
+    // Tolerans uyarı mesajını da güncelleyelim
+    function updateToleranceWarning() {
+        const warningDiv = document.querySelector('.alert-warning');
+        if (warningDiv) {
+            warningDiv.innerHTML = '<strong>Uyarı:</strong> Hesaplanan miktara göre ±%10 tolerans kontrolü yapılır';
         }
     }
 
@@ -887,16 +847,140 @@
             alert('Hammadde eklenirken bir hata oluştu.');
         }
     }
+        // Malzeme tablosu oluştur (güncellenmiş versiyon - silme özelliği ile)
+    function malzemeTablosuOlustur() {
+           console.log('Malzeme tablosu oluşturuluyor...');
+           const tbody = document.getElementById('malzeme-tbody');
 
-    // Eklenen malzemeyi sil
+           // Mevcut hesaplanan değerleri ve input değerlerini sakla
+           const mevcutHesaplananlar = {};
+           const mevcutInputDegerleri = {};
+
+           document.querySelectorAll('.hesaplanan-miktar').forEach(span => {
+               const stokKodu = span.getAttribute('data-stok');
+               mevcutHesaplananlar[stokKodu] = span.textContent;
+           });
+
+           document.querySelectorAll('.tuketim-input[data-tip="planlanan"]').forEach(input => {
+               const stokKodu = input.getAttribute('data-stok');
+               if (input.value) {
+                   mevcutInputDegerleri[stokKodu] = input.value;
+               }
+           });
+
+           tbody.innerHTML = '';
+
+           // Planlanan malzemeleri ekle
+           malzemeListesi.forEach(malzeme => {
+               const row = tbody.insertRow();
+               const depodakiMiktar = malzeme.depodakiMiktar || 0;
+               const planliMiktar = malzeme.planlananMiktar || 0;
+               const kalanMiktar = malzeme.kalanMiktar || 0;
+
+               // Toleranslı maksimum miktar hesaplama (kalan miktar + %10)
+               const toleransliMaxMiktar = kalanMiktar * 1.1; // +%10 tolerans
+
+               const depoRenk = depodakiMiktar >= planliMiktar ? 'color: green; font-weight: bold;' : 'color: red; font-weight: bold;';
+
+               // Parti kodlarını miktara göre sırala (EN KÜÇÜK MİKTAR ÖNCE)
+               const siraliPartiKodlari = partiKodlari[malzeme.stokKodu]?.length
+                   ? [...partiKodlari[malzeme.stokKodu]].sort((a, b) => a.Miktar - b.Miktar)
+                   : [];
+
+               let partiSelect = createPartiSelectHtml(malzeme.stokKodu, siraliPartiKodlari);
+
+               // Saklanan değerleri geri yükle
+               const hesaplananDeger = mevcutHesaplananlar[malzeme.stokKodu] || '-';
+               const inputDeger = mevcutInputDegerleri[malzeme.stokKodu] || '';
+
+               let silmeButonu = `<button class="btn btn-sm btn-warning" onclick="planliMalzemeyiTemizle('${malzeme.stokKodu}')"><i class="fas fa-times"></i></button>`;
+
+               row.innerHTML = `
+                   <td><strong>${malzeme.stokKodu}</strong></td>
+                   <td>${malzeme.stokAdi}</td>
+                   <td class="text-center">${malzeme.birimAdi}</td>
+                   <td class="text-end">${malzeme.planlananMiktar.toFixed(2)}</td>
+                   <td class="text-end">${malzeme.tuketilenMiktar.toFixed(2)}</td>
+                   <td class="text-end"><strong>${malzeme.kalanMiktar.toFixed(2)}</strong> <small class="text-muted">(+10%: ${toleransliMaxMiktar.toFixed(2)})</small></td>
+                   <td class="text-end" style="${depoRenk}">${depodakiMiktar.toFixed(2)}</td>
+                   <td class="text-end" style="background-color: #f8f9fa;"><span class="hesaplanan-miktar" data-stok="${malzeme.stokKodu}">${hesaplananDeger}</span></td>
+                   <td>${partiSelect}</td>
+                   <td><input type="number" class="form-control tuketim-input" data-stok="${malzeme.stokKodu}" data-planlanan="${malzeme.planlananMiktar}" data-kalan="${malzeme.kalanMiktar}" data-tip="planlanan" min="0" max="${toleransliMaxMiktar}" step="0.01" onchange="tuketimMiktarKontrol(this)" style="width: 120px;" value="${inputDeger}"></td>
+                   <td><span class="durum-badge" data-stok="${malzeme.stokKodu}"></span></td>
+                   <td><span class="badge bg-primary">Planlanan</span></td>
+                   <td>${silmeButonu}</td>`;
+           });
+
+           // Eklenen malzemeleri ekle (değişiklik yok)
+           eklenenMalzemeler.forEach((malzeme, index) => {
+               const row = tbody.insertRow();
+               const uniqueStokId = `${malzeme.stokKodu}_eklenen_${index}`;
+
+               const siraliPartiKodlari = partiKodlari[malzeme.stokKodu]?.length
+                   ? [...partiKodlari[malzeme.stokKodu]].sort((a, b) => a.Miktar - b.Miktar)
+                   : [];
+
+               let partiSelect = createPartiSelectHtml(uniqueStokId, siraliPartiKodlari);
+
+               row.innerHTML = `
+                   <td><strong>${malzeme.stokKodu}</strong> <small class="text-muted">(#${index + 1})</small></td>
+                   <td>${malzeme.stokAdi}</td>
+                   <td class="text-center">${malzeme.birimAdi}</td>
+                   <td class="text-end">-</td>
+                   <td class="text-end">-</td>
+                   <td class="text-end">-</td>
+                   <td class="text-end" style="color: #888;">Parti'de</td>
+                   <td class="text-end" style="background-color: #f8f9fa;">-</td>
+                   <td>${partiSelect}</td>
+                   <td><input type="number" class="form-control tuketim-input" data-stok="${uniqueStokId}" data-original-stok="${malzeme.stokKodu}" data-planlanan="0" data-tip="eklenen" data-index="${index}" value="${malzeme.miktar || ''}" min="0" step="0.01" onchange="tuketimMiktarKontrol(this)" style="width: 120px;"></td>
+                   <td><span class="durum-badge" data-stok="${uniqueStokId}"></span></td>
+                   <td><span class="badge bg-warning">Eklenen</span></td>
+                   <td><button class="btn btn-sm btn-danger" onclick="eklenenMalzemeyiSil(${index})"><i class="fas fa-trash"></i></button></td>`;
+           });
+
+           // Tüketim miktarlarını kontrol et
+           setTimeout(() => {
+               document.querySelectorAll('.tuketim-input').forEach(input => {
+                   tuketimMiktarKontrol(input);
+               });
+           }, 100);
+       }
+
+    // Planlı malzeme tüketimini temizleme fonksiyonu
+    function planliMalzemeyiTemizle(stokKodu) {
+        if (!confirm('Bu malzemenin tüketim miktarını temizlemek istediğinizden emin misiniz?')) {
+            return;
+        }
+
+        // Input'u temizle
+        const tuketimInput = document.querySelector(`[data-stok="${stokKodu}"].tuketim-input[data-tip="planlanan"]`);
+        if (tuketimInput) {
+            tuketimInput.value = '';
+            tuketimMiktarKontrol(tuketimInput);
+        }
+
+        // Parti seçimini temizle
+        const partiSelect = document.querySelector(`[data-stok="${stokKodu}"].parti-select`);
+        if (partiSelect) {
+            partiSelect.value = '';
+        }
+
+        // Tabloyu yeniden oluştur (silme butonunu gizlemek için)
+        malzemeTablosuOlustur();
+
+        showToast(`Malzeme tüketimi temizlendi: ${stokKodu}`, 'info');
+    }
+
+    // Mevcut eklenenMalzemeyiSil fonksiyonunu güncelle
     function eklenenMalzemeyiSil(index) {
         if (!confirm('Bu malzemeyi listeden çıkarmak istediğinizden emin misiniz?')) return;
+
         eklenenMalzemeler.splice(index, 1); // Index ile sil
         malzemeTablosuOlustur();
         showToast('Malzeme listeden çıkarıldı.', 'info');
     }
 
-    // Tüketim kaydet
+    // Tüketim kaydet fonksiyonunu da güncelle (değişiklik yok, mevcut kod çalışır)
     async function tuketimKaydet() {
         console.log('Tüketim kaydediliyor...');
 
@@ -1016,6 +1100,7 @@
             alert(`Hata: ${error.message}`);
         }
     }
+
 </script>
 
 
@@ -1028,7 +1113,7 @@
             font-size: 0.9em;
         }
 </style>
- <style>
+<style>
     .is-warning {
         border-color: #ffc107 !important;
         background-color: #fff3cd;
@@ -1146,7 +1231,7 @@
         max-width: 130px; /* Parti kodu için optimize edilmiş genişlik */
         font-size: calc(0.7rem + 0.2vw);
         padding: 0.3rem;
-        margin: 0 ;
+        margin: 0;
         text-overflow: ellipsis; /* Uzun parti kodlarını keser */
         white-space: nowrap;
         overflow: hidden;
@@ -1156,6 +1241,7 @@
     .form-control {
         height: auto !important;
     }
+
     .hesaplanan-miktar,
     .durum-badge {
         font-size: calc(0.7rem + 0.2vw);
@@ -1176,149 +1262,143 @@
 
     /* Responsive medya sorguları */
     @@media (max-width: 768px) {
-        .card-header
-
-    {
-        padding: 0.6rem;
-        font-size: calc(0.8rem + 0.3vw);
-    }
-
-    .table {
-        font-size: calc(0.7rem + 0.2vw);
-        min-width: 800px; /* Tablo taşmasını önlemek için */
-    }
-
-        .table th,
-        .table td {
-            padding: 0.4rem;
-            font-size: calc(0.6rem + 0.2vw);
-            min-width: 70px;
+        .card-header {
+            padding: 0.6rem;
+            font-size: calc(0.8rem + 0.3vw);
         }
 
-    .btn-lg {
-        padding: 0.5rem 1rem;
-        font-size: calc(0.8rem + 0.2vw);
-        max-width: 100%;
-    }
+        .table {
+            font-size: calc(0.7rem + 0.2vw);
+            min-width: 800px; /* Tablo taşmasını önlemek için */
+        }
 
-    .modal-lg {
-        max-width: 95vw;
-    }
+            .table th,
+            .table td {
+                padding: 0.4rem;
+                font-size: calc(0.6rem + 0.2vw);
+                min-width: 70px;
+            }
 
-    .position-fixed {
-        width: 95%;
-        max-width: 260px;
-        top: 0.5rem;
-        right: 0.5rem;
-    }
+        .btn-lg {
+            padding: 0.5rem 1rem;
+            font-size: calc(0.8rem + 0.2vw);
+            max-width: 100%;
+        }
 
-    #stok-sonuclari .table-responsive {
-        max-height: 40vh;
-    }
+        .modal-lg {
+            max-width: 95vw;
+        }
 
-    .table-responsive {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
+        .position-fixed {
+            width: 95%;
+            max-width: 260px;
+            top: 0.5rem;
+            right: 0.5rem;
+        }
 
-    .tuketim-input {
-        max-width: 80px;
-        font-size: calc(0.6rem + 0.2vw);
-        padding: 0.2rem;
-    }
+        #stok-sonuclari .table-responsive {
+            max-height: 40vh;
+        }
 
-    .parti-select {
-        max-width: 100%;
-        font-size: calc(0.6rem + 0.2vw);
-    }
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
 
-    .hesaplanan-miktar,
-    .durum-badge {
-        font-size: calc(0.6rem + 0.2vw);
-    }
+        .tuketim-input {
+            max-width: 80px;
+            font-size: calc(0.6rem + 0.2vw);
+            padding: 0.2rem;
+        }
 
-    .table td:nth-child(9) {
-        min-width: 120px;
-    }
+        .parti-select {
+            max-width: 100%;
+            font-size: calc(0.6rem + 0.2vw);
+        }
 
-    .table td:nth-child(10) {
-        min-width: 100%;
-    }
+        .hesaplanan-miktar,
+        .durum-badge {
+            font-size: calc(0.6rem + 0.2vw);
+        }
 
+        .table td:nth-child(9) {
+            min-width: 120px;
+        }
+
+        .table td:nth-child(10) {
+            min-width: 100%;
+        }
     }
 
     @@media (max-width: 576px) {
-        .card-header
+        .card-header {
+            padding: 0.5rem;
+            font-size: calc(0.7rem + 0.3vw);
+        }
 
-    {
-        padding: 0.5rem;
-        font-size: calc(0.7rem + 0.3vw);
-    }
+        .table th,
+        .table td {
+            padding: 0.3rem;
+            font-size: calc(0.6rem + 0.1vw);
+            min-width: 60px;
+        }
 
-    .table th,
-    .table td {
-        padding: 0.3rem;
-        font-size: calc(0.6rem + 0.1vw);
-        min-width: 60px;
-    }
-
-    .btn-lg {
-        padding: 0.4rem 0.8rem;
-        font-size: calc(0.7rem + 0.2vw);
-    }
-
-    .alert-info {
-        padding: 0.5rem;
-        font-size: calc(0.7rem + 0.2vw);
-    }
-
-    .position-fixed {
-        width: 90%;
-        max-width: 240px;
-        top: 0.5rem;
-        right: 0.5rem;
-    }
-
-    #stok-sonuclari .table-responsive {
-        max-height: 30vh;
-    }
-
-    .input-group {
-        flex-direction: column;
-    }
-
-        .input-group .form-control,
-        .input-group .btn {
-            width: 100%;
-            margin-bottom: 0.5rem;
+        .btn-lg {
+            padding: 0.4rem 0.8rem;
             font-size: calc(0.7rem + 0.2vw);
         }
 
-    .tuketim-input {
-        max-width: 100%;
-        font-size: calc(0.6rem + 0.1vw);
-        padding: 0.2rem;
-    }
+        .alert-info {
+            padding: 0.5rem;
+            font-size: calc(0.7rem + 0.2vw);
+        }
 
-    .parti-select {
-        max-width: 100%;
-        font-size: calc(0.6rem + 0.1vw);
-        padding: 0.2rem;
-    }
+        .position-fixed {
+            width: 90%;
+            max-width: 240px;
+            top: 0.5rem;
+            right: 0.5rem;
+        }
 
-    .hesaplanan-miktar,
-    .durum-badge {
-        font-size: calc(0.6rem + 0.1vw);
-    }
+        #stok-sonuclari .table-responsive {
+            max-height: 30vh;
+        }
 
-    .table td:nth-child(9) {
-        min-width: 110px;
-    }
+        .input-group {
+            flex-direction: column;
+        }
 
-    .table td:nth-child(10) {
-        min-width: 80px;
-    }
+            .input-group .form-control,
+            .input-group .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+                font-size: calc(0.7rem + 0.2vw);
+            }
 
+        .tuketim-input {
+            max-width: 100%;
+            font-size: calc(0.6rem + 0.1vw);
+            padding: 0.2rem;
+        }
+
+        .parti-select {
+            max-width: 100%;
+            font-size: calc(0.6rem + 0.1vw);
+            padding: 0.2rem;
+        }
+
+        .hesaplanan-miktar,
+        .durum-badge {
+            font-size: calc(0.6rem + 0.1vw);
+        }
+
+        .table td:nth-child(9) {
+            min-width: 110px;
+        }
+
+        .table td:nth-child(10) {
+            min-width: 80px;
+        }
     }
 </style>
 <style>

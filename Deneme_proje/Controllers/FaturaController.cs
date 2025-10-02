@@ -965,11 +965,39 @@ public IActionResult HataliUretimler(DateTime? baslangicTarihi = null, DateTime?
             }
         }
 
-    
-   
+
+
 
         [HttpPost]
         public JsonResult UretIsEmri(string isEmriKodu, string urunKodu, int depoNo)
+        {
+            try
+            {
+                _logger.LogInformation($"Üretim başlatıldı - İş Emri: {isEmriKodu}, Ürün: {urunKodu}, Depo: {depoNo}");
+
+                var sonuc = _faturaRepository.UretIsEmri(isEmriKodu, urunKodu, depoNo);
+
+                _logger.LogInformation($"Üretim tamamlandı - Sonuç: {sonuc}");
+
+                return Json(new
+                {
+                    success = true,
+                    message = $"Üretim başarıyla tamamlandı. {sonuc}"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Üretim işlemi sırasında hata oluştu - İş Emri: {isEmriKodu}");
+                return Json(new
+                {
+                    success = false,
+                    message = "Üretim işlemi sırasında bir hata oluştu: " + ex.Message
+                });
+            }
+        }
+        [AllowAnonymous]
+        [HttpPost]
+        public JsonResult BarkodBasimIsEmri(string isEmriKodu, string urunKodu, int depoNo)
         {
             try
             {
@@ -1370,7 +1398,6 @@ ORDER BY
                 return View("Error");
             }
         }
-
         public IActionResult IsEmriDurumu()
         {
             try
@@ -1378,6 +1405,9 @@ ORDER BY
                 _logger.LogInformation("IsEmriDurumu sayfası açıldı");
 
                 var isEmirleri = _faturaRepository.GetIsEmirleri();
+
+                // Üretim yetkisini true olarak set et
+                ViewBag.HasProductionPermission = true;
 
                 _logger.LogInformation($"IsEmriDurumu sayfası: {isEmirleri.Count()} iş emri gösteriliyor");
 

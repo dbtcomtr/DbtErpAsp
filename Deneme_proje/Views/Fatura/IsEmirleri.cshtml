@@ -39,7 +39,7 @@
         button.disabled = true;
         button.textContent = 'Üretiliyor...';
 
-        fetch('@Url.Action("UretIsEmri", "Fatura")', {
+        fetch('@Url.Action("BarkodBasimIsEmri", "Fatura")', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',

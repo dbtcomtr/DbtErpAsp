@@ -123,24 +123,13 @@ namespace Deneme_proje.Repository
                     parameters.Add("@BitisTarihi", bitisTarihi);
                     parameters.Add("@ParaBirimi", paraBirimi);
 
-                    // Depo parametresinin null veya boş string olma durumunu ayrı ayrı ele al
-                    if (depolar == null)
-                    {
-                        parameters.Add("@Depolar", DBNull.Value);
-                    }
-                    else if (string.IsNullOrWhiteSpace(depolar))
-                    {
-                        parameters.Add("@Depolar", DBNull.Value);
-                    }
-                    else
-                    {
-                        parameters.Add("@Depolar", depolar);
-                    }
+                    // Dapper için null gönder, DBNull.Value değil
+                    parameters.Add("@Depolar", string.IsNullOrWhiteSpace(depolar) ? null : depolar);
 
                     _logger.LogInformation("Gönderilen depolar parametresi: {depolar}", depolar ?? "NULL");
 
                     var result = connection.Query<StokHareketFoyu>(
-                        "dbo.DBT_STOK_StokHareketFoyu",
+                        "dbo.DBT_STOK_StokHareketFoyuV2",
                         parameters,
                         commandType: CommandType.StoredProcedure,
                         commandTimeout: 120
@@ -153,6 +142,57 @@ namespace Deneme_proje.Repository
                     _logger.LogError(ex, "Stok hareket verileri alınırken hata oluştu. StokKodu: {StokKodu}, Depolar: {Depolar}",
                         stokKodu, depolar ?? "NULL");
                     throw new Exception($"Stok hareket verileri alınırken bir hata oluştu: {ex.Message}", ex);
+                }
+            }
+        }
+
+        public IEnumerable<StokDepoListesi> GetStokDepoListesi(string stokKodu = null, int? depoNo = null)
+        {
+            var connectionString = _dbSelectorService.GetConnectionString();
+            using (var connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+
+                    var sql = @"
+                SELECT 
+                    [#msg_S_0088] AS KayitNo,
+                    [msg_S_0078] AS StokKodu,
+                    [msg_S_0870] AS StokAdi,
+                    [msg_S_0006] AS Fiyat,
+                    [msg_S_1173] AS DovizCinsi,
+                    DepoNo,
+                    DepoAdi,
+                    [msg_S_0165] AS Miktar,
+                    BirimAdi,
+                    GuncellemeTarihi
+                FROM [dbo].[STOKLAR_CHOOSE_2A_DEPO]
+                WHERE 1=1";
+
+                    var parameters = new DynamicParameters();
+
+                    if (!string.IsNullOrWhiteSpace(stokKodu))
+                    {
+                        sql += " AND [msg_S_0078] = @StokKodu";
+                        parameters.Add("@StokKodu", stokKodu);
+                    }
+
+                    if (depoNo.HasValue && depoNo.Value > 0)
+                    {
+                        sql += " AND DepoNo = @DepoNo";
+                        parameters.Add("@DepoNo", depoNo.Value);
+                    }
+
+                    sql += " ORDER BY [msg_S_0078], DepoNo";
+
+                    var result = connection.Query<StokDepoListesi>(sql, parameters, commandTimeout: 120);
+                    return result.ToList();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Stok-Depo listesi alınırken hata oluştu.");
+                    throw new Exception($"Stok-Depo listesi alınırken bir hata oluştu: {ex.Message}", ex);
                 }
             }
         }

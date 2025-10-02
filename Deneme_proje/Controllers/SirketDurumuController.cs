@@ -399,17 +399,22 @@ namespace Deneme_proje.Controllers
                 ViewBag.Depolar = depolarList;
                 ViewBag.Stoklar = stoklarList;
 
-                // Varsayılan tarih aralığı
+                // Varsayılan tarih aralığı - bugünden 1 ay önce ve bugün
                 if (!baslamaTarihi.HasValue)
-                    baslamaTarihi = DateTime.Now.AddMonths(-1);
-
+                    baslamaTarihi = DateTime.Now.AddMonths(-1).Date;
                 if (!bitisTarihi.HasValue)
-                    bitisTarihi = DateTime.Now;
+                    bitisTarihi = DateTime.Now.Date;
 
-                // Depo seçimi kontrolü ve loglaması
+                // ViewBag'e tarihleri ekle
+                ViewBag.BaslamaTarihi = baslamaTarihi.Value.ToString("yyyy-MM-dd");
+                ViewBag.BitisTarihi = bitisTarihi.Value.ToString("yyyy-MM-dd");
+                ViewBag.ParaBirimi = paraBirimi;
+                ViewBag.SelectedDepolar = depolar;
+                ViewBag.SelectedStokKodu = stokKodu;
+
                 _logger.LogInformation("Controller'da depolar parametresi: {depolar}", depolar ?? "NULL");
 
-                // Stok kodu kontrolü
+                // Stok kodu boşsa sadece formu göster
                 if (string.IsNullOrEmpty(stokKodu))
                 {
                     return View(Enumerable.Empty<StokHareketFoyu>());
@@ -424,28 +429,55 @@ namespace Deneme_proje.Controllers
                     depolar
                 );
 
-                // ViewBag'e değerleri ekle
-                ViewBag.SelectedStokKodu = stokKodu;
-                ViewBag.BaslamaTarihi = baslamaTarihi.Value.ToString("yyyy-MM-dd");
-                ViewBag.BitisTarihi = bitisTarihi.Value.ToString("yyyy-MM-dd");
-                ViewBag.ParaBirimi = paraBirimi;
-                ViewBag.SelectedDepolar = depolar;
-
                 return View(stokHareketFoyu);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Stok hareket verileri alınırken bir hata oluştu. StokKodu: {StokKodu}", stokKodu);
-
                 TempData["ErrorMessage"] = "Stok hareket verileri alınırken bir hata oluştu: " + ex.Message;
 
+                var depolarList = _sirketDurumuRepository.GetDepolar();
+                var stoklarList = _sirketDurumuRepository.GetStoklar();
+                ViewBag.Depolar = depolarList;
+                ViewBag.Stoklar = stoklarList;
+
+                ViewBag.BaslamaTarihi = baslamaTarihi?.ToString("yyyy-MM-dd") ?? DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd");
+                ViewBag.BitisTarihi = bitisTarihi?.ToString("yyyy-MM-dd") ?? DateTime.Now.ToString("yyyy-MM-dd");
+                ViewBag.ParaBirimi = paraBirimi;
+                ViewBag.SelectedDepolar = depolar;
+                ViewBag.SelectedStokKodu = stokKodu;
+
+                return View(Enumerable.Empty<StokHareketFoyu>());
+            }
+        }
+ 
+        public IActionResult StokDepoListesi(string stokKodu = null, int? depoNo = null)
+        {
+            try
+            {
                 var depolarList = _sirketDurumuRepository.GetDepolar();
                 var stoklarList = _sirketDurumuRepository.GetStoklar();
 
                 ViewBag.Depolar = depolarList;
                 ViewBag.Stoklar = stoklarList;
+                ViewBag.SelectedStokKodu = stokKodu;
+                ViewBag.SelectedDepoNo = depoNo?.ToString() ?? "";
 
-                return View(Enumerable.Empty<StokHareketFoyu>());
+                var stokDepoListesi = _sirketDurumuRepository.GetStokDepoListesi(stokKodu, depoNo);
+
+                return View(stokDepoListesi);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Stok-Depo listesi görüntülenirken bir hata oluştu.");
+                TempData["ErrorMessage"] = "Stok-Depo listesi görüntülenirken bir hata oluştu: " + ex.Message;
+
+                var depolarList = _sirketDurumuRepository.GetDepolar();
+                var stoklarList = _sirketDurumuRepository.GetStoklar();
+                ViewBag.Depolar = depolarList;
+                ViewBag.Stoklar = stoklarList;
+
+                return View(Enumerable.Empty<StokDepoListesi>());
             }
         }
         [AllowAnonymous]

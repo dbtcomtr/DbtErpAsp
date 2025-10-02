@@ -396,6 +396,7 @@
                                                 {
                                                     <li><a href="/fatura/stokyaslandirma">Stok Yaşlandırma</a></li>
                                                 }
+                                       
                                                
                                              
                                               @*   @if (MenuHelper.KullaniciYetkisiVarMi("SirketDurumu", "BankaAnaliz", userNo))
@@ -455,7 +456,7 @@
                                 </a>
                                 <ul class="sub-menu" aria-expanded="false">
                                     
-                                        <li><a href="/CRM/Dashboard">Dashboard</a></li>
+                                       @*  <li><a href="/CRM/Dashboard">Dashboard</a></li>
                                     
                                     
                                       
@@ -488,17 +489,17 @@
 
                                 
                                         <li><a href="/CRM/Stoklar">Stoklar</a></li>
-                                    
+                                     *@
 
                                       <li><a href="/CRM/Teklifler">Teklifler</a></li>
                                     
 
-                                  
+                                 @*  
                                         <li><a href="/CRM/YeniTeklif">Yeni Teklif</a></li>
                                     
 
                                    
-                                        <li><a href="/CRM/CariAnaliz">Cari Analiz</a></li>
+                                        <li><a href="/CRM/CariAnaliz">Cari Analiz</a></li> *@
                                 
                                 </ul>
                             </li>
@@ -821,6 +822,30 @@
                                                 @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "SilinenBarkodlar", userNo))
                                                 {
                                                     <li><a href="/Fatura/silinenbarkodlar">Silinen Barkodlar</a></li>
+                                                }
+                                            </ul>
+                                        </li>
+                                    }
+                                    @if (MenuHelper.KullaniciYetkisiVarMi("SirketDurumu", "StokHareket", userNo) || MenuHelper.KullaniciYetkisiVarMi("SirketDurumu", "StokDepoListesi", userNo) ||
+                                   MenuHelper.KullaniciYetkisiVarMi("Fatura", "StokYaslandirma", userNo))
+                                    {
+                                        <li>
+                                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                                <i class="mdi mdi-account-group"></i>
+                                                <span>Raporlar</span>
+                                            </a>
+                                            <ul class="sub-menu" aria-expanded="false">
+                                                @if (MenuHelper.KullaniciYetkisiVarMi("SirketDurumu", "StokHareket", userNo))
+                                                {
+                                                    <li><a href="/sirketdurumu/stokhareket">Stok Hareket Föyü</a></li>
+                                                }
+                                                @if (MenuHelper.KullaniciYetkisiVarMi("SirketDurumu", "StokDepoListesi", userNo))
+                                                {
+                                                    <li><a href="/SirketDurumu/StokDepoListesi">Depo Bazlı Stok Durumu</a></li>
+                                                }
+                                                @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "StokYaslandirma", userNo))
+                                                {
+                                                    <li><a href="/Fatura/StokYaslandirma">Stok Yaşlandırma</a></li>
                                                 }
                                             </ul>
                                         </li>

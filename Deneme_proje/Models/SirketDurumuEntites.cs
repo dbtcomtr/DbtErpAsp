@@ -2,6 +2,19 @@
 {
     public class SirketDurumuEntites
     {
+        public class StokDepoListesi
+        {
+            public Guid KayitNo { get; set; }
+            public string StokKodu { get; set; }
+            public string StokAdi { get; set; }
+            public decimal Fiyat { get; set; }
+            public string DovizCinsi { get; set; }
+            public int DepoNo { get; set; }
+            public string DepoAdi { get; set; }
+            public decimal Miktar { get; set; }
+            public string BirimAdi { get; set; }
+            public DateTime GuncellemeTarihi { get; set; }
+        }
         public class BankaLimitViewModel
         {
             public string BankaAdi { get; set; }

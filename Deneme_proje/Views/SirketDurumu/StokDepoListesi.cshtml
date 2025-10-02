@@ -1,13 +1,10 @@
-﻿@model IEnumerable<Deneme_proje.Models.SirketDurumuEntites.StokHareketFoyu>
+﻿@model IEnumerable<Deneme_proje.Models.SirketDurumuEntites.StokDepoListesi>
 @{
-    ViewData["Title"] = "Stok Hareket";
+    ViewData["Title"] = "Stok-Depo Listesi";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
-    var baslamaTarihi = ViewBag.BaslamaTarihi ?? DateTime.Now.ToString("yyyy-MM-dd");
-    var bitisTarihi = ViewBag.BitisTarihi ?? DateTime.Now.AddMonths(1).ToString("yyyy-MM-dd");
     var selectedStokKodu = ViewBag.SelectedStokKodu?.ToString() ?? "";
-    var selectedDepolar = ViewBag.SelectedDepolar?.ToString() ?? "";
-    var selectedParaBirimi = ViewBag.ParaBirimi?.ToString() ?? "0";
+    var selectedDepoNo = ViewBag.SelectedDepoNo?.ToString() ?? "";
 }
 
 <link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
@@ -26,7 +23,6 @@
         padding-left: 15px;
     }
 
-    /* Search Form Styles */
     .search-form {
         background: white;
         box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
@@ -54,7 +50,6 @@
             box-shadow: 0 0 0 0.2rem rgba(0, 118, 168, 0.25);
         }
 
-    /* Input Group Styles */
     .input-group {
         display: flex;
         width: 100%;
@@ -91,18 +86,15 @@
             color: #495057;
         }
 
-    /* Hidden Select */
     .hidden-select {
         display: none;
     }
 
-    /* Stok Arama Container */
     .stok-arama-container {
         position: relative;
         width: 100%;
     }
 
-    /* Select2 Styling */
     .select2-container--default .select2-selection--single {
         height: 38px !important;
         border: 1px solid #ced4da !important;
@@ -119,7 +111,6 @@
         box-shadow: 0 0 0 0.2rem rgba(0, 118, 168, 0.25) !important;
     }
 
-    /* Button Styles */
     .btn-tumblr {
         background: linear-gradient(135deg, #162e54 0%, #0076a8 100%);
         color: white;
@@ -138,7 +129,6 @@
             color: white;
         }
 
-    /* Card Styles */
     .card {
         box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
         border: 1px solid rgba(0, 0, 0, 0.125);
@@ -164,7 +154,6 @@
             font-size: 18px;
         }
 
-    /* Info Box */
     .info-box {
         background: #e6f2ff;
         border-left: 4px solid #0076a8;
@@ -178,7 +167,6 @@
             color: #0076a8;
         }
 
-    /* Table Styles */
     table.dataTable {
         border-collapse: collapse !important;
         width: 100%;
@@ -208,7 +196,6 @@
                 background-color: #f0f8ff;
             }
 
-    /* DataTables Buttons */
     div.dt-buttons {
         margin-bottom: 15px;
         text-align: right;
@@ -244,40 +231,37 @@
         color: white !important;
     }
 
-    /* Modal Styles */
-    #stokSearchModal .modal-content {
+    #stokSearchModal .modal-content,
+    #depoSearchModal .modal-content {
         border-radius: 0.5rem;
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
     }
 
-    #stokSearchModal .modal-header {
+    #stokSearchModal .modal-header,
+    #depoSearchModal .modal-header {
         background: linear-gradient(135deg, #162e54 0%, #0076a8 100%);
         color: white;
         border-radius: 0.5rem 0.5rem 0 0;
     }
 
-    #stokSearchModal .close {
+    #stokSearchModal .close,
+    #depoSearchModal .close {
         color: white;
         text-shadow: none;
         opacity: 0.8;
     }
 
-        #stokSearchModal .close:hover {
+        #stokSearchModal .close:hover,
+        #depoSearchModal .close:hover {
             opacity: 1;
         }
 
-    #stokSearchModal .modal-footer {
-        border-top: 1px solid #e9ecef;
-        background-color: #f8f9fa;
-        border-radius: 0 0 0.5rem 0.5rem;
-    }
-
-    #stokTable {
+    #stokTable, #depoTable {
         width: 100%;
         border-collapse: collapse;
     }
 
-        #stokTable th {
+        #stokTable th, #depoTable th {
             position: sticky;
             top: 0;
             background-color: #162e54;
@@ -285,24 +269,34 @@
             z-index: 10;
         }
 
-        #stokTable tbody tr:hover {
+        #stokTable tbody tr:hover,
+        #depoTable tbody tr:hover {
             background-color: #f0f8ff;
             cursor: pointer;
         }
 
-    .btn-sm.btn-primary {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.82rem;
-    }
-
-    /* Responsive Table */
     .simple-scroll-table {
         width: 100%;
         overflow-x: auto;
         overflow-y: visible;
     }
 
-    /* Responsive Adjustments */
+    .badge-success {
+        background-color: #28a745;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+    }
+
+    .badge-warning {
+        background-color: #ffc107;
+        color: #212529;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+    }
+
     @@media (max-width: 768px) {
         .search-form
 
@@ -314,24 +308,10 @@
         width: 100%;
     }
 
-    .page-title {
-        font-size: 20px;
-    }
-
     table.dataTable thead th,
     table.dataTable tbody td {
         font-size: 12px;
         padding: 8px;
-    }
-
-    .stok-arama-container {
-        min-width: auto;
-        width: 100%;
-    }
-
-    #stokSearchModal .modal-dialog {
-        margin: 0.5rem;
-        max-width: none;
     }
 
     }
@@ -355,137 +335,123 @@
 
 <div class="main-content mt-5">
     <div class="container-fluid px-lg-4 px-3 mt-5">
-        <!-- Arama Formu -->
-        <div class="row mb-4">
+        <div class="row mb-3">
             <div class="col-12">
-                <div class="card search-form">
-                    <form method="get">
-                        <!-- Hidden input for selected stok text -->
-                        <input type="hidden" id="selectedStokText" name="selectedStokText" value="@(ViewData["SelectedStokText"] ?? "")" />
-
-                        <div class="row">
-                            <div class="col-lg-3 col-md-6 col-sm-12">
-                                <div class="form-group mb-0">
-                                    <label for="stokArama">Stok Kodu:</label>
-                                    <div class="stok-arama-container">
-                                        <div class="input-group">
-                                            <input type="text" id="stokArama" class="form-control"
-                                                   placeholder="Stok Kodu veya Adını Arayın"
-                                                   list="stokCodeList"
-                                                   autocomplete="off"
-                                                   value="@ViewData["SelectedStokText"]"
-                                                   onchange="updateStokCodeSelect(this.value)">
-
-                                            <div class="input-group-append">
-                                                <button class="btn btn-outline-secondary" type="button" onclick="openStokSearchModal()">
-                                                    <i class="fa fa-search"></i>
-                                                </button>
-                                            </div>
-
-                                            <div class="input-group-append">
-                                                <button class="btn btn-outline-secondary" type="button" onclick="clearStokSearch()">
-                                                    <i class="fa fa-times"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <datalist id="stokCodeList">
-                                            @if (ViewBag.Stoklar != null)
-                                            {
-                                                foreach (var stok in ViewBag.Stoklar)
-                                                {
-                                                    <option value="@stok.StokKodu">@stok.StokKodu - @stok.StokAdi</option>
-                                                }
-                                            }
-                                        </datalist>
-
-                                        <!-- Hidden select -->
-                                        <select id="stokKodu" name="stokKodu" class="hidden-select" required>
-                                            <option value="">Stok Seçiniz</option>
-                                            @if (ViewBag.Stoklar != null)
-                                            {
-                                                foreach (var stok in ViewBag.Stoklar)
-                                                {
-                                                    var isStokSelected = stok.StokKodu == selectedStokKodu;
-                                                    <option value="@stok.StokKodu" selected="@isStokSelected">
-                                                        @stok.StokKodu - @stok.StokAdi
-                                                    </option>
-                                                }
-                                            }
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-2 col-md-6 col-sm-6">
-                                <div class="form-group mb-0">
-                                    <label for="baslamaTarihi">Başlama Tarihi:</label>
-                                    <input type="date" id="baslamaTarihi" name="baslamaTarihi"
-                                           class="form-control" value="@baslamaTarihi" required />
-                                </div>
-                            </div>
-
-                            <div class="col-lg-2 col-md-6 col-sm-6">
-                                <div class="form-group mb-0">
-                                    <label for="bitisTarihi">Bitiş Tarihi:</label>
-                                    <input type="date" id="bitisTarihi" name="bitisTarihi"
-                                           class="form-control" value="@bitisTarihi" required />
-                                </div>
-                            </div>
-
-                            <div class="col-lg-2 col-md-6 col-sm-6">
-                                <div class="form-group mb-0">
-                                    <label for="depolar">Depo:</label>
-                                    <select id="depolar" name="depolar" class="form-control">
-                                        <option value="">Tüm Depolar</option>
-                                        @if (ViewBag.Depolar != null)
-                                        {
-                                            foreach (var depo in ViewBag.Depolar)
-                                            {
-                                                var depoNoStr = depo.DepoNo.ToString();
-                                                var isDepoSelected = depoNoStr == selectedDepolar;
-                                                <option value="@depo.DepoNo" selected="@isDepoSelected">
-                                                    @depo.DepoAdi
-                                                </option>
-                                            }
-                                        }
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-2 col-md-6 col-sm-6">
-                                <div class="form-group mb-0">
-                                    <label for="paraBirimi">Para Birimi:</label>
-                                    <select id="paraBirimi" name="paraBirimi" class="form-control">
-                                        <option value="0" selected="@(selectedParaBirimi == "0")">TL</option>
-                                        <option value="1" selected="@(selectedParaBirimi == "1")">USD</option>
-                                        <option value="2" selected="@(selectedParaBirimi == "2")">EUR</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-1 col-md-6 col-sm-12">
-                                <button type="submit" class="btn btn-tumblr w-100">Ara</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+                <h4 class="page-title">Stok-Depo Listesi</h4>
             </div>
         </div>
 
-        <!-- Sonuç Tablosu -->
+   <div class="row mb-4">
+    <div class="col-12">
+        <div class="card search-form">
+            <form method="get">
+                <input type="hidden" id="selectedStokText" name="selectedStokText" value="" />
+                <input type="hidden" id="selectedDepoText" name="selectedDepoText" value="" />
+
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="form-group mb-0">
+                            <label for="stokArama">Stok Kodu:</label>
+                            <div class="stok-arama-container">
+                                <div class="input-group">
+                                    <input type="text" id="stokArama" class="form-control"
+                                           placeholder="Stok Kodu veya Adını Arayın"
+                                           autocomplete="off">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="openStokSearchModal()">
+                                            <i class="fa fa-search"></i>
+                                        </button>
+                                    </div>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="clearStokSearch()">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <select id="stokKodu" name="stokKodu" class="hidden-select">
+                                    <option value="">Tüm Stoklar</option>
+                                    @if (ViewBag.Stoklar != null)
+                                    {
+                                        foreach (var stok in ViewBag.Stoklar)
+                                        {
+                                            var isStokSelected = stok.StokKodu == selectedStokKodu;
+                                            <option value="@stok.StokKodu" selected="@isStokSelected">
+                                                @stok.StokKodu - @stok.StokAdi
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="form-group mb-0">
+                            <label for="depoArama">Depo:</label>
+                            <div class="stok-arama-container">
+                                <div class="input-group">
+                                    <input type="text" id="depoArama" class="form-control"
+                                           placeholder="Depo Adını Arayın"
+                                           autocomplete="off">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="openDepoSearchModal()">
+                                            <i class="fa fa-search"></i>
+                                        </button>
+                                    </div>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="clearDepoSearch()">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <select id="depoNo" name="depoNo" class="hidden-select">
+                                    <option value="">Tüm Depolar</option>
+                                    @if (ViewBag.Depolar != null)
+                                    {
+                                        foreach (var depo in ViewBag.Depolar)
+                                        {
+                                            var isDepoSelected = depo.DepoNo.ToString() == selectedDepoNo;
+                                            <option value="@depo.DepoNo" selected="@isDepoSelected">
+                                                @depo.DepoAdi
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 col-md-6 col-sm-12">
+                        <div class="form-group mb-0">
+                            <label for="durum">Durum:</label>
+                            <select id="durum" name="durum" class="form-control">
+                                <option value="" @@(ViewBag.SelectedDurum == null || ViewBag.SelectedDurum == "" ? "selected" : "")>Tüm Durumlar</option>
+                                <option value="Stokta" @@(ViewBag.SelectedDurum == "Stokta" ? "selected" : "")>Stokta</option>
+                                <option value="Tükendi" @@(ViewBag.SelectedDurum == "Tükendi" ? "selected" : "")>Tükendi</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 col-md-6 col-sm-12">
+                        <button type="submit" class="btn btn-tumblr w-100">Listele</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
         <div class="row">
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5><i class="fa fa-list"></i> Stok Hareket Listesi</h5>
+                        <h5><i class="fa fa-warehouse"></i> Stok-Depo Listesi</h5>
                     </div>
                     <div class="card-body">
                         @if (Model != null && Model.Any())
                         {
                             <div class="info-box">
                                 <i class="fa fa-info-circle"></i> Bu raporda <strong>@Model.Count()</strong> adet kayıt bulunmaktadır.
-                                Tabloyu dışa aktarmak için üstteki butonları kullanabilirsiniz.
                             </div>
 
                             <div class="simple-scroll-table">
@@ -494,52 +460,32 @@
                                         <tr>
                                             <th>Stok Kodu</th>
                                             <th>Stok Adı</th>
-                                            <th>Tarih</th>
-                                            <th>Seri</th>
-                                            <th>Sıra</th>
-                                            <th>Evrak Tipi</th>
-                                            <th>Hareket Cinsi</th>
-                                            <th>Tipi</th>
-                                            <th>Normal/İade</th>
-                                            <th>Belge No</th>
-                                            <th>Belge Tarihi</th>
                                             <th>Depo</th>
-                                            <th>Karşı Depo</th>
-                                            <th class="text-right">Giren Miktar</th>
-                                            <th class="text-right">Çıkan Miktar</th>
-                                            <th class="text-right">Kalan Miktar</th>
+                                            <th class="text-right">Miktar</th>
                                             <th>Birim</th>
-                                            <th>Proje Kodu</th>
-                                            <th>Proje Adı</th>
-                                            <th>Srm. Mrk. Kodu</th>
-                                            <th>Srm. Mrk. Adı</th>
+                                            <th class="text-right">Fiyat</th>
+                                            <th>Döviz</th>
+                                            <th class="text-right">Toplam Değer</th>
+                                            <th>Durum</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach (var item in Model)
                                         {
+                                            var toplamDeger = item.Miktar * item.Fiyat;
+                                            var durum = item.Miktar > 0 ? "Stokta" : "Tükendi";
+                                            var durumClass = item.Miktar > 0 ? "badge-success" : "badge-warning";
+
                                             <tr>
                                                 <td>@item.StokKodu</td>
                                                 <td>@item.StokAdi</td>
-                                                <td>@item.Tarih.ToString("dd.MM.yyyy")</td>
-                                                <td>@item.Seri</td>
-                                                <td>@item.Sira</td>
-                                                <td>@item.EvrakTipi</td>
-                                                <td>@item.HareketCinsi</td>
-                                                <td>@item.Tipi</td>
-                                                <td>@item.NormalIade</td>
-                                                <td>@item.BelgeNo</td>
-                                                <td>@(item.BelgeTarihi?.ToString("dd.MM.yyyy"))</td>
-                                                <td>@item.Depo</td>
-                                                <td>@item.KarsiDepo</td>
-                                                <td class="text-right">@item.GirenMiktar.ToString("N2")</td>
-                                                <td class="text-right">@item.CikanMiktar.ToString("N2")</td>
-                                                <td class="text-right">@item.KalanMiktar.ToString("N2")</td>
+                                                <td>@item.DepoAdi</td>
+                                                <td class="text-right"><strong>@item.Miktar.ToString("N2")</strong></td>
                                                 <td>@item.BirimAdi</td>
-                                                <td>@item.ProjeKodu</td>
-                                                <td>@item.ProjeAdi</td>
-                                                <td>@item.SrmMrkzKodu</td>
-                                                <td>@item.SrmMrkzAdi</td>
+                                                <td class="text-right">@item.Fiyat.ToString("N2")</td>
+                                                <td>@item.DovizCinsi</td>
+                                                <td class="text-right"><strong>@toplamDeger.ToString("N2")</strong></td>
+                                                <td><span class="@durumClass">@durum</span></td>
                                             </tr>
                                         }
                                     </tbody>
@@ -550,7 +496,7 @@
                         {
                             <div class="info-box">
                                 <i class="fa fa-exclamation-triangle"></i>
-                                @(string.IsNullOrEmpty(selectedStokKodu) ? "Lütfen bir stok kodu seçip arama yapınız." : "Seçilen kriterlere uygun kayıt bulunamadı.")
+                                Seçilen kriterlere uygun kayıt bulunamadı.
                             </div>
                         }
                     </div>
@@ -561,29 +507,23 @@
 </div>
 
 <!-- Stok Arama Modal -->
-<div class="modal fade" id="stokSearchModal" tabindex="-1" role="dialog" aria-labelledby="stokSearchModalLabel" aria-hidden="true">
+<div class="modal fade" id="stokSearchModal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="stokSearchModalLabel"><i class="fa fa-search"></i> Stok Arama</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                <h5 class="modal-title"><i class="fa fa-search"></i> Stok Arama</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa fa-search"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="stokModalSearch"
-                               placeholder="Stok Kodu veya Adı ile Arayın..."
-                               onkeyup="filterStokTable()">
-                    </div>
+                    <input type="text" class="form-control" id="stokModalSearch"
+                           placeholder="Stok Kodu veya Adı ile Arayın..."
+                           onkeyup="filterStokTable()">
                 </div>
-
                 <div style="max-height: 400px; overflow-y: auto;">
-                    <table id="stokTable" class="table table-striped table-bordered table-hover">
+                    <table id="stokTable" class="table table-striped table-bordered">
                         <thead>
                             <tr>
                                 <th>Stok Kodu</th>
@@ -601,7 +541,60 @@
                                         <td>@stok.StokAdi</td>
                                         <td class="text-center">
                                             <button type="button" class="btn btn-sm btn-primary"
-                                                    onclick="selectStokFromModal('@stok.StokKodu', '@stok.StokAdi'); return false;">
+                                                    onclick="selectStokFromModal('@stok.StokKodu', '@stok.StokAdi')">
+                                                <i class="fa fa-check"></i> Seç
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Depo Arama Modal -->
+<div class="modal fade" id="depoSearchModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa fa-search"></i> Depo Arama</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="depoModalSearch"
+                           placeholder="Depo Adı ile Arayın..."
+                           onkeyup="filterDepoTable()">
+                </div>
+                <div style="max-height: 400px; overflow-y: auto;">
+                    <table id="depoTable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Depo No</th>
+                                <th>Depo Adı</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.Depolar != null)
+                            {
+                                foreach (var depo in ViewBag.Depolar)
+                                {
+                                    <tr>
+                                        <td>@depo.DepoNo</td>
+                                        <td>@depo.DepoAdi</td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-sm btn-primary"
+                                                    onclick="selectDepoFromModal('@depo.DepoNo', '@depo.DepoAdi')">
                                                 <i class="fa fa-check"></i> Seç
                                             </button>
                                         </td>
@@ -620,7 +613,6 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script type="text/javascript" src="~/Content/DataTables/datatables.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
@@ -631,68 +623,64 @@
 
 <script>
     $(document).ready(function() {
-        // Select2 initialization - sadece depo için
-        $('#depolar').select2({
-            placeholder: 'Tüm Depolar',
-            allowClear: true,
-            width: '100%'
-        });
-
-        // DataTable initialization
         var hasData = @(Model != null && Model.Any() ? "true" : "false");
 
-        if (hasData) {
-            $('#example').DataTable({
-                "order": [[2, "desc"]],
-                "dom": '<"row"<"col-sm-12"B>>' +
-                       '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
-                       't' +
-                       '<"row"<"col-sm-6"i><"col-sm-6"p>>',
-                "language": {
-                    "url": "/Content/DataTables/turkish.json"
-                },
-                "buttons": [
-                    {
-                        extend: 'excel',
-                        text: '<i class="fa fa-file-excel"></i> Excel',
-                        className: 'btn btn-success',
-                        exportOptions: { columns: ':visible' },
-                        title: 'Stok Hareket Raporu'
-                    },
-                    {
-                        extend: 'pdf',
-                        text: '<i class="fa fa-file-pdf"></i> PDF',
-                        className: 'btn btn-danger',
-                        exportOptions: { columns: ':visible' },
-                        title: 'Stok Hareket Raporu'
-                    },
-                    {
-                        extend: 'print',
-                        text: '<i class="fa fa-print"></i> Yazdır',
-                        className: 'btn btn-secondary',
-                        exportOptions: { columns: ':visible' },
-                        title: 'Stok Hareket Raporu'
-                    }
-                ],
-                "responsive": false,
-                "ordering": true,
-                "paging": true,
-                "pageLength": 25,
-                "lengthMenu": [[10, 25, 50, 100, 500], [10, 25, 50, 100, 500]],
-                "scrollX": true
-            });
-        }
+       if (hasData) {
+        // Extend DataTables search
+        $.fn.dataTable.ext.search.push(
+            function(settings, data, dataIndex) {
+                var durumFilter = $('#durum').val();
+                var durumColumn = data[8]; // "Durum" column index (9th column, 0-based)
 
-        // Satıra tıklanınca da seçim yap
-        $(document).on('click', '#stokTable tbody tr', function(e) {
-            if (!$(e.target).is('button') && !$(e.target).is('i')) {
-                var stokKod = $(this).find('td:first').text();
-                var stokAdi = $(this).find('td:eq(1)').text();
-                selectStokFromModal(stokKod, stokAdi);
+                if (durumFilter === '') {
+                    return true; // Show all rows if no filter is selected
+                }
+                return durumColumn === durumFilter;
             }
+        );
+
+        var table = $('#example').DataTable({
+            "order": [[0, "asc"]],
+            "dom": '<"row"<"col-sm-12"B>>' +
+                   '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+                   't' +
+                   '<"row"<"col-sm-6"i><"col-sm-6"p>>',
+            "language": {
+                "url": "/Content/DataTables/turkish.json"
+            },
+            "buttons": [
+                {
+                    extend: 'excel',
+                    text: '<i class="fa fa-file-excel"></i> Excel',
+                    className: 'btn btn-success',
+                    title: 'Stok-Depo Listesi'
+                },
+                {
+                    extend: 'pdf',
+                    text: '<i class="fa fa-file-pdf"></i> PDF',
+                    className: 'btn btn-danger',
+                    title: 'Stok-Depo Listesi'
+                },
+                {
+                    extend: 'print',
+                    text: '<i class="fa fa-print"></i> Yazdır',
+                    className: 'btn btn-secondary',
+                    title: 'Stok-Depo Listesi'
+                }
+            ],
+            "pageLength": 50,
+            "lengthMenu": [[10, 25, 50, 100, 500], [10, 25, 50, 100, 500]],
+            "scrollX": true
         });
 
-        // Modal Enter tuşuna basıldığında ilk eşleşen kaydı seç
+        // Redraw table when durum filter changes
+        $('#durum').on('change', function() {
+            table.draw();
+        });
+    }
+
+        // Modal işlemleri
+         // Modal Enter tuşuna basıldığında ilk eşleşen kaydı seç
         $('#stokModalSearch').keypress(function(e) {
             if (e.which == 13) {
                 e.preventDefault();
