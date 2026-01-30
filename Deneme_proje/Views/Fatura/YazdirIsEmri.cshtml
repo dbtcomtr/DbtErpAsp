@@ -6,275 +6,306 @@
 <html lang="tr">
 <head>
     <meta charset="utf-8" />
-    <title>Bahçepınar Ürün Etiketi</title>
-  <style>
+    <title>2D Ürün Etiketi</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    /* Yazdırma için sayfa boyutu ayarı */
+    @@page {
+        size: 100mm 100mm;
+        margin: 0;
+    }
+
+    .etiket-container {
+        width: 100mm;
+        height: 100mm;
+        border: 2px solid #000;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background-color: #fff;
+        box-sizing: border-box;
+    }
+
+    /* Ekran önizlemesi için */
+    @@media screen {
         body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
+            min-height: 100vh;
             background-color: #f0f0f0;
+        }
+        
+        .etiket-container {
+            transform: scale(1);
+        }
+    }
+
+    /* Yazdırma ayarları */
+    @@media print {
+        html, body {
+            width: 100mm;
+            height: 100mm;
+            margin: 0;
+            padding: 0;
         }
 
         .etiket-container {
-            width: 8cm;
-            height: 8cm;
-            border: 1px solid #888;
+            width: 100% !important;
+            height: 100% !important;
+            border: 2px solid #000 !important;
+            page-break-inside: avoid !important;
+            transform: none !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+    }
+
+    /* ÜST BÖLÜM – logo + adres */
+    .top-row {
+        display: flex;
+        border-bottom: 2px solid #000;
+        height: 18%;
+    }
+
+    .top-logo {
+        width: 25%;
+        border-right: 2px solid #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 4px;
+    }
+
+    .top-logo img {
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain;
+    }
+
+    .top-address {
+        flex: 1;
+        font-size: 8px;
+        padding: 4px 6px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        line-height: 1.4;
+    }
+
+    .top-address div {
+        margin-bottom: 3px;
+    }
+
+    /* ORTA BAŞLIK – ÜRÜN / ÜRETİM */
+    .middle-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border-bottom: 2px solid #000;
+        font-size: 11px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .middle-header div {
+        padding: 4px 0;
+        border-right: 2px solid #000;
+    }
+
+    .middle-header div:last-child {
+        border-right: none;
+    }
+
+    /* BİLGİ TABLOSU */
+    .info-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 9px;
+        flex: 1;
+    }
+
+    .info-table th,
+    .info-table td {
+        border: 1px solid #000;
+        padding: 3px 4px;
+        text-align: left;
+    }
+
+    .cell-title {
+        font-weight: bold;
+        width: 22%;
+        background-color: #f5f5f5;
+    }
+
+    .cell-value {
+        width: 28%;
+    }
+
+    /* SERTİFİKA LOGOLARI */
+    .cert-row {
+        display: flex;
+        border-top: 2px solid #000;
+        border-bottom: 2px solid #000;
+        height: 12%;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        padding: 4px 0;
+    }
+
+    .cert-logo {
+        height: 80%;
+        object-fit: contain;
+    }
+
+    /* ALT – barkod + QR */
+        .bottom-row {
+            height: 28%; /* ← %25'ten %28'e çıkarın */
             display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            max-width: 95vw;
-            max-height: 95vh;
-            transform-origin: center center;
         }
 
-        /* Otomatik ölçeklendirme */
-        @@media screen {
-            .etiket-container {
-                transform: scale(min(
-                    calc(95vw / 8cm),
-                    calc(95vh / 8cm)
-                ));
-            }
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 3px 6px;
-            border-bottom: 1px solid #888;
-            background-color: #fff;
-            height: 18%;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-        }
-
-        .logo-img {
-            height: 25px;
-            margin-right: 4px;
-        }
-
-        .header-text {
-            font-size: 7px;
-            color: #555;
-            line-height: 1.2;
-        }
-
-        .contact-info {
-            display: flex;
-            flex-direction: column;
-            font-size: 6px;
-            color: #555;
-            line-height: 1.1;
-        }
-
-        .location-info {
-            display: flex;
-            font-size: 6px;
-            color: #555;
-        }
-
-        .location-block {
-            margin-left: 6px;
-            padding-left: 6px;
-            border-left: 1px solid #aaa;
-            line-height: 1.1;
-        }
-
-        .urun-baslik {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #888;
-            padding: 3px 8px;
-            height: 25%;
-        }
-
-        .urun-adi {
-            font-size: 24px;
-            font-weight: bold;
-            color: #666;
-            text-transform: uppercase;
-            padding-right: 6px;
-            border-right: 2px solid #888;
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .urun-fiyat {
-            font-size: 24px;
-            font-weight: bold;
-            color: #666;
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .urun-detaylar {
-            display: grid;
-            grid-template-columns: 1fr 3fr 1fr 1fr;
-            border-bottom: 1px solid #888;
-            height: 40%;
-        }
-
-        .detay-baslik {
-            padding: 2px 4px;
-            font-size: 8px;
-            font-weight: bold;
-            color: #666;
-            border-right: 1px solid #888;
-            border-bottom: 1px solid #888;
-            text-transform: uppercase;
-            line-height: 1.1;
-        }
-
-        .detay-deger {
-            padding: 2px 4px;
-            font-size: 8px;
-            border-right: 1px solid #888;
-            border-bottom: 1px solid #888;
-            line-height: 1.2;
-        }
-
-        .etiket-footer {
-            display: flex;
-            justify-content: center;
-            padding: 3px 8px;
-            flex-grow: 1;
-            height: 17%;
-        }
-
-        .barcode-area {
+        .barcode-wrapper {
+            flex: 0 0 60%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            flex: 1;
-            width: 100%;
+            padding: 2px; /* ← 4px'den 2px'e düşürün */
+            border-right: 2px solid #000;
+            min-height: 22mm;
         }
 
-        .barcode-text {
-            font-family: monospace;
-            font-size: 8px;
-            margin-top: 2px;
-            color: #666;
+        #barcode {
+            max-width: 100%; /* ← width: 100% yerine */
+            height: auto; /* ← height: 100% yerine */
         }
 
-        @@page {
-            size: 8cm 8cm;
-            margin: 0;
-            padding: 0;
-        }
 
+    .barcode-text {
+        font-family: monospace;
+        font-size: 10px;
+        font-weight: bold;
+        margin-top: 2px;
+    }
+
+    .qrcode-wrapper {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px;
+        text-align: center
+    }
+
+    #qrcode svg {
+        width: 60%;
+        height: 60%;
+    }
         @@media print {
-            html, body {
-                width: 100vw !important;
-                height: 100vh !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                overflow: hidden !important;
-                display: flex !important;
-                justify-content: center !important;
-                align-items: center !important;
-                background-color: white !important;
-                -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
+            #barcode svg
 
-            .etiket-container {
-                width: 8cm !important;
-                height: 8cm !important;
-                border: 1px solid #888 !important;
-                display: flex !important;
-                flex-direction: column !important;
-                overflow: hidden !important;
-                page-break-inside: avoid !important;
-                transform: none !important;
-                max-width: none !important;
-                max-height: none !important;
-                position: relative !important;
-            }
-
-            /* Print'te otomatik ölçeklendirmeyi kapat */
-            @@media print {
-                .etiket-container {
-                    transform: none !important;
-                }
-            }
+        {
+            max-width: 100% !important;
+            height: auto !important;
         }
-    </style>
+
+        }
+</style>
 </head>
 <body>
     <div class="etiket-container">
-        <div class="header">
-			<div class="header-left">
-		
-                <img class="logo-img" src="~/bahcelogo.png" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22100%22%20height%3D%2240%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Ctext%20x%3D%220%22%20y%3D%2225%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%3EBah%C3%A7ep%C4%B1nar%3C/text%3E%3C/svg%3E';">
-                <div class="contact-info">
-                    <div>0324 327 75 75 - 0324 327 75 60</div>
-                    <div>bahcepinar@bahcepinar.com.tr</div>
-                    <div>www.bahcepinar.com.tr</div>
-                </div>
+        <!-- ÜST SATIR -->
+        <div class="top-row">
+            <div class="top-logo">
+                <img src="~/2dlogosiyah.png"
+                     alt="2D"
+                     onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22100%22%20height%3D%2240%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Crect%20width%3D%22100%22%20height%3D%2240%22%20fill%3D%22%230066cc%22/%3E%3Ctext%20x%3D%2250%22%20y%3D%2225%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%3EBah%C3%A7ep%C4%B1nar%3C/text%3E%3C/svg%3E';" />
             </div>
-            <div class="location-info">
-                <div class="location-block">
-                    <div><strong>Merkez</strong></div>
-                    <div>Dumlupinar Mh.1506 Sok. No:8</div>
-                    <div>Yenişehir /MERSİN</div>
-                </div>
-                <div class="location-block">
-                    <div><strong>Fabrika</strong></div>
-                    <div>Yeşilyurt Mh. Şehit Mehmet Çelik Cd. No:58</div>
-                    <div>Osmaniye/TÜRKİYE</div>
-                </div>
+            <div class="top-address">
+                <div><strong>Fabrika:</strong> Yeşilyurt mah. Şehit Mehmet Çelik Caddesi No:58 Bahçe / Osmaniye</div>
+                <div><strong>Ofis:</strong> Dumlupınar mah. Adnan Menderes Bulvarı No:98/5 Yenişehir / Mersin</div>
             </div>
         </div>
 
-        <div class="urun-baslik">
-            <div class="urun-adi">@Model.KisaIsim</div>
-            <div class="urun-fiyat">@Model.YabanciIsim</div>
+        <!-- ORTA BAŞLIK -->
+        <div class="middle-header">
+            <div>ÜRÜN BİLGİLERİ</div>
+            <div>ÜRETİM BİLGİLERİ</div>
         </div>
 
-        <div class="urun-detaylar">
-            <div class="detay-baslik">ÜRÜN KODU</div>
-            <div class="detay-deger">@Model.UrunKodu</div>
-            <div class="detay-baslik">PLT. KOLİ MİK.</div>
-            <div class="detay-deger">@(Model.Birim2Katsayi.HasValue ? ((-1) * Model.Birim2Katsayi.Value).ToString("N0") : "")</div>
+        <!-- BİLGİ TABLOSU -->
+        <table class="info-table">
+            <tbody>
+                <tr>
+                    <td class="cell-title">Firma / Company</td>
+                    <td class="cell-value" colspan="3"></td>
+                </tr>
+                <tr>
+                    <td class="cell-title">Ürün / Product</td>
+                    <td class="cell-value">
+                        @(string.IsNullOrEmpty(Model.UrunAciklamasi) ? Model.UrunAdi : Model.UrunAciklamasi)
+                    </td>
+                    <td class="cell-title">Operatör</td>
+                    <td class="cell-value">@Model.OperatorAdi</td>
+                </tr>
+                <tr>
+                    <td class="cell-title">Renk / Color</td>
+                    <td class="cell-value">@Model.Renk</td>
+                    <td class="cell-title">Hammadde</td>
+                    <td class="cell-value">@Model.Hammadde</td>
+                </tr>
+                <tr>
+                    <td class="cell-title">Miktar</td>
+                    <td class="cell-value">@Model.Birim3Katsayi</td>
+                    <td class="cell-title">Kalıp</td>
+                    <td class="cell-value">@Model.Kalip</td>
+                </tr>
+                <tr>
+                    <td class="cell-title"></td>
+                    <td class="cell-value"></td>
+                    <td class="cell-title">Palet</td>
+                    <td class="cell-value">@Model.PaletNo</td>
+                </tr>
+                <tr>
+                    <td class="cell-title"></td>
+                    <td class="cell-value"></td>
+                    <td class="cell-title">Koli</td>
+                    <td class="cell-value">
+                        @(Model.Birim3Katsayi / Model.Birim2Katsayi)
+                    </td>
 
-            <div class="detay-baslik">ÜRÜN CİNSİ</div>
-            <div class="detay-deger">@(string.IsNullOrEmpty(Model.UrunAciklamasi) ? Model.UrunAdi : Model.UrunAciklamasi)</div>
-            <div class="detay-baslik">ÜRET. SAATİ</div>
-            <div class="detay-deger">@DateTime.Now.ToString("HH.mm")</div>
+                </tr>
+                <tr>
+                    <td class="cell-title"></td>
+                    <td class="cell-value"></td>
+                    <td class="cell-title">Üretim Tarihi/Saati</td>
+                    <td class="cell-value">@DateTime.Now.ToString("dd.MM.yyyy / HH:mm")</td>
+                </tr>
+            </tbody>
+        </table>
 
-            <div class="detay-baslik">ÜRET. TARİHİ</div>
-            <div class="detay-deger">@DateTime.Now.ToString("dd.MM.yyyy")</div>
-            <div class="detay-baslik">BARKOD NO</div>
-            <div class="detay-deger">@Model.IsEmriKodu</div>
-
-            <div class="detay-baslik">ÜRETİM YERİ</div>
-            <div class="detay-deger">BAHÇE OSMANİYE</div>
-            <div class="detay-baslik"></div>
-            <div class="detay-deger"></div>
+        <!-- SERTİFİKA LOGOLARI (ORTADA) -->
+        <div class="cert-row">
+            <img src="~/ISO.jpeg" alt="ISO" class="cert-logo"
+                 onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2280%22%20height%3D%2230%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Crect%20width%3D%2280%22%20height%3D%2230%22%20fill%3D%22%23dddddd%22/%3E%3Ctext%20x%3D%2240%22%20y%3D%2220%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20text-anchor%3D%22middle%22%3EISO%3C/text%3E%3C/svg%3E';" />
+            <img src="~/FSSC.jpeg" alt="FSSC 22000" class="cert-logo"
+                 onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2280%22%20height%3D%2230%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Crect%20width%3D%2280%22%20height%3D%2230%22%20fill%3D%22%23dddddd%22/%3E%3Ctext%20x%3D%2240%22%20y%3D%2220%22%20font-family%3D%22Arial%22%20font-size%3D%2210%22%20text-anchor%3D%22middle%22%3EFSSC%2022000%3C/text%3E%3C/svg%3E';" />
         </div>
 
-        <div class="etiket-footer">
-            <div class="barcode-area">
+        <!-- ALT SATIR – barkod ve QR -->
+        <div class="bottom-row">
+            <div class="barcode-wrapper">
                 <svg id="barcode"></svg>
                 <div class="barcode-text">@Model.IsEmriKodu</div>
             </div>
-           
+            <div class="qrcode-wrapper">
+                <div id="qrcode"></div>
+            </div>
         </div>
     </div>
 
@@ -282,14 +313,22 @@
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <script>
         window.onload = function () {
-            // Barkod oluşturma - 17cm genişliğe uygun boyut
-            JsBarcode("#barcode", "@Model.IsEmriKodu", {
-                format: "CODE128",
-                lineColor: "#000",
-                width: 6,      // Daha geniş kağıt için artırıldı
-                height: 160,   
-                displayValue: false,
-                margin: 10     // Kenarlardan boşluk
+            // Barkod
+              JsBarcode("#barcode", "@Model.IsEmriKodu", {
+            format: "CODE128",
+            lineColor: "#000",
+            width: 4,
+            height: 60,
+            displayValue: false,
+            margin: 2
+        });
+
+            // QR kod
+            var qr = qrcode(4, "L");
+            qr.addData("@Model.IsEmriKodu");
+            qr.make();
+            document.getElementById("qrcode").innerHTML = qr.createSvgTag({
+                scalable: true
             });
 
             setTimeout(function () {

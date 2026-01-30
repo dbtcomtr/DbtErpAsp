@@ -9,6 +9,10 @@
       "PackagePath": "staticwebassets\\1.pdf"
     },
     {
+      "Id": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\2dlogosiyah.png",
+      "PackagePath": "staticwebassets\\2dlogosiyah.png"
+    },
+    {
       "Id": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\BahceLogo.png",
       "PackagePath": "staticwebassets\\BahceLogo.png"
     },
@@ -5883,6 +5887,18 @@
     {
       "Id": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\Content\\dashboard-img\\verilen-siparis.svg",
       "PackagePath": "staticwebassets\\Content\\dashboard-img\\verilen-siparis.svg"
+    },
+    {
+      "Id": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\Diokilogoyeni.png",
+      "PackagePath": "staticwebassets\\Diokilogoyeni.png"
+    },
+    {
+      "Id": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\FSSC.jpeg",
+      "PackagePath": "staticwebassets\\FSSC.jpeg"
+    },
+    {
+      "Id": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\ISO.jpeg",
+      "PackagePath": "staticwebassets\\ISO.jpeg"
     },
     {
       "Id": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\RAMPA1.png",

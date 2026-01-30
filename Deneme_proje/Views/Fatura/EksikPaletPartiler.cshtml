@@ -1,0 +1,655 @@
+﻿@model List<Deneme_proje.Models.Entities.EksikPaletPartiViewModel>
+@{
+    ViewData["Title"] = "Eksik Paletli Partiler";
+    var stokArama = ViewData["StokArama"]?.ToString() ?? "";
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eksik Paletli Partiler</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+        }
+
+        .main-content {
+            margin-top: 1rem;
+            padding: 0 0.5rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            border-radius: 6px 6px 0 0;
+            padding: 0.75rem 1rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        .form-control, .form-control-sm {
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+            font-size: 13px;
+            padding: 0.375rem 0.75rem;
+        }
+
+            .form-control:focus {
+                border-color: #ff6b35;
+                box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.25);
+            }
+
+        .btn {
+            border-radius: 4px;
+            font-size: 13px;
+            padding: 0.375rem 0.75rem;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: #ff6b35;
+            border-color: #ff6b35;
+        }
+
+            .btn-primary:hover {
+                background-color: #e55a2b;
+                border-color: #e55a2b;
+            }
+
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+            .btn-success:hover {
+                background-color: #218838;
+                border-color: #1e7e34;
+            }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+
+        .table-responsive {
+            max-height: 500px;
+            overflow-y: auto;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+
+        .table {
+            margin-bottom: 0;
+            font-size: 12px;
+        }
+
+            .table thead th {
+                position: sticky;
+                top: 0;
+                background: #fff;
+                z-index: 10;
+                box-shadow: inset 0 -1px 0 #dee2e6;
+                padding: 0.5rem;
+                font-weight: 500;
+                white-space: nowrap;
+            }
+
+            .table tbody tr {
+                transition: background-color 0.15s ease;
+            }
+
+                .table tbody tr:hover {
+                    background-color: #fff3e0;
+                }
+
+            .table td {
+                padding: 0.5rem;
+                vertical-align: middle;
+            }
+
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            padding-right: 20px !important;
+        }
+
+            .sortable::after {
+                content: '↕';
+                position: absolute;
+                right: 5px;
+                color: #999;
+                font-size: 11px;
+            }
+
+            .sortable.asc::after {
+                content: '↑';
+                color: #ff6b35;
+            }
+
+            .sortable.desc::after {
+                content: '↓';
+                color: #ff6b35;
+            }
+
+            .sortable:hover {
+                background-color: #f8f9fa;
+            }
+
+        .filter-section {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .result-count {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge {
+            font-size: 11px;
+            padding: 0.25em 0.5em;
+        }
+
+        .badge-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .badge-danger {
+            background-color: #dc3545;
+        }
+
+        .progress {
+            height: 18px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .progress-bar {
+            background-color: #ff6b35;
+            line-height: 18px;
+        }
+
+            .progress-bar.low {
+                background-color: #dc3545;
+            }
+
+            .progress-bar.medium {
+                background-color: #ffc107;
+            }
+
+            .progress-bar.high {
+                background-color: #28a745;
+            }
+
+        .stats-card {
+            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+            .stats-card h5 {
+                color: #ff6b35;
+                font-weight: 600;
+                font-size: 0.95rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .stats-card .stat-item {
+                display: flex;
+                justify-content: space-between;
+                padding: 0.35rem 0;
+                border-bottom: 1px solid #ffcc80;
+                font-size: 12px;
+            }
+
+                .stats-card .stat-item:last-child {
+                    border-bottom: none;
+                }
+
+        .search-highlight {
+            background-color: yellow;
+            font-weight: bold;
+        }
+
+        .form-label {
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        @@media (max-width: 768px) {
+            .main-content
+
+        {
+            padding: 0 0.25rem;
+        }
+
+        .table-responsive {
+            max-height: 350px;
+        }
+
+        .table {
+            font-size: 11px;
+        }
+
+        .card-body {
+            padding: 0.75rem;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content mt-4">
+        <div class="px-lg-4 px-2 mt-4">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="fas fa-pallet"></i> Eksik Paletli Partiler
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <!-- İstatistikler -->
+                                @if (Model != null && Model.Any())
+                                {
+                                    <div class="stats-card">
+                                        <h5><i class="fas fa-chart-bar"></i> Özet İstatistikler</h5>
+                                        <div class="stat-item">
+                                            <span>Toplam Eksik Parti:</span>
+                                            <strong>@Model.Count</strong>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span>Toplam Eksik Miktar:</span>
+                                            <strong>@Model.Sum(x => x.EksikMiktar).ToString("N2") @(Model.First().TemelBirimAdi)</strong>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span>Ortalama Doluluk:</span>
+                                            <strong>%@Model.Average(x => x.DolulukOrani).ToString("N2")</strong>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span>En Düşük Doluluk:</span>
+                                            <strong class="text-danger">%@Model.Min(x => x.DolulukOrani).ToString("N2")</strong>
+                                        </div>
+                                    </div>
+                                }
+
+                                <!-- Filtreleme Bölümü -->
+                                <div class="filter-section">
+                                    <form id="searchForm" method="get" action="@Url.Action("EksikPaletPartiler", "SirketDurumu")">
+                                        <div class="row">
+                                            <div class="col-md-7">
+                                                <label for="stokArama" class="form-label">Stok Kodu/Adı:</label>
+                                                <input type="text" id="stokArama" name="stokArama" class="form-control form-control-sm"
+                                                       placeholder="Stok Kodu veya Adını Yazın"
+                                                       value="@stokArama">
+                                            </div>
+                                            <div class="col-md-2 d-flex align-items-end">
+                                                <button type="submit" class="btn btn-primary btn-sm btn-block">
+                                                    <i class="fas fa-search"></i> Ara
+                                                </button>
+                                            </div>
+                                            <div class="col-md-2 d-flex align-items-end">
+                                                <button type="button" id="clearSearchButton" class="btn btn-secondary btn-sm btn-block">
+                                                    <i class="fas fa-times"></i> Temizle
+                                                </button>
+                                            </div>
+                                            <div class="col-md-1 d-flex align-items-end">
+                                                @if (Model != null && Model.Any())
+                                                {
+                                                    <button type="button" id="excelExportButton" class="btn btn-success btn-sm btn-block" title="Excel'e Aktar">
+                                                        <i class="fas fa-file-excel"></i>
+                                                    </button>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="row mt-2">
+                                            <div class="col-12">
+                                                <div class="result-count" id="resultCount">
+                                                    @if (Model != null && Model.Any())
+                                                    {
+                                                        <span><i class="fas fa-info-circle"></i> Toplam @Model.Count eksik paletli parti</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span><i class="fas fa-info-circle"></i> Kayıt bulunamadı</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- Tablo -->
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped table-hover table-sm" id="eksikPaletTable">
+                                        <thead>
+                                            <tr>
+                                                <th class="sortable" data-column="0" data-type="text">Stok Kodu</th>
+                                                <th class="sortable" data-column="1" data-type="text">Stok Adı</th>
+                                                <th class="sortable" data-column="2" data-type="text">Parti</th>
+                                                <th class="sortable" data-column="3" data-type="number">Lot</th>
+                                                <th class="sortable text-right" data-column="4" data-type="number">Kapasite</th>
+                                                <th class="sortable text-right" data-column="5" data-type="number">Mevcut</th>
+                                                <th class="sortable text-right" data-column="6" data-type="number">Çıkan</th>
+                                         
+                                                <th class="sortable" data-column="9" data-type="date">Son İşlem</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (Model != null && Model.Any())
+                                            {
+                                                foreach (var item in Model)
+                                                {
+                                                    var dolulukClass = item.DolulukOrani < 50 ? "low" : item.DolulukOrani < 75 ? "medium" : "high";
+                                                    var badgeClass = item.DolulukOrani < 50 ? "badge-danger" : "badge-warning";
+
+                                                    <tr class="data-row">
+                                                        <td class="stok-kodu">@item.StokKodu</td>
+                                                        <td class="stok-adi">@item.StokIsmi</td>
+                                                        <td>@item.PartiKodu</td>
+                                                        <td class="text-center" data-sort="@(item.LotNo.HasValue ? item.LotNo.Value.ToString() : "0")">
+                                                            @(item.LotNo.HasValue ? item.LotNo.Value.ToString() : "-")
+                                                        </td>
+                                                        <td class="text-right" data-sort="@item.OlmasiGerekenPaletMiktari">
+                                                            <strong>@item.OlmasiGerekenPaletMiktari.ToString("N0")</strong>
+                                                        </td>
+                                                        <td class="text-right" data-sort="@item.PartidekiMiktar">
+                                                            @item.PartidekiMiktar.ToString("N2")
+                                                        </td>
+                                                        <td class="text-right text-danger" data-sort="@item.EksikMiktar">
+                                                            <strong>@item.EksikMiktar.ToString("N2")</strong>
+                                                        </td>
+                                                       
+                                                        <td data-sort="@item.SonIslemTarihi.ToString("yyyy-MM-dd HH:mm:ss")">
+                                                            @item.SonIslemTarihi.ToString("dd.MM.yyyy HH:mm")
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="10" class="text-center">Eksik paletli parti bulunamadı.</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section scripts {
+        <script>
+            $(document).ready(function () {
+                console.log("Sayfa yüklendi");
+
+                // Sıralama durumu
+                var currentSort = {
+                    column: null,
+                    order: 'asc'
+                };
+
+                // Temizle butonu
+                $("#clearSearchButton").click(function() {
+                    $("#stokArama").val("");
+                    $("#searchForm").submit();
+                });
+
+                // Excel export fonksiyonu - DÜZELTİLDİ
+                function exportToExcel() {
+                    var data = [];
+                    var headers = ['Stok Kodu', 'Stok Adı', 'Parti Kodu', 'Lot No', 'Palet Kapasitesi',
+                                   'Mevcut Miktar', 'Eksik Miktar', 'Eksik Palet', 'Doluluk %', 'Son İşlem'];
+
+                    data.push(headers);
+
+                    var rows = $('.data-row:visible');
+
+                    if (rows.length === 0) {
+                        Swal.fire({
+                            title: 'Uyarı!',
+                            text: 'Aktarılacak kayıt bulunamadı.',
+                            icon: 'warning',
+                            confirmButtonText: 'Tamam'
+                        });
+                        return;
+                    }
+
+                    rows.each(function() {
+                        var row = $(this);
+
+                        // Miktarları data-sort attribute'undan al (sayısal değer olarak)
+                        var kapasite = parseFloat(row.find('td:eq(4)').attr('data-sort')) || 0;
+                        var mevcutMiktar = parseFloat(row.find('td:eq(5)').attr('data-sort')) || 0;
+                        var eksikMiktar = parseFloat(row.find('td:eq(6)').attr('data-sort')) || 0;
+                        var eksikPalet = parseFloat(row.find('td:eq(7)').attr('data-sort')) || 0;
+                        var doluluk = parseFloat(row.find('td:eq(8)').attr('data-sort')) || 0;
+
+                        var rowData = [
+                            row.find('td:eq(0)').text().trim(), // Stok Kodu
+                            row.find('td:eq(1)').text().trim(), // Stok Adı
+                            row.find('td:eq(2)').text().trim(), // Parti Kodu
+                            row.find('td:eq(3)').text().trim(), // Lot No
+                            kapasite,                            // Kapasite (sayısal)
+                            mevcutMiktar,                        // Mevcut Miktar (sayısal)
+                            eksikMiktar,                         // Eksik Miktar (sayısal)
+                            eksikPalet,                          // Eksik Palet (sayısal)
+                            doluluk,                             // Doluluk (sayısal)
+                            row.find('td:eq(9)').text().trim()  // Son İşlem
+                        ];
+                        data.push(rowData);
+                    });
+
+                    var ws = XLSX.utils.aoa_to_sheet(data);
+
+                    // Sütun genişlikleri
+                    var colWidths = [
+                        { wch: 15 }, { wch: 30 }, { wch: 15 }, { wch: 10 }, { wch: 15 },
+                        { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 12 }, { wch: 18 }
+                    ];
+                    ws['!cols'] = colWidths;
+
+                    // Sayısal sütunlar için format belirle (virgüllü gösterim)
+                    var range = XLSX.utils.decode_range(ws['!ref']);
+                    for (var R = 1; R <= range.e.r; ++R) { // Header'ı atla (R=1'den başla)
+                        // Kapasite (E sütunu)
+                        var cellE = ws[XLSX.utils.encode_cell({r: R, c: 4})];
+                        if (cellE && typeof cellE.v === 'number') {
+                            cellE.z = '#,##0';
+                        }
+
+                        // Mevcut Miktar (F sütunu)
+                        var cellF = ws[XLSX.utils.encode_cell({r: R, c: 5})];
+                        if (cellF && typeof cellF.v === 'number') {
+                            cellF.z = '#,##0.00';
+                        }
+
+                        // Eksik Miktar (G sütunu)
+                        var cellG = ws[XLSX.utils.encode_cell({r: R, c: 6})];
+                        if (cellG && typeof cellG.v === 'number') {
+                            cellG.z = '#,##0.00';
+                        }
+
+                        // Eksik Palet (H sütunu)
+                        var cellH = ws[XLSX.utils.encode_cell({r: R, c: 7})];
+                        if (cellH && typeof cellH.v === 'number') {
+                            cellH.z = '#,##0.00';
+                        }
+
+                        // Doluluk % (I sütunu)
+                        var cellI = ws[XLSX.utils.encode_cell({r: R, c: 8})];
+                        if (cellI && typeof cellI.v === 'number') {
+                            cellI.z = '#,##0.00';
+                        }
+                    }
+
+                    var wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "Eksik Paletli Partiler");
+
+                    var today = new Date();
+                    var dateStr = today.getDate().toString().padStart(2, '0') + '-' +
+                                  (today.getMonth() + 1).toString().padStart(2, '0') + '-' +
+                                  today.getFullYear();
+                    var fileName = 'Eksik_Paletli_Partiler_' + dateStr + '.xlsx';
+
+                    XLSX.writeFile(wb, fileName);
+
+                    Swal.fire({
+                        title: 'Başarılı!',
+                        text: `${rows.length} kayıt Excel dosyasına aktarıldı.`,
+                        icon: 'success',
+                        confirmButtonText: 'Tamam',
+                        timer: 2000
+                    });
+                }
+
+                $('#excelExportButton').click(function() {
+                    exportToExcel();
+                });
+
+                // Sıralama fonksiyonu
+                function sortTable(columnIndex, dataType) {
+                    var tbody = $('#eksikPaletTable tbody');
+                    var rows = tbody.find('.data-row').toArray();
+
+                    var order = 'asc';
+                    if (currentSort.column === columnIndex) {
+                        order = currentSort.order === 'asc' ? 'desc' : 'asc';
+                    }
+
+                    currentSort = {
+                        column: columnIndex,
+                        order: order
+                    };
+
+                    $('.sortable').removeClass('asc desc');
+                    $('.sortable[data-column="' + columnIndex + '"]').addClass(order);
+
+                    rows.sort(function(a, b) {
+                        var aVal = getCellValue(a, columnIndex, dataType);
+                        var bVal = getCellValue(b, columnIndex, dataType);
+
+                        var result = 0;
+
+                        if (dataType === 'number') {
+                            aVal = parseFloat(aVal) || 0;
+                            bVal = parseFloat(bVal) || 0;
+                            result = aVal - bVal;
+                        } else if (dataType === 'date') {
+                            aVal = new Date(aVal);
+                            bVal = new Date(bVal);
+                            result = aVal - bVal;
+                        } else {
+                            aVal = aVal.toLowerCase();
+                            bVal = bVal.toLowerCase();
+                            result = aVal.localeCompare(bVal, 'tr');
+                        }
+
+                        return order === 'asc' ? result : -result;
+                    });
+
+                    tbody.empty();
+                    $.each(rows, function(index, row) {
+                        tbody.append(row);
+                    });
+                }
+
+                function getCellValue(row, columnIndex, dataType) {
+                    var cell = $(row).find('td').eq(columnIndex);
+
+                    if (cell.attr('data-sort')) {
+                        return cell.attr('data-sort');
+                    }
+
+                    return cell.text().trim();
+                }
+
+                $(document).on('click', '.sortable', function() {
+                    var columnIndex = parseInt($(this).data('column'));
+                    var dataType = $(this).data('type');
+                    sortTable(columnIndex, dataType);
+                });
+
+                // Gerçek zamanlı arama (client-side)
+                $("#stokArama").on("input", function() {
+                    var searchTerm = $(this).val().toLowerCase();
+                    var visibleRows = 0;
+
+                    // Önceki vurguları temizle
+                    $('.search-highlight').each(function() {
+                        var parent = $(this).parent();
+                        parent.html(parent.text());
+                    });
+
+                    $(".data-row").each(function() {
+                        var row = $(this);
+                        var stokKodu = row.find('.stok-kodu').text().toLowerCase();
+                        var stokAdi = row.find('.stok-adi').text().toLowerCase();
+
+                        if (searchTerm === "" || stokKodu.includes(searchTerm) || stokAdi.includes(searchTerm)) {
+                            row.show();
+                            visibleRows++;
+
+                            // Arama terimi varsa vurgula
+                            if (searchTerm !== "") {
+                                highlightText(row.find('.stok-kodu'), searchTerm);
+                                highlightText(row.find('.stok-adi'), searchTerm);
+                            }
+                        } else {
+                            row.hide();
+                        }
+                    });
+
+                    $("#resultCount").html(`<span><i class="fas fa-info-circle"></i> Görüntülenen: ${visibleRows} kayıt</span>`);
+                });
+
+                // Metni vurgulama fonksiyonu
+                function highlightText(element, searchTerm) {
+                    var text = element.text();
+                    var regex = new RegExp(`(${searchTerm})`, 'gi');
+                    var highlightedText = text.replace(regex, '<span class="search-highlight">$1</span>');
+                    element.html(highlightedText);
+                }
+            });
+        </script>
+    }
+</body>
+</html>

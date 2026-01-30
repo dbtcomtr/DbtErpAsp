@@ -51,11 +51,19 @@ C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.DiaSymReader.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.DotNet.PlatformAbstractions.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.DotNet.Scaffolding.Shared.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.EntityFrameworkCore.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.EntityFrameworkCore.Design.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.EntityFrameworkCore.Relational.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.Extensions.Caching.Memory.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.Extensions.Configuration.FileExtensions.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.Extensions.Configuration.Json.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.Extensions.DependencyInjection.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.Extensions.DependencyInjection.Abstractions.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.Extensions.DependencyModel.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.Extensions.Logging.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.Extensions.Options.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.Identity.Client.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.Identity.Client.Extensions.Msal.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\Microsoft.IdentityModel.Abstractions.dll
@@ -100,6 +108,7 @@ C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\System.Data.SqlClient.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\System.Drawing.Common.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\System.Private.Windows.Core.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\System.Formats.Asn1.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\System.IdentityModel.Tokens.Jwt.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\System.IO.Packaging.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\obj\Release\net8.0\PubTmp\Out\System.IO.Pipelines.dll

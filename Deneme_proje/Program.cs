@@ -17,6 +17,9 @@ builder.Services.AddControllersWithViews(options =>
     options.Filters.Add(new AuthFilter());
 });
 
+// ✅ HttpClient servisini ekleyin - EN ÜSTE
+builder.Services.AddHttpClient();
+
 // Authentication servisleri - Oturum süresiz açık kalacak şekilde ayarlandı
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -25,11 +28,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LogoutPath = "/Login/Logout";
         options.Cookie.Name = "ERPAuth";
         options.Cookie.HttpOnly = true;
-        // Maksimum değeri kullanarak süresiz oturum sağlanıyor
-        options.ExpireTimeSpan = TimeSpan.FromDays(3650); // 10 yıl (pratikte süresiz)
+        options.ExpireTimeSpan = TimeSpan.FromDays(3650);
         options.SlidingExpiration = true;
-        // Süresiz kalıcı oturum için
-        options.Cookie.MaxAge = TimeSpan.FromDays(3650); // 10 yıl (pratikte süresiz)
+        options.Cookie.MaxAge = TimeSpan.FromDays(3650);
     });
 
 builder.Services.AddHttpContextAccessor();
@@ -59,8 +60,21 @@ builder.Services.AddScoped<FaturaRepository>();
 builder.Services.AddScoped<DenizlerRepository>();
 builder.Services.AddScoped<SirketDurumuRepository>();
 builder.Services.AddScoped<GunayRepository>();
-builder.Services.AddScoped<CrmRepository>();
+builder.Services.AddScoped<SarfCikisRepository>();
+builder.Services.AddHttpContextAccessor();
+
+// ✅ CrmRepository'ye IConfiguration inject et
+builder.Services.AddScoped<CrmRepository>(sp =>
+    new CrmRepository(
+        sp.GetRequiredService<DatabaseSelectorService>(),
+        sp.GetRequiredService<IConfiguration>(), 
+        sp.GetRequiredService<IHttpContextAccessor>()
+        
+    )
+);
+
 builder.Services.AddScoped<DiokiRepository>();
+builder.Services.AddScoped<ApiRepository>();
 builder.Services.AddScoped<EmailNotificationService>();
 
 // Singleton Configuration
@@ -100,9 +114,9 @@ app.UseSession();
 
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapControllers(); // Attribute routing için gerekli
+    endpoints.MapControllers();
 
-    // PDF indirme route'ları - BUNLARI EKLEDİK
+    // PDF indirme route'ları
     endpoints.MapControllerRoute(
         name: "TeklifYazdir",
         pattern: "crm/teklifyazdir/{teklifNo}",
@@ -115,11 +129,17 @@ app.UseEndpoints(endpoints =>
         defaults: new { controller = "Crm", action = "TeklifYazdir" }
     );
 
-    // Mevcut route'lar
     endpoints.MapControllerRoute(
         name: "TeklifDuzenle",
         pattern: "crm/teklifduzenle/{teklifNo}",
         defaults: new { controller = "Crm", action = "TeklifDuzenle" }
+    );
+
+    // ✅ API Route ekleyin
+    endpoints.MapControllerRoute(
+        name: "ApiAyarlari",
+        pattern: "api/apiayarlari",
+        defaults: new { controller = "Api", action = "ApiAyarlari" }
     );
 
     // Default route en sonda olmalı
@@ -148,11 +168,7 @@ static async Task WarmupApplication(WebApplication app)
 
         logger.LogInformation("Uygulama warm-up işlemi başlatılıyor...");
 
-        // Temel servisleri initialize edin
         var dbSelector = scope.ServiceProvider.GetRequiredService<DatabaseSelectorService>();
-
-        // Database bağlantısını test edin
-        // await dbSelector.TestConnection(); // Eğer böyle bir method varsa
 
         logger.LogInformation("Uygulama warm-up işlemi tamamlandı.");
     }
@@ -181,20 +197,14 @@ public class WarmupService : BackgroundService
         {
             try
             {
-                // Her 5 dakikada bir keep-alive işlemi
                 await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
 
                 using var scope = _serviceProvider.CreateScope();
 
-                // Basit bir database ping veya health check
                 _logger.LogDebug("Keep-alive ping - {Time}", DateTime.Now);
-
-                // Buraya kendi health check kodunuzu ekleyebilirsiniz
-                // Örneğin: database connection test, cache refresh vb.
             }
             catch (OperationCanceledException)
             {
-                // Normal kapatma
                 break;
             }
             catch (Exception ex)

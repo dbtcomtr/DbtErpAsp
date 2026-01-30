@@ -1,0 +1,141 @@
+﻿@model IEnumerable<Deneme_proje.Models.SarfCikisDepartmanBazli>
+@{
+    ViewData["Title"] = "Sarf Çıkış Onay";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <i class="fas fa-clipboard-check"></i> Bekleyen Sarf Çıkış Talepleri
+                    </h4>
+                </div>
+                <div class="card-body">
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Evrak No</th>
+                                        <th>Talep Tarihi</th>
+                                        <th>Talep Eden</th>
+                                        <th>Masraf Merkezi</th>
+                                        <th>Durum</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int sira = 1;
+                                    }
+                                    @foreach (var talep in Model)
+                                    {
+                                        <tr>
+                                            <td>@sira</td>
+                                            <td><strong>@talep.sth_evrakno_seri-@talep.sth_evrakno_sira</strong></td>
+                                            <td>@talep.talep_tarihi?.ToString("dd.MM.yyyy HH:mm")</td>
+                                            <td>@talep.talep_eden_isim</td>
+                                            <td>@talep.masraf_merkezi_ismi</td>
+                                            <td><span class="badge bg-warning">Bekliyor</span></td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-success" onclick="onaylaFunc(@talep.Id, '@talep.sth_evrakno_seri-@talep.sth_evrakno_sira')">
+                                                    <i class="fas fa-check"></i> Onayla
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-danger" onclick="reddetFunc(@talep.Id, '@talep.sth_evrakno_seri-@talep.sth_evrakno_sira')">
+                                                    <i class="fas fa-times"></i> Reddet
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        sira++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Bekleyen talep yok.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    console.log('✅ Onay sayfası yüklendi');
+    console.log('✅ jQuery var mı?', typeof jQuery !== 'undefined');
+
+    function onaylaFunc(id, evrak) {
+        console.log('✅ Onayla fonksiyonu çağrıldı:', id, evrak);
+
+        if (!confirm('Bu talebi onaylamak istediğinize emin misiniz?\n\nEvrak: ' + evrak)) {
+            return;
+        }
+
+        console.log('✅ AJAX isteği gönderiliyor...');
+
+        $.ajax({
+            url: '@Url.Action("Onayla", "SarfCikis")',
+            type: 'POST',
+            data: { id: id },
+            success: function(result) {
+                console.log('✅ Sonuç:', result);
+                if (result.success) {
+                    alert('✅ Başarıyla onaylandı!');
+                    location.reload();
+                } else {
+                    alert('❌ Hata: ' + result.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('❌ AJAX hatası:', error);
+                alert('❌ Sunucu hatası: ' + error);
+            }
+        });
+    }
+
+    function reddetFunc(id, evrak) {
+        console.log('❌ Reddet fonksiyonu çağrıldı:', id, evrak);
+
+        var neden = prompt('Red nedeni giriniz:');
+        if (!neden || neden.trim() === '') {
+            alert('Red nedeni girmelisiniz!');
+            return;
+        }
+
+        console.log('✅ AJAX isteği gönderiliyor...');
+
+        $.ajax({
+            url: '@Url.Action("Reddet", "SarfCikis")',
+            type: 'POST',
+            data: {
+                id: id,
+                kapatmaNedeni: neden
+            },
+            success: function(result) {
+                console.log('✅ Sonuç:', result);
+                if (result.success) {
+                    alert('✅ Başarıyla reddedildi!');
+                    location.reload();
+                } else {
+                    alert('❌ Hata: ' + result.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('❌ AJAX hatası:', error);
+                alert('❌ Sunucu hatası: ' + error);
+            }
+        });
+    }
+
+    console.log('✅ Fonksiyonlar yüklendi');
+</script>

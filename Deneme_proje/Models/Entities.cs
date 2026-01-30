@@ -4,6 +4,22 @@ namespace Deneme_proje.Models
 {
     public class Entities
     {// Models klasörüne ekleyin
+
+        public class EksikPaletPartiViewModel
+        {
+            public string StokKodu { get; set; }
+            public string StokIsmi { get; set; }
+            public string PartiKodu { get; set; }
+            public int? LotNo { get; set; }
+            public decimal OlmasiGerekenPaletMiktari { get; set; }
+            public string BirimAdi { get; set; }
+            public string TemelBirimAdi { get; set; }
+            public decimal PartidekiMiktar { get; set; }
+            public decimal EksikMiktar { get; set; }
+            public decimal EksikPaletSayisi { get; set; }
+            public decimal DolulukOrani { get; set; }
+            public DateTime SonIslemTarihi { get; set; }
+        }
         public class PartiKoduBilgisi
         {
             public string StokKodu { get; set; }
@@ -100,6 +116,7 @@ namespace Deneme_proje.Models
             public decimal Miktar { get; set; }
             public string StokAdi { get; set; }
             public string BarkodNo { get; set; }
+            public string IsEmriGiderKodu { get; set; }
         }
 
         public class SilinenBarkodViewModel
@@ -168,13 +185,21 @@ namespace Deneme_proje.Models
             public string KisaIsim { get; set; }
             public string Birim1Ad { get; set; }
             public string Birim2Ad { get; set; }
+            public string Birim3Ad { get; set; }
+            public string Renk { get; set; }
+            public string Kalip { get; set; }
+            public string Hammadde { get; set; }
             public decimal? Birim2Katsayi { get; set; }
+            public decimal? Birim3Katsayi { get; set; }
             public string IsEmriKodu { get; set; }
             public string UrunKodu { get; set; }
             public string UrunKisaIsim { get; set; }
 
             public string UrunAdi { get; set; }
             public decimal? Miktar { get; set; }
+            public decimal? Adet { get; set; }
+            public string OperatorAdi { get; set; }
+            public int PaletNo { get; set; }
             public DateTime? BaslangicTarihi { get; set; }
             public DateTime? BitisTarihi { get; set; }
             public string IsMerkezi { get; set; }
@@ -465,7 +490,11 @@ namespace Deneme_proje.Models
             public DateTime? is_BaslangicTarihi { get; set; }
             public string UrunKodu { get; set; }
             public string UrunAdi { get; set; }
+            public string Renk { get; set; }
+            public string Kalip { get; set; }
+            public string Hammadde { get; set; }
             public decimal? Miktar { get; set; }
+            public decimal? Adet { get; set; }
             public string IsMerkezi { get; set; }
             public string DurumText { get; set; }
             public string YabanciIsim { get; set; }
@@ -473,7 +502,9 @@ namespace Deneme_proje.Models
             public string UrunKisaIsim { get; set; }
             public string Birim1Ad { get; set; }
             public string Birim2Ad { get; set; }
+            public string Birim3Ad { get; set; }
             public decimal? Birim2Katsayi { get; set; }
+            public decimal? Birim3Katsayi { get; set; }
         }
 
         public class CiroRaporuDepoBazli

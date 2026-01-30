@@ -9,6 +9,14 @@
         margin-top: 50px;
         padding: 20px;
     }
+    /* Modal z-index fix */
+    .modal {
+        z-index: 10550 !important;
+    }
+
+    .modal-backdrop {
+        z-index: 10540 !important;
+    }
 
     /* Sağ Üst İş Merkezi Alanı */
     .business-unit-container {
@@ -39,6 +47,98 @@
                 box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
             }
 
+    /* Filtre Alanı */
+    .filter-container {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+        .filter-container .form-group {
+            margin-bottom: 15px;
+        }
+
+        .filter-container label {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .filter-container input[type="date"],
+        .filter-container select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+    .filter-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .btn-filter {
+        padding: 10px 20px;
+        background-color: #1E3559;
+        color: white;
+        font-weight: bold;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: background-color 0.3s;
+    }
+
+        .btn-filter:hover {
+            background-color: #003366;
+        }
+
+    .btn-reset {
+        padding: 10px 20px;
+        background-color: #6c757d;
+        color: white;
+        font-weight: bold;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: background-color 0.3s;
+    }
+
+        .btn-reset:hover {
+            background-color: #5a6268;
+        }
+
+    .btn-export {
+        padding: 10px 20px;
+        background-color: #28A745;
+        color: white;
+        font-weight: bold;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: background-color 0.3s;
+    }
+
+        .btn-export:hover {
+            background-color: #218838;
+        }
+
     /* Kart Stili */
     .card {
         border-radius: 8px;
@@ -50,6 +150,9 @@
         background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%);
         padding: 15px 20px;
         border-radius: 8px 8px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .card-header-text {
@@ -76,7 +179,13 @@
             background-color: #f4f4f4;
             font-weight: bold;
             color: #333;
+            cursor: pointer;
+            user-select: none;
         }
+
+            .table th:hover {
+                background-color: #e9ecef;
+            }
 
         .table tbody tr:hover {
             background-color: #f9f9f9;
@@ -84,6 +193,44 @@
 
     /* Buton Stili */
     .barkod-button-yeni {
+        padding: 8px 15px;
+        background-color: #901505;
+        color: white;
+        font-weight: bold;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: background-color 0.3s;
+    }
+
+        .barkod-button-yeni:hover {
+            background-color: #D53722;
+        }
+
+    .barkod-button-yazdir {
+        padding: 8px 15px;
+        background-color: #E0B123;
+        color: white;
+        font-weight: bold;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: background-color 0.3s;
+    }
+
+        .barkod-button-yazdir:hover {
+            background-color: #FFC107;
+        }
+
+    .barkod-button-kaldir {
         padding: 8px 15px;
         background-color: #28A745;
         color: white;
@@ -98,7 +245,7 @@
         transition: background-color 0.3s;
     }
 
-        .barkod-button-yeni:hover {
+        .barkod-button-kaldir:hover {
             background-color: #218838;
         }
 
@@ -125,7 +272,7 @@
 
     /* Hatalı Durum Stili */
     .faulty-status {
-        color: #dc3545; /* Kırmızı renk */
+        color: #dc3545;
         font-weight: bold;
         display: inline-flex;
         align-items: center;
@@ -134,6 +281,100 @@
 
         .faulty-status i {
             font-size: 14px;
+        }
+
+    /* Sıra Numarası Badge */
+    .sira-badge {
+        background-color: #007bff;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+    /* Toplam Badge */
+    .toplam-badge {
+        background-color: #6c757d;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: bold;
+        margin-left: 5px;
+    }
+
+    /* İstatistik Kartları */
+    .stats-container {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        flex: 1;
+        padding: 20px;
+        border-radius: 8px;
+        color: white;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+        .stat-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .stat-card {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            border-radius: 14px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .stat-card.green {
+            background-color: #0b1d3a; /* Saf lacivert */
+            color: #ffffff;
+        }
+
+        .stat-card.orange {
+            background-color: #102a54; /* Bir tık açık lacivert */
+            color: #ffffff;
+        }
+
+        .stat-card.blue {
+            background-color: #0a1a33; /* Bir tık koyu lacivert */
+            color: #ffffff;
+        }
+
+    /* Sort Icons */
+    .sort-icon {
+        margin-left: 5px;
+        font-size: 12px;
+        opacity: 0.5;
+    }
+
+        .sort-icon.active {
+            opacity: 1;
+        }
+
+    /* Açıklama Tooltip */
+    .aciklama-text {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        cursor: help;
+        color: #666;
+    }
+
+        .aciklama-text:hover {
+            overflow: visible;
+            white-space: normal;
         }
 </style>
 
@@ -147,6 +388,7 @@
                 </div>
             </div>
         </div>
+
         <div class="business-unit-container">
             @if (ViewBag.BusinessUnits != null && ViewBag.BusinessUnits.Count > 0)
             {
@@ -176,24 +418,139 @@
                 <span>İş merkezi tanımlı değil</span>
             }
         </div>
+
+        <!-- İstatistikler -->
+        <div class="stats-container">
+            <div class="stat-card green">
+                <h3>Toplam Üretim</h3>
+                <p class="stat-value" id="totalProduction">@Model.Count()</p>
+            </div>
+            <div class="stat-card orange">
+                <h3>Bugün Üretilen</h3>
+                <p class="stat-value" id="todayProduction">@Model.Count(x => x.UretimTarihi.Date == DateTime.Now.Date)</p>
+            </div>
+            <div class="stat-card blue">
+                <h3>Hatalı Üretim</h3>
+                <p class="stat-value" id="faultyProduction">@Model.Count(x => x.HataliDurum == "001")</p>
+            </div>
+        </div>
+
+        <!-- Filtre Alanı -->
+        <div class="filter-container">
+            <h5 style="margin-bottom: 15px; color: #1E3559;">
+                <i class="fas fa-filter"></i> Filtrele
+            </h5>
+            <form id="filterForm" method="get" action="/Dioki/ÜretimListesi">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="baslangicTarihi">Başlangıç Tarihi</label>
+                            <input type="date" id="baslangicTarihi" name="baslangicTarihi" class="form-control" value="@ViewBag.BaslangicTarihi">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="bitisTarihi">Bitiş Tarihi</label>
+                            <input type="date" id="bitisTarihi" name="bitisTarihi" class="form-control" value="@ViewBag.BitisTarihi">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="isMerkezi">İş Merkezi</label>
+                            <select id="isMerkezi" name="isMerkezi" class="form-control">
+                                <option value="">Tümü</option>
+                                @if (ViewBag.BusinessUnits != null)
+                                {
+                                    foreach (var unit in ViewBag.BusinessUnits)
+                                    {
+                                        if (unit == ViewBag.IsMerkezi)
+                                        {
+                                            <option value="@unit" selected>@unit</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@unit">@unit</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="hataliDurum">Hatalı Durum</label>
+                            <select id="hataliDurum" name="hataliDurum" class="form-control">
+                                <option value="" @@(string.IsNullOrEmpty(ViewBag.HataliDurum) ? "selected" : "")>Tümü</option>
+                                <option value="hatali" @@(ViewBag.HataliDurum == "hatali" ? "selected" : "")>Sadece Hatalı</option>
+                                <option value="normal" @@(ViewBag.HataliDurum == "normal" ? "selected" : "")>Sadece Normal</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-buttons">
+                    <button type="submit" class="btn-filter">
+                        <i class="fas fa-search"></i> Filtrele
+                    </button>
+                    <button type="button" class="btn-reset" onclick="resetFilters()">
+                        <i class="fas fa-redo"></i> Sıfırla
+                    </button>
+                    <button type="button" class="btn-export" onclick="exportToExcel()">
+                        <i class="fas fa-file-excel"></i> Excel'e Aktar
+                    </button>
+                </div>
+            </form>
+        </div>
+
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-header-text">Üretim Listesi</h5>
+                        <span style="color: white; font-size: 14px;">
+                            <i class="fas fa-info-circle"></i> Toplam @Model.Count() kayıt
+                        </span>
                     </div>
-                    <div class="card-block">
-                        <table class="table table-striped">
+                    <div class="card-block" style="overflow-x: auto;">
+                        <table class="table table-striped" id="productionTable">
                             <thead>
                                 <tr>
-                                    <th>Barkod Kodu</th>
-                                    <th>Stok Kodu</th>
-                                    <th>Parti Kodu</th>
-                                    <th>Lot No</th>
-                                    <th>Kullanıcı</th>
-                                    <th>İş Merkezi</th>
-                                    <th>Hatalı Durum</th>
-                                    <th>İşlem</th>
+                                    <th onclick="sortTable(0)">
+                                        Barkod Kodu
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </th>
+                                    <th onclick="sortTable(1)">
+                                        Stok Adı
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </th>
+                                    <th onclick="sortTable(2)">
+                                        Parti Kodu
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </th>
+                                    <th>
+                                        Sıra / Toplam
+                                    </th>
+                                    <th onclick="sortTable(4)">
+                                        Kullanıcı
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </th>
+                                    <th onclick="sortTable(5)">
+                                        İş Merkezi
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </th>
+                                    <th onclick="sortTable(6)">
+                                        Üretim Tarihi
+                                        <i class="fas fa-sort sort-icon active"></i>
+                                    </th>
+                                    <th>
+                                        Hatalı Durum
+                                    </th>
+                                    <th onclick="sortTable(8)">
+                                        Açıklama
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </th>
+                                    <th>
+                                        İşlem
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -201,11 +558,17 @@
                                 {
                                     <tr>
                                         <td>@item.bar_kodu</td>
-                                        <td>@item.bar_stokkodu</td>
+                                        <td>@item.StokAdi</td>
                                         <td>@item.bar_partikodu</td>
-                                        <td>@item.bar_lotno</td>
+                                        <td>
+                                            <span class="sira-badge">@item.SiraNo</span>
+                                            <span class="toplam-badge">/ @item.AyniLottanToplam</span>
+                                        </td>
                                         <td>@(string.IsNullOrEmpty(item.PersonelAdi) ? "-" : $"{item.PersonelAdi} {item.PersonelSoyadi}")</td>
                                         <td>@(string.IsNullOrEmpty(item.IsMerkezi) ? "-" : item.IsMerkezi)</td>
+                                        <td data-timestamp="@item.UretimTarihi.ToString("yyyy-MM-dd HH:mm:ss")">
+                                            @item.UretimTarihi.ToString("dd.MM.yyyy HH:mm:ss")
+                                        </td>
                                         <td>
                                             @if (item.HataliDurum == "001")
                                             {
@@ -219,12 +582,35 @@
                                             }
                                         </td>
                                         <td>
-                                            @if (item.HataliDurum != "001")
+                                            @if (!string.IsNullOrEmpty(item.HataliAciklama))
                                             {
-                                                <button class="barkod-button-yeni" onclick="markAsFaulty('@item.bar_kodu')">
-                                                    <i class="fas fa-exclamation-triangle"></i> Hatalı İşaretle
-                                                </button>
+                                                <span class="aciklama-text" title="@item.HataliAciklama">
+                                                    @item.HataliAciklama
+                                                </span>
                                             }
+                                            else
+                                            {
+                                                <span>-</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                                @if (item.HataliDurum != "001")
+                                                {
+                                                    <button class="barkod-button-yeni" onclick="openFaultyModal('@item.bar_kodu')">
+                                                        <i class="fas fa-exclamation-triangle"></i> Hatalı İşaretle
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="barkod-button-kaldir" onclick="removeFromFaulty('@item.bar_kodu')">
+                                                        <i class="fas fa-check-circle"></i> Hatalıyı Kaldır
+                                                    </button>
+                                                }
+                                                <button class="barkod-button-yazdir" onclick="printBarkod('@item.bar_kodu')">
+                                                    <i class="fas fa-print"></i> Yazdır
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 }
@@ -238,8 +624,117 @@
     </div>
 </div>
 
+<!-- Hatalı İşaretleme Modal -->
+<div class="modal fade" id="faultyModal" tabindex="-1" role="dialog" aria-labelledby="faultyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="faultyModalLabel">
+                    <i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i> Hatalı Üretim İşaretleme
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Barkod:</strong> <span id="faultyBarkod"></span></p>
+                <div class="form-group">
+                    <label for="faultyAciklama">Hata Açıklaması <span style="color: red;">*</span></label>
+                    <textarea id="faultyAciklama" class="form-control" rows="4" placeholder="Lütfen hatanın detaylarını açıklayın..." required></textarea>
+                    <small class="form-text text-muted">Açıklama zorunludur.</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-danger" onclick="markAsFaulty()">
+                    <i class="fas fa-exclamation-triangle"></i> Hatalı Olarak İşaretle
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 <script>
+    let currentBarkod = '';
+
+    function openFaultyModal(barkod) {
+        currentBarkod = barkod;
+        $('#faultyBarkod').text(barkod);
+        $('#faultyAciklama').val('');
+        $('#faultyModal').modal('show');
+    }
+
+    function markAsFaulty() {
+        const aciklama = $('#faultyAciklama').val().trim();
+
+        if (!aciklama) {
+            alert('Lütfen hata açıklaması giriniz!');
+            return;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/Dioki/UretimiHataliOlarakIsaretle',
+            data: { barkod: currentBarkod, aciklama: aciklama },
+            success: function (response) {
+                if (response.success) {
+                    $('#faultyModal').modal('hide');
+                    $('#outputMessage').html(`
+                        <div class="success-message">
+                            <strong>Başarılı:</strong> ${response.message}
+                        </div>`);
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    $('#outputMessage').html(`
+                        <div class="error-message">
+                            <strong>Hata:</strong> ${response.message}
+                        </div>`);
+                }
+            },
+            error: function () {
+                $('#outputMessage').html(`
+                    <div class="error-message">
+                        <strong>Hata:</strong> Barkod hatalı olarak işaretlenirken bir hata oluştu.
+                    </div>`);
+            }
+        });
+    }
+
+    function removeFromFaulty(barkod) {
+        if (confirm('Bu barkodun hatalı durumunu kaldırmak istediğinize emin misiniz?')) {
+            $.ajax({
+                type: 'POST',
+                url: '/Dioki/HataliyiKaldir',
+                data: { barkod: barkod },
+                success: function (response) {
+                    if (response.success) {
+                        $('#outputMessage').html(`
+                            <div class="success-message">
+                                <strong>Başarılı:</strong> ${response.message}
+                            </div>`);
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        $('#outputMessage').html(`
+                            <div class="error-message">
+                                <strong>Hata:</strong> ${response.message}
+                            </div>`);
+                    }
+                },
+                error: function () {
+                    $('#outputMessage').html(`
+                        <div class="error-message">
+                            <strong>Hata:</strong> Hatalı durumu kaldırılırken bir hata oluştu.
+                        </div>`);
+                }
+            });
+        }
+    }
+
     function selectBusinessUnit() {
         const selectedUnit = $('#businessUnitSelector').val();
         $.ajax({
@@ -265,33 +760,360 @@
         });
     }
 
-    function markAsFaulty(barkod) {
-        if (confirm('Bu barkodu hatalı olarak işaretlemek istediğinize emin misiniz?')) {
-            $.ajax({
-                type: 'POST',
-                url: '/Dioki/UretimiHataliOlarakIsaretle',
-                data: { barkod: barkod },
-                success: function (response) {
-                    if (response.success) {
-                        $('#outputMessage').html(`
-                            <div class="success-message">
-                                <strong>Başarılı:</strong> ${response.message}
-                            </div>`);
-                        setTimeout(() => location.reload(), 2000);
-                    } else {
-                        $('#outputMessage').html(`
-                            <div class="error-message">
-                                <strong>Hata:</strong> ${response.message}
-                            </div>`);
-                    }
-                },
-                error: function () {
-                    $('#outputMessage').html(`
-                        <div class="error-message">
-                            <strong>Hata:</strong> Barkod hatalı olarak işaretlenirken bir hata oluştu.
-                        </div>`);
-                }
-            });
+    function resetFilters() {
+        $('#baslangicTarihi').val('');
+        $('#bitisTarihi').val('');
+        $('#isMerkezi').val('');
+        $('#hataliDurum').val('');
+        $('#filterForm').submit();
+    }
+
+    function exportToExcel() {
+        const table = document.getElementById('productionTable');
+        const wb = XLSX.utils.table_to_book(table, { sheet: "Üretim Listesi" });
+        
+        const today = new Date().toISOString().split('T')[0];
+        const fileName = `Uretim_Listesi_${today}.xlsx`;
+        
+        XLSX.writeFile(wb, fileName);
+    }
+
+    // Tablo sıralama
+    let sortDirection = {};
+
+    function sortTable(columnIndex) {
+        const table = document.getElementById('productionTable');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        
+        if (!sortDirection[columnIndex]) {
+            sortDirection[columnIndex] = 'asc';
+        } else {
+            sortDirection[columnIndex] = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';
         }
+        
+        rows.sort((a, b) => {
+            let aValue, bValue;
+            
+            if (columnIndex === 6) {
+                aValue = a.cells[columnIndex].getAttribute('data-timestamp');
+                bValue = b.cells[columnIndex].getAttribute('data-timestamp');
+            } else {
+                aValue = a.cells[columnIndex].textContent.trim();
+                bValue = b.cells[columnIndex].textContent.trim();
+            }
+            
+            if (sortDirection[columnIndex] === 'asc') {
+                return aValue > bValue ? 1 : -1;
+            } else {
+                return aValue < bValue ? 1 : -1;
+            }
+        });
+        
+        rows.forEach(row => tbody.appendChild(row));
+        
+        const headers = table.querySelectorAll('th');
+        headers.forEach((header, index) => {
+            const icon = header.querySelector('.sort-icon');
+            if (icon) {
+                icon.classList.remove('active', 'fa-sort-up', 'fa-sort-down');
+                icon.classList.add('fa-sort');
+                
+                if (index === columnIndex) {
+                    icon.classList.add('active');
+                    if (sortDirection[columnIndex] === 'asc') {
+                        icon.classList.remove('fa-sort');
+                        icon.classList.add('fa-sort-up');
+                    } else {
+                        icon.classList.remove('fa-sort');
+                        icon.classList.add('fa-sort-down');
+                    }
+                }
+            }
+        });
+    }
+
+    // Barkod yazdırma fonksiyonu
+    function printBarkod(barkodKodu) {
+        $.ajax({
+            url: '/Dioki/GetCurrentUserInfo',
+            type: 'GET',
+            success: function (userInfo) {
+                $.ajax({
+                    url: '/Dioki/GetBarkodBilgileri',
+                    type: 'GET',
+                    data: { barkod: barkodKodu },
+                    success: function (response) {
+                        if (!response.success) {
+                            alert(response.message);
+                            return;
+                        }
+
+                        response.userName = userInfo.userName;
+                        response.isMerkezi = userInfo.businessUnit;
+
+                        printBarkodEtiket(response);
+                    }
+                });
+            },
+            error: function () {
+                alert('Kullanıcı bilgisi alınamadı.');
+            }
+        });
+    }
+
+    function printBarkodEtiket(barkodData) {
+        const oldPrintArea = document.getElementById('print-area');
+        if (oldPrintArea) {
+            document.body.removeChild(oldPrintArea);
+        }
+
+        const oldStyle = document.getElementById('print-styles');
+        if (oldStyle) {
+            document.head.removeChild(oldStyle);
+        }
+
+        const printStyles = document.createElement('style');
+        printStyles.id = 'print-styles';
+        printStyles.innerHTML = `
+            @@media print {
+                body > *:not(#print-area) {
+                    display: none !important;
+                }
+                #print-area {
+                    display: block !important;
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    margin: 0;
+                    padding: 0;
+                    page-break-after: avoid;
+                    page-break-inside: avoid;
+                }
+            }
+            @@page {
+                size: 100mm 140mm;
+                margin: 0;
+            }
+            #print-area {
+                display: none;
+                width: 100mm;
+                height: 140mm;
+                font-family: 'Segoe UI', Arial, sans-serif;
+                background: white;
+                padding: 5mm;
+                box-sizing: border-box;
+            }
+            #print-area .etiket-container {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 3mm;
+            }
+            #print-area .ust-header {
+                background: white;
+                border: 2px solid #0076a8;
+                border-radius: 12px;
+                padding: 4mm;
+                text-align: center;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+            #print-area .logo-container {
+                flex: 0 0 30mm;
+            }
+            #print-area .logo {
+                height: 17mm;
+                width: auto;
+            }
+            #print-area .header-text {
+                flex: 1;
+                text-align: center;
+            }
+            #print-area .baslik {
+                font-size: 10pt;
+                font-weight: bold;
+                color: #1a1a1a;
+                margin: 0;
+                letter-spacing: 1px;
+            }
+            #print-area .alt-baslik {
+                font-size: 7pt;
+                color: #666;
+                margin-top: 1mm;
+            }
+            #print-area .urun-kutusu {
+                background: white;
+                border: 2px solid #0076a8;
+                border-radius: 12px;
+                padding: 12px;
+                text-align: center;
+            }
+            #print-area .urun-label {
+                font-size: 8pt;
+                font-weight: bold;
+                color: #000;
+                margin-bottom: 3mm;
+                letter-spacing: 0.5px;
+            }
+            #print-area .urun-adi {
+                font-size: 35px;
+                font-weight: normal;
+                color: #1a1a1a;
+                letter-spacing: 1px;
+            }
+            #print-area .bilgi-grid {
+                background: white;
+                border: 2px solid #0076a8;
+                border-radius: 12px;
+                padding: 5mm;
+                display: flex;
+                flex-direction:column;
+                gap: 2mm;
+                font-size: 16px;
+            }
+            #print-area .bilgi-item {
+                display: flex;
+                flex-direction: column;
+                gap: 1mm;
+            }
+            #print-area .bilgi-baslik {
+                font-size: 8pt;
+                font-weight: bold;
+                color: #000;
+                text-transform: uppercase;
+                letter-spacing: 0.3px;
+            }
+            #print-area .bilgi-deger {
+                font-size: 9pt;
+                font-weight: normal;
+                color: #1a1a1a;
+            }
+            #print-area .barkod-kutusu {
+                background: white;
+                border: 2px solid #0076a8;
+                border-radius: 12px;
+                padding: 10px;
+                text-align: center;
+            }
+            #print-area .barkod-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-bottom: 2mm;
+                min-height: 25px;
+            }
+            #print-area .barkod-container svg {
+                max-width: 100%;
+                height: auto;
+            }
+            #print-area .barkod-numara {
+                font-size: 10pt;
+                font-weight: bold;
+                color: #1a1a1a;
+                letter-spacing: 1.5px;
+                margin-bottom: 2mm;
+            }
+            #print-area .alt-bilgi {
+                font-size: 6pt;
+                color: #666;
+            }
+        `;
+
+        document.head.appendChild(printStyles);
+
+        const printDiv = document.createElement('div');
+        printDiv.id = 'print-area';
+
+        const miktar = barkodData.miktar || '-';
+        const kisaIsim = barkodData.kisaIsim || barkodData.stokKodu;
+        const modelKodu = barkodData.modelKodu || '-';
+        const isMerkezi = barkodData.isMerkezi || '-';
+        const userName = barkodData.userName || 'Bilinmiyor';
+        
+        printDiv.innerHTML = `
+            <div class="etiket-container">
+                <div class="ust-header">
+                    <div class="logo-container">
+                      <img src="/Diokilogoyeni.png" class="logo" alt="DİOKİ">
+                    </div>
+                    <div class="header-text">
+                        <div class="baslik">ÜRÜN ETİKETİ</div>
+                        <div class="alt-baslik">Barkodlu İzlenebilirlik</div>
+                    </div>
+                </div>
+                <div class="urun-kutusu">
+                    <div class="urun-label">ÜRÜN KODU</div>
+                    <div class="urun-adi">${kisaIsim}</div>
+                </div>
+                <div class="bilgi-grid">
+                    <div class='row'>
+                        <div class='col-6'>
+                            <div class="bilgi-item full-width">
+                                <div class="bilgi-baslik">ÜRÜN ADI</div>
+                                <div class="bilgi-deger">${modelKodu}</div>
+                            </div>
+                        </div>
+                        <div class='col-6'>
+                            <div class="bilgi-item full-width">
+                                <div class="bilgi-baslik">İŞLETME</div>
+                                <div class="bilgi-deger">${userName}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='row'>
+                        <div class='col-6'>
+                            <div class="bilgi-item">
+                                <div class="bilgi-baslik">MİKTAR</div>
+                                <div class="bilgi-deger">${miktar} KG</div>
+                            </div>
+                        </div>
+                        <div class='col-6'>
+                            <div class="bilgi-item">
+                                <div class="bilgi-baslik">PARTİ NO</div>
+                                <div class="bilgi-deger">${barkodData.partiKodu}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="barkod-kutusu">
+                    <div class="barkod-container">
+                        <svg id="printBarcode"></svg>
+                    </div>
+                    <div class="barkod-numara">${barkodData.barkod}</div>
+                    <div class="alt-bilgi">BARKOD (Code-128) · PARTİ: ${barkodData.partiKodu}</div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(printDiv);
+        printDiv.style.display = 'block';
+
+        setTimeout(function() {
+            JsBarcode("#printBarcode", barkodData.barkod, {
+                format: "CODE128",
+                width: 3,
+                height: 50,
+                displayValue: false,
+                margin: 5
+            });
+
+            printDiv.style.display = 'none';
+
+            setTimeout(function() {
+                window.print();
+
+                window.onafterprint = function() {
+                    if (document.getElementById('print-area')) {
+                        document.body.removeChild(printDiv);
+                    }
+                    if (document.getElementById('print-styles')) {
+                        document.head.removeChild(printStyles);
+                    }
+                };
+            }, 300);
+        }, 100);
     }
 </script>

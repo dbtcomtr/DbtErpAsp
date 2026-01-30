@@ -1,0 +1,459 @@
+﻿@model IEnumerable<Deneme_proje.Models.SarfCikisDepartmanBazli>
+@{
+    ViewData["Title"] = "Sarf Çıkış Talep Listesi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-12">
+            <!-- İstatistik Kartları -->
+            <div class="row">
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="card border-left-warning shadow h-100">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        Bekleyen Talepler
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        @Model.Count(x => x.bekleyen == true)
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-clock fa-2x text-warning"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="card border-left-info shadow h-100">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        Onaylanan Talepler
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        @Model.Count(x => x.onaylanan == true)
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-check fa-2x text-info"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="card border-left-success shadow h-100">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Tamamlanan Talepler
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        @Model.Count(x => x.tamamlanan == true)
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-check-double fa-2x text-success"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="card border-left-danger shadow h-100">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                        Reddedilen Talepler
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        @Model.Count(x => x.red_edilen == true)
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-times fa-2x text-danger"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h4 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-list"></i> Tüm Sarf Çıkış Talepleri
+                    </h4>
+                    <a href="@Url.Action("Talep", "SarfCikis")" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Yeni Talep Oluştur
+                    </a>
+                </div>
+                <div class="card-body">
+                    <!-- Filtreler -->
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Durum Filtresi</label>
+                            <select class="form-select" id="durumFiltre">
+                                <option value="">Tümü</option>
+                                <option value="bekleyen">Bekleyen</option>
+                                <option value="onaylanan">Onaylanan</option>
+                                <option value="tamamlanan">Tamamlanan</option>
+                                <option value="red_edilen">Reddedilen</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Başlangıç Tarihi</label>
+                            <input type="date" class="form-control" id="baslangicTarih" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Bitiş Tarihi</label>
+                            <input type="date" class="form-control" id="bitisTarih" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="button" class="btn btn-info w-100" id="filtreUygula">
+                                <i class="fas fa-filter"></i> Filtrele
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tablo -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover" id="talepTablosu">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="5%">#</th>
+                                    <th width="10%">Evrak No</th>
+                                    <th width="10%">Talep Tarihi</th>
+                                    <th width="12%">Talep Eden</th>
+                                    <th width="18%">Masraf Merkezi</th>
+                                    <th width="12%">Birim</th>
+                                    <th width="10%">Onaylayan</th>
+                                    <th width="10%">Tamamlayan</th>
+                                    <th width="8%">Durum</th>
+                                    <th width="10%">İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int sira = 1;
+                                }
+                                @foreach (var talep in Model.OrderByDescending(x => x.talep_tarihi))
+                                {
+                                    string durumBadge = "";
+                                    string durumText = "";
+
+                                    if (talep.red_edilen == true)
+                                    {
+                                        durumBadge = "bg-danger";
+                                        durumText = "Reddedildi";
+                                    }
+                                    else if (talep.tamamlanan == true)
+                                    {
+                                        durumBadge = "bg-success";
+                                        durumText = "Tamamlandı";
+                                    }
+                                    else if (talep.onaylanan == true)
+                                    {
+                                        durumBadge = "bg-info";
+                                        durumText = "Onaylandı";
+                                    }
+                                    else if (talep.bekleyen == true)
+                                    {
+                                        durumBadge = "bg-warning";
+                                        durumText = "Bekliyor";
+                                    }
+
+                                    <tr data-durum="@durumText.ToLower().Replace("ı", "i")">
+                                        <td>@sira</td>
+                                        <td><strong>@talep.sth_evrakno_seri-@talep.sth_evrakno_sira</strong></td>
+                                        <td>@talep.talep_tarihi?.ToString("dd.MM.yyyy HH:mm")</td>
+                                        <td>@talep.talep_eden_isim</td>
+                                        <td>@talep.masraf_merkezi_ismi</td>
+                                        <td>@talep.birim_adi</td>
+                                        <td>@(talep.onaylayan_kisi_isim ?? "-")</td>
+                                        <td>@(talep.tamamlayan_kisi_isim ?? "-")</td>
+                                        <td>
+                                            <span class="badge @durumBadge">@durumText</span>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-info detay-btn"
+                                                    data-id="@talep.Id">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            @if (talep.red_edilen == true && !string.IsNullOrEmpty(talep.kapatma_nedeni))
+                                            {
+                                                <button type="button" class="btn btn-sm btn-danger red-nedeni-btn"
+                                                        data-nedeni="@talep.kapatma_nedeni">
+                                                    <i class="fas fa-info-circle"></i>
+                                                </button>
+                                            }
+                                        </td>
+                                    </tr>
+                                    sira++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detay Modal -->
+<div class="modal fade" id="detayModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Sarf Çıkış Detayı</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detayIcerik">
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Red Nedeni Modal -->
+<div class="modal fade" id="redNedeniModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Red Nedeni</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <i class="fas fa-info-circle"></i> <strong>Red Nedeni:</strong>
+                    <p id="redNedeniText" class="mb-0 mt-2"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // DataTable
+            let table = $('#talepTablosu').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/tr.json'
+                },
+                order: [[2, 'desc']],
+                pageLength: 25
+            });
+
+            // Filtre uygula
+            $('#filtreUygula').on('click', function () {
+                let durum = $('#durumFiltre').val();
+
+                if (durum) {
+                    table.column(8).search(durum).draw();
+                } else {
+                    table.column(8).search('').draw();
+                }
+            });
+
+            // Detay göster
+            $(document).on('click', '.detay-btn', function () {
+                let id = $(this).data('id');
+
+                $('#detayIcerik').html(`
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Yükleniyor...</span>
+                        </div>
+                    </div>
+                `);
+
+                $.get('@Url.Action("GetSarfCikisDetay", "SarfCikis")', { id: id }, function (result) {
+                    if (result.success) {
+                        let durumBadge = '';
+                        let durumText = '';
+
+                        if (result.sarfCikis.red_edilen) {
+                            durumBadge = 'bg-danger';
+                            durumText = 'Reddedildi';
+                        } else if (result.sarfCikis.tamamlanan) {
+                            durumBadge = 'bg-success';
+                            durumText = 'Tamamlandı';
+                        } else if (result.sarfCikis.onaylanan) {
+                            durumBadge = 'bg-info';
+                            durumText = 'Onaylandı';
+                        } else if (result.sarfCikis.bekleyen) {
+                            durumBadge = 'bg-warning';
+                            durumText = 'Bekliyor';
+                        }
+
+                        let html = `
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <div class="alert alert-secondary">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <strong>Evrak No:</strong><br>
+                                                <span class="h5">${result.sarfCikis.sth_evrakno_seri}-${result.sarfCikis.sth_evrakno_sira}</span>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <strong>Durum:</strong><br>
+                                                <span class="badge ${durumBadge}">${durumText}</span>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <strong>Talep Tarihi:</strong><br>
+                                                ${new Date(result.sarfCikis.talep_tarihi).toLocaleString('tr-TR')}
+                                            </div>
+                                            <div class="col-md-3">
+                                                <strong>Talep Eden:</strong><br>
+                                                ${result.sarfCikis.talep_eden_isim}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <strong>Masraf Merkezi:</strong> ${result.sarfCikis.masraf_merkezi_ismi}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Birim:</strong> ${result.sarfCikis.birim_adi || '-'}
+                                </div>
+                            </div>
+
+                            ${result.sarfCikis.onaylanan ? `
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <strong>Onaylayan:</strong> ${result.sarfCikis.onaylayan_kisi_isim || '-'}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Onay Tarihi:</strong> ${result.sarfCikis.onaylanma_tarihi ? new Date(result.sarfCikis.onaylanma_tarihi).toLocaleString('tr-TR') : '-'}
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            ${result.sarfCikis.tamamlanan ? `
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <strong>Tamamlayan:</strong> ${result.sarfCikis.tamamlayan_kisi_isim || '-'}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Tamamlanma Tarihi:</strong> ${result.sarfCikis.tamamlanma_tarihi ? new Date(result.sarfCikis.tamamlanma_tarihi).toLocaleString('tr-TR') : '-'}
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            ${result.sarfCikis.red_edilen && result.sarfCikis.kapatma_nedeni ? `
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <div class="alert alert-danger">
+                                            <strong><i class="fas fa-exclamation-triangle"></i> Red Nedeni:</strong><br>
+                                            ${result.sarfCikis.kapatma_nedeni}
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            <hr>
+                            <h6 class="mb-3">Stok Listesi</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Stok Kodu</th>
+                                            <th>Stok Adı</th>
+                                            <th>Planlanan</th>
+                                            <th>Tamamlanan</th>
+                                            <th>Birim Fiyat</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                        `;
+
+                        result.stoklar.forEach((stok, index) => {
+                            html += `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${stok.sth_stok_kod}</td>
+                                    <td>${stok.sth_stok_adi}</td>
+                                    <td>${stok.planlanan_adet || 0}</td>
+                                    <td>${stok.tamamlanan_adet || 0}</td>
+                                    <td>${stok.sth_tutar ? stok.sth_tutar.toFixed(2) : '0.00'} TL</td>
+                                </tr>
+                            `;
+                        });
+
+                        html += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+
+                        $('#detayIcerik').html(html);
+                        $('#detayModal').modal('show');
+                    } else {
+                        Swal.fire('Hata', result.message, 'error');
+                    }
+                }).fail(function() {
+                    $('#detayIcerik').html(`
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle"></i> Detay yüklenirken hata oluştu!
+                        </div>
+                    `);
+                });
+            });
+
+            // Red nedeni göster
+            $(document).on('click', '.red-nedeni-btn', function () {
+                let nedeni = $(this).data('nedeni');
+                $('#redNedeniText').text(nedeni);
+                $('#redNedeniModal').modal('show');
+            });
+        });
+    </script>
+
+    <style>
+        .border-left-warning {
+            border-left: 0.25rem solid #f6c23e !important;
+        }
+
+        .border-left-info {
+            border-left: 0.25rem solid #36b9cc !important;
+        }
+
+        .border-left-success {
+            border-left: 0.25rem solid #1cc88a !important;
+        }
+
+        .border-left-danger {
+            border-left: 0.25rem solid #e74a3b !important;
+        }
+    </style>

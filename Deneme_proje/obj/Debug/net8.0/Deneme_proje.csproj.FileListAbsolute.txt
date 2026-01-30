@@ -1479,3 +1479,12 @@ C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\bin\Debug\net8.0\Sy
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\bin\Debug\net8.0\System.Text.Encodings.Web.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\bin\Debug\net8.0\System.Text.Json.dll
 C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\bin\Debug\net8.0\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Design.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\bin\Debug\net8.0\Microsoft.Extensions.Caching.Memory.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\bin\Debug\net8.0\Microsoft.Extensions.Logging.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+C:\Users\Lenovo\source\repos\dbtcomtr\DbtErpAsp\Deneme_proje\bin\Debug\net8.0\System.Formats.Asn1.dll

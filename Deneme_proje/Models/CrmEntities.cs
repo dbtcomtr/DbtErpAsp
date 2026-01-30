@@ -4,25 +4,119 @@ namespace Deneme_proje.Models
 {
     public class CrmEntities
     {
+        public class AdayCariHesapModel
+        {
+            public string Kod { get; set; }
+
+            [Required(ErrorMessage = "Ünvan 1 zorunludur")]
+            public string Unvan1 { get; set; }
+
+            // ✅ Required kaldırıldı - opsiyonel
+            public string Unvan2 { get; set; }
+            public string SektorKodu { get; set; }
+            public string BolgeKodu { get; set; }
+            public string GrupKodu { get; set; }
+            public string TemsilciKodu { get; set; }
+            public string WwwAdresi { get; set; }
+
+            [Required(ErrorMessage = "E-posta zorunludur")]
+            [EmailAddress(ErrorMessage = "Geçerli bir e-posta adresi giriniz")]
+            public string Email { get; set; }
+
+            public string Adr1Cadde { get; set; }
+            public string Adr1Mahalle { get; set; }
+            public string Adr1Sokak { get; set; }
+            public string Adr1Semt { get; set; }
+            public string Adr1AptNo { get; set; }
+            public string Adr1DaireNo { get; set; }
+            public string Adr1PostaKodu { get; set; }
+            public string Adr1Ilce { get; set; }
+            public string Adr1Il { get; set; }
+            public string Adr1Ulke { get; set; }
+            public string Adr1AdresKodu { get; set; }
+            public string Adr1TelUlkeKodu { get; set; }
+            public string Adr1TelBolgeKodu { get; set; }
+
+            [Required(ErrorMessage = "Telefon zorunludur")]
+            public string Adr1TelNo1 { get; set; }
+
+            public string Yetkili1Isim { get; set; }
+            public string Yetkili1DahiliTelno { get; set; }
+            public string Yetkili1EmailAdres { get; set; }
+            public string Yetkili1CepTelno { get; set; }
+        }
+
         #region Teklif Modelleri
+
+        public class TeklifSiparisViewModel
+        {
+            public int TeklifNo { get; set; }
+            public string MusteriAdi { get; set; }
+            public string MusteriKod { get; set; }
+            public List<TeklifUrunSiparisModel> Urunler { get; set; } = new List<TeklifUrunSiparisModel>();
+        }
+
+        public class TeklifUrunSiparisModel
+        {
+            public string TeklifStokKod { get; set; }
+            public string StokAdi { get; set; }
+            public decimal SiparisMiktar { get; set; }
+            public int BirimPntr { get; set; }
+            public bool MikrodaVarMi { get; set; }
+            public string MikroStokKod { get; set; }
+            public decimal EldekiMiktar { get; set; }
+            public decimal SatinAlmaTalep { get; set; }
+        }
+
+        public class MikroStokModel
+        {
+            public string StokKod { get; set; }
+            public string StokAdi { get; set; }
+            public string KisaIsim { get; set; }
+            public string Birim { get; set; }
+        }
+
+        public class TeklifSiparisDonusturModel
+        {
+            public int TeklifNo { get; set; }
+            public List<SiparisUrunModel> Urunler { get; set; }
+        }
+
+        public class SiparisUrunModel
+        {
+            public string MikroStokKod { get; set; }
+            public decimal SiparisMiktar { get; set; }
+            public decimal SatinAlmaTalep { get; set; }
+            public string TeklifStokKod { get; set; }
+        }
+
+        public class SiparisKayitSonuc
+        {
+            public bool Success { get; set; }
+            public string Message { get; set; }
+            public int SiparisNo { get; set; }
+            public decimal ToplamTutar { get; set; }
+        }
 
         public class TeklifListeModel
         {
             public Guid tkl_Guid { get; set; }
             public string TeklifNo { get; set; }
-            public string Konu { get; set; }
+            public string Konu { get; set; }  // ✅ Teklif konusu (tkl_Aciklama)
             public string Kime { get; set; }
             public decimal? Toplam { get; set; }
+            public decimal? ToplamKdv { get; set; }  // ✅ YENİ: Toplam KDV tutarı
             public DateTime Tarih { get; set; }
             public DateTime? GecerlilikTarihi { get; set; }
             public string Etiketler { get; set; }
             public DateTime OlusturmaTarihi { get; set; }
             public string Durum { get; set; }
             public string TeklifKonusu { get; set; }
-            public string Urunler { get; set; } // New field for concatenated product names
+            public string Urunler { get; set; }
 
             // Formatted properties
             public string ToplamFormatted => Toplam?.ToString("N2") + " TL";
+            public string ToplamKdvFormatted => ToplamKdv?.ToString("N2") + " TL";  // ✅ YENİ
             public string TarihFormatted => Tarih.ToString("dd.MM.yyyy");
             public string GecerlilikTarihiFormatted => GecerlilikTarihi?.ToString("dd.MM.yyyy");
         }
@@ -31,13 +125,13 @@ namespace Deneme_proje.Models
         {
             public string CariKod { get; set; }
             public DateTime Tarih { get; set; }
-            public DateTime BaslangicTarihi { get; set; } // tkl_baslangic_tarihi
-            public int GecerlilikSuresi { get; set; } = 7; // Gün sayısı
+            public DateTime BaslangicTarihi { get; set; }
+            public int GecerlilikSuresi { get; set; } = 7;
             public string FormNo { get; set; }
             public string SorumluKod { get; set; }
             public string Yetkili { get; set; }
-            public string Aciklama { get; set; }
-            public string Durum { get; set; } = "Taslak"; // Varsayılan: 0 (Taslak)
+            public string Aciklama { get; set; }  // ✅ Teklif konusu (tüm satırlar için aynı)
+            public string Durum { get; set; } = "Taslak";
             public string CreateUser { get; set; }
             public List<TeklifUrunModel> Urunler { get; set; } = new List<TeklifUrunModel>();
         }
@@ -48,27 +142,40 @@ namespace Deneme_proje.Models
             public string tkl_cari_kod { get; set; }
             public string tkl_evrak_tarihi { get; set; }
             public string tkl_baslangic_tarihi { get; set; }
-            public DateTime tkl_Gecerlilik_Sures { get; set; } // Bitiş tarihi olarak kullanılıyor
+            public DateTime tkl_Gecerlilik_Sures { get; set; }
             public string tkl_belge_no { get; set; }
             public string tkl_Sorumlu_Kod { get; set; }
-            public string tkl_Aciklama { get; set; }
+            public string tkl_Aciklama { get; set; }  // ✅ Teklif konusu
             public string tkl_durumu { get; set; }
             public decimal? tkl_Alisfiyati { get; set; }
+            public decimal? ToplamKdv { get; set; }  // ✅ YENİ: Toplam KDV tutarı
             public string CariAdi { get; set; }
             public string HazirlayanAdi { get; set; }
             public List<TeklifUrunModel> Urunler { get; set; } = new List<TeklifUrunModel>();
         }
+
+        // ✅ GÜNCELLENMIŞ - KDV alanları eklendi
         public class TeklifUrunModel
         {
             public string StokKod { get; set; }
             public string StokAdi { get; set; }
-            public string Aciklama { get; set; }
+            public string Aciklama { get; set; }  // ✅ Satır açıklaması (tkl_special1)
             public decimal Miktar { get; set; }
-            public decimal BirimFiyat { get; set; }
-            public decimal IndirimliFiyat { get; set; }
-            public decimal Toplam => Miktar * (IndirimliFiyat > 0 ? IndirimliFiyat : BirimFiyat);
-            public byte[]? ImageData { get; set; } // Ürün fotoğrafı için yeni alan
+            public decimal BirimFiyat { get; set; }  // Liste fiyatı (tkl_Brut_fiyat)
+            public decimal IndirimliFiyat { get; set; }  // Teklif fiyatı (tkl_Alisfiyati)
+
+            // ✅ YENİ: KDV alanları
+            public int KdvOrani { get; set; } = 20;  // KDV oranı (tkl_special2) - varsayılan %20
+            public decimal KdvTutari { get; set; }  // KDV tutarı (tkl_vergi)
+
+            // Hesaplanan alanlar
+            public decimal Toplam => Miktar * (IndirimliFiyat > 0 ? IndirimliFiyat : BirimFiyat);  // KDV hariç
+            public decimal ToplamKdvDahil => Toplam + KdvTutari;  // ✅ YENİ: KDV dahil toplam
+
+            public int SatirNo { get; set; }
+            public byte[]? ImageData { get; set; }
         }
+
         public class TeklifGuncelleModel : YeniTeklifModel
         {
             public Guid TeklifGuid { get; set; }
@@ -108,11 +215,11 @@ namespace Deneme_proje.Models
             public string GrupKodu { get; set; }
             public string Email { get; set; }
             public string Telefon { get; set; }
+            public bool IsAdayCari { get; set; }
         }
 
         public class CariHesapDetayModel
         {
-            // CARI_HESAPLAR tablosundan temel alanlar
             public string cari_kod { get; set; }
             public string cari_unvan1 { get; set; }
             public string cari_unvan2 { get; set; }
@@ -125,8 +232,6 @@ namespace Deneme_proje.Models
             public string cari_vdaire_adi { get; set; }
             public string cari_vdaire_no { get; set; }
             public string cari_VergiKimlikNo { get; set; }
-
-            // Join'den gelen alanlar
             public string TemsilciAdi { get; set; }
         }
 
@@ -150,7 +255,7 @@ namespace Deneme_proje.Models
             public string AnaGrupKod { get; set; }
             public decimal Birim1Katsayi { get; set; }
             public string FiyatDoviz { get; set; }
-            public byte[] ImageData { get; set; } // Fotoğraf verisi
+            public byte[] ImageData { get; set; }
             public string SatisFiyatFormatted => SatisFiyat.ToString("N2") + " TL";
         }
 
@@ -179,8 +284,8 @@ namespace Deneme_proje.Models
 
         public class StokSelectModel
         {
-            public string Value { get; set; } // StokKod
-            public string Text { get; set; }  // StokKod - StokAdi
+            public string Value { get; set; }
+            public string Text { get; set; }
             public decimal Fiyat { get; set; }
             public string Birim { get; set; }
             public string AnaGrupAdi { get; set; }
@@ -194,8 +299,6 @@ namespace Deneme_proje.Models
             public int ListeNo { get; set; }
             public string ListeAdi { get; set; }
         }
-
-       
 
         #endregion
 
@@ -224,7 +327,7 @@ namespace Deneme_proje.Models
 
         #endregion
 
-        #region Mevcut Firsat Modeli (Değişiklik yok)
+        #region Mevcut Firsat Modeli
 
         public class Firsat
         {
@@ -269,8 +372,6 @@ namespace Deneme_proje.Models
             public string Value { get; set; }
             public string Text { get; set; }
         }
-
-      
 
         #endregion
     }

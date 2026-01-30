@@ -1282,6 +1282,9 @@ SELECT
       i.is_EmriDurumu,
       i.is_BaslangicTarihi,
       i.is_Emri_PlanBitisTarihi,
+i.is_special1 as RENK,
+i.is_special2 as Hammadde,
+i.is_special3 as Kalip,
       rtp.RtP_PlanlananIsMerkezi AS IsMerkezi,
       im.IsM_Aciklama AS IsMerkeziAciklama,
       upl.upl_kodu AS UrunKodu,
@@ -1290,7 +1293,11 @@ SELECT
       s.sto_kisa_ismi AS KisaIsim,
       s.sto_birim1_ad AS Birim1Ad,
       s.sto_birim2_ad AS Birim2Ad,
+      s.sto_birim3_ad AS Birim3Ad,
       s.sto_birim2_katsayi AS Birim2Katsayi,
+      s.sto_birim3_katsayi AS Birim3Katsayi,
+ ( ISNULL(s.sto_birim1_katsayi, 1) 
+       * ISNULL(s.sto_birim2_katsayi, 1)) AS Adet,
       upl.upl_miktar AS Miktar
   FROM ISEMIRLERI i 
   LEFT JOIN URETIM_MALZEME_PLANLAMA upl 
@@ -1306,7 +1313,7 @@ SELECT
       ON im.IsM_Kodu = rtp.RtP_PlanlananIsMerkezi
   WHERE i.is_EmriDurumu IN (0, 1)
       AND upl.upl_kodu IS NOT NULL
-      AND i.is_Emri_PlanBitisTarihi >= CAST(GETDATE() AS DATE)
+
       {IS_MERKEZI_FILTER}
   ORDER BY upl.upl_kodu ASC, i.is_BaslangicTarihi DESC";
         }
@@ -3256,15 +3263,16 @@ ORDER BY sb.cari_unvan1, sb.sip_evrakno_sira, sb.sip_stok_kod;";
                 connection.Open();
 
                 string query = @"
-            SELECT 
-                sto_kod AS StokKodu,
-                sto_isim AS Isim,
-                sto_yabanci_isim AS YabanciIsim,
-                sto_kisa_ismi AS KisaIsim,
-                sto_birim1_ad AS Birim1Ad,
-                sto_birim2_ad AS Birim2Ad,
-                sto_birim2_katsayi AS Birim2Katsayi
-            FROM STOKLAR
+                    SELECT 
+             sto_kod AS StokKodu,
+             sto_isim AS Isim,
+             sto_yabanci_isim AS YabanciIsim,
+             sto_kisa_ismi AS KisaIsim,
+             sto_birim1_ad AS Birim1Ad,
+             sto_birim2_ad AS Birim2Ad,
+             sto_birim2_katsayi AS Birim2Katsayi,
+             sto_birim3_ad AS Birim3Ad,
+             sto_birim3_katsayi AS Birim3Katsayi
             WHERE sto_kod = @StokKodu";
 
                 var stokDetay = connection.QueryFirstOrDefault<StokDetayModel>(query, new { StokKodu = stokKodu });
@@ -3639,6 +3647,7 @@ ORDER BY sh.sth_create_date DESC";
                             sth_parti_kodu AS PartiKodu, 
                             sth_lot_no AS LotNo,
                             sth_miktar AS Miktar,
+                            sth_isemri_gider_kodu AS IsEmriGiderKodu,
                             (SELECT sto_isim FROM STOKLAR WHERE sto_kod = sth_stok_kod) AS StokAdi,
                             (SELECT TOP 1 bar_kodu FROM BARKOD_TANIMLARI 
                              WHERE bar_stokkodu = sth_stok_kod 
@@ -3700,6 +3709,31 @@ ORDER BY sh.sth_create_date DESC";
 
                             _logger.LogInformation($"Silinen stok hareketi: {silinenStokHareketi} (GUID: {stokHareketGuid})");
 
+                            // 2.5. İş emri üretim miktarını güncelle (YENİ EKLEME)
+                            if (!string.IsNullOrEmpty(stokHareket.IsEmriGiderKodu))
+                            {
+                                int guncellenenIsEmri = connection.Execute(
+                                    @"UPDATE ISEMRI_MALZEME_DURUMLARI 
+                              SET ish_uret_miktar = ish_uret_miktar - @Miktar
+                              WHERE ish_isemri = @IsEmriGiderKodu
+                              AND ish_uret_miktar >= @Miktar",
+                                    new
+                                    {
+                                        IsEmriGiderKodu = stokHareket.IsEmriGiderKodu,
+                                        Miktar = stokHareket.Miktar
+                                    },
+                                    transaction);
+
+                                if (guncellenenIsEmri > 0)
+                                {
+                                    _logger.LogInformation($"İş emri güncellendi: {stokHareket.IsEmriGiderKodu}, azaltılan miktar: {stokHareket.Miktar}");
+                                }
+                                else
+                                {
+                                    _logger.LogWarning($"İş emri güncellenemedi veya miktar yetersiz: {stokHareket.IsEmriGiderKodu}");
+                                }
+                            }
+
                             // 3. Parti lot kaydını sil (eğer başka stok hareketleri tarafından kullanılmıyorsa)
                             if (!string.IsNullOrEmpty(stokHareket.PartiKodu) && stokHareket.LotNo.HasValue)
                             {
@@ -3743,7 +3777,6 @@ ORDER BY sh.sth_create_date DESC";
                 }
             }
         }
-
 
 
         public List<SilinenBarkodViewModel> GetSilinenBarkodlar(DateTime? baslangicTarihi = null, DateTime? bitisTarihi = null, string stokKodu = null)
@@ -4124,7 +4157,7 @@ ORDER BY sh.sth_create_date DESC";
             msg_S_0165 AS Miktar
         FROM PARTILOT_CHOOSE_2A 
         WHERE msg_S_0001 = @StokKodu 
-            AND msg_S_0165 > 10
+            AND msg_S_0165 >= 0.1
         ORDER BY msg_S_0342 ASC";
 
                 try
@@ -4137,6 +4170,109 @@ ORDER BY sh.sth_create_date DESC";
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Parti kodları alınırken hata oluştu. Stok Kodu: {StokKodu}", stokKodu);
+                    throw;
+                }
+            }
+        }
+        public IEnumerable<EksikPaletPartiViewModel> GetEksikPaletPartiler(string stokArama = "")
+        {
+            var connectionString = _dbSelectorService.GetConnectionString();
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                string query = @"
+            SELECT 
+                s.sto_kod AS StokKodu,
+                s.sto_isim AS StokIsmi,
+                p.pl_partikodu AS PartiKodu,
+                p.pl_lotno AS LotNo,
+                ABS(s.sto_birim2_katsayi) AS OlmasiGerekenPaletMiktari,
+                s.sto_birim2_ad AS BirimAdi,
+                s.sto_birim1_ad AS TemelBirimAdi,
+                -- Partidaki toplam miktar
+                SUM(CASE 
+                    WHEN sh.sth_tip = 0 THEN sh.sth_miktar  -- Giriş
+                    ELSE -sh.sth_miktar  -- Çıkış
+                END) AS PartidekiMiktar,
+                -- Eksik miktar
+                ABS(s.sto_birim2_katsayi) - SUM(CASE 
+                    WHEN sh.sth_tip = 0 THEN sh.sth_miktar 
+                    ELSE -sh.sth_miktar 
+                END) AS EksikMiktar,
+                -- Eksik palet sayısı (yaklaşık)
+                CASE 
+                    WHEN ABS(s.sto_birim2_katsayi) > 0 THEN
+                        1 - (SUM(CASE 
+                            WHEN sh.sth_tip = 0 THEN sh.sth_miktar 
+                            ELSE -sh.sth_miktar 
+                        END) / ABS(s.sto_birim2_katsayi))
+                    ELSE 0
+                END AS EksikPaletSayisi,
+                -- Doluluk oranı
+                CASE 
+                    WHEN ABS(s.sto_birim2_katsayi) > 0 THEN
+                        (SUM(CASE 
+                            WHEN sh.sth_tip = 0 THEN sh.sth_miktar 
+                            ELSE -sh.sth_miktar 
+                        END) * 100.0 / ABS(s.sto_birim2_katsayi))
+                    ELSE 0
+                END AS DolulukOrani,
+                MAX(sh.sth_create_date) AS SonIslemTarihi
+            FROM 
+                STOKLAR s
+            INNER JOIN 
+                STOK_HAREKETLERI sh ON s.sto_kod = sh.sth_stok_kod
+            INNER JOIN 
+                PARTILOT p ON sh.sth_parti_kodu = p.pl_partikodu 
+                           AND sh.sth_lot_no = p.pl_lotno
+                           AND sh.sth_stok_kod = p.pl_stokkodu
+            WHERE 
+                s.sto_birim2_ad = 'PALET'
+                AND s.sto_birim2_katsayi IS NOT NULL
+                AND s.sto_birim2_katsayi <> 0
+                AND (@StokArama IS NULL OR @StokArama = '' OR 
+                     s.sto_kod LIKE '%' + @StokArama + '%' OR 
+                     s.sto_isim LIKE '%' + @StokArama + '%')
+            GROUP BY 
+                s.sto_kod,
+                s.sto_isim,
+                p.pl_partikodu,
+                p.pl_lotno,
+                s.sto_birim2_katsayi,
+                s.sto_birim2_ad,
+                s.sto_birim1_ad
+            HAVING 
+                -- Partideki miktar, olması gereken palet miktarından az ise
+                SUM(CASE 
+                    WHEN sh.sth_tip = 0 THEN sh.sth_miktar 
+                    ELSE -sh.sth_miktar 
+                END) < ABS(s.sto_birim2_katsayi)
+                -- Ve partideki miktar pozitif ise (stokta var)
+                AND SUM(CASE 
+                    WHEN sh.sth_tip = 0 THEN sh.sth_miktar 
+                    ELSE -sh.sth_miktar 
+                END) > 0
+            ORDER BY 
+                EksikPaletSayisi DESC,
+                s.sto_kod, 
+                p.pl_partikodu";
+
+                try
+                {
+                    var parameters = new
+                    {
+                        StokArama = string.IsNullOrWhiteSpace(stokArama) ? null : stokArama.Trim()
+                    };
+
+                    var results = connection.Query<EksikPaletPartiViewModel>(query, parameters).ToList();
+
+                    _logger.LogInformation($"Eksik paletli parti sayısı: {results.Count}");
+
+                    return results;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Eksik paletli partiler listelenirken hata oluştu");
                     throw;
                 }
             }

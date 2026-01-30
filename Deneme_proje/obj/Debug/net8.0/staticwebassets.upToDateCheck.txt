@@ -1,4 +1,5 @@
 wwwroot\1.pdf
+wwwroot\2dlogosiyah.png
 wwwroot\BahceLogo.png
 wwwroot\Content\assets\css\bahcepinar.css
 wwwroot\Content\assets\css\basarili-odeme.css
@@ -1468,6 +1469,9 @@ wwwroot\Content\DataTables\Select-1.3.4\js\select.jqueryui.min.js
 wwwroot\Content\DataTables\Select-1.3.4\js\select.semanticui.js
 wwwroot\Content\DataTables\Select-1.3.4\js\select.semanticui.min.js
 wwwroot\Content\DataTables\turkish.json
+wwwroot\Diokilogoyeni.png
+wwwroot\FSSC.jpeg
+wwwroot\ISO.jpeg
 wwwroot\lib\bootstrap\dist\css\bootstrap.css
 wwwroot\lib\bootstrap\dist\css\bootstrap.css.map
 wwwroot\lib\bootstrap\dist\css\bootstrap.min.css

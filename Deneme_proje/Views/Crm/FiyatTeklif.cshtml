@@ -5,17 +5,94 @@
 }
 
 <style>
-	/* Yazdırma sayfası tasarımını form için uyarlandı */
-
-
-	select.form-control:not([size]):not([multiple])
-	Specificity: (0,3,1) {
+	/* Genel Form Stilleri */
+	select.form-control:not([size]):not([multiple]) {
 		height: 2rem !important;
 	}
 
 	.form-control {
 		height: auto !important;
 	}
+
+	/* TAB Stilleri */
+	.tab-container {
+		background: white;
+		border-radius: 8px;
+		box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+		margin-bottom: 20px;
+		overflow: hidden;
+	}
+
+	.tab-header {
+		display: flex;
+		background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+		border-bottom: 3px solid #2c5aa0;
+		padding: 0;
+	}
+
+	.tab-button {
+		flex: 1;
+		padding: 15px 20px;
+		border: none;
+		background: transparent;
+		cursor: pointer;
+		font-size: 16px;
+		font-weight: 600;
+		color: #6c757d;
+		transition: all 0.3s ease;
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+	}
+
+		.tab-button:hover {
+			background: rgba(44, 90, 160, 0.1);
+			color: #2c5aa0;
+		}
+
+		.tab-button.active {
+			background: linear-gradient(135deg, #2c5aa0 0%, #1e3d72 100%);
+			color: white;
+			border-bottom: 4px solid #1e3d72;
+		}
+
+			.tab-button.active::after {
+				content: '';
+				position: absolute;
+				bottom: -3px;
+				left: 0;
+				right: 0;
+				height: 3px;
+				background: #ffc107;
+			}
+
+	.tab-content {
+		display: none;
+		padding: 0;
+		animation: fadeIn 0.3s ease;
+	}
+
+		.tab-content.active {
+			display: block;
+		}
+
+	@@keyframes fadeIn {
+		from
+
+	{
+		opacity: 0;
+		transform: translateY(10px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	}
+
 	/* Header */
 	.header {
 		text-align: center;
@@ -170,7 +247,6 @@
 		align-items: stretch;
 		flex-wrap: nowrap !important;
 	}
-
 
 		.input-group .form-control {
 			flex: 1;
@@ -439,8 +515,8 @@
 		padding: 0;
 		border: none;
 		width: 100%;
-		height: 100%;
 		max-width: 800px;
+		max-height: 80vh;
 		border-radius: 8px;
 		box-shadow: 0 10px 40px rgba(0,0,0,0.2);
 		overflow: hidden;
@@ -477,7 +553,7 @@
 
 	.modal-body {
 		padding: 20px;
-		max-height: 100%;
+		max-height: 60vh;
 		overflow-y: auto;
 	}
 
@@ -511,6 +587,7 @@
 			background: #f8f9fa;
 			position: sticky;
 			top: 0;
+			z-index: 10;
 		}
 
 		.table th {
@@ -555,20 +632,131 @@
 				color: #1e3d72;
 			}
 
+	/* Aday Cari Form Stilleri */
+	.aday-cari-form {
+		padding: 30px;
+		background: white;
+	}
+
+	.form-section-aday {
+		margin-bottom: 30px;
+		background: white;
+		border-radius: 8px;
+		padding: 20px;
+		box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+	}
+
+	.section-title-aday {
+		font-size: 16px;
+		font-weight: 600;
+		color: #2c5aa0;
+		margin-bottom: 15px;
+		padding-bottom: 8px;
+		border-bottom: 2px solid #e9ecef;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.form-grid-aday {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 20px;
+		margin-bottom: 15px;
+	}
+
+	.form-group-aday {
+		display: flex;
+		flex-direction: column;
+	}
+
+		.form-group-aday label {
+			font-weight: 600;
+			color: #495057;
+			margin-bottom: 5px;
+			font-size: 13px;
+		}
+
+		.form-group-aday input,
+		.form-group-aday select {
+			padding: 8px 12px;
+			border: 2px solid #e0e6ed;
+			border-radius: 6px;
+			font-size: 14px;
+			transition: all 0.2s ease;
+		}
+
+			.form-group-aday input:focus,
+			.form-group-aday select:focus {
+				outline: none;
+				border-color: #2c5aa0;
+				box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+			}
+
+	.required-aday:after {
+		content: " *";
+		color: #dc3545;
+		font-weight: bold;
+	}
+
+	.btn-group-aday {
+		display: flex;
+		gap: 10px;
+		justify-content: flex-end;
+		margin-top: 30px;
+		padding-top: 20px;
+		border-top: 2px solid #e9ecef;
+	}
+
+	.alert-success {
+		background: #d4edda;
+		border: 1px solid #c3e6cb;
+		color: #155724;
+		padding: 12px 20px;
+		border-radius: 6px;
+		margin-bottom: 20px;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.alert-danger {
+		background: #f8d7da;
+		border: 1px solid #f5c6cb;
+		color: #721c24;
+		padding: 12px 20px;
+		border-radius: 6px;
+		margin-bottom: 20px;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
 	/* Responsive */
 	@@media (max-width: 768px) {
-		.form-row {
-			grid-template-columns: 1fr;
-			gap: 15px;
-		}
+		.form-row
 
-		.form-actions {
-			flex-direction: column;
-		}
+	{
+		grid-template-columns: 1fr;
+		gap: 15px;
+	}
 
-		.info-grid {
-			grid-template-columns: 1fr;
-		}
+	.form-actions {
+		flex-direction: column;
+	}
+
+	.info-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.form-grid-aday {
+		grid-template-columns: 1fr;
+	}
+
+	.tab-header {
+		flex-direction: column;
+	}
+
 	}
 </style>
 
@@ -579,237 +767,554 @@
 			<span><a href="/crm/dashboard">CRM</a> → <a href="/crm/teklifler">Teklifler</a> → <strong>Yeni Teklif</strong></span>
 		</nav>
 
+		<!-- TAB CONTAINER -->
+		<div class="tab-container">
+			<!-- TAB HEADER -->
+			<div class="tab-header">
+				<button class="tab-button active" onclick="openTab(event, 'teklifTab')" id="defaultOpen">
+					<i class="fas fa-file-invoice"></i> Fiyat Teklifi
+				</button>
+				<button class="tab-button" onclick="openTab(event, 'adayCariTab')">
+					<i class="fas fa-user-plus"></i> Aday Cari Ekle
+				</button>
+			</div>
 
-		@using (Html.BeginForm("Fiyatteklif", "Crm", FormMethod.Post, new { @class = "form-container", @id = "teklifForm" }))
-		{
-			<div class="row">
-				<!-- Temel Bilgiler -->
-				<div class="form-section">
-					<div class="section-header">
-						<h3 class="section-title">📋 Teklif Detayları</h3>
+			<!-- TAB 1: FİYAT TEKLİFİ -->
+			<div id="teklifTab" class="tab-content active">
+				@using (Html.BeginForm("Fiyatteklif", "Crm", FormMethod.Post, new { @class = "form-container", @id = "teklifForm" }))
+				{
+					<div class="row">
+						<!-- Temel Bilgiler -->
+						<div class="form-section">
+							<div class="section-header">
+								<h3 class="section-title">📋 Teklif Detayları</h3>
+							</div>
+							<div class="section-body">
+								<div class="form-row">
+									<div class="form-group">
+										@Html.LabelFor(m => m.Teklif.CariKod, "Firma / Kurum")
+										<div class="input-group">
+											@Html.DropDownListFor(m => m.Teklif.CariKod,
+																							new SelectList(Model.CariHesaplar, "CariKod", "CariAdi"),
+																							"Firma Seçiniz",
+																							new { @class = "form-control", @id = "cariSelect", @required = "required" })
+											<button type="button" class="btn btn-secondary" onclick="openCariModal()">Seç</button>
+											<button type="button" class="btn btn-success" onclick="switchToAdayCariTab()" title="Yeni Aday Cari Ekle">
+												<i class="fas fa-plus"></i>
+											</button>
+										</div>
+									</div>
+									<div class="form-group">
+										@Html.LabelFor(m => m.Teklif.Tarih, "Teklif Tarihi")
+										@Html.TextBoxFor(m => m.Teklif.Tarih, "{0:yyyy-MM-dd}",
+																			new { @type = "date", @class = "form-control", @required = "required", @onchange = "syncDatesAndCalculate()" })
+									</div>
+									<div class="form-group">
+										@Html.LabelFor(m => m.Teklif.FormNo, "Form No")
+										@Html.TextBoxFor(m => m.Teklif.FormNo, new { @class = "form-control", @readonly = "readonly" })
+									</div>
+									<div class="form-group">
+										<label>Hazırlayan</label>
+										<input type="text"
+											   class="form-control"
+											   value="@User.Identity.Name"
+											   readonly
+											   style="background-color: #f8f9fa; cursor: not-allowed;" />
+									</div>
+								</div>
+								<div class="form-row">
+									<div class="form-group">
+										@Html.LabelFor(m => m.Teklif.GecerlilikSuresi, "Geçerlilik Süresi (Gün)")
+										@Html.DropDownListFor(m => m.Teklif.GecerlilikSuresi,
+																			new SelectList(new[]
+																			{
+									new { Value = 7, Text = "7 Gün" },
+									new { Value = 14, Text = "14 Gün" },
+									new { Value = 30, Text = "30 Gün" }
+									}, "Value", "Text", Model.Teklif.GecerlilikSuresi),
+																			"Seçiniz",
+																			new { @class = "form-control", @onchange = "calculateBitisTarihi()", @required = "required" })
+									</div>
+									<div class="form-group">
+										<label for="BitisTarihiDisplay">Bitiş Tarihi</label>
+										<input type="text" id="BitisTarihiDisplay" class="form-control" readonly />
+									</div>
+									<div class="form-group">
+										@Html.LabelFor(m => m.Teklif.Yetkili, "Yetkili")
+										@Html.TextBoxFor(m => m.Teklif.Yetkili, new { @class = "form-control" })
+									</div>
+								</div>
+								<div class="form-row">
+									<div class="form-group">
+										@Html.LabelFor(m => m.Teklif.Aciklama, "Konu")
+										@Html.TextBoxFor(m => m.Teklif.Aciklama, new { @class = "form-control" })
+									</div>
+								</div>
+								<input type="hidden" name="Teklif.Durum" value="0" />
+								@Html.HiddenFor(m => m.Teklif.BaslangicTarihi)
+							</div>
+						</div>
 					</div>
-					<div class="section-body">
-						<div class="form-row">
-							<div class="form-group">
-								@Html.LabelFor(m => m.Teklif.CariKod, "Firma / Kurum")
-								<div class="input-group">
-									@Html.DropDownListFor(m => m.Teklif.CariKod,
-																		new SelectList(Model.CariHesaplar, "CariKod", "CariAdi"),
-																		"Firma Seçiniz",
-																		new { @class = "form-control", @id = "cariSelect", @required = "required" })
-									<button type="button" class="btn btn-secondary" onclick="openCariModal()">Seç</button>
+
+					<!-- Ürün Listesi -->
+					<div class="row">
+						<div class="form-section">
+							<div class="section-header">
+								<h3 class="section-title">📦 ÜRÜN LİSTESİ VE FOTOĞRAFLAR</h3>
+								<button type="button" class="add-product-btn" onclick="addProductRow()">+ Yeni Ürün Ekle</button>
+							</div>
+							<div class="section-body">
+								<table class="products-table" id="productTable">
+									<thead>
+										<tr>
+											<th style="width: 50px;">No</th>
+											<th style="width: 280px;">Ürün Bilgileri</th>
+											<th style="width: 200px;">Açıklama</th>
+											<th style="width: 80px;">Miktar</th>
+											<th style="width: 120px;">Liste Fiyatı</th>
+											<th style="width: 120px;">Teklif Fiyatı</th>
+											<th style="width: 120px;">Toplam Tutar</th>
+											<th style="width: 60px;">İşlem</th>
+										</tr>
+									</thead>
+									<tbody id="productTableBody">
+										<!-- Ürün satırları buraya eklenecek -->
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+
+					<!-- Toplam ve Bilgilendirme -->
+					<div class="row">
+						<div class="col-md-6">
+							<div class="totals-section">
+								<div class="totals-title">💰 TOPLAM HESAPLAMA</div>
+								<div class="totals-row">
+									<span>Ara Toplam:</span>
+									<span id="subTotal">0,00 TL</span>
+								</div>
+								<div class="totals-row">
+									<span>KDV (%20):</span>
+									<span id="kdvAmount">0,00 TL</span>
+								</div>
+								<div class="totals-row">
+									<span>GENEL TOPLAM:</span>
+									<span id="grandTotal">0,00 TL</span>
 								</div>
 							</div>
-							<div class="form-group">
-								@Html.LabelFor(m => m.Teklif.Tarih, "Teklif Tarihi")
-								@Html.TextBoxFor(m => m.Teklif.Tarih, "{0:yyyy-MM-dd}",
-																	new { @type = "date", @class = "form-control", @required = "required", @onchange = "syncDatesAndCalculate()" })
-							</div>
-							<div class="form-group">
-								@Html.LabelFor(m => m.Teklif.FormNo, "Form No")
-								@Html.TextBoxFor(m => m.Teklif.FormNo, new { @class = "form-control", @readonly = "readonly" })
-							</div>
-							<div class="form-group">
-								@Html.LabelFor(m => m.Teklif.SorumluKod, "Hazırlayan")
-								@Html.DropDownListFor(m => m.Teklif.SorumluKod,
-																	new SelectList(Model.Personeller, "PersonelKod", "PersonelAdi"),
-																	"Seçiniz",
-																	new { @class = "form-control", @id = "personelSelect" })
+						</div>
+						<div class="col-md-6">
+							<div class="totals-section">
+								<div class="totals-title">BİLGİLENDİRME</div>
+								<div class="totals-row">
+									<span>Yukarıda belirtilen tüm fiyatlarda KDV dahil değildir.</span>
+								</div>
+								<div class="totals-row">
+									<span id="gecerlilikMesaji">Bu teklifin geçerlilik süresi düzenleme tarihinden itibaren 7 (yedi) iş günüdür.</span>
+								</div>
+								<div class="totals-row">
+									<span>Nakliye, kurulum ve montaj hizmetleri firmamız tarafından ücretsiz yapılacaktır.</span>
+								</div>
 							</div>
 						</div>
-						<div class="form-row">
-
-							<div class="form-group">
-								@Html.LabelFor(m => m.Teklif.GecerlilikSuresi, "Geçerlilik Süresi (Gün)")
-								@Html.DropDownListFor(m => m.Teklif.GecerlilikSuresi,
-																	new SelectList(new[]
-																	{
-							new { Value = 7, Text = "7 Gün" },
-							new { Value = 14, Text = "14 Gün" },
-							new { Value = 30, Text = "30 Gün" }
-							}, "Value", "Text", Model.Teklif.GecerlilikSuresi),
-																	"Seçiniz",
-																	new { @class = "form-control", @onchange = "calculateBitisTarihi()", @required = "required" })
-							</div>
-							<div class="form-group">
-								<label for="BitisTarihiDisplay">Bitiş Tarihi</label>
-								<input type="text" id="BitisTarihiDisplay" class="form-control" readonly />
-							</div>
-							<div class="form-group">
-								@Html.LabelFor(m => m.Teklif.Yetkili, "Yetkili")
-								@Html.TextBoxFor(m => m.Teklif.Yetkili, new { @class = "form-control" })
-							</div>
-						</div>
-						<div class="form-row">
-							<div class="form-group">
-								@Html.LabelFor(m => m.Teklif.Aciklama, "Konu")
-								@Html.TextBoxFor(m => m.Teklif.Aciklama, new { @class = "form-control" })
-							</div>
-						</div>
-						<input type="hidden" name="Teklif.Durum" value="0" />
-						@Html.HiddenFor(m => m.Teklif.BaslangicTarihi)
 					</div>
+
+					<!-- Form Actions -->
+					<div class="row">
+						<div class="form-actions">
+							<div>
+								<a href="/crm/teklifler" class="btn btn-secondary">İptal</a>
+							</div>
+							<div style="display: flex; gap: 10px;">
+								<button type="button" class="btn btn-primary" onclick="calculateTotal()">Hesapla</button>
+								<button type="submit" class="btn btn-success">Kaydet</button>
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+
+			<!-- TAB 2: ADAY CARİ EKLE -->
+			<div id="adayCariTab" class="tab-content">
+				<div class="aday-cari-form">
+					<div id="adayCariMessages"></div>
+
+					<form id="adayCariForm">
+						@Html.AntiForgeryToken()
+
+						<!-- Temel Bilgiler -->
+						<div class="form-section-aday">
+							<h3 class="section-title-aday">
+								<i class="fas fa-building"></i> Temel Bilgiler
+							</h3>
+							<div class="form-grid-aday">
+								<div class="form-group-aday">
+									<label class="required-aday">Cari Kodu</label>
+									<input type="text" id="adayCariKod" name="Kod" class="form-control" readonly placeholder="Otomatik oluşturulacak (CRM001...)" />
+								</div>
+								<div class="form-group-aday">
+									<label class="required-aday">Ünvan 1</label>
+									<input type="text" name="Unvan1" class="form-control" required placeholder="Firma ünvanı" />
+								</div>
+							</div>
+							<div class="form-grid-aday">
+								<div class="form-group-aday">
+									<label>Ünvan 2</label>
+									<input type="text" name="Unvan2" class="form-control" placeholder="Ek ünvan (opsiyonel)" />
+								</div>
+								<div class="form-group-aday">
+									<label class="required-aday">E-posta</label>
+									<input type="email" name="Email" class="form-control" required placeholder="ornek@firma.com" />
+								</div>
+							</div>
+							<div class="form-grid-aday">
+								<div class="form-group-aday">
+									<label>Web Sitesi</label>
+									<input type="text" name="WwwAdresi" class="form-control" placeholder="www.firma.com" />
+								</div>
+								<div class="form-group-aday">
+									<label class="required-aday">Telefon</label>
+									<input type="text" name="Adr1TelNo1" class="form-control" required placeholder="0555 555 55 55" />
+								</div>
+							</div>
+						</div>
+
+						<!-- Adres Bilgileri -->
+						<div class="form-section-aday">
+							<h3 class="section-title-aday">
+								<i class="fas fa-map-marker-alt"></i> Adres Bilgileri
+							</h3>
+							<div class="form-grid-aday">
+								<div class="form-group-aday">
+									<label>Cadde</label>
+									<input type="text" name="Adr1Cadde" class="form-control" />
+								</div>
+								<div class="form-group-aday">
+									<label>Mahalle</label>
+									<input type="text" name="Adr1Mahalle" class="form-control" />
+								</div>
+							</div>
+							<div class="form-grid-aday">
+								<div class="form-group-aday">
+									<label>Sokak</label>
+									<input type="text" name="Adr1Sokak" class="form-control" />
+								</div>
+								<div class="form-group-aday">
+									<label>Semt</label>
+									<input type="text" name="Adr1Semt" class="form-control" />
+								</div>
+							</div>
+							<div class="form-grid-aday">
+								<div class="form-group-aday">
+									<label>Bina No</label>
+									<input type="text" name="Adr1AptNo" class="form-control" />
+								</div>
+								<div class="form-group-aday">
+									<label>Daire No</label>
+									<input type="text" name="Adr1DaireNo" class="form-control" />
+								</div>
+							</div>
+							<div class="form-grid-aday">
+								<div class="form-group-aday">
+									<label>İlçe</label>
+									<input type="text" name="Adr1Ilce" class="form-control" />
+								</div>
+								<div class="form-group-aday">
+									<label>İl</label>
+									<input type="text" name="Adr1Il" class="form-control" />
+								</div>
+							</div>
+							<div class="form-grid-aday">
+								<div class="form-group-aday">
+									<label>Ülke</label>
+									<input type="text" name="Adr1Ulke" class="form-control" value="TÜRKİYE" />
+								</div>
+								<div class="form-group-aday">
+									<label>Posta Kodu</label>
+									<input type="text" name="Adr1PostaKodu" class="form-control" />
+								</div>
+							</div>
+						</div>
+
+						<!-- Yetkili Bilgileri -->
+						<div class="form-section-aday">
+							<h3 class="section-title-aday">
+								<i class="fas fa-user"></i> Yetkili Kişi Bilgileri
+							</h3>
+							<div class="form-grid-aday">
+								<div class="form-group-aday">
+									<label>Yetkili Adı</label>
+									<input type="text" name="Yetkili1Isim" class="form-control" />
+								</div>
+								<div class="form-group-aday">
+									<label>Yetkili E-posta</label>
+									<input type="email" name="Yetkili1EmailAdres" class="form-control" />
+								</div>
+							</div>
+							<div class="form-grid-aday">
+								<div class="form-group-aday">
+									<label>Yetkili Cep Telefonu</label>
+									<input type="text" name="Yetkili1CepTelno" class="form-control" />
+								</div>
+								<div class="form-group-aday">
+									<label>Dahili Telefon</label>
+									<input type="text" name="Yetkili1DahiliTelno" class="form-control" />
+								</div>
+							</div>
+						</div>
+
+						<div class="btn-group-aday">
+							<button type="button" class="btn btn-secondary" onclick="resetAdayCariForm()">
+								<i class="fas fa-redo"></i> Formu Temizle
+							</button>
+							<button type="submit" class="btn btn-success">
+								<i class="fas fa-save"></i> Kaydet ve Teklif Oluştur
+							</button>
+						</div>
+					</form>
 				</div>
 			</div>
-			<div class="row">
-				<!-- Ürün Listesi -->
-				<div class="form-section">
-					<div class="section-header">
-						<h3 class="section-title">📦 ÜRÜN LİSTESİ VE FOTOĞRAFLAR</h3>
-						<button type="button" class="add-product-btn" onclick="addProductRow()">+ Yeni Ürün Ekle</button>
-					</div>
-					<div class="section-body">
-						<table class="products-table" id="productTable">
+		</div>
+
+		<!-- Cari Seçim Modal -->
+		<div id="cariModal" class="modal">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Firma / Kurum Seçin</h4>
+					<span class="close" onclick="closeCariModal()">&times;</span>
+				</div>
+				<div class="modal-body">
+					<input type="text" class="search-input" placeholder="Firma adı ile arayın..." onkeyup="searchCari()" id="cariSearchInput">
+					<div class="table-responsive">
+						<table class="table table-striped" id="cariTable">
 							<thead>
 								<tr>
-									<th style="width: 50px;">No</th>
-									<th style="width: 280px;">Ürün Bilgileri</th>
-									<th style="width: 200px;">Açıklama</th>
-									<th style="width: 80px;">Miktar</th>
-									<th style="width: 120px;">Liste Fiyatı</th>
-									<th style="width: 120px;">Teklif Fiyatı</th>
-									<th style="width: 120px;">Toplam Tutar</th>
-									<th style="width: 60px;">İşlem</th>
+									<th>Kod</th>
+									<th>Firma Adı</th>
+									<th>Email</th>
+									<th>Telefon</th>
 								</tr>
 							</thead>
-							<tbody id="productTableBody">
-								<!-- Ürün satırları buraya eklenecek -->
+							<tbody id="cariTableBody">
+								@foreach (var cari in Model.CariHesaplar)
+								{
+									<tr class="select-row" onclick="selectCari('@cari.CariKod', '@cari.CariAdi')">
+										<td>@cari.CariKod</td>
+										<td>@cari.CariAdi @(cari.IsAdayCari ? "(Aday)" : "")</td>
+										<td>@cari.Email</td>
+										<td>@cari.Telefon</td>
+									</tr>
+								}
 							</tbody>
 						</table>
 					</div>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-md-6">
-					<!-- Toplam Bilgileri -->
-					<div class="totals-section">
-						<div class="totals-title">💰 TOPLAM HESAPLAMA</div>
-						<div class="totals-row">
-							<span>Ara Toplam:</span>
-							<span id="subTotal">0,00 TL</span>
-						</div>
-						<div class="totals-row">
-							<span>KDV (%20):</span>
-							<span id="kdvAmount">0,00 TL</span>
-						</div>
-						<div class="totals-row">
-							<span>GENEL TOPLAM:</span>
-							<span id="grandTotal">0,00 TL</span>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-6">
-					<!-- Toplam Bilgileri -->
-					<div class="totals-section">
-						<div class="totals-title">BİLGİLENDİRME</div>
-						<div class="totals-row">
-							<span>Yukarıda belirtilen tüm fiyatlarda KDV dahil değildir.</span>
-						</div>
-						<div class="totals-row">
-							<span id="gecerlilikMesaji">Bu teklifin geçerlilik süresi düzenleme tarihinden itibaren 7 (yedi) iş günüdür.</span>
-						</div>
-						<div class="totals-row">
-							<span>Nakliye, kurulum ve montaj hizmetleri firmamız tarafından ücretsiz yapılacaktır.</span>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<!-- Form Actions -->
-				<div class="form-actions">
-					<div>
-						<a href="/crm/teklifler" class="btn btn-secondary">İptal</a>
-					</div>
-					<div style="display: flex; gap: 10px;">
-						<button type="button" class="btn btn-primary" onclick="calculateTotal()">Hesapla</button>
-						<button type="submit" class="btn btn-success">Kaydet</button>
-					</div>
-				</div>
-			</div>
-		}
-	</div>
-
-	<!-- Cari Seçim Modal -->
-	<div id="cariModal" class="modal">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h4 class="modal-title">Firma / Kurum Seçin</h4>
-				<span class="close" onclick="closeCariModal()">&times;</span>
-			</div>
-			<div class="modal-body">
-				<input type="text" class="search-input" placeholder="Firma adı ile arayın..." onkeyup="searchCari()">
-				<div class="table-responsive">
-					<table class="table table-striped" id="cariTable">
-						<thead>
-							<tr>
-								<th>Kod</th>
-								<th>Firma Adı</th>
-								<th>Email</th>
-								<th>Telefon</th>
-							</tr>
-						</thead>
-						<tbody id="cariTableBody">
-							@foreach (var cari in Model.CariHesaplar)
-							{
-								<tr class="select-row" onclick="selectCari('@cari.CariKod', '@cari.CariAdi')">
-									<td>@cari.CariKod</td>
-									<td>@cari.CariAdi</td>
-									<td>@cari.Email</td>
-									<td>@cari.Telefon</td>
-								</tr>
-							}
-						</tbody>
-					</table>
-				</div>
-			</div>
 		</div>
-	</div>
 
-	<!-- Stok Seçim Modal -->
-	<div id="StokModal" class="modal">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h4 class="modal-title">Ürün Seçin</h4>
-				<span class="close" onclick="closeStokModal()">&times;</span>
-			</div>
-			<div class="modal-body">
-				<input type="text" class="search-input" placeholder="Ürün adı ile arayın..." onkeyup="searchStok()" id="StokSearchInput">
-				<div class="table-responsive">
-					<table class="table table-striped" id="StokTable">
-						<thead>
-							<tr>
-								<th>Stok Kodu</th>
-								<th>Ürün Adı</th>
-								<th>Kısa İsim</th>
-								<th>Birim</th>
-								<th>Fotoğraf</th>
-							</tr>
-						</thead>
-						<tbody id="StokTableBody">
-							<!-- JavaScript ile doldurulacak -->
-						</tbody>
-					</table>
+		<!-- Stok Seçim Modal -->
+		<div id="StokModal" class="modal">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Ürün Seçin</h4>
+					<span class="close" onclick="closeStokModal()">&times;</span>
+				</div>
+				<div class="modal-body">
+					<input type="text" class="search-input" placeholder="Ürün adı ile arayın..." onkeyup="searchStok()" id="StokSearchInput">
+					<div class="table-responsive">
+						<table class="table table-striped" id="StokTable">
+							<thead>
+								<tr>
+									<th>Stok Kodu</th>
+									<th>Ürün Adı</th>
+									<th>Kısa İsim</th>
+									<th>Birim</th>
+									<th>Fotoğraf</th>
+								</tr>
+							</thead>
+							<tbody id="StokTableBody">
+								<!-- JavaScript ile doldurulacak -->
+							</tbody>
+						</table>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
- <script>
-	// Stok URL'sini Razor ile dinamik olarak üret
-	const StokUrl = '@Url.Action("GetStoklar", "Crm")';
 
+ <script>
+		// ==================== GLOBAL DEĞİŞKENLER ====================
+	const StokUrl = '@Url.Action("GetStoklar", "Crm")';
 	let rowCounter = 0;
 	let currentStokRow = null;
 	let StokListesi = [];
 
-	// Sayfa yüklendiğinde ilk satırı ekle, stokları yükle ve bitiş tarihini hesapla
+	// ==================== SAYFA YÜKLENME ====================
 	document.addEventListener('DOMContentLoaded', function() {
 		loadStoklar();
 		addProductRow();
 		calculateBitisTarihi();
+		document.getElementById('defaultOpen').click();
 	});
 
-	// Cari seçim fonksiyonları
+	// ==================== TAB FONKSİYONLARI ====================
+	function openTab(evt, tabName) {
+		const tabContents = document.getElementsByClassName('tab-content');
+		for (let i = 0; i < tabContents.length; i++) {
+			tabContents[i].classList.remove('active');
+		}
+		const tabButtons = document.getElementsByClassName('tab-button');
+		for (let i = 0; i < tabButtons.length; i++) {
+			tabButtons[i].classList.remove('active');
+		}
+		document.getElementById(tabName).classList.add('active');
+		if (evt && evt.currentTarget) {
+			evt.currentTarget.classList.add('active');
+		} else {
+			for (let i = 0; i < tabButtons.length; i++) {
+				if (tabButtons[i].getAttribute('onclick').includes(tabName)) {
+					tabButtons[i].classList.add('active');
+					break;
+				}
+			}
+		}
+		if (tabName === 'adayCariTab') {
+			loadYeniAdayCariKodu();
+		}
+	}
+
+	function switchToAdayCariTab() {
+		const adayTabButton = document.querySelector('[onclick*="adayCariTab"]');
+		if (adayTabButton) {
+			adayTabButton.click();
+		}
+	}
+
+	// ==================== ADAY CARİ FONKSİYONLARI ====================
+	function loadYeniAdayCariKodu() {
+		fetch('/Crm/GetYeniAdayCariKodu')
+			.then(response => response.json())
+			.then(data => {
+				if (data.success || data.Success) {
+					document.getElementById('adayCariKod').value = data.kod || data.Kod || 'CRM001';
+				}
+			})
+			.catch(error => {
+				console.error('Aday cari kodu alınamadı:', error);
+				document.getElementById('adayCariKod').value = 'CRM001';
+			});
+	}
+
+	function resetAdayCariForm() {
+		document.getElementById('adayCariForm').reset();
+		loadYeniAdayCariKodu();
+		document.getElementById('adayCariMessages').innerHTML = '';
+	}
+
+	document.getElementById('adayCariForm').addEventListener('submit', function(e) {
+		e.preventDefault();
+		const formData = new FormData(this);
+		const jsonData = {};
+		formData.forEach((value, key) => {
+			jsonData[key] = value;
+		});
+		const submitBtn = this.querySelector('button[type="submit"]');
+		const originalText = submitBtn.innerHTML;
+		submitBtn.disabled = true;
+		submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kaydediliyor...';
+		fetch('/api/crm/adaycari', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+			},
+			body: JSON.stringify(jsonData)
+		})
+		.then(response => {
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+			return response.json();
+		})
+		.then(data => {
+			if (data.success) {
+				document.getElementById('adayCariMessages').innerHTML = `
+					<div class="alert-success">
+						<i class="fas fa-check-circle"></i>
+						<span>${data.message}</span>
+					</div>`;
+				refreshCariList();
+				resetAdayCariForm();
+				setTimeout(() => {
+					openTab(null, 'teklifTab');
+					if (data.data && data.data.cariKod) {
+						document.getElementById('cariSelect').value = data.data.cariKod;
+					}
+				}, 1500);
+			} else {
+				document.getElementById('adayCariMessages').innerHTML = `
+					<div class="alert-danger">
+						<i class="fas fa-exclamation-triangle"></i>
+						<span>${data.message}</span>
+					</div>`;
+			}
+		})
+		.catch(error => {
+			console.error('API hatası:', error);
+			document.getElementById('adayCariMessages').innerHTML = `
+				<div class="alert-danger">
+					<i class="fas fa-exclamation-triangle"></i>
+					<span>Bağlantı hatası: ${error.message}</span>
+				</div>`;
+		})
+		.finally(() => {
+			submitBtn.disabled = false;
+			submitBtn.innerHTML = originalText;
+		});
+	});
+
+	function refreshCariList() {
+		fetch('/Crm/GetCariHesaplar')
+			.then(response => response.json())
+			.then(data => {
+				if (data.Success || data.success) {
+					const cariSelect = document.getElementById('cariSelect');
+					const cariler = data.Data || data.data;
+					cariSelect.innerHTML = '<option value="">Firma Seçiniz</option>';
+					cariler.forEach(cari => {
+						const option = document.createElement('option');
+						option.value = cari.Value;
+						option.textContent = cari.Text;
+						cariSelect.appendChild(option);
+					});
+					const cariTableBody = document.getElementById('cariTableBody');
+					cariTableBody.innerHTML = '';
+					cariler.forEach(cari => {
+						const cariKod = cari.Value || '';
+						const cariText = cari.Text || '';
+						const parts = cariText.split(' - ');
+						const cariAdi = parts.length > 1 ? parts[1] : cariText;
+						const row = document.createElement('tr');
+						row.className = 'select-row';
+						row.onclick = function() { selectCari(cariKod, cariAdi); };
+						row.innerHTML = `
+							<td>${cariKod}</td>
+							<td>${cariText}</td>
+							<td>-</td>
+							<td>-</td>
+						`;
+						cariTableBody.appendChild(row);
+					});
+				}
+			})
+			.catch(error => {
+				console.error('Cari listesi yenilenemedi:', error);
+			});
+	}
+
+	// ==================== CARİ SEÇİM FONKSİYONLARI ====================
 	function openCariModal() {
 		document.getElementById('cariModal').style.display = 'block';
 	}
@@ -820,8 +1325,6 @@
 
 	function selectCari(cariKod, cariAdi) {
 		document.getElementById('cariSelect').value = cariKod;
-
-		// Dropdown'ın text değerini de güncelle
 		const cariSelect = document.getElementById('cariSelect');
 		for (let i = 0; i < cariSelect.options.length; i++) {
 			if (cariSelect.options[i].value === cariKod) {
@@ -829,17 +1332,13 @@
 				break;
 			}
 		}
-
-		// Cari değiştiğinde personelleri güncelle
 		loadCariPersonelleri(cariKod);
-
 		closeCariModal();
 	}
 
 	function searchCari() {
-		const input = event.target.value.toLowerCase();
+		const input = document.getElementById('cariSearchInput').value.toLowerCase();
 		const rows = document.querySelectorAll('#cariTableBody tr');
-
 		rows.forEach(row => {
 			const text = row.textContent.toLowerCase();
 			if (text.includes(input)) {
@@ -850,17 +1349,14 @@
 		});
 	}
 
-	// Cari personellerini yükle
 	function loadCariPersonelleri(cariKod) {
 		if (!cariKod) return;
-
 		fetch(`/Crm/GetCariPersonelleri?cariKod=${cariKod}`)
 			.then(response => response.json())
 			.then(data => {
 				if (data.Success) {
 					const personelSelect = document.getElementById('personelSelect');
 					personelSelect.innerHTML = '<option value="">Seçiniz</option>';
-
 					data.Data.forEach(personel => {
 						const option = document.createElement('option');
 						option.value = personel.Value;
@@ -874,93 +1370,7 @@
 			});
 	}
 
-	function populateStokModal() {
-		const tbody = document.getElementById('StokTableBody');
-
-		if (!tbody) {
-			console.error('StokTableBody elementi bulunamadı');
-			return;
-		}
-
-		tbody.innerHTML = '';
-		console.log('populateStokModal çalışıyor, StokListesi:', StokListesi);
-
-		if (!StokListesi || StokListesi.length === 0) {
-			tbody.innerHTML = '<tr><td colspan="5" class="text-center">Stok bulunamadı</td></tr>';
-			return;
-		}
-
-		StokListesi.forEach((stok, index) => {
-			console.log(`İşlenen stok [${index}]:`, stok);
-
-			const row = document.createElement('tr');
-			row.className = 'select-row';
-			row.style.cursor = 'pointer';
-
-			// Field name case sensitivity sorunu düzeltildi
-			const stokKod = stok.StokKod || stok.stokKod || '';
-			const stokAdi = stok.StokAdi || stok.stokAdi || '';
-			const kisaIsim = stok.KisaIsim || stok.kisaIsim || '';
-			const birim = stok.Birim1 || stok.birim1 || 'Adet';
-
-			// ÖNEMLİ: Hem büyük hem küçük harf versiyonlarını kontrol et
-			const imageData = stok.imageData || stok.ImageData || '';  // Küçük harf önce!
-
-			console.log(`Stok [${index}] - Kod: ${stokKod}, ImageData kontrol:`, {
-				'stok.imageData': stok.imageData,
-				'stok.ImageData': stok.ImageData,
-				'seçilen': imageData,
-				'uzunluk': imageData ? imageData.length : 'null'
-			});
-
-			row.onclick = function() {
-				selectStok(stokKod, stokAdi, birim);
-			};
-
-			// Fotoğraf gösterimi için HTML oluştur
-			let imageHtml = '';
-			if (imageData && imageData.trim() !== '') {
-				try {
-					// Base64 data'sını img tag'inde göster
-					imageHtml = `<img src="data:image/jpeg;base64,${imageData}"
-									 alt="${stokAdi}"
-									 class="product-image"
-									 style="width: 40px; height: 40px; border-radius: 4px; object-fit: cover; cursor: pointer;"
-									 onclick="event.stopPropagation(); showImageModal('data:image/jpeg;base64,${imageData}', '${stokAdi}')"
-									 onload="console.log('Fotoğraf başarıyla yüklendi: ${stokKod}')"
-									 onerror="console.error('Fotoğraf yüklenirken hata: ${stokKod}'); this.style.display='none'; this.nextElementSibling.style.display='inline';" />
-								 <span style="display: none; color: #e74c3c; font-size: 12px;">Hatalı fotoğraf</span>`;
-					console.log(`Fotoğraf bulundu: ${stokKod} - Base64 uzunluk: ${imageData.length}`);
-				} catch (error) {
-					console.error(`Fotoğraf işlenirken hata (${stokKod}):`, error);
-					imageHtml = '<span style="color: #e74c3c; font-size: 12px;">Hatalı fotoğraf</span>';
-				}
-			} else {
-				imageHtml = '<span style="color: #95a5a6; font-size: 12px;">Fotoğraf Yok</span>';
-				console.log(`Fotoğraf yok: ${stokKod} - imageData: "${imageData}"`);
-			}
-
-			row.innerHTML = `
-				<td>${stokKod}</td>
-				<td>${stokAdi}</td>
-				<td>${kisaIsim}</td>
-				<td>${birim}</td>
-				<td style="text-align: center;">${imageHtml}</td>
-			`;
-
-			tbody.appendChild(row);
-		});
-
-		// Fotoğraflı stok sayısını yeniden say ve logla
-		const fotografliStokSayisi = StokListesi.filter(s => {
-			const imageData = s.imageData || s.ImageData || '';
-			return imageData && imageData.trim() !== '';
-		}).length;
-
-		console.log(`populateStokModal tamamlandı: ${StokListesi.length} stok satırı eklendi, ${fotografliStokSayisi} tanesi fotoğraflı`);
-	}
-
-	// loadStoklar fonksiyonunu da güncelle - daha detaylı log için
+	// ==================== STOK FONKSİYONLARI ====================
 	function loadStoklar() {
 		console.log('Loading Stoklar from: ' + StokUrl);
 		fetch(StokUrl)
@@ -975,33 +1385,14 @@
 				if (data.Success || data.success) {
 					StokListesi = data.Data || data.data;
 					console.log('StokListesi set to:', StokListesi);
-
-					// Her stoğun field'larını detaylı logla
-					StokListesi.forEach((stok, index) => {
-						console.log(`Stok ${index} fields:`, {
-							StokKod: stok.StokKod,
-							stokKod: stok.stokKod,
-							StokAdi: stok.StokAdi,
-							stokAdi: stok.stokAdi,
-							ImageData: stok.ImageData,
-							imageData: stok.imageData,
-							imageDataLength: stok.imageData ? stok.imageData.length : 'null',
-							ImageDataLength: stok.ImageData ? stok.ImageData.length : 'null'
-						});
-					});
-
-					// Fotoğraflı stok sayısını doğru şekilde say
 					const fotografliStokSayisi = StokListesi.filter(s => {
 						const imageData = s.imageData || s.ImageData || '';
 						return imageData && imageData.trim() !== '';
 					}).length;
-
 					console.log(`Toplam ${StokListesi.length} stok yüklendi, ${fotografliStokSayisi} tanesi fotoğraflı`);
-
 					populateStokModal();
 				} else {
 					console.error('Stoklar yüklenemedi:', data.Message || data.message || 'Bilinmeyen hata');
-					console.log('Tam veri objesi:', data);
 					alert('Stoklar yüklenemedi: ' + (data.Message || data.message || 'Bilinmeyen hata'));
 				}
 			})
@@ -1011,7 +1402,61 @@
 			});
 	}
 
-	// Fotoğraf modal gösterimi
+	function populateStokModal() {
+		const tbody = document.getElementById('StokTableBody');
+		if (!tbody) {
+			console.error('StokTableBody elementi bulunamadı');
+			return;
+		}
+		tbody.innerHTML = '';
+		console.log('populateStokModal çalışıyor, StokListesi:', StokListesi);
+		if (!StokListesi || StokListesi.length === 0) {
+			tbody.innerHTML = '<tr><td colspan="5" class="text-center">Stok bulunamadı</td></tr>';
+			return;
+		}
+		StokListesi.forEach((stok, index) => {
+			const row = document.createElement('tr');
+			row.className = 'select-row';
+			row.style.cursor = 'pointer';
+			const stokKod = stok.StokKod || stok.stokKod || '';
+			const stokAdi = stok.StokAdi || stok.stokAdi || '';
+			const kisaIsim = stok.KisaIsim || stok.kisaIsim || '';
+			const birim = stok.Birim1 || stok.birim1 || 'Adet';
+			const imageData = stok.imageData || stok.ImageData || '';
+			row.onclick = function() {
+				selectStok(stokKod, stokAdi, birim);
+			};
+			let imageHtml = '';
+			if (imageData && imageData.trim() !== '') {
+				try {
+					imageHtml = `<img src="data:image/jpeg;base64,${imageData}"
+									 alt="${stokAdi}"
+									 class="product-image"
+									 style="width: 40px; height: 40px; border-radius: 4px; object-fit: cover; cursor: pointer;"
+									 onclick="event.stopPropagation(); showImageModal('data:image/jpeg;base64,${imageData}', '${stokAdi}')" />`;
+				} catch (error) {
+					console.error(`Fotoğraf işlenirken hata (${stokKod}):`, error);
+					imageHtml = '<span style="color: #e74c3c; font-size: 12px;">Hatalı fotoğraf</span>';
+				}
+			} else {
+				imageHtml = '<span style="color: #95a5a6; font-size: 12px;">Fotoğraf Yok</span>';
+			}
+			row.innerHTML = `
+				<td>${stokKod}</td>
+				<td>${stokAdi}</td>
+				<td>${kisaIsim}</td>
+				<td>${birim}</td>
+				<td style="text-align: center;">${imageHtml}</td>
+			`;
+			tbody.appendChild(row);
+		});
+		const fotografliStokSayisi = StokListesi.filter(s => {
+			const imageData = s.imageData || s.ImageData || '';
+			return imageData && imageData.trim() !== '';
+		}).length;
+		console.log(`populateStokModal tamamlandı: ${StokListesi.length} stok satırı eklendi, ${fotografliStokSayisi} tanesi fotoğraflı`);
+	}
+
 	function showImageModal(imageSrc, stokAdi) {
 		const modal = document.createElement('div');
 		modal.style.cssText = `
@@ -1025,7 +1470,6 @@
 			background-color: rgba(0,0,0,0.8);
 			cursor: pointer;
 		`;
-
 		modal.innerHTML = `
 			<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
 				<img src="${imageSrc}" alt="${stokAdi}" style="max-width: 90vw; max-height: 90vh; border-radius: 8px;" />
@@ -1033,11 +1477,9 @@
 				<div style="color: #ccc; margin-top: 5px; font-size: 14px;">Kapatmak için tıklayın</div>
 			</div>
 		`;
-
 		modal.onclick = function() {
 			document.body.removeChild(modal);
 		};
-
 		document.body.appendChild(modal);
 	}
 
@@ -1047,9 +1489,7 @@
 			callback(0);
 			return;
 		}
-
 		console.log(`Fiyat alınıyor: ${stokKod}`);
-
 		fetch(`/Crm/GetStokFiyati?StokKod=${encodeURIComponent(stokKod)}&dovizCinsi=0`)
 			.then(response => {
 				if (!response.ok) {
@@ -1061,21 +1501,16 @@
 				console.log('Fiyat response:', data);
 				const success = data.Success || data.success;
 				const fiyat = data.Fiyat || data.fiyat;
-				const message = data.Message || data.message;
-
 				if (success === true) {
 					console.log(`Fiyat başarıyla alındı: ${fiyat}`);
 					callback(fiyat || 0);
 				} else {
-					const errorMsg = message || 'Fiyat bilgisi alınamadı';
-					console.error('Fiyat alınamadı:', errorMsg);
-					console.warn(`${stokKod} için fiyat bulunamadı: ${errorMsg}`);
+					console.warn(`${stokKod} için fiyat bulunamadı`);
 					callback(0);
 				}
 			})
 			.catch(error => {
 				console.error('Fiyat getirilirken hata:', error);
-				console.warn(`${stokKod} için fiyat getirilirken ağ hatası: ${error.message}`);
 				callback(0);
 			});
 	}
@@ -1083,7 +1518,6 @@
 	function searchStok() {
 		const searchTerm = document.getElementById('StokSearchInput').value.toLowerCase();
 		const rows = document.querySelectorAll('#StokTableBody tr');
-
 		rows.forEach(row => {
 			const text = row.textContent.toLowerCase();
 			if (text.includes(searchTerm)) {
@@ -1119,16 +1553,9 @@
 				if (StokAdiInput) {
 					StokAdiInput.value = StokAdi || '';
 				}
-				const aciklamaInput = row.querySelector('[name*="].Aciklama"]');
-				if (aciklamaInput && !aciklamaInput.value) {
-					aciklamaInput.value = StokAdi || '';
-				}
 				updateSelectedStokDisplay(currentStokRow, StokAdi);
-
-				// Seçilen stokun fotoğrafını bul ve göster
 				const selectedStok = StokListesi.find(s => (s.StokKod || s.stokKod) === StokKod);
 				updateProductRowImage(currentStokRow, selectedStok, StokAdi);
-
 				getStokFiyati(StokKod, function(fiyat) {
 					row.querySelector('[name*="].BirimFiyat"]').value = fiyat;
 					const indirimliFiyatInput = row.querySelector('[name*="].IndirimliFiyat"]');
@@ -1145,12 +1572,142 @@
 	function updateSelectedStokDisplay(rowIndex, StokAdi) {
 		const nameDisplay = document.getElementById(`selectedStokName_${rowIndex}`);
 		if (nameDisplay) {
-
+			nameDisplay.textContent = StokAdi || 'Ürün seçilmedi';
 			nameDisplay.className = StokAdi ? 'selected-product-name text-success' : 'selected-product-name text-muted';
 		}
 	}
 
-	// Ürün satırındaki fotoğrafı güncelle
+	// ==================== ÜRÜN SATIRI FONKSİYONLARI ====================
+	function addProductRow() {
+		const tbody = document.getElementById('productTableBody');
+		const row = document.createElement('tr');
+
+		row.innerHTML = `
+			<td>${rowCounter + 1}</td>
+			<td>
+				<div class="product-image-container">
+					<div style="flex-shrink: 0;">
+						<img id="productImage_${rowCounter}"
+							 src=""
+							 alt=""
+							 style="display: none; width: 50px; height: 50px; border-radius: 6px; object-fit: cover; border: 1px solid #e0e6ed; cursor: pointer;"
+							 onclick="showImageModal(this.src, document.querySelector('input[name=&quot;Teklif.Urunler[${rowCounter}].StokAdi&quot;]').value)" />
+						<div id="noImagePlaceholder_${rowCounter}" class="product-placeholder">
+							Fotoğraf<br>Yok
+						</div>
+					</div>
+					<div class="product-select-area">
+						<div class="input-group">
+							<input type="text" name="Teklif.Urunler[${rowCounter}].StokKod" readonly placeholder="Stok Kodu" />
+							<button type="button" class="btn btn-secondary" onclick="openStokModal(${rowCounter})">Seç</button>
+						</div>
+						<input type="hidden" name="Teklif.Urunler[${rowCounter}].StokAdi" />
+						<span id="selectedStokName_${rowCounter}" class="selected-product-name text-muted">Ürün seçilmedi</span>
+					</div>
+				</div>
+			</td>
+			<td>
+				<input type="text" name="Teklif.Urunler[${rowCounter}].Aciklama" placeholder="Her ürün için ayrı açıklama..." />
+			</td>
+			<td>
+				<input type="number"
+					   name="Teklif.Urunler[${rowCounter}].Miktar"
+					   value="1"
+					   min="0.01"
+					   step="0.01"
+					   lang="tr"
+					   onchange="calculateRowTotal(this.closest('tr'))" />
+			</td>
+			<td>
+				<input type="number"
+					   name="Teklif.Urunler[${rowCounter}].BirimFiyat"
+					   value="0"
+					   min="0"
+					   step="0.01"
+					   lang="tr"
+					   onchange="calculateRowTotal(this.closest('tr'))"
+					   readonly />
+			</td>
+			<td>
+				<input type="number"
+					   name="Teklif.Urunler[${rowCounter}].IndirimliFiyat"
+					   value="0"
+					   min="0"
+					   step="0.01"
+					   lang="tr"
+					   onchange="calculateRowTotal(this.closest('tr'))" />
+			</td>
+			<td>
+				<select name="Teklif.Urunler[${rowCounter}].KdvOrani" onchange="calculateRowTotal(this.closest('tr'))">
+					<option value="0">%0</option>
+					<option value="1">%1</option>
+					<option value="10">%10</option>
+					<option value="20" selected>%20</option>
+					<option value="30">%30</option>
+				</select>
+			</td>
+			<td>
+				<input type="number"
+					   name="Teklif.Urunler[${rowCounter}].Toplam"
+					   value="0"
+					   readonly
+					   class="row-total"
+					   step="0.01"
+					   lang="tr" />
+			</td>
+			<td>
+				<button type="button" class="remove-product-btn" onclick="removeProductRow(this)">Sil</button>
+			</td>
+		`;
+
+		tbody.appendChild(row);
+		rowCounter++;
+	}
+
+	// ✅ KDV DAHİL HESAPLAMA
+	function calculateRowTotal(row) {
+		const miktarInput = row.querySelector('[name*="].Miktar"]');
+		const indirimliFiyatInput = row.querySelector('[name*="].IndirimliFiyat"]');
+		const birimFiyatInput = row.querySelector('[name*="].BirimFiyat"]');
+		const kdvOraniSelect = row.querySelector('[name*="].KdvOrani"]');
+
+		let miktarValue = miktarInput.value.replace(',', '.');
+		let indirimliFiyatValue = indirimliFiyatInput.value.replace(',', '.');
+		let birimFiyatValue = birimFiyatInput.value.replace(',', '.');
+
+		const miktar = parseFloat(miktarValue) || 0;
+		const indirimliFiyat = parseFloat(indirimliFiyatValue) || 0;
+		const birimFiyat = parseFloat(birimFiyatValue) || 0;
+		const kdvOrani = parseInt(kdvOraniSelect.value) || 0;
+
+		const kullanilacakFiyat = indirimliFiyat > 0 ? indirimliFiyat : birimFiyat;
+		const araToplam = miktar * kullanilacakFiyat;
+		const kdvTutari = (araToplam * kdvOrani) / 100;
+		const toplam = araToplam + kdvTutari;
+
+		row.querySelector('[name*="].Toplam"]').value = toplam.toFixed(2);
+
+		calculateTotal();
+	}
+
+	function removeProductRow(button) {
+		const row = button.closest('tr');
+		if (document.querySelectorAll('#productTableBody tr').length > 1) {
+			row.remove();
+			calculateTotal();
+			updateRowNumbers();
+		} else {
+			alert('En az bir ürün satırı olmalıdır.');
+		}
+	}
+
+	function updateRowNumbers() {
+		const rows = document.querySelectorAll('#productTableBody tr');
+		rows.forEach((row, index) => {
+			row.querySelector('td:first-child').textContent = index + 1;
+		});
+	}
+
 	function updateProductRowImage(rowIndex, stok, stokAdi) {
 		const productImage = document.getElementById(`productImage_${rowIndex}`);
 		const noImagePlaceholder = document.getElementById(`noImagePlaceholder_${rowIndex}`);
@@ -1174,113 +1731,43 @@
 			}
 		}
 
-		// Fotoğraf yoksa placeholder göster
 		productImage.style.display = 'none';
 		noImagePlaceholder.style.display = 'flex';
 		console.log(`Ürün satırında fotoğraf bulunamadı: ${stok?.StokKod || stok?.stokKod || 'Bilinmeyen'}`);
 	}
 
-	// addProductRow fonksiyonunu fotoğraf desteği ile güncelleyin
-	function addProductRow() {
-		const tbody = document.getElementById('productTableBody');
-		const row = document.createElement('tr');
-
-		row.innerHTML = `
-			<td>${rowCounter + 1}</td>
-			<td>
-				<div class="product-image-container">
-					<!-- Fotoğraf alanı -->
-					<div style="flex-shrink: 0;">
-						<img id="productImage_${rowCounter}"
-							 src=""
-							 alt=""
-							 style="display: none; width: 50px; height: 50px; border-radius: 6px; object-fit: cover; border: 1px solid #e0e6ed; cursor: pointer;"
-							 onclick="showImageModal(this.src, document.querySelector('input[name=&quot;Teklif.Urunler[${rowCounter}].StokAdi&quot;]').value)" />
-						<div id="noImagePlaceholder_${rowCounter}" class="product-placeholder">
-							Fotoğraf<br>Yok
-						</div>
-					</div>
-
-					<!-- Ürün seçim alanı -->
-					<div class="product-select-area">
-						<div class="input-group">
-							<input type="text" name="Teklif.Urunler[${rowCounter}].StokKod" readonly placeholder="Stok Kodu" />
-							<button type="button" class="btn btn-secondary" onclick="openStokModal(${rowCounter})">Seç</button>
-						</div>
-						<input type="hidden" name="Teklif.Urunler[${rowCounter}].StokAdi" />
-		
-
-					</div>
-				</div>
-			</td>
-			<td>
-				<input type="text" name="Teklif.Urunler[${rowCounter}].Aciklama" placeholder="Açıklama" />
-			</td>
-			<td>
-				<input type="number" name="Teklif.Urunler[${rowCounter}].Miktar" value="1" min="1" step="1" onchange="calculateRowTotal(this.closest('tr'))" />
-			</td>
-			<td>
-				<input type="number" name="Teklif.Urunler[${rowCounter}].BirimFiyat" value="0" min="0" step="0.01" onchange="calculateRowTotal(this.closest('tr'))" readonly />
-			</td>
-			<td>
-				<input type="number" name="Teklif.Urunler[${rowCounter}].IndirimliFiyat" value="0" min="0" step="0.01" onchange="calculateRowTotal(this.closest('tr'))" />
-			</td>
-			<td>
-				<input type="number" name="Teklif.Urunler[${rowCounter}].Toplam" value="0" readonly class="row-total" />
-			</td>
-			<td>
-				<button type="button" class="remove-product-btn" onclick="removeProductRow(this)">Sil</button>
-			</td>
-		`;
-
-		tbody.appendChild(row);
-		rowCounter++;
-	}
-
-	function removeProductRow(button) {
-		const row = button.closest('tr');
-		if (document.querySelectorAll('#productTableBody tr').length > 1) {
-			row.remove();
-			calculateTotal();
-			updateRowNumbers();
-		} else {
-			alert('En az bir ürün satırı olmalıdır.');
-		}
-	}
-
-	function updateRowNumbers() {
-		const rows = document.querySelectorAll('#productTableBody tr');
-		rows.forEach((row, index) => {
-			row.querySelector('td:first-child').textContent = index + 1;
-		});
-	}
-
-	function calculateRowTotal(row) {
-		const miktar = parseFloat(row.querySelector('[name*="].Miktar"]').value || 0);
-		const indirimliFiyat = parseFloat(row.querySelector('[name*="].IndirimliFiyat"]').value || 0);
-		const birimFiyat = parseFloat(row.querySelector('[name*="].BirimFiyat"]').value || 0);
-
-		const kullanilacakFiyat = indirimliFiyat > 0 ? indirimliFiyat : birimFiyat;
-		const toplam = miktar * kullanilacakFiyat;
-
-		row.querySelector('[name*="].Toplam"]').value = toplam.toFixed(2);
-
-		calculateTotal();
-	}
-
+	// ==================== HESAPLAMA FONKSİYONLARI ====================
+	// ✅ TOPLAM KDV HESAPLAMASI DAHİL
 	function calculateTotal() {
 		let subTotal = 0;
+		let totalKdv = 0;
 
-		document.querySelectorAll('.row-total').forEach(input => {
-			subTotal += parseFloat(input.value || 0);
+		// Her satırı işle
+		document.querySelectorAll('#productTableBody tr').forEach(row => {
+			const miktarInput = row.querySelector('[name*="].Miktar"]');
+			const indirimliFiyatInput = row.querySelector('[name*="].IndirimliFiyat"]');
+			const birimFiyatInput = row.querySelector('[name*="].BirimFiyat"]');
+			const kdvOraniSelect = row.querySelector('[name*="].KdvOrani"]');
+
+			if (miktarInput && indirimliFiyatInput && kdvOraniSelect) {
+				const miktar = parseFloat(miktarInput.value.replace(',', '.')) || 0;
+				const indirimliFiyat = parseFloat(indirimliFiyatInput.value.replace(',', '.')) || 0;
+				const birimFiyat = parseFloat(birimFiyatInput.value.replace(',', '.')) || 0;
+				const kdvOrani = parseInt(kdvOraniSelect.value) || 0;
+
+				const kullanilacakFiyat = indirimliFiyat > 0 ? indirimliFiyat : birimFiyat;
+				const araToplam = miktar * kullanilacakFiyat;
+				const kdvTutari = (araToplam * kdvOrani) / 100;
+
+				subTotal += araToplam;
+				totalKdv += kdvTutari;
+			}
 		});
 
-		const kdvRate = 0.20; // %20 KDV
-		const kdvAmount = subTotal * kdvRate;
-		const grandTotal = subTotal + kdvAmount;
+		const grandTotal = subTotal + totalKdv;
 
 		document.getElementById('subTotal').textContent = formatCurrency(subTotal);
-		document.getElementById('kdvAmount').textContent = formatCurrency(kdvAmount);
+		document.getElementById('kdvAmount').textContent = formatCurrency(totalKdv);
 		document.getElementById('grandTotal').textContent = formatCurrency(grandTotal);
 	}
 
@@ -1296,7 +1783,6 @@
 		const baslangicTarihiInput = document.querySelector('input[name="Teklif.BaslangicTarihi"]');
 
 		if (tarihInput && baslangicTarihiInput) {
-			// Tarih değiştiğinde BaslangicTarihi'ni de güncelle
 			baslangicTarihiInput.value = tarihInput.value;
 			console.log('Tarihler senkronize edildi:', tarihInput.value);
 		}
@@ -1308,7 +1794,7 @@
 		const tarihInput = document.querySelector('input[name="Teklif.Tarih"]');
 		const gecerlilikSuresiSelect = document.querySelector('select[name="Teklif.GecerlilikSuresi"]');
 		const bitisTarihiDisplay = document.getElementById('BitisTarihiDisplay');
-		const gecerlilikMesaji = document.getElementById('gecerlilikMesaji'); // Yeni eklenen
+		const gecerlilikMesaji = document.getElementById('gecerlilikMesaji');
 
 		if (!tarihInput || !gecerlilikSuresiSelect || !bitisTarihiDisplay) {
 			console.log('Gerekli elementler bulunamadı');
@@ -1328,7 +1814,6 @@
 			const bitisTarihi = bitisTarihiObj.toISOString().split('T')[0];
 			bitisTarihiDisplay.value = bitisTarihi;
 
-			// Geçerlilik mesajını güncelle
 			if (gecerlilikMesaji) {
 				const gunYazisi = getGunYazisi(gecerlilikSuresi);
 				gecerlilikMesaji.textContent = `Bu teklifin geçerlilik süresi düzenleme tarihinden itibaren ${gecerlilikSuresi} (${gunYazisi}) iş günüdür.`;
@@ -1338,14 +1823,12 @@
 		} else {
 			bitisTarihiDisplay.value = '';
 
-			// Varsayılan mesajı göster
 			if (gecerlilikMesaji) {
 				gecerlilikMesaji.textContent = 'Bu teklifin geçerlilik süresi düzenleme tarihinden itibaren 7 (yedi) iş günüdür.';
 			}
 		}
 	}
 
-	// Yardımcı fonksiyon
 	function getGunYazisi(gun) {
 		switch(gun) {
 			case 7: return 'yedi';
@@ -1355,12 +1838,15 @@
 		}
 	}
 
-	// Event listener'lar
-	document.querySelector('input[name="Teklif.BaslangicTarihi"]').addEventListener('change', calculateBitisTarihi);
-	document.querySelector('select[name="Teklif.GecerlilikSuresi"]').addEventListener('change', calculateBitisTarihi);
-
-	// Form gönderim kontrolü
+	// ==================== FORM SUBMIT ====================
 	document.getElementById('teklifForm').addEventListener('submit', function(e) {
+		const numberInputs = this.querySelectorAll('input[type="number"]');
+		numberInputs.forEach(input => {
+			if (input.value && input.value.includes(',')) {
+				input.value = input.value.replace(',', '.');
+			}
+		});
+
 		let hasProducts = false;
 		const rows = document.querySelectorAll('#productTableBody tr');
 
@@ -1379,7 +1865,10 @@
 		}
 	});
 
-	// Modal dışı tıklama ile kapatma
+	// ==================== EVENT LISTENERS ====================
+	document.querySelector('input[name="Teklif.BaslangicTarihi"]').addEventListener('change', calculateBitisTarihi);
+	document.querySelector('select[name="Teklif.GecerlilikSuresi"]').addEventListener('change', calculateBitisTarihi);
+
 	window.addEventListener('click', function(event) {
 		const cariModal = document.getElementById('cariModal');
 		const StokModal = document.getElementById('StokModal');

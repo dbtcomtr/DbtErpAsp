@@ -1,0 +1,124 @@
+﻿@model IEnumerable<Deneme_proje.Models.SarfCikisDepartmanBazli>
+@{
+    ViewData["Title"] = "Sarf Çıkış Tamamlama";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-check-double"></i> Onaylanmış Sarf Çıkış Talepleri
+                    </h4>
+                </div>
+                <div class="card-body">
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>DİKKAT:</strong> Tamamlama işlemi MikroDB'ye stok hareketi kaydeder ve GERİ ALINAMAZ!
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Evrak No</th>
+                                        <th>Talep Tarihi</th>
+                                        <th>Onay Tarihi</th>
+                                        <th>Talep Eden</th>
+                                        <th>Onaylayan</th>
+                                        <th>Masraf Merkezi</th>
+                                        <th>Durum</th>
+                                        <th>İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int sira = 1;
+                                    }
+                                    @foreach (var talep in Model)
+                                    {
+                                        <tr>
+                                            <td>@sira</td>
+                                            <td><strong>@talep.sth_evrakno_seri-@talep.sth_evrakno_sira</strong></td>
+                                            <td>@talep.talep_tarihi?.ToString("dd.MM.yyyy")</td>
+                                            <td>@talep.onaylanma_tarihi?.ToString("dd.MM.yyyy")</td>
+                                            <td>@talep.talep_eden_isim</td>
+                                            <td>@talep.onaylayan_kisi_isim</td>
+                                            <td>@talep.masraf_merkezi_ismi</td>
+                                            <td><span class="badge bg-info">Onaylandı</span></td>
+                                            <td>
+                                                <button type="button"
+                                                        class="btn btn-sm btn-success"
+                                                        onclick="tamamlaFunc(@talep.Id, '@talep.sth_evrakno_seri-@talep.sth_evrakno_sira')">
+                                                    <i class="fas fa-check-circle"></i> Tamamla
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        sira++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Tamamlanacak talep yok.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    console.log('✅ Tamamla sayfası yüklendi');
+    console.log('✅ jQuery var mı?', typeof jQuery !== 'undefined');
+
+    function tamamlaFunc(id, evrak) {
+        console.log('✅ Tamamla fonksiyonu çağrıldı:', id, evrak);
+
+        if (!confirm('⚠️ DİKKAT! Bu işlem GERİ ALINAMAZ!\n\n' + evrak + ' evrak nolu talebi tamamlamak istediğinize emin misiniz?\n\nStok hareketleri MikroDB\'ye kaydedilecek!')) {
+            return;
+        }
+
+        console.log('✅ AJAX isteği gönderiliyor...');
+
+        // Butonu devre dışı bırak
+        event.target.disabled = true;
+        event.target.innerHTML = '<i class="fas fa-spinner fa-spin"></i> İşleniyor...';
+
+        $.ajax({
+            url: '@Url.Action("TamamlaIslem", "SarfCikis")',
+            type: 'POST',
+            data: { id: id },
+            success: function(result) {
+                console.log('✅ Sonuç:', result);
+                if (result.success) {
+                    alert('✅ Başarıyla tamamlandı!\n\nStok hareketleri MikroDB\'ye kaydedildi.');
+                    location.reload();
+                } else {
+                    alert('❌ Hata: ' + result.message);
+                    event.target.disabled = false;
+                    event.target.innerHTML = '<i class="fas fa-check-circle"></i> Tamamla';
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('❌ AJAX hatası:', error);
+                console.error('Response:', xhr.responseText);
+                alert('❌ Sunucu hatası: ' + error);
+                event.target.disabled = false;
+                event.target.innerHTML = '<i class="fas fa-check-circle"></i> Tamamla';
+            }
+        });
+    }
+
+    console.log('✅ Fonksiyonlar yüklendi');
+</script>

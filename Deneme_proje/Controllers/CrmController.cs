@@ -16,6 +16,9 @@ using System.IO;
 using iText.IO.Font.Constants;
 using iText.Kernel.Colors;
 using iText.Kernel.Font;
+using Microsoft.IdentityModel.Tokens;
+using NuGet.Protocol.Core.Types;
+using System.Text.Json;
 namespace Deneme_proje.Controllers
 {
     [AllowAnonymous]
@@ -78,6 +81,9 @@ namespace Deneme_proje.Controllers
         {
             try
             {
+                // Oturumdaki kullanıcı adını al
+                string currentUsername = User.Identity?.Name ?? "Bilinmeyen Kullanıcı";
+
                 var model = new TeklifFormViewModel
                 {
                     CariHesaplar = _crmRepository.GetCariHesaplar().ToList(),
@@ -86,12 +92,11 @@ namespace Deneme_proje.Controllers
                     Durumlar = _crmRepository.GetTeklifDurumlari().ToList(),
                     Teklif = new YeniTeklifModel
                     {
-                        // Her iki tarih alanını da aynı değerle başlat
                         Tarih = DateTime.Today,
                         BaslangicTarihi = DateTime.Today,
-                   
                         FormNo = _crmRepository.GetYeniFormNumarasi(),
-                        Durum = "Taslak"
+                        Durum = "Taslak",
+                        Yetkili = currentUsername  // Burada oturumdaki kullanıcı adını ata
                     }
                 };
 
@@ -104,8 +109,11 @@ namespace Deneme_proje.Controllers
             }
         }
 
+        // ============================================
+        // ✅ 1. METOD: Fiyatteklif POST
+        // ============================================
         [HttpPost]
-        public IActionResult Fiyatteklif(TeklifFormViewModel model)
+        public async Task<IActionResult> Fiyatteklif(TeklifFormViewModel model)  // ⬅️ async eklendi
         {
             _logger.LogInformation("Fiyatteklif POST metoduna girildi");
 
@@ -114,55 +122,27 @@ namespace Deneme_proje.Controllers
             ModelState.Remove("Teklif.CreateUser");
             ModelState.Remove("Teklif.Aciklama");
             ModelState.Remove("Teklif.SorumluKod");
-            ModelState.Remove("Teklif.GecerlilikSuresi"); // ✅ Bu satırı ekleyin
-
-            // Gelen model verilerini logla
-            if (model?.Teklif != null)
-            {
-                _logger.LogInformation($"CariKod: {model.Teklif.CariKod}");
-                _logger.LogInformation($"Tarih: {model.Teklif.Tarih}");
-                _logger.LogInformation($"FormNo: {model.Teklif.FormNo}");
-            }
-
-            if (model?.Teklif?.Urunler != null)
-            {
-                foreach (var urun in model.Teklif.Urunler)
-                {
-                    _logger.LogInformation($"Ürün: StokKod={urun.StokKod}, Miktar={urun.Miktar}, BirimFiyat={urun.BirimFiyat}");
-                }
-            }
+            ModelState.Remove("Teklif.GecerlilikSuresi");
 
             try
             {
                 // Model validation kontrolü
                 if (!ModelState.IsValid)
                 {
-                    _logger.LogWarning("ModelState geçersiz - Validation hataları:");
-                    foreach (var modelError in ModelState)
-                    {
-                        var key = modelError.Key;
-                        var errors = modelError.Value.Errors;
-                        foreach (var error in errors)
-                        {
-                            _logger.LogWarning($"Hata - {key}: {error.ErrorMessage}");
-                        }
-                    }
-
-                    model.CariHesaplar = _crmRepository.GetCariHesaplar().ToList();
+                    _logger.LogWarning("ModelState geçersiz");
+                    model.CariHesaplar = _crmRepository.GetTumCariler().ToList();
                     model.Personeller = _crmRepository.GetPersoneller().ToList();
                     model.Stoklar = _crmRepository.GetStoklar().ToList();
                     model.Durumlar = _crmRepository.GetTeklifDurumlari().ToList();
 
-                    TempData["ErrorMessage"] = "Form verilerinde hata bulundu. Lütfen kontrol edin.";
+                    TempData["ErrorMessage"] = "Form verilerinde hata bulundu.";
                     return View(model);
                 }
-
-                _logger.LogInformation("ModelState geçerli - kaydetme işlemine başlanıyor");
 
                 // Model null kontrolü
                 if (model?.Teklif == null)
                 {
-                    _logger.LogError("Model.Teklif null geldi");
+                    _logger.LogError("Model.Teklif null");
                     TempData["ErrorMessage"] = "Teklif verileri bulunamadı.";
                     return View(new TeklifFormViewModel());
                 }
@@ -171,7 +151,7 @@ namespace Deneme_proje.Controllers
                 if (model.Teklif.Urunler == null || !model.Teklif.Urunler.Any())
                 {
                     _logger.LogWarning("Hiç ürün eklenmemiş");
-                    model.CariHesaplar = _crmRepository.GetCariHesaplar().ToList();
+                    model.CariHesaplar = _crmRepository.GetTumCariler().ToList();
                     model.Personeller = _crmRepository.GetPersoneller().ToList();
                     model.Stoklar = _crmRepository.GetStoklar().ToList();
                     model.Durumlar = _crmRepository.GetTeklifDurumlari().ToList();
@@ -187,8 +167,8 @@ namespace Deneme_proje.Controllers
 
                 if (!gecerliUrunler.Any())
                 {
-                    _logger.LogWarning("Hiç geçerli ürün bulunamadı");
-                    model.CariHesaplar = _crmRepository.GetCariHesaplar().ToList();
+                    _logger.LogWarning("Geçerli ürün bulunamadı");
+                    model.CariHesaplar = _crmRepository.GetTumCariler().ToList();
                     model.Personeller = _crmRepository.GetPersoneller().ToList();
                     model.Stoklar = _crmRepository.GetStoklar().ToList();
                     model.Durumlar = _crmRepository.GetTeklifDurumlari().ToList();
@@ -197,58 +177,56 @@ namespace Deneme_proje.Controllers
                     return View(model);
                 }
 
-                // Sadece geçerli ürünleri kaydet
                 model.Teklif.Urunler = gecerliUrunler;
 
-                // Kullanıcı bilgisini UserNo olarak al
+                // Kullanıcı bilgisi
                 string userNo = User.Claims.FirstOrDefault(c => c.Type == "UserNo")?.Value;
                 if (!int.TryParse(userNo, out int createUserId))
                 {
-                    createUserId = 0; // Varsayılan değer, örneğin 'SYSTEM' yerine 0
-                    _logger.LogWarning("UserNo alınamadı veya geçersiz, varsayılan değer 0 kullanıldı.");
+                    createUserId = 0;
                 }
-                model.Teklif.CreateUser = createUserId.ToString(); // Repository string bekliyor
+                model.Teklif.CreateUser = createUserId.ToString();
 
-                _logger.LogInformation($"Kullanıcı UserNo: {createUserId}, Repository'ye gönderilecek ürün sayısı: {model.Teklif.Urunler.Count}");
+                _logger.LogInformation($"API ile kayıt başlıyor - Ürün sayısı: {model.Teklif.Urunler.Count}");
 
-                // Repository metodunu çağır
-                var result = _crmRepository.YeniTeklifKaydet(model.Teklif);
+                // ✅ API ile kaydet (await eklendi)
+                var result = await _crmRepository.YeniTeklifKaydet(model.Teklif);  // ⬅️ await eklendi
 
-                if (result)
+                if (result.Success)
                 {
-                    _logger.LogInformation("Teklif başarıyla kaydedildi");
-                    TempData["SuccessMessage"] = "Teklif başarıyla kaydedildi.";
+                    _logger.LogInformation("✅ Teklif başarıyla kaydedildi");
+                    TempData["SuccessMessage"] = "Teklif başarıyla Mikro ERP'ye kaydedildi.";
                     return RedirectToAction("Teklifler");
                 }
                 else
                 {
-                    _logger.LogError("Repository false döndü - kaydetme başarısız");
-                    model.CariHesaplar = _crmRepository.GetCariHesaplar().ToList();
+                    _logger.LogError($"❌ API hatası: {result.Message}");
+                    model.CariHesaplar = _crmRepository.GetTumCariler().ToList();
                     model.Personeller = _crmRepository.GetPersoneller().ToList();
                     model.Stoklar = _crmRepository.GetStoklar().ToList();
                     model.Durumlar = _crmRepository.GetTeklifDurumlari().ToList();
 
-                    TempData["ErrorMessage"] = "Teklif kaydedilirken bir hata oluştu.";
+                    TempData["ErrorMessage"] = $"Teklif kaydedilemedi: {result.Message}";
                     return View(model);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Fiyatteklif POST metodunda beklenmeyen hata oluştu");
+                _logger.LogError(ex, "Fiyatteklif POST hatası");
                 try
                 {
-                    model.CariHesaplar = _crmRepository.GetCariHesaplar().ToList();
+                    model.CariHesaplar = _crmRepository.GetTumCariler().ToList();
                     model.Personeller = _crmRepository.GetPersoneller().ToList();
                     model.Stoklar = _crmRepository.GetStoklar().ToList();
                     model.Durumlar = _crmRepository.GetTeklifDurumlari().ToList();
                 }
                 catch (Exception ex2)
                 {
-                    _logger.LogError(ex2, "Dropdown verileri yüklenirken hata oluştu");
+                    _logger.LogError(ex2, "Dropdown yüklenemedi");
                     model = new TeklifFormViewModel();
                 }
 
-                TempData["ErrorMessage"] = "Teklif kaydedilirken bir hata oluştu: " + ex.Message;
+                TempData["ErrorMessage"] = "Teklif kaydedilirken hata: " + ex.Message;
                 return View(model);
             }
         }
@@ -402,15 +380,46 @@ namespace Deneme_proje.Controllers
                     _ => "0"
                 };
 
+                // ✅ Eğer durum "Kazanıldı" ise aday cariyi cari tablosuna aktar
+                if (durumKodu == "2") // Kazanıldı
+                {
+                    if (int.TryParse(model.teklifId, out int teklifIdInt))
+                    {
+                        // Teklifteki cari kodunu al
+                        var cariKodQuery = @"
+                    SELECT TOP 1 tkl_cari_kod 
+                    FROM VERILEN_TEKLIFLER 
+                    WHERE tkl_evrakno_sira = @TeklifId";
+
+                        var cariKod = connection.QueryFirstOrDefault<string>(cariKodQuery,
+                            new { TeklifId = teklifIdInt });
+
+                        if (!string.IsNullOrEmpty(cariKod) && cariKod.StartsWith("CRM"))
+                        {
+                            // Bu bir aday cari, cari tablosuna aktar
+                            var aktarimSonuc = _crmRepository.AdayCaridenCariyeAktar(cariKod);
+
+                            if (!aktarimSonuc)
+                            {
+                                _logger.LogWarning($"Aday cari aktarılamadı: {cariKod}");
+                            }
+                            else
+                            {
+                                _logger.LogInformation($"Aday cari başarıyla aktarıldı: {cariKod}");
+                            }
+                        }
+                    }
+                }
+
+                // Teklif durumunu güncelle
                 var query = @"
             UPDATE VERILEN_TEKLIFLER 
             SET tkl_durumu = @DurumKodu
             WHERE tkl_evrakno_sira = @TeklifId";
 
-                // TeklifNo'yu int'e çevir
-                if (int.TryParse(model.teklifId, out int teklifIdInt))
+                if (int.TryParse(model.teklifId, out int teklifId))
                 {
-                    connection.Execute(query, new { DurumKodu = durumKodu, TeklifId = teklifIdInt });
+                    connection.Execute(query, new { DurumKodu = durumKodu, TeklifId = teklifId });
                     return Json(new { success = true, message = "Durum başarıyla güncellendi." });
                 }
                 else
@@ -424,7 +433,6 @@ namespace Deneme_proje.Controllers
                 return Json(new { success = false, message = "Durum güncellenirken bir hata oluştu." });
             }
         }
-
         public class TeklifDurumGuncelleModel
         {
             public string teklifId { get; set; }
@@ -440,11 +448,11 @@ namespace Deneme_proje.Controllers
         {
             try
             {
-                var cariler = _crmRepository.GetCariHesaplar()
+                var cariler = _crmRepository.GetTumCariler()
                     .Select(c => new CariSelectModel
                     {
                         Value = c.CariKod,
-                        Text = $"{c.CariKod} - {c.CariAdi}"
+                        Text = $"{c.CariKod} - {c.CariAdi}" + (c.IsAdayCari ? " (Aday)" : "")
                     }).ToList();
 
                 return Json(new ApiResponse<List<CariSelectModel>>
@@ -461,6 +469,81 @@ namespace Deneme_proje.Controllers
                     Success = false,
                     Message = "Cari hesaplar yüklenirken hata oluştu."
                 });
+            }
+        }
+        [HttpGet]
+        public IActionResult AdayCariEkle()
+        {
+            var model = new AdayCariHesapModel
+            {
+                Kod = _crmRepository.GetYeniAdayCariKodu() // CRM001, CRM002...
+            };
+            return View(model);
+        }
+
+        // GetYeniAdayCariKodu - AJAX için
+        [HttpGet]
+        public JsonResult GetYeniAdayCariKodu()
+        {
+            try
+            {
+                var kod = _crmRepository.GetYeniAdayCariKodu();
+                return Json(new { success = true, kod = kod });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Yeni aday cari kodu alınırken hata");
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // AdayCariEkle - AJAX POST için
+        [HttpPost]
+        public JsonResult AdayCariEkle(AdayCariHesapModel model)
+        {
+            try
+            {
+                // ✅ Basit validation - sadece zorunlu alanları kontrol et
+                if (string.IsNullOrWhiteSpace(model.Unvan1))
+                {
+                    return Json(new { success = false, message = "Firma ünvanı zorunludur" });
+                }
+
+                if (string.IsNullOrWhiteSpace(model.Email))
+                {
+                    return Json(new { success = false, message = "E-posta zorunludur" });
+                }
+
+                if (string.IsNullOrWhiteSpace(model.Adr1TelNo1))
+                {
+                    return Json(new { success = false, message = "Telefon numarası zorunludur" });
+                }
+
+                // Yeni kod oluştur
+                model.Kod = _crmRepository.GetYeniAdayCariKodu();
+
+                // Repository'ye kaydet
+                var result = _crmRepository.AdayCariKaydet(model);
+
+                if (result)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Aday cari başarıyla kaydedildi.",
+                        cariKod = model.Kod,
+                        cariAdi = model.Unvan1
+                    });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Kayıt sırasında bir hata oluştu." });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Aday cari eklenirken hata");
+                return Json(new { success = false, message = $"Hata: {ex.Message}" });
             }
         }
 
@@ -828,7 +911,6 @@ namespace Deneme_proje.Controllers
         // CrmController.cs dosyasındaki TeklifDuzenle metodlarını şununla değiştirin:
 
         #region Teklif Düzenleme - Düzeltilmiş
-
         [HttpGet]
         [Route("crm/teklifduzenle/{teklifNo}")]
         public IActionResult TeklifDuzenle(string teklifNo)
@@ -850,11 +932,82 @@ namespace Deneme_proje.Controllers
                     return RedirectToAction("Teklifler");
                 }
 
-                // ✅ Debug için tarihleri logla
-                _logger.LogInformation($"Veritabanından gelen tarihler:");
-                _logger.LogInformation($"tkl_evrak_tarihi: '{mevcutTeklif.tkl_evrak_tarihi}'");
-                _logger.LogInformation($"tkl_baslangic_tarihi: '{mevcutTeklif.tkl_baslangic_tarihi}'");
-                _logger.LogInformation($"tkl_Gecerlilik_Sures: '{mevcutTeklif.tkl_Gecerlilik_Sures}'");
+                string currentUsername = User.Identity?.Name ?? "Bilinmeyen Kullanıcı";
+                ViewBag.CurrentUsername = currentUsername;
+
+                // ✅ Tarih parse'lama - DÜZELTME
+                DateTime evrakTarih = DateTime.Today;
+                DateTime baslangicTarih = DateTime.Today;
+                DateTime bitisTarih = DateTime.Today.AddDays(7);
+
+                try
+                {
+                    // ✅ tkl_evrak_tarihi
+                    if (!string.IsNullOrEmpty(mevcutTeklif.tkl_evrak_tarihi))
+                    {
+                        if (DateTime.TryParse(mevcutTeklif.tkl_evrak_tarihi, out DateTime parsedEvrakTarih))
+                        {
+                            evrakTarih = parsedEvrakTarih;
+                            _logger.LogInformation($"Evrak tarihi parse edildi: {evrakTarih:yyyy-MM-dd}");
+                        }
+                    }
+
+                    // ✅ tkl_baslangic_tarihi
+                    if (!string.IsNullOrEmpty(mevcutTeklif.tkl_baslangic_tarihi))
+                    {
+                        if (DateTime.TryParse(mevcutTeklif.tkl_baslangic_tarihi, out DateTime parsedBasTarih))
+                        {
+                            baslangicTarih = parsedBasTarih;
+                            _logger.LogInformation($"Başlangıç tarihi parse edildi: {baslangicTarih:yyyy-MM-dd}");
+                        }
+                    }
+                    else
+                    {
+                        // Başlangıç tarihi yoksa evrak tarihini kullan
+                        baslangicTarih = evrakTarih;
+                        _logger.LogInformation($"Başlangıç tarihi boştu, evrak tarihinden alındı: {baslangicTarih:yyyy-MM-dd}");
+                    }
+
+                    // ✅ tkl_Gecerlilik_Sures - bu bir DateTime
+                    if (mevcutTeklif.tkl_Gecerlilik_Sures != null && mevcutTeklif.tkl_Gecerlilik_Sures != DateTime.MinValue)
+                    {
+                        bitisTarih = mevcutTeklif.tkl_Gecerlilik_Sures;
+                        _logger.LogInformation($"Bitiş tarihi alındı: {bitisTarih:yyyy-MM-dd}");
+                    }
+                    else
+                    {
+                        // Bitiş tarihi yoksa başlangıçtan 7 gün sonra
+                        bitisTarih = baslangicTarih.AddDays(7);
+                        _logger.LogInformation($"Bitiş tarihi boştu, 7 gün eklendi: {bitisTarih:yyyy-MM-dd}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning($"Tarih parse hatası: {ex.Message}");
+                }
+
+                // ✅ Geçerlilik süresini hesapla
+                int gecerlilikGunSayisi = (int)(bitisTarih - baslangicTarih).TotalDays;
+
+                // Normalize et
+                if (gecerlilikGunSayisi <= 0 || gecerlilikGunSayisi > 365)
+                {
+                    gecerlilikGunSayisi = 7;
+                }
+                else if (gecerlilikGunSayisi <= 10)
+                {
+                    gecerlilikGunSayisi = 7;
+                }
+                else if (gecerlilikGunSayisi <= 22)
+                {
+                    gecerlilikGunSayisi = 14;
+                }
+                else
+                {
+                    gecerlilikGunSayisi = 30;
+                }
+
+                _logger.LogInformation($"Normalize edilmiş geçerlilik süresi: {gecerlilikGunSayisi} gün");
 
                 var model = new TeklifEditViewModel
                 {
@@ -866,20 +1019,9 @@ namespace Deneme_proje.Controllers
                     Teklif = new YeniTeklifModel
                     {
                         CariKod = mevcutTeklif.tkl_cari_kod,
-
-                        // ✅ Tarih parse'ını güvenli hale getir
-                        Tarih = DateTime.TryParse(mevcutTeklif.tkl_evrak_tarihi, out DateTime evrakTarih)
-                            ? evrakTarih : DateTime.Today,
-
-                        BaslangicTarihi = DateTime.TryParse(mevcutTeklif.tkl_baslangic_tarihi, out DateTime basTarih)
-                            ? basTarih : DateTime.Today,
-
-                        // ✅ Geçerlilik süresini gün sayısı olarak hesapla
-                        GecerlilikSuresi = DateTime.TryParse(mevcutTeklif.tkl_evrak_tarihi, out DateTime evrak) &&
-                                  DateTime.TryParse(mevcutTeklif.tkl_Gecerlilik_Sures.ToString(), out DateTime bitis)
-                    ? (int)(bitis - evrak).TotalDays
-                    : 7, // Varsayılan 7 gün
-
+                        Tarih = evrakTarih,
+                        BaslangicTarihi = baslangicTarih,
+                        GecerlilikSuresi = gecerlilikGunSayisi,
                         FormNo = mevcutTeklif.tkl_belge_no,
                         SorumluKod = mevcutTeklif.tkl_Sorumlu_Kod,
                         Aciklama = mevcutTeklif.tkl_Aciklama,
@@ -897,11 +1039,7 @@ namespace Deneme_proje.Controllers
                     }
                 };
 
-                // ✅ Debug için hesaplanan değerleri logla
-                _logger.LogInformation($"Hesaplanan değerler:");
-                _logger.LogInformation($"Tarih: {model.Teklif.Tarih:yyyy-MM-dd}");
-                _logger.LogInformation($"BaslangicTarihi: {model.Teklif.BaslangicTarihi:yyyy-MM-dd}");
-                _logger.LogInformation($"GecerlilikSuresi: {model.Teklif.GecerlilikSuresi} gün");
+                _logger.LogInformation($"ViewModel oluşturuldu - Ürün sayısı: {model.Teklif.Urunler.Count}");
 
                 return View(model);
             }
@@ -946,13 +1084,13 @@ namespace Deneme_proje.Controllers
 
         [HttpPost]
         [Route("crm/teklifduzenle/{teklifNo}")]
-        public IActionResult TeklifDuzenle(string teklifNo, TeklifEditViewModel model)
+        public async Task<IActionResult> TeklifDuzenle(string teklifNo, TeklifEditViewModel model)  // ⬅️ 1. async eklendi
         {
             _logger.LogInformation($"TeklifDuzenle POST - TeklifNo: '{teklifNo}'");
 
             int evrakSiraNo = 0;
 
-            // TÜM MevcutTeklif validation'larını kaldır
+            // ✅ TÜM MevcutTeklif validation'larını kaldır
             var keysToRemove = ModelState.Keys.Where(k => k.StartsWith("MevcutTeklif.")).ToList();
             foreach (var key in keysToRemove)
             {
@@ -964,9 +1102,10 @@ namespace Deneme_proje.Controllers
             ModelState.Remove("Teklif.CreateUser");
             ModelState.Remove("Teklif.Aciklama");
             ModelState.Remove("Teklif.SorumluKod");
+            ModelState.Remove("Teklif.GecerlilikSuresi");
 
             // Ürün validation'larını da temizle
-            var urunKeysToRemove = ModelState.Keys.Where(k => k.Contains(".ImageData") || k.Contains(".Aciklama")).ToList();
+            var urunKeysToRemove = ModelState.Keys.Where(k => k.Contains(".ImageData")).ToList();
             foreach (var key in urunKeysToRemove)
             {
                 ModelState.Remove(key);
@@ -1007,21 +1146,38 @@ namespace Deneme_proje.Controllers
                     return View(model);
                 }
 
+                _logger.LogInformation("ModelState geçerli - güncelleme işlemine başlanıyor");
+
                 // Model null kontrolü
                 if (model?.Teklif == null)
                 {
+                    _logger.LogError("Model.Teklif null geldi");
                     TempData["ErrorMessage"] = "Teklif verileri bulunamadı.";
                     return RedirectToAction("Teklifler");
                 }
 
+                // Ürün kontrolü
+                if (model.Teklif.Urunler == null || !model.Teklif.Urunler.Any())
+                {
+                    _logger.LogWarning("Hiç ürün eklenmemiş");
+                    model.MevcutTeklif = _crmRepository.GetTeklifDetay(evrakSiraNo);
+                    model.CariHesaplar = _crmRepository.GetCariHesaplar().ToList();
+                    model.Personeller = _crmRepository.GetPersoneller().ToList();
+                    model.Stoklar = _crmRepository.GetStoklar().ToList();
+                    model.Durumlar = _crmRepository.GetTeklifDurumlari().ToList();
+
+                    TempData["ErrorMessage"] = "Lütfen en az bir ürün ekleyiniz.";
+                    return View(model);
+                }
+
                 // Geçerli ürünleri filtrele
                 var gecerliUrunler = model.Teklif.Urunler
-                    ?.Where(u => !string.IsNullOrEmpty(u.StokKod) && u.Miktar > 0)
+                    .Where(u => !string.IsNullOrEmpty(u.StokKod) && u.Miktar > 0)
                     .ToList();
 
-                if (gecerliUrunler == null || !gecerliUrunler.Any())
+                if (!gecerliUrunler.Any())
                 {
-                    // MevcutTeklif'i yeniden yükle
+                    _logger.LogWarning("Hiç geçerli ürün bulunamadı");
                     model.MevcutTeklif = _crmRepository.GetTeklifDetay(evrakSiraNo);
                     model.CariHesaplar = _crmRepository.GetCariHesaplar().ToList();
                     model.Personeller = _crmRepository.GetPersoneller().ToList();
@@ -1042,33 +1198,42 @@ namespace Deneme_proje.Controllers
                 }
                 model.Teklif.CreateUser = updateUserId.ToString();
 
-                // Repository metodunu çağır
-                var result = _crmRepository.TeklifGuncelle(evrakSiraNo, model.Teklif);
+                _logger.LogInformation($"Repository çağrılıyor - EvrakSira: {evrakSiraNo}, Ürün sayısı: {model.Teklif.Urunler.Count}");
 
-                if (result)
+                // ✅ Her ürün için KDV bilgisini logla
+                foreach (var urun in model.Teklif.Urunler)
                 {
+                    _logger.LogInformation($"  → {urun.StokKod}: Miktar={urun.Miktar}, Liste={urun.BirimFiyat:N2}, Teklif={urun.IndirimliFiyat:N2}, KDV%={urun.KdvOrani}, Açıklama={urun.Aciklama}");
+                }
+
+                // ✅ 2. await eklendi
+                var result = await _crmRepository.TeklifGuncelle(evrakSiraNo, model.Teklif);
+
+                // ✅ 3. result.Success ile kontrol
+                if (result.Success)
+                {
+                    _logger.LogInformation($"Teklif başarıyla güncellendi: {evrakSiraNo}");
                     TempData["SuccessMessage"] = "Teklif başarıyla güncellendi.";
                     return RedirectToAction("Teklifler");
                 }
                 else
                 {
+                    _logger.LogError($"Repository false döndü: {evrakSiraNo}");
                     model.MevcutTeklif = _crmRepository.GetTeklifDetay(evrakSiraNo);
                     model.CariHesaplar = _crmRepository.GetCariHesaplar().ToList();
                     model.Personeller = _crmRepository.GetPersoneller().ToList();
                     model.Stoklar = _crmRepository.GetStoklar().ToList();
                     model.Durumlar = _crmRepository.GetTeklifDurumlari().ToList();
 
-                    TempData["ErrorMessage"] = "Teklif güncellenirken bir hata oluştu.";
+                    TempData["ErrorMessage"] = $"Teklif güncellenemedi: {result.Message}";  // ⬅️ BONUS: Hata mesajını göster
                     return View(model);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"TeklifDuzenle POST - Exception: TeklifNo: '{teklifNo}'");
-
+                _logger.LogError(ex, $"TeklifDuzenle POST - Exception");
                 try
                 {
-                    // evrakSiraNo artık burada da kullanılabilir
                     if (evrakSiraNo > 0)
                     {
                         model.MevcutTeklif = _crmRepository.GetTeklifDetay(evrakSiraNo);
@@ -1088,7 +1253,6 @@ namespace Deneme_proje.Controllers
                 return View(model);
             }
         }
-
         #endregion
         // CrmController.cs - Ürün fotoğrafları dahil PDF çözümü
 
@@ -1181,7 +1345,9 @@ namespace Deneme_proje.Controllers
                 foreach (var urun in teklifDetay.Urunler)
                 {
                     satirSayisi++;
-                    var satirToplami = urun.Miktar * urun.IndirimliFiyat;
+
+                    // ✅ DÜZELTME: Toplam hesaplama teklif fiyatı ile yapılsın
+                    var satirToplami = urun.Miktar * urun.IndirimliFiyat;  // Teklif fiyatı kullan
                     grandTotal += satirToplami;
 
                     // Ürün fotoğrafını Base64'e çevir
@@ -1231,6 +1397,7 @@ namespace Deneme_proje.Controllers
                 </tr>";
                 }
             }
+
 
             var kdv = grandTotal * 0.20m;
             var toplamTutar = grandTotal; // KDV hariç toplam
@@ -1878,10 +2045,10 @@ namespace Deneme_proje.Controllers
                     <span class='info-label'>Tarih:</span>
                     <span class='info-value'>{teklifDetay.tkl_evrak_tarihi}</span>
                 </div>
-                <div class='info-row'>
-                    <span class='info-label'>Hazırlayan:</span>
-                    <span class='info-value'>{teklifDetay.HazirlayanAdi}</span>
-                </div>
+           <div class='info-row'>
+    <span class='info-label'>Hazırlayan:</span>
+    <span class='info-value'>{teklifDetay.HazirlayanAdi}</span>
+</div>
                 <div class='info-row'>
                     <span class='info-label'>Yazdırma:</span>
                     <span class='info-value'>{tarih}</span>
@@ -1997,49 +2164,35 @@ namespace Deneme_proje.Controllers
         }
 
         [HttpPost]
-        public IActionResult TeklifGuncelle(TeklifEditViewModel model)  // Method adını değiştirin
+        public async Task<IActionResult> TeklifGuncelle(TeklifEditViewModel model)  // ⬅️ async eklendi
         {
             _logger.LogInformation("TeklifGuncelle POST metoduna girildi");
 
-            // Validation state'den problematik alanları temizle
+            // Validation temizliği
             ModelState.Remove("Teklif.Yetkili");
             ModelState.Remove("Teklif.CreateUser");
             ModelState.Remove("Teklif.Aciklama");
             ModelState.Remove("Teklif.SorumluKod");
 
-            // ViewData'dan UpdateUser değerini al
-            string updateUser = ViewData["UpdateUser"]?.ToString() ?? "1";
-
             try
             {
-                // Model validation kontrolü
+                // Model validation
                 if (!ModelState.IsValid)
                 {
-                    _logger.LogWarning("TeklifGuncelle POST - ModelState geçersiz");
-                    foreach (var modelError in ModelState)
-                    {
-                        var key = modelError.Key;
-                        var errors = modelError.Value.Errors;
-                        foreach (var error in errors)
-                        {
-                            _logger.LogWarning($"Validation Hata - {key}: {error.ErrorMessage}");
-                        }
-                    }
-
-                    // Dropdown verilerini yeniden yükle
+                    _logger.LogWarning("ModelState geçersiz");
                     model.CariHesaplar = _crmRepository.GetCariHesaplar().ToList();
                     model.Personeller = _crmRepository.GetPersoneller().ToList();
                     model.Stoklar = _crmRepository.GetStoklar().ToList();
                     model.Durumlar = _crmRepository.GetTeklifDurumlari().ToList();
 
-                    TempData["ErrorMessage"] = "Form verilerinde hata bulundu. Lütfen kontrol edin.";
+                    TempData["ErrorMessage"] = "Form verilerinde hata bulundu.";
                     return View("TeklifDuzenle", model);
                 }
 
                 // Model null kontrolü
                 if (model?.Teklif == null || model?.MevcutTeklif == null)
                 {
-                    _logger.LogError("TeklifGuncelle POST - Model.Teklif veya MevcutTeklif null");
+                    _logger.LogError("Model.Teklif veya MevcutTeklif null");
                     TempData["ErrorMessage"] = "Teklif verileri bulunamadı.";
                     return RedirectToAction("Teklifler");
                 }
@@ -2053,7 +2206,7 @@ namespace Deneme_proje.Controllers
 
                 if (gecerliUrunler == null || !gecerliUrunler.Any())
                 {
-                    _logger.LogWarning("TeklifGuncelle POST - Geçerli ürün bulunamadı");
+                    _logger.LogWarning("Geçerli ürün bulunamadı");
                     model.CariHesaplar = _crmRepository.GetCariHesaplar().ToList();
                     model.Personeller = _crmRepository.GetPersoneller().ToList();
                     model.Stoklar = _crmRepository.GetStoklar().ToList();
@@ -2065,41 +2218,41 @@ namespace Deneme_proje.Controllers
 
                 model.Teklif.Urunler = gecerliUrunler;
 
-                // Kullanıcı bilgisini al
+                // Kullanıcı bilgisi
                 string userNo = User.Claims.FirstOrDefault(c => c.Type == "UserNo")?.Value;
                 if (!int.TryParse(userNo, out int updateUserId))
                 {
                     updateUserId = 1;
-                    _logger.LogWarning("TeklifGuncelle POST - UserNo parse edilemedi, 1 kullanıldı");
                 }
                 model.Teklif.CreateUser = updateUserId.ToString();
 
-                _logger.LogInformation($"TeklifGuncelle POST - Repository çağrılıyor. EvrakSira: {evrakSiraNo}, Ürün sayısı: {model.Teklif.Urunler.Count}");
+                _logger.LogInformation($"Repository çağrılıyor - EvrakSira: {evrakSiraNo}");
 
-                // Repository metodunu çağır
-                var result = _crmRepository.TeklifGuncelle(evrakSiraNo, model.Teklif);
+                // ✅ API ile güncelle
+                var result = await _crmRepository.TeklifGuncelle(evrakSiraNo, model.Teklif);  // ⬅️ await eklendi
 
-                if (result)
+                // ✅ result.Success kontrolü
+                if (result.Success)  // ⬅️ bool yerine result.Success
                 {
-                    _logger.LogInformation($"TeklifGuncelle POST - Başarılı: {evrakSiraNo}");
+                    _logger.LogInformation($"✅ Teklif güncellendi: {evrakSiraNo}");
                     TempData["SuccessMessage"] = "Teklif başarıyla güncellendi.";
                     return RedirectToAction("Teklifler");
                 }
                 else
                 {
-                    _logger.LogError($"TeklifGuncelle POST - Repository false döndü: {evrakSiraNo}");
+                    _logger.LogError($"❌ API hatası: {result.Message}");
                     model.CariHesaplar = _crmRepository.GetCariHesaplar().ToList();
                     model.Personeller = _crmRepository.GetPersoneller().ToList();
                     model.Stoklar = _crmRepository.GetStoklar().ToList();
                     model.Durumlar = _crmRepository.GetTeklifDurumlari().ToList();
 
-                    TempData["ErrorMessage"] = "Teklif güncellenirken bir hata oluştu.";
+                    TempData["ErrorMessage"] = $"Güncelleme başarısız: {result.Message}";
                     return View("TeklifDuzenle", model);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"TeklifGuncelle POST - Exception");
+                _logger.LogError(ex, "TeklifGuncelle POST - Exception");
                 try
                 {
                     model.CariHesaplar = _crmRepository.GetCariHesaplar().ToList();
@@ -2109,12 +2262,94 @@ namespace Deneme_proje.Controllers
                 }
                 catch (Exception ex2)
                 {
-                    _logger.LogError(ex2, "TeklifGuncelle POST - Dropdown verileri yüklenemedi");
+                    _logger.LogError(ex2, "Dropdown yüklenemedi");
                     model = new TeklifEditViewModel();
                 }
 
-                TempData["ErrorMessage"] = "Teklif güncellenirken bir hata oluştu: " + ex.Message;
+                TempData["ErrorMessage"] = "Hata: " + ex.Message;
                 return View("TeklifDuzenle", model);
+            }
+        }
+        [HttpGet]
+        public IActionResult GetTeklifForSiparis(int id)
+        {
+            try
+            {
+                var data = _crmRepository.GetTeklifForSiparis(id);
+
+                if (data == null)
+                    return NotFound(new { success = false, message = "Teklif bulunamadı." });
+
+                // ✅ PascalCase için JSON ayarı
+                return Json(data, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = null // camelCase yerine PascalCase
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult GetMikroStoklar()
+        {
+            try
+            {
+                var stoklar = _crmRepository.GetMikroStoklar();
+                return Json(stoklar);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult GetEldekiMiktar(string stokKod)
+        {
+            try
+            {
+                var miktar = _crmRepository.GetEldekiMiktar(stokKod);
+                return Json(miktar);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult TekliftenSiparisOlustur([FromBody] TeklifSiparisDonusturModel model)
+        {
+            try
+            {
+                if (model == null || model.Urunler == null || !model.Urunler.Any())
+                {
+                    return BadRequest(new { success = false, message = "Geçersiz veri." });
+                }
+
+                var sonuc = _crmRepository.TekliftenSiparisOlustur(model);
+
+                if (sonuc.Success)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        message = sonuc.Message,
+                        siparisNo = sonuc.SiparisNo,
+                        toplamTutar = sonuc.ToplamTutar
+                    });
+                }
+                else
+                {
+                    return BadRequest(new { success = false, message = sonuc.Message });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = $"Bir hata oluştu: {ex.Message}" });
             }
         }
     }

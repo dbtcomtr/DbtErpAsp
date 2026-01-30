@@ -1,0 +1,394 @@
+﻿@model Deneme_proje.Models.ApiAyarlariViewModel
+
+@{
+    ViewData["Title"] = "API Ayarları (Sistem Yöneticisi)";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .api-settings-container {
+        max-width: 900px;
+        margin: 50px auto;
+        padding: 30px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .api-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 3px solid #2c5aa0;
+    }
+
+        .api-header h2 {
+            color: #2c5aa0;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .api-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+    .warning-box {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%);
+        border-left: 5px solid #ffc107;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+    }
+
+        .warning-box strong {
+            color: #856404;
+            font-size: 16px;
+        }
+
+        .warning-box p {
+            color: #856404;
+            margin: 10px 0 0 0;
+        }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+    .form-control {
+        border: 2px solid #e0e6ed;
+        border-radius: 6px;
+        padding: 10px 15px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+        .form-control:focus {
+            border-color: #2c5aa0;
+            box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+            outline: none;
+        }
+
+        .form-control:read-only {
+            background: #f8f9fa;
+            cursor: not-allowed;
+        }
+
+    .info-box {
+        background: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+    }
+
+        .info-box p {
+            margin: 5px 0;
+        }
+
+        .info-box strong {
+            color: #1976d2;
+        }
+
+    .readonly-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 2px solid #e9ecef;
+    }
+
+        .readonly-section h4 {
+            color: #495057;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+    .btn-group {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 30px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #2c5aa0 0%, #1e3d72 100%);
+        border: none;
+        padding: 12px 30px;
+        color: white;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3);
+        }
+
+    .btn-test {
+        background: linear-gradient(135deg, #28a745 0%, #20a53a 100%);
+        border: none;
+        padding: 12px 30px;
+        color: white;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .btn-test:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+    .alert {
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+    }
+
+    .password-toggle {
+        position: relative;
+    }
+
+        .password-toggle input {
+            padding-right: 45px;
+        }
+
+    .password-toggle-btn {
+        position: absolute;
+        right: 10px;
+        top: 38px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #666;
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-check-input {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+    .required {
+        color: red;
+    }
+
+    .badge {
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-success {
+        background: #28a745;
+        color: white;
+    }
+
+    .badge-warning {
+        background: #ffc107;
+        color: #333;
+    }
+
+    .last-update-info {
+        background: #e8f5e9;
+        border-left: 4px solid #4caf50;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        font-size: 13px;
+    }
+</style>
+
+<div class="api-settings-container">
+    <div class="api-header">
+        <h2><i class="fas fa-shield-alt"></i> Mikro API Ayarları (Sistem Yöneticisi)</h2>
+        <p>Bu ayarlar tüm sistem için geçerlidir - Sadece SRV kullanıcısı değiştirebilir</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="warning-box">
+        <strong>⚠️ ÖNEMLİ UYARI</strong>
+        <p>Bu sayfa <strong>SİSTEM GENELİ</strong> API ayarlarını içerir. Buraya girdiğiniz şifre <strong>TÜM KULLANICILAR</strong> tarafından kullanılacaktır!</p>
+    </div>
+
+    @if (Model.MevcutKayitVar && Model.SonGuncellemeTarihi.HasValue)
+    {
+        <div class="last-update-info">
+            <strong>Son Güncelleme:</strong> @Model.SonGuncellemeTarihi.Value.ToString("dd.MM.yyyy HH:mm")
+            @if (!string.IsNullOrEmpty(Model.GuncelleyenKullanici))
+            {
+                <span>- Güncelleyen: <strong>@Model.GuncelleyenKullanici</strong></span>
+            }
+        </div>
+    }
+
+    <div class="info-box">
+        <p><strong>Aktif Kullanıcı:</strong> @ViewBag.KullaniciAdi (Sistem Yöneticisi)</p>
+        <p><strong>Seçili Veritabanı:</strong> @ViewBag.SecilenDatabase</p>
+        <p><strong>Server Adresi:</strong> @Model.ServerAddress</p>
+        <p>
+            <strong>Durum:</strong>
+            @if (Model.MevcutKayitVar)
+            {
+                <span class="badge badge-success">✅ Sistem Şifresi Kayıtlı</span>
+            }
+            else
+            {
+                <span class="badge badge-warning">⚠️ Sistem Şifresi Girilmemiş</span>
+            }
+        </p>
+    </div>
+
+    <!-- Sabit Bilgiler -->
+    <div class="readonly-section">
+        <h4><i class="fas fa-lock"></i> Sabit Sistem Ayarları (Değiştirilemez)</h4>
+
+        <div class="form-group">
+            <label>API Key</label>
+            <input type="text" class="form-control" value="@Model.ApiKey" readonly />
+        </div>
+
+        <div class="form-group">
+            <label>Kullanıcı Kodu</label>
+            <input type="text" class="form-control" value="@Model.KullaniciKodu" readonly />
+            <small class="form-text text-muted">Tüm API istekleri bu kullanıcı ile yapılır</small>
+        </div>
+
+        <div class="form-group">
+            <label>API Base URL</label>
+            <input type="text" class="form-control" value="@Model.BaseUrl" readonly />
+            <small class="form-text text-muted">Server adresi otomatik olarak eklenecektir</small>
+        </div>
+    </div>
+
+    <!-- Şifre Formu -->
+    @using (Html.BeginForm("ApiAyarlari", "Api", FormMethod.Post, new { @id = "apiForm" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-group password-toggle">
+            <label for="MikroSifre">
+                <i class="fas fa-lock"></i> Sistem Geneli Mikro Şifre <span class="required">*</span>
+            </label>
+            @Html.PasswordFor(m => m.MikroSifre, new { @class = "form-control", @id = "passwordInput", placeholder = "Mikro sistem şifresini giriniz", required = "required" })
+            <button type="button" class="password-toggle-btn" onclick="togglePassword()">
+                <i class="fas fa-eye" id="eyeIcon"></i>
+            </button>
+            <small class="form-text text-muted">
+                Bu şifre tüm kullanıcılar için geçerli olacak. Şifre her istekte "YYYY-MM-DD şifre" formatında MD5 ile şifrelenir.
+            </small>
+        </div>
+
+        <div class="form-group">
+            <div class="form-check">
+                @Html.CheckBoxFor(m => m.Aktif, new { @class = "form-check-input", @checked = "checked" })
+                <label class="form-check-label" for="Aktif">
+                    API Entegrasyonu Sistem Genelinde Aktif
+                </label>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button type="button" class="btn-test" onclick="testConnection()">
+                <i class="fas fa-plug"></i> Bağlantıyı Test Et
+            </button>
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> Sisteme Kaydet
+            </button>
+        </div>
+    }
+</div>
+
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById('passwordInput');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.classList.remove('fa-eye');
+            eyeIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.classList.remove('fa-eye-slash');
+            eyeIcon.classList.add('fa-eye');
+        }
+    }
+
+    function testConnection() {
+        const btn = event.target.closest('button');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Test ediliyor...';
+
+        fetch('/Api/TestApiConnection', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+
+            if (data.success) {
+                alert('✅ Sistem API Bağlantısı Başarılı!\n\n' + data.message + '\n\nTüm kullanıcılar bu şifreyi kullanabilir.');
+            } else {
+                alert('❌ Sistem API Bağlantı Hatası!\n\n' + data.message);
+            }
+        })
+        .catch(error => {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            alert('❌ Hata: ' + error.message);
+        });
+    }
+</script>

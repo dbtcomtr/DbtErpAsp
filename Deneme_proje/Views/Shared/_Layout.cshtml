@@ -490,8 +490,9 @@
                                 
                                         <li><a href="/CRM/Stoklar">Stoklar</a></li>
                                      *@
-
+@* 
                                       <li><a href="/CRM/Teklifler">Teklifler</a></li>
+                                     <li><a href="/SarfIslemleri/SarfCikisTanimla">Sarf İşlemleri </a>></li> *@
                                     
 
                                  @*  
@@ -743,6 +744,7 @@
                         MenuHelper.KullaniciYetkisiVarMi("Fatura", "IsEmriDurumu", userNo) ||
                         MenuHelper.KullaniciYetkisiVarMi("Fatura", "IsEmirleri", userNo) ||
                         MenuHelper.KullaniciYetkisiVarMi("Fatura", "Tuketim", userNo) ||
+                        MenuHelper.KullaniciYetkisiVarMi("Fatura", "EksikPaletPartiler", userNo) ||
                         MenuHelper.KullaniciYetkisiVarMi("Dioki", "Index", userNo) ||
                         MenuHelper.KullaniciYetkisiVarMi("Fatura", "HataliUretimler", userNo) ||
                         MenuHelper.KullaniciYetkisiVarMi("Dioki", "silinenbarkodlar", userNo) ||
@@ -795,7 +797,7 @@
                                             </ul>
                                         </li>
                                     }
-                                    @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "IsEmirleri", userNo) || MenuHelper.KullaniciYetkisiVarMi("Fatura", "Tuketim", userNo) ||
+                                    @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "IsEmirleri", userNo) || MenuHelper.KullaniciYetkisiVarMi("Fatura", "EksikPaletPartiler", userNo) || MenuHelper.KullaniciYetkisiVarMi("Fatura", "Tuketim", userNo) ||
                                    MenuHelper.KullaniciYetkisiVarMi("Fatura", "IsEmriDurumu", userNo))
                                     {
                                         <li>
@@ -815,7 +817,12 @@
                                                 @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "IsEmriDurumu", userNo))
                                                 {
                                                     <li><a href="/Fatura/IsEmriDurumu">İş Emirleri Yönetimi</a></li>
-                                                }  @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "HataliUretimler", userNo))
+                                                }
+                                                @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "EksikPaletPartiler", userNo))
+                                                {
+                                                    <li><a href="/Fatura/EksikPaletPartiler">Parçalı Barkodlar</a></li>
+                                                }
+                                                @if (MenuHelper.KullaniciYetkisiVarMi("Fatura", "HataliUretimler", userNo))
                                                 {
                                                     <li><a href="/Fatura/HataliUretimler">Hatalı Üretimler</a></li>
                                                 }

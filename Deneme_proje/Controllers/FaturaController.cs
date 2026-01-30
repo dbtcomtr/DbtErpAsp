@@ -23,13 +23,19 @@ namespace Deneme_proje.Controllers
         private readonly DatabaseSelectorService _dbSelectorService;
         private readonly ILogger<FaturaController> _logger;
         private readonly FaturaRepository _faturaRepository;
+        private readonly IConfiguration _configuration; // BUNU EKLEYİN
 
         // Constructor
-        public FaturaController(ILogger<FaturaController> logger, FaturaRepository faturaRepository, DatabaseSelectorService dbSelectorService)
+        public FaturaController(
+            ILogger<FaturaController> logger,
+            FaturaRepository faturaRepository,
+            DatabaseSelectorService dbSelectorService,
+            IConfiguration configuration) // BUNU EKLEYİN
         {
             _logger = logger;
             _faturaRepository = faturaRepository;
             _dbSelectorService = dbSelectorService;
+            _configuration = configuration; // BUNU EKLEYİN
         }
 
         public ActionResult Index(string cariKodu, DateTime? vadeBaslangic, DateTime? vadeBitis)
@@ -717,47 +723,142 @@ namespace Deneme_proje.Controllers
         }
         // İş emri yazdırma sayfasını gösteren action
         [AllowAnonymous]
-        public IActionResult YazdirIsEmri(string isEmriKodu, string urunKodu, string barkod)
+        public IActionResult YazdirIsEmri(string isEmriKodu, string urunKodu, string barkod, int? paletNo = null)
         {
             try
             {
-                // İş emri bulma
                 var isEmri = _faturaRepository.GetIsEmirleri()
                     .FirstOrDefault(ie => ie.is_Kod == isEmriKodu && ie.UrunKodu == urunKodu);
+
                 if (isEmri == null)
                 {
                     return NotFound("İş emri bulunamadı.");
                 }
 
-                // Yazdırma view modeli oluştur
+                var username = User.Identity?.Name ?? "Bilinmeyen Kullanıcı";
+                var connectionString = _configuration.GetConnectionString("ERPDatabase");
+
+                // Bu iş emrinden şu ana kadar kaç barkod basıldığını say
+                int kacinciBarkod = GetBarkodSayisi(isEmriKodu, urunKodu, connectionString);
+
                 var model = new IsEmriYazdirViewModel
                 {
-                    IsEmriKodu = string.IsNullOrEmpty(barkod) ? isEmriKodu : barkod, // Barkod varsa onu kullan, yoksa iş emri kodu
+                    IsEmriKodu = string.IsNullOrEmpty(barkod) ? isEmriKodu : barkod,
                     UrunKodu = urunKodu,
                     UrunAdi = isEmri.UrunAdi,
                     KisaIsim = isEmri.KisaIsim,
                     YabanciIsim = isEmri.YabanciIsim,
                     Birim2Katsayi = isEmri.Birim2Katsayi,
+                    Birim3Katsayi = isEmri.Birim3Katsayi,
                     Miktar = isEmri.Miktar,
                     BaslangicTarihi = isEmri.is_BaslangicTarihi,
                     IsMerkezi = isEmri.IsMerkezi,
-                    // Standart firma bilgileri
+                    Renk = isEmri.Renk,
+                    Kalip = isEmri.Kalip,
+                    Hammadde = isEmri.Hammadde,
+                    Adet = isEmri.Adet,
+                    OperatorAdi = username,
+                    PaletNo = kacinciBarkod, // Kaçıncı barkod = kaçıncı palet
                     FirmaAdi = "Şirket Adı",
                     FirmaAdresi = "Şirket Adresi",
                     FirmaTelefon = "Şirket Telefon"
                 };
 
-                // Yazdırma sayfasını görüntüle
+                // Barkod basıldıktan SONRA kaydet
+                SaveBarkodBasimi(isEmriKodu, urunKodu, barkod, username, kacinciBarkod, connectionString);
+
                 return View(model);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "İş emri yazdırılırken hata oluştu. İş Emri Kodu: {IsEmriKodu}, Ürün Kodu: {UrunKodu}, Barkod: {Barkod}",
-                    isEmriKodu, urunKodu, barkod);
+                _logger.LogError(ex, "İş emri yazdırılırken hata oluştu.");
                 return View("Error");
             }
         }
 
+        // Bu iş emrinden şu ana kadar kaç barkod basıldığını say
+        private int GetBarkodSayisi(string isEmriKodu, string urunKodu, string connectionString)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+
+                    // Tablo yoksa oluştur
+                    string createTableQuery = @"
+            IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'BarkodBasimGecmisi')
+            BEGIN
+                CREATE TABLE BarkodBasimGecmisi (
+                    Id INT IDENTITY(1,1) PRIMARY KEY,
+                    IsEmriKodu NVARCHAR(50) NOT NULL,
+                    UrunKodu NVARCHAR(50) NOT NULL,
+                    Barkod NVARCHAR(100),
+                    SiraNo INT NOT NULL,
+                    OperatorAdi NVARCHAR(100),
+                    BasimTarihi DATETIME NOT NULL DEFAULT GETDATE()
+                );
+                CREATE INDEX IX_IsEmri_Urun ON BarkodBasimGecmisi(IsEmriKodu, UrunKodu);
+            END";
+
+                    using (SqlCommand cmd = new SqlCommand(createTableQuery, connection))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    // Bu iş emrinden şu ana kadar kaç barkod basıldı?
+                    string countQuery = @"
+            SELECT COUNT(*) + 1
+            FROM BarkodBasimGecmisi 
+            WHERE IsEmriKodu = @IsEmriKodu AND UrunKodu = @UrunKodu";
+
+                    using (SqlCommand cmd = new SqlCommand(countQuery, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@IsEmriKodu", isEmriKodu);
+                        cmd.Parameters.AddWithValue("@UrunKodu", urunKodu);
+
+                        int sayi = (int)cmd.ExecuteScalar();
+                        return sayi; // İlk barkod = 1, ikinci = 2, üçüncü = 3...
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Barkod sayısı alınırken hata oluştu");
+                return 1; // Hata durumunda 1 döndür
+            }
+        }
+
+        // Barkod basımını kaydet
+        private void SaveBarkodBasimi(string isEmriKodu, string urunKodu, string barkod, string operatorAdi, int siraNo, string connectionString)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+
+                    string insertQuery = @"
+            INSERT INTO BarkodBasimGecmisi (IsEmriKodu, UrunKodu, Barkod, SiraNo, OperatorAdi, BasimTarihi)
+            VALUES (@IsEmriKodu, @UrunKodu, @Barkod, @SiraNo, @OperatorAdi, GETDATE())";
+
+                    using (SqlCommand cmd = new SqlCommand(insertQuery, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@IsEmriKodu", isEmriKodu);
+                        cmd.Parameters.AddWithValue("@UrunKodu", urunKodu);
+                        cmd.Parameters.AddWithValue("@Barkod", barkod ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@SiraNo", siraNo);
+                        cmd.Parameters.AddWithValue("@OperatorAdi", operatorAdi);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Barkod basımı kaydedilirken hata oluştu");
+            }
+        }
         [AllowAnonymous]
         // Bu metodu BarcodeLib olmadan kullanabilirsiniz
         public IActionResult GenerateBarcode(string data, int width = 200, int height = 80)
@@ -797,6 +898,12 @@ namespace Deneme_proje.Controllers
                 // Stok bilgilerini veritabanından al
                 var stokDetay = _faturaRepository.GetStokDetay(urunKodu);
 
+                var username = User.Identity?.Name ?? "Bilinmeyen Kullanıcı";
+                var connectionString = _configuration.GetConnectionString("ERPDatabase");
+
+                // Bu iş emrinden şu ana kadar kaç barkod basıldığını say
+                int kacinciBarkod = GetBarkodSayisi(isEmriKodu, urunKodu, connectionString);
+
                 // Yazdırma view modeli oluştur
                 var model = new IsEmriYazdirViewModel
                 {
@@ -808,7 +915,17 @@ namespace Deneme_proje.Controllers
                     Miktar = stokDetay?.Birim2Katsayi ?? isEmri.Miktar, // sto_birim2_katsayi
                     BaslangicTarihi = isEmri.is_BaslangicTarihi,
                     IsMerkezi = isEmri.IsMerkezi,
+                    PaletNo = kacinciBarkod, // Kaçıncı barkod = kaçıncı palet
+                    OperatorAdi = username,
+                    Renk = isEmri.Renk,
+                    Kalip = isEmri.Kalip,
+                    Hammadde = isEmri.Hammadde,
+                    Adet = isEmri.Adet,
+                    Birim2Katsayi = isEmri.Birim2Katsayi
                 };
+
+                // Barkod basıldıktan SONRA kaydet
+                SaveBarkodBasimi(isEmriKodu, urunKodu, isEmriKodu, username, kacinciBarkod, connectionString);
 
                 // Yazdırma sayfasını görüntüle
                 return View("YazdirUrunEtiketi", model);
@@ -819,7 +936,6 @@ namespace Deneme_proje.Controllers
                 return View("Error");
             }
         }
-
         [AllowAnonymous]
         public IActionResult MusteriAcikFaturalar(string aramaMetni = "")
         {
@@ -1598,6 +1714,26 @@ ORDER BY
                     message = "Parti kodları getirilirken hata oluştu.",
                     error = ex.Message
                 });
+            }
+        }
+
+        public IActionResult EksikPaletPartiler(string stokArama = "")
+        {
+            try
+            {
+                // Repository'den eksik paletli partileri çek (tarih olmadan)
+                var eksikPartiler = _faturaRepository.GetEksikPaletPartiler(stokArama);
+
+                // ViewData'ya parametreleri gönder
+                ViewData["StokArama"] = stokArama;
+
+                return View(eksikPartiler);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Eksik paletli partiler listelenirken hata oluştu");
+                TempData["ErrorMessage"] = "Eksik paletli partiler listelenirken bir hata oluştu: " + ex.Message;
+                return View(Enumerable.Empty<EksikPaletPartiViewModel>());
             }
         }
     }

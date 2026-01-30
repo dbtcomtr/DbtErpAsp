@@ -108,29 +108,23 @@ namespace Deneme_proje.Controllers
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> IzinTalepKaydet(string talepTarihi, string izinTipi, string eksikNedeni,
-     int izinGun, int izinSaat, string baslangicTarihi, string bitisTarihi, string iseBaslamaTarihi, string baslamaSaat,
-     string izinAmaci, string personnelCode)
+            int izinGun, int izinSaat, string baslangicTarihi, string bitisTarihi, string iseBaslamaTarihi, string baslamaSaat,
+            string izinAmaci, string personnelCode)
         {
             try
             {
                 string username = HttpContext.Session.GetString("Username");
                 string version = HttpContext.Session.GetString("SelectedVersion");
-
-                // Personel kodunu doğrudan kullan
                 string persKod = personnelCode;
-
-                // Kullanıcı bilgilerini alalım
                 string mikroDbConnectionString = version == "V16"
                     ? _configuration.GetConnectionString("MikroDB_V16")
                     : _configuration.GetConnectionString("MikroDesktop");
 
                 string userNo = null;
-
                 using (SqlConnection mikroConnection = new SqlConnection(mikroDbConnectionString))
                 {
                     await mikroConnection.OpenAsync();
                     string userQuery = "SELECT User_no FROM KULLANICILAR WHERE User_name = @username";
-
                     using (SqlCommand command = new SqlCommand(userQuery, mikroConnection))
                     {
                         command.Parameters.AddWithValue("@username", username);
@@ -144,17 +138,16 @@ namespace Deneme_proje.Controllers
                     return Json(new { success = false, message = "Personel veya kullanıcı bilgisi bulunamadı." });
                 }
 
-                Guid izinGuid = Guid.NewGuid(); // Yeni GUID oluştur
+                Guid izinGuid = Guid.NewGuid();
                 string sessionKey = "IseBaslamaTarihi_" + izinGuid.ToString();
                 HttpContext.Session.SetString(sessionKey, iseBaslamaTarihi);
-                int izinSatirNo = 0;
 
+                int izinSatirNo = 0;
                 string connectionString = _dbSelectorService.GetConnectionString();
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     await connection.OpenAsync();
 
-                    // Önce satır numarası al
                     string getMaxSatirNo = "SELECT ISNULL(MAX(pit_satir_no), 0) + 1 FROM PERSONEL_IZIN_TALEPLERI WHERE pit_pers_kod = @persKod";
                     using (SqlCommand command = new SqlCommand(getMaxSatirNo, connection))
                     {
@@ -164,98 +157,24 @@ namespace Deneme_proje.Controllers
                     }
 
                     string insertQuery = @"INSERT INTO PERSONEL_IZIN_TALEPLERI (
-            pit_guid,
-            pit_pers_kod,
-            pit_talep_tarihi,
-            pit_izin_tipi,
-            pit_eksikcalismanedeni,
-            pit_gun_sayisi,
-            pit_yol_izni,
-            pit_baslangictarih,
-            pit_BaslamaSaati,
-            pit_saat,
-            pit_amac,
-            pit_izin_durum,
-            pit_onaylayan_kullanici,
-            pit_create_user,
-            pit_create_date,
-            pit_lastup_user,
-            pit_lastup_date,
-            pit_special1,
-            pit_special2,
-            pit_special3,
-            pit_iptal,
-            pit_hidden,
-            pit_kilitli,
-            pit_degisti,
-            pit_mali_yil,
-            pit_satir_no,
-            pit_SpecRECno,
-            pit_fileid,
-            pit_checksum,
-            pit_cadde,
-            pit_mahalle,
-            pit_sokak,
-            pit_il,
-            pit_ulke,
-            pit_Semt,
-            pit_Apt_No,
-            pit_Daire_No,
-            pit_posta_kodu,
-            pit_ilce,
-            pit_adres_kodu,
-            pit_tel1,
-            pit_tel2,
-            pit_email,
-            pit_aciklama1,
-            pit_aciklama2
-        ) VALUES (
-            @izinGuid,
-            @persKod,
-            @talepTarihi,
-            @izinTipi,
-            @eksikNedeni,
-            @izinGun,
-            0, -- Yol izni varsayılan olarak 0
-            @baslangicTarihi,
-            @bitisTarihi,
-            @izinSaat,
-            @izinAmaci,
-            0, -- izin_durum varsayılan olarak 0 (beklemede)
-            0, -- onaylayan kullanıcı varsayılan olarak 0
-            @createUser,
-            GETDATE(),
-            @lastupUser,
-            GETDATE(),
-            ' ',
-            ' ',
-            ' ',
-            0,
-            0,
-            0,
-            0,
-            YEAR(GETDATE()),
-            @izinSatirNo,
-            0,
-            229,
-            0,
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' '
-        )";
+                        pit_guid, pit_pers_kod, pit_talep_tarihi, pit_izin_tipi, pit_eksikcalismanedeni,
+                        pit_gun_sayisi, pit_yol_izni, pit_baslangictarih, pit_BaslamaSaati, pit_saat,
+                        pit_amac, pit_izin_durum, pit_onaylayan_kullanici, pit_create_user, pit_create_date,
+                        pit_lastup_user, pit_lastup_date, pit_special1, pit_special2, pit_special3,
+                        pit_iptal, pit_hidden, pit_kilitli, pit_degisti, pit_mali_yil, pit_satir_no,
+                        pit_SpecRECno, pit_fileid, pit_checksum, pit_cadde, pit_mahalle, pit_sokak,
+                        pit_il, pit_ulke, pit_Semt, pit_Apt_No, pit_Daire_No, pit_posta_kodu,
+                        pit_ilce, pit_adres_kodu, pit_tel1, pit_tel2, pit_email, pit_aciklama1, pit_aciklama2
+                    ) VALUES (
+                        @izinGuid, @persKod, @talepTarihi, @izinTipi, @eksikNedeni,
+                        @izinGun, 0, @baslangicTarihi, @bitisTarihi, @izinSaat,
+                        @izinAmaci, 0, 0, @createUser, GETDATE(),
+                        @lastupUser, GETDATE(), ' ', ' ', ' ',
+                        0, 0, 0, 0, YEAR(GETDATE()), @izinSatirNo,
+                        0, 229, 0, ' ', ' ', ' ',
+                        ' ', ' ', ' ', ' ', ' ', ' ',
+                        ' ', ' ', ' ', ' ', ' ', ' ', ' '
+                    )";
 
                     using (SqlCommand command = new SqlCommand(insertQuery, connection))
                     {
@@ -268,24 +187,18 @@ namespace Deneme_proje.Controllers
                         command.Parameters.AddWithValue("@baslangicTarihi", Convert.ToDateTime(baslangicTarihi));
                         command.Parameters.AddWithValue("@bitisTarihi", Convert.ToDateTime(bitisTarihi));
                         command.Parameters.AddWithValue("@izinSatirNo", izinSatirNo);
-
-                        command.Parameters.AddWithValue("@izinSaat", izinSaat); // izinSaat değeri pit_saat alanına kaydedilecek
+                        command.Parameters.AddWithValue("@izinSaat", izinSaat);
                         command.Parameters.AddWithValue("@izinAmaci", !string.IsNullOrEmpty(izinAmaci) ? izinAmaci : (object)DBNull.Value);
                         command.Parameters.AddWithValue("@createUser", userNo);
                         command.Parameters.AddWithValue("@lastupUser", userNo);
-
                         await command.ExecuteNonQueryAsync();
                     }
 
-                    // İşe başlama tarihini PERSONEL_IZIN_TALEPLERI_user tablosuna kaydet
                     string insertUserQuery = @"
-            IF EXISTS (SELECT 1 FROM PERSONEL_IZIN_TALEPLERI_user WHERE Record_uid = @izinGuid)
-                UPDATE PERSONEL_IZIN_TALEPLERI_user 
-                SET IsbaslamaTarihi = @iseBaslamaTarihi 
-                WHERE Record_uid = @izinGuid
-            ELSE
-                INSERT INTO PERSONEL_IZIN_TALEPLERI_user (Record_uid, IsbaslamaTarihi) 
-                VALUES (@izinGuid, @iseBaslamaTarihi)";
+                        IF EXISTS (SELECT 1 FROM PERSONEL_IZIN_TALEPLERI_user WHERE Record_uid = @izinGuid)
+                            UPDATE PERSONEL_IZIN_TALEPLERI_user SET IsbaslamaTarihi = @iseBaslamaTarihi WHERE Record_uid = @izinGuid
+                        ELSE
+                            INSERT INTO PERSONEL_IZIN_TALEPLERI_user (Record_uid, IsbaslamaTarihi) VALUES (@izinGuid, @iseBaslamaTarihi)";
 
                     using (SqlCommand command = new SqlCommand(insertUserQuery, connection))
                     {
@@ -294,10 +207,8 @@ namespace Deneme_proje.Controllers
                         await command.ExecuteNonQueryAsync();
                     }
 
-                    // İzin kaydını gerçekleştirdikten sonra idari amire e-posta gönderme
                     await SendNotificationToManagersAsync(persKod, izinGuid, connection);
 
-                    // İzin kaydını gerçekleştirdikten sonra izinId değerini döndürme
                     HttpContext.Session.SetString("LastIzinGuid", izinGuid.ToString());
                     HttpContext.Session.SetString("LastIzinTarihi", baslangicTarihi);
                     HttpContext.Session.SetString("LastIseBaslamaTarihi", iseBaslamaTarihi);
@@ -313,15 +224,11 @@ namespace Deneme_proje.Controllers
             }
         }
 
-
-
-
         // İdari amire e-posta gönderme metodu
         private async Task SendNotificationToManagersAsync(string personelKodu, Guid izinGuid, SqlConnection connection)
         {
             try
             {
-                // 1. İzin talebi detaylarını çek
                 var izinTalebi = await GetIzinTalebiDetaylariAsync(izinGuid, connection);
                 if (izinTalebi == null)
                 {
@@ -329,26 +236,22 @@ namespace Deneme_proje.Controllers
                     return;
                 }
 
-                // 2. Tüm yönetici kodlarını al
-                var managerCodes = new HashSet<string>(); // Benzersiz kodlar için HashSet kullan
-
+                var managerCodes = new HashSet<string>();
                 string managerQuery = @"
-            SELECT 
-                per_IdariAmirKodu, 
-                per_raporlama_yapacagi_per_kod, 
-                per_TeknikAmirKodu 
-            FROM PERSONELLER 
-            WHERE per_kod = @personelKodu";
+                    SELECT
+                        per_IdariAmirKodu,
+                        per_raporlama_yapacagi_per_kod,
+                        per_TeknikAmirKodu
+                    FROM PERSONELLER
+                    WHERE per_kod = @personelKodu";
 
                 using (SqlCommand managerCommand = new SqlCommand(managerQuery, connection))
                 {
                     managerCommand.Parameters.AddWithValue("@personelKodu", personelKodu);
-
                     using (var reader = await managerCommand.ExecuteReaderAsync())
                     {
                         if (await reader.ReadAsync())
                         {
-                            // İdari amir ekle
                             if (!reader.IsDBNull(0))
                             {
                                 string idariAmirKodu = reader.GetString(0);
@@ -357,8 +260,6 @@ namespace Deneme_proje.Controllers
                                     managerCodes.Add(idariAmirKodu);
                                 }
                             }
-
-                            // Raporlama yapacağı personel ekle
                             if (!reader.IsDBNull(1))
                             {
                                 string raporlamaKodu = reader.GetString(1);
@@ -367,8 +268,6 @@ namespace Deneme_proje.Controllers
                                     managerCodes.Add(raporlamaKodu);
                                 }
                             }
-
-                            // Teknik amir ekle
                             if (!reader.IsDBNull(2))
                             {
                                 string teknikAmirKodu = reader.GetString(2);
@@ -387,13 +286,10 @@ namespace Deneme_proje.Controllers
                     return;
                 }
 
-                // 3. Her yönetici için e-posta adreslerini bul ve bildirim gönder
                 foreach (var managerCode in managerCodes)
                 {
-                    // Yöneticinin e-posta adresini al
                     string managerEmail = null;
                     string emailQuery = "SELECT Per_PersMailAddress FROM PERSONELLER WHERE per_kod = @managerCode";
-
                     using (SqlCommand emailCommand = new SqlCommand(emailQuery, connection))
                     {
                         emailCommand.Parameters.AddWithValue("@managerCode", managerCode);
@@ -407,62 +303,44 @@ namespace Deneme_proje.Controllers
                         continue;
                     }
 
-                    // E-posta gönder
                     await SendManagerNotificationEmailAsync(managerEmail, izinTalebi);
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Yöneticilere bildirim gönderilirken hata oluştu: {ex.Message}");
-                // Burada hatayı sadece logluyoruz, ana işlemi bozmamak için tekrar fırlatmıyoruz
             }
         }
-
         // İdari amire özel e-posta gönderme metodu
         private async Task SendManagerNotificationEmailAsync(string managerEmail, IzinTalepModel izinTalebi)
         {
             try
             {
-                // SMTP ayarlarını konfigürasyondan al
                 var smtpServer = _configuration["EmailSettings:SmtpServer"];
                 var smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"]);
                 var senderEmail = _configuration["EmailSettings:SenderEmail"];
                 var senderPassword = _configuration["EmailSettings:SenderPassword"];
                 var senderDisplayName = _configuration["EmailSettings:SenderDisplayName"];
 
-                // SSL güvenlik protokolünü ayarla
-                System.Net.ServicePointManager.SecurityProtocol =
-                    System.Net.SecurityProtocolType.Tls12 |
-                    System.Net.SecurityProtocolType.Tls11 |
-                    System.Net.SecurityProtocolType.Tls;
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 
-                // Sertifika doğrulamasını geçici olarak atla
-                System.Net.ServicePointManager.ServerCertificateValidationCallback =
-                    delegate { return true; };
-
-                // E-posta başlığı
                 string subject = $"Yeni İzin Talebi: {izinTalebi.PersonelAdSoyad}";
 
-                // Türkçe tarih formatını ayarla
                 System.Globalization.CultureInfo trCulture = new System.Globalization.CultureInfo("tr-TR");
-
-                // Tarihleri doğru formatla
                 string talepTarihi = izinTalebi.TalepTarihi.ToString("dd.MM.yyyy", trCulture);
                 string baslangicTarihi = izinTalebi.BaslangicTarihi.ToString("dd.MM.yyyy", trCulture);
                 string bitisTarihi = izinTalebi.BitisTarihi.ToString("dd.MM.yyyy", trCulture);
 
-                // İzin saati bilgisini formatla
                 string izinSaatText = "Belirtilmemiş";
                 if (izinTalebi.IzinSaat > 0)
                 {
-                    // Ondalık sayı ise virgüllü, tam sayı ise virgülsüz göster
                     if (Math.Abs(izinTalebi.IzinSaat % 1) < 0.001)
                         izinSaatText = ((int)izinTalebi.IzinSaat).ToString();
                     else
-                        izinSaatText = izinTalebi.IzinSaat.ToString("N2", trCulture).Replace(".00", ""); // 2 ondalık basamaklı
+                        izinSaatText = izinTalebi.IzinSaat.ToString("N2", trCulture).Replace(".00", "");
                 }
 
-                // E-posta içeriği
                 string body = $@"
 <!DOCTYPE html>
 <html lang=""tr"">
@@ -476,8 +354,6 @@ namespace Deneme_proje.Controllers
         .content {{ padding: 20px 0; }}
         .details {{ background-color: #f8f9fa; padding: 15px; margin: 15px 0; border-left: 3px solid #007bff; }}
         .footer {{ font-size: 12px; color: #6c757d; margin-top: 30px; border-top: 1px solid #e9ecef; padding-top: 10px; }}
-        .button {{ display: inline-block; background-color: #007bff; color: white; text-decoration: none; padding: 10px 15px; 
-                   border-radius: 4px; margin-top: 20px; }}
     </style>
 </head>
 <body>
@@ -487,10 +363,10 @@ namespace Deneme_proje.Controllers
         </div>
         <div class=""content"">
             <p>Sayın Yönetici,</p>
-            
-            <p><strong>{izinTalebi.PersonelAdSoyad}</strong> adlı personelden yeni bir izin talebi oluşturulmuştur. 
+           
+            <p><strong>{izinTalebi.PersonelAdSoyad}</strong> adlı personelden yeni bir izin talebi oluşturulmuştur.
                Lütfen bu talebi inceleyip onaylama veya reddetme işlemini gerçekleştiriniz.</p>
-            
+           
             <div class=""details"">
                 <h3>İzin Talebi Detayları:</h3>
                 <p><strong>Personel:</strong> {izinTalebi.PersonelAdSoyad}</p>
@@ -501,9 +377,9 @@ namespace Deneme_proje.Controllers
                 <p><strong>İzin Saati:</strong> {izinSaatText}</p>
                 <p><strong>İzin Amacı:</strong> {izinTalebi.Amac ?? "Belirtilmemiş"}</p>
             </div>
-            
-            <p>Bu izin talebini incelemek ve işlem yapmak için lütfen İnsan Kaynakları portalına giriş yapınız. https://hr.dioki.com.tr/Login/LoginKullanici </p>
-            
+           
+            <p>Bu izin talebini incelemek ve işlem yapmak için lütfen İnsan Kaynakları portalına giriş yapınız. <https://hr.dioki.com.tr/Login/LoginKullanici> </p>
+           
             <p>Bilgilerinize sunarız.</p>
         </div>
         <div class=""footer"">
@@ -513,17 +389,15 @@ namespace Deneme_proje.Controllers
 </body>
 </html>";
 
-                // SMTP istemcisini oluştur
                 using (var client = new SmtpClient(smtpServer)
                 {
                     Port = smtpPort,
                     Credentials = new NetworkCredential(senderEmail, senderPassword),
                     EnableSsl = true,
                     DeliveryMethod = SmtpDeliveryMethod.Network,
-                    Timeout = 20000 // 20 saniye timeout
+                    Timeout = 20000
                 })
                 {
-                    // E-posta mesajını oluştur
                     using (var mailMessage = new MailMessage
                     {
                         From = new MailAddress(senderEmail, senderDisplayName),
@@ -532,23 +406,15 @@ namespace Deneme_proje.Controllers
                         IsBodyHtml = true
                     })
                     {
-                        // Alıcı e-posta adresini ekle
                         mailMessage.To.Add(managerEmail);
-
-                        // E-postayı gönder
                         await client.SendMailAsync(mailMessage);
-
-                        // Başarılı gönderim log'u
                         System.Diagnostics.Debug.WriteLine($"Yöneticiye izin talebi bildirimi gönderildi: {managerEmail}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                // Genel hata yakalama
                 System.Diagnostics.Debug.WriteLine($"Yöneticiye e-posta gönderme hatası: {ex.Message}");
-
-                // İç içe hata varsa onu da logla
                 if (ex.InnerException != null)
                 {
                     System.Diagnostics.Debug.WriteLine($"İç Hata: {ex.InnerException.Message}");
@@ -556,8 +422,7 @@ namespace Deneme_proje.Controllers
             }
             finally
             {
-                // Güvenlik için sertifika doğrulamasını geri yükle
-                System.Net.ServicePointManager.ServerCertificateValidationCallback = null;
+                ServicePointManager.ServerCertificateValidationCallback = null;
             }
         }
         // IzinTalepPdfIndir metodundaki güncellemeler - işe giriş tarihi ve kalan izin hakkı eklendi
@@ -582,11 +447,8 @@ namespace Deneme_proje.Controllers
                     return RedirectToAction("Izinlerim");
                 }
 
-                string mikroDbConnectionString = version == "V16"
-                    ? _configuration.GetConnectionString("MikroDB_V16")
-                    : _configuration.GetConnectionString("MikroDesktop");
+                string connectionString = _dbSelectorService.GetConnectionString();
 
-                // Personel bilgilerini al
                 string personelKodu = "";
                 string personelAdi = "";
                 string personelSoyadi = "";
@@ -594,187 +456,203 @@ namespace Deneme_proje.Controllers
                 string personelBirim = "";
                 string personelTcNo = "";
                 DateTime personelIseGirisTarihi = DateTime.Now;
-                decimal kalanIzinHakki = 0;
+                decimal kalanIzinHakki = 0m;
                 string idariAmirKodu = "";
                 string idariAmirAdi = "";
                 string idariAmirSoyadi = "";
                 string ikKodu = "";
                 string ikAdi = "";
                 string ikSoyadi = "";
+
                 DateTime izinBaslangic = DateTime.Now;
                 DateTime izinBitis = DateTime.Now;
                 DateTime iseBaslamaTarih = DateTime.Now;
                 byte izinTipi = 0;
                 string izinAmaci = "";
                 byte gunSayisi = 0;
-                float izinSaati = 0;
+                float izinSaati = 0f;
 
-                string connectionString = _dbSelectorService.GetConnectionString();
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     await connection.OpenAsync();
 
-                    // İzin talebini al
-                    if (izinGuid != Guid.Empty)
-                    {
-                        string izinQuery = @"
-                SELECT 
-                    pit_pers_kod, 
-                    pit_baslangictarih, 
+                    // 1. İzin talebi detaylarını al
+                    string izinQuery = @"
+                SELECT
+                    pit_pers_kod,
+                    pit_baslangictarih,
                     pit_BaslamaSaati,
-                    pit_izin_tipi, 
+                    pit_izin_tipi,
                     pit_amac,
                     pit_gun_sayisi,
                     pit_saat
-                FROM PERSONEL_IZIN_TALEPLERI 
+                FROM PERSONEL_IZIN_TALEPLERI
                 WHERE pit_guid = @izinGuid";
 
-                        using (SqlCommand command = new SqlCommand(izinQuery, connection))
+                    using (SqlCommand cmd = new SqlCommand(izinQuery, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@izinGuid", izinGuid);
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                         {
-                            command.Parameters.AddWithValue("@izinGuid", izinGuid);
-                            using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                            if (await reader.ReadAsync())
                             {
-                                if (await reader.ReadAsync())
-                                {
-                                    personelKodu = reader["pit_pers_kod"].ToString();
-                                    izinBaslangic = Convert.ToDateTime(reader["pit_baslangictarih"]);
-                                    izinBitis = Convert.ToDateTime(reader["pit_BaslamaSaati"]);
-                                    izinTipi = reader.GetByte(reader.GetOrdinal("pit_izin_tipi"));
-                                    izinAmaci = reader["pit_amac"]?.ToString() ?? "";
-                                    gunSayisi = reader.GetByte(reader.GetOrdinal("pit_gun_sayisi"));
-                                    izinSaati = reader["pit_saat"] != DBNull.Value
-                                        ? Convert.ToSingle(reader["pit_saat"])
-                                        : 0;
-                                }
+                                personelKodu = reader["pit_pers_kod"]?.ToString() ?? "";
+                                izinBaslangic = reader.GetDateTime(reader.GetOrdinal("pit_baslangictarih"));
+                                izinBitis = reader.GetDateTime(reader.GetOrdinal("pit_BaslamaSaati"));
+                                izinTipi = reader.GetByte(reader.GetOrdinal("pit_izin_tipi"));
+                                izinAmaci = reader["pit_amac"]?.ToString() ?? "";
+                                gunSayisi = reader.GetByte(reader.GetOrdinal("pit_gun_sayisi"));
+                                izinSaati = !reader.IsDBNull(reader.GetOrdinal("pit_saat"))
+                                    ? Convert.ToSingle(reader.GetDouble(reader.GetOrdinal("pit_saat")))
+                                    : 0f;
+                            }
+                            else
+                            {
+                                return RedirectToAction("Izinlerim", new { error = "İzin talebi bulunamadı." });
                             }
                         }
                     }
 
-                    // İşe başlama tarihini PERSONEL_IZIN_TALEPLERI_user tablosundan al
+                    // 2. İşe başlama tarihi
                     string iseBaslamaSorgusu = @"
-                SELECT IsbaslamaTarihi 
-                FROM PERSONEL_IZIN_TALEPLERI_user 
+                SELECT IsbaslamaTarihi
+                FROM PERSONEL_IZIN_TALEPLERI_user
                 WHERE Record_uid = @izinGuid";
 
-                    using (SqlCommand iseBaslamaCommand = new SqlCommand(iseBaslamaSorgusu, connection))
+                    using (SqlCommand cmd = new SqlCommand(iseBaslamaSorgusu, connection))
                     {
-                        iseBaslamaCommand.Parameters.AddWithValue("@izinGuid", izinGuid);
-                        var result = await iseBaslamaCommand.ExecuteScalarAsync();
-
-                        if (result != null && result != DBNull.Value)
-                        {
-                            iseBaslamaTarih = Convert.ToDateTime(result);
-                        }
-                        else
-                        {
-                            iseBaslamaTarih = izinBitis.AddDays(1);
-                        }
+                        cmd.Parameters.AddWithValue("@izinGuid", izinGuid);
+                        var result = await cmd.ExecuteScalarAsync();
+                        iseBaslamaTarih = result != null && result != DBNull.Value
+                            ? Convert.ToDateTime(result)
+                            : izinBitis.AddDays(1);
                     }
 
-                    // Personel bilgilerini ve kalan izin hakkını al
-                    string personelQuery = @"
+                    // 3. KALAN İZİN HAKKI - En güncel ve güvenli versiyon (double → decimal dönüşümü güvenli)
+                    string kalanIzinQuery = @"
 DECLARE @Yil INT = YEAR(GETDATE());
 
-WITH PersonelBilgileri AS (
-    SELECT 
-        p.per_kod,
-        p.per_adi, 
-        p.per_soyadi, 
-        p.per_kim_gorev, 
-        d.pdp_adi as DepartmanAdi, 
-        p.Per_TcKimlikNo,
-        p.per_IdariAmirKodu,
-        p.per_raporlama_yapacagi_per_kod,
+WITH Base AS (
+    SELECT
         p.per_giris_tar,
-        CASE
-            WHEN DATEFROMPARTS(@Yil, MONTH(p.per_giris_tar), DAY(p.per_giris_tar)) <= GETDATE() THEN 
-                DATEDIFF(YEAR, p.per_giris_tar, GETDATE())
-            ELSE 
-                DATEDIFF(YEAR, p.per_giris_tar, GETDATE()) - 1
-        END AS CalismaSuresiYil,
-        CASE
-            WHEN DATEFROMPARTS(@Yil, MONTH(p.per_giris_tar), DAY(p.per_giris_tar)) <= GETDATE() THEN 1
-            ELSE 0
-        END AS YildonumuGectiMi
+        p.per_nuf_dogum_tarih,
+        CASE WHEN p.per_nuf_dogum_tarih IS NULL OR CAST(p.per_nuf_dogum_tarih AS DATE) = '1899-12-31' THEN 0
+             ELSE DATEDIFF(YEAR, p.per_nuf_dogum_tarih, GETDATE()) -
+                  CASE WHEN MONTH(p.per_nuf_dogum_tarih) > MONTH(GETDATE()) OR
+                       (MONTH(p.per_nuf_dogum_tarih) = MONTH(GETDATE()) AND DAY(p.per_nuf_dogum_tarih) > DAY(GETDATE()))
+                       THEN 1 ELSE 0 END
+        END AS Yas,
+        CASE WHEN DATEFROMPARTS(@Yil, MONTH(p.per_giris_tar), DAY(p.per_giris_tar)) <= GETDATE()
+             THEN DATEDIFF(YEAR, p.per_giris_tar, GETDATE())
+             ELSE DATEDIFF(YEAR, p.per_giris_tar, GETDATE()) - 1
+        END AS CalismaYili,
+        CASE WHEN DATEFROMPARTS(@Yil, MONTH(p.per_giris_tar), DAY(p.per_giris_tar)) <= GETDATE() THEN 1 ELSE 0 END AS YildonumuGectiMi
     FROM PERSONELLER p
-    LEFT JOIN DEPARTMANLAR d ON p.per_dept_kod = d.pdp_kodu
     WHERE p.per_kod = @personelKodu
+),
+GecenYilHaklari AS (
+    SELECT
+        CASE WHEN DATEFROMPARTS(@Yil - 1, MONTH(per_giris_tar), DAY(per_giris_tar)) <= DATEFROMPARTS(@Yil - 1, 12, 31)
+             THEN DATEDIFF(YEAR, per_giris_tar, DATEFROMPARTS(@Yil - 1, 12, 31))
+             ELSE DATEDIFF(YEAR, per_giris_tar, DATEFROMPARTS(@Yil - 1, 12, 31)) - 1
+        END AS GecenYilCalismaSuresi,
+        CASE WHEN DATEFROMPARTS(@Yil - 1, MONTH(per_giris_tar), DAY(per_giris_tar)) <= DATEFROMPARTS(@Yil - 1, 12, 31) THEN 1 ELSE 0 END AS GecenYilYildonumuGectiMi,
+        Yas
+    FROM Base
+),
+GecenYilHakEdis AS (
+    SELECT
+        CASE WHEN GecenYilYildonumuGectiMi = 0 THEN 0
+             WHEN Yas >= 50 AND Yas > 0 AND GecenYilCalismaSuresi >= 1 THEN 20
+             WHEN GecenYilCalismaSuresi >= 15 THEN 26
+             WHEN GecenYilCalismaSuresi > 5 THEN 20
+             WHEN GecenYilCalismaSuresi >= 1 THEN 14
+             ELSE 0
+        END AS GecenYilHakEdilenIzin
+    FROM GecenYilHaklari
+),
+GecenYilKullanim AS (
+    SELECT
+        GecenYilHakEdilenIzin,
+        ISNULL((SELECT SUM(CASE WHEN pz_saat > 0 THEN CASE WHEN pz_saat <= 4 THEN 0.5 + pz_gun_sayisi ELSE 1.0 + pz_gun_sayisi END ELSE pz_gun_sayisi END)
+                FROM PERSONEL_IZINLERI WHERE pz_pers_kod = @personelKodu AND pz_izin_yil = @Yil - 1 AND pz_izin_tipi = 0), 0.0) AS GecenYilKullanilanIzin,
+        ISNULL((SELECT SUM(pro_gecyil_devir_izin) FROM PERSONEL_TAHAKKUK_OZETLERI WHERE pro_kodozet = @personelKodu AND pro_ozetyili = @Yil - 1), 0.0) AS Gecen2024Devir,
+        ISNULL((SELECT SUM(pro_gecyil_devir_saatlikizin) FROM PERSONEL_TAHAKKUK_OZETLERI WHERE pro_kodozet = @personelKodu AND pro_ozetyili = @Yil - 1), 0.0) AS Gecen2024DevirSaat
+    FROM GecenYilHakEdis
 ),
 IzinHaklari AS (
     SELECT
-        per_kod,
-        per_adi,
-        per_soyadi,
-        per_kim_gorev,
-        DepartmanAdi,
-        Per_TcKimlikNo,
-        per_IdariAmirKodu,
-        per_raporlama_yapacagi_per_kod,
-        per_giris_tar,
-        CalismaSuresiYil,
-        YildonumuGectiMi,
-        CASE 
-            WHEN YildonumuGectiMi = 0 THEN 0
-            WHEN CalismaSuresiYil >= 15 THEN 26
-            WHEN CalismaSuresiYil > 5 THEN 20
-            WHEN CalismaSuresiYil >= 1 THEN 14
-            ELSE 0
+        CASE WHEN YildonumuGectiMi = 0 THEN 0
+             WHEN Yas >= 50 AND Yas > 0 AND CalismaYili >= 1 THEN 20
+             WHEN CalismaYili >= 15 THEN 26
+             WHEN CalismaYili > 5 THEN 20
+             WHEN CalismaYili >= 1 THEN 14
+             ELSE 0
         END AS HakEdilenYillikIzin
-    FROM PersonelBilgileri
+    FROM Base
 ),
 GecenYilDevredilen AS (
     SELECT
-        IH.*,
-        ISNULL((SELECT SUM(pro_gecyil_devir_izin) 
-                FROM dbo.PERSONEL_TAHAKKUK_OZETLERI WITH (NOLOCK) 
-                WHERE pro_kodozet = IH.per_kod 
-                AND pro_ozetyili = @Yil), 0) AS GecenYilDevirIzinGun,
-        ISNULL((SELECT SUM(pro_gecyil_devir_saatlikizin) 
-                FROM dbo.PERSONEL_TAHAKKUK_OZETLERI WITH (NOLOCK) 
-                WHERE pro_kodozet = IH.per_kod 
-                AND pro_ozetyili = @Yil), 0) AS GecenYilDevirIzinSaat
-    FROM IzinHaklari IH
+        ih.HakEdilenYillikIzin,
+        COALESCE((SELECT SUM(pro_gecyil_devir_izin) FROM PERSONEL_TAHAKKUK_OZETLERI WHERE pro_kodozet = @personelKodu AND pro_ozetyili = @Yil),
+                 (gy.Gecen2024Devir + gy.GecenYilHakEdilenIzin - gy.GecenYilKullanilanIzin), 0.0) AS GecenYilDevirIzinGun,
+        COALESCE((SELECT SUM(pro_gecyil_devir_saatlikizin) FROM PERSONEL_TAHAKKUK_OZETLERI WHERE pro_kodozet = @personelKodu AND pro_ozetyili = @Yil),
+                 gy.Gecen2024DevirSaat, 0.0) AS GecenYilDevirIzinSaat
+    FROM IzinHaklari ih
+    CROSS JOIN GecenYilKullanim gy
 ),
 KullanilanIzinler AS (
     SELECT
         GYD.*,
-        ISNULL((
-            SELECT SUM(
-                CASE
-                    WHEN pz_saat IS NOT NULL AND pz_saat > 0 THEN
-                        CASE 
-                            WHEN pz_saat <= 4 THEN 0.5 + pz_gun_sayisi
-                            ELSE 1.0 + pz_gun_sayisi
-                        END
-                    ELSE pz_gun_sayisi
-                END
-            )
-            FROM PERSONEL_IZINLERI WITH (NOLOCK) 
-            WHERE pz_pers_kod = GYD.per_kod 
-            AND pz_izin_yil = @Yil
-            AND pz_izin_tipi = 0
-        ), 0) AS KullanilanIzinGun
+        ISNULL((SELECT SUM(CASE WHEN pz_saat > 0 THEN CASE WHEN pz_saat <= 4 THEN 0.5 + pz_gun_sayisi ELSE 1.0 + pz_gun_sayisi END ELSE pz_gun_sayisi END)
+                FROM PERSONEL_IZINLERI WHERE pz_pers_kod = @personelKodu AND pz_izin_yil = @Yil AND pz_izin_tipi = 0), 0.0) AS KullanilanIzinGun
     FROM GecenYilDevredilen GYD
 )
 SELECT
-    per_kod,
-    per_adi,
-    per_soyadi,
-    per_kim_gorev,
-    DepartmanAdi,
-    Per_TcKimlikNo,
-    per_IdariAmirKodu,
-    per_raporlama_yapacagi_per_kod,
-    per_giris_tar,
-    CASE
-        WHEN GecenYilDevirIzinSaat IS NOT NULL AND GecenYilDevirIzinSaat > 0 THEN
-            CASE 
-                WHEN GecenYilDevirIzinSaat <= 4 THEN 0.5 + (GecenYilDevirIzinGun + HakEdilenYillikIzin - KullanilanIzinGun)
-                ELSE 1.0 + (GecenYilDevirIzinGun + HakEdilenYillikIzin - KullanilanIzinGun)
-            END
-        ELSE (GecenYilDevirIzinGun + HakEdilenYillikIzin - KullanilanIzinGun)
+    CASE WHEN ISNULL(GecenYilDevirIzinSaat, 0.0) > 0
+         THEN CASE WHEN ISNULL(GecenYilDevirIzinSaat, 0.0) <= 4 THEN 0.5 ELSE 1.0 END + 
+              (ISNULL(GecenYilDevirIzinGun, 0.0) + ISNULL(HakEdilenYillikIzin, 0) - ISNULL(KullanilanIzinGun, 0.0))
+         ELSE (ISNULL(GecenYilDevirIzinGun, 0.0) + ISNULL(HakEdilenYillikIzin, 0) - ISNULL(KullanilanIzinGun, 0.0))
     END AS KalanIzinBakiyesi
 FROM KullanilanIzinler";
+
+                    using (SqlCommand command = new SqlCommand(kalanIzinQuery, connection))
+                    {
+                        command.Parameters.AddWithValue("@personelKodu", personelKodu);
+                        var result = await command.ExecuteScalarAsync();
+
+                        // Sonuç double/float gelebilir → güvenli dönüşüm
+                        if (result != null && result != DBNull.Value)
+                        {
+                            if (result is double dbl)
+                                kalanIzinHakki = (decimal)dbl;
+                            else if (result is float flt)
+                                kalanIzinHakki = (decimal)flt;
+                            else if (result is decimal dec)
+                                kalanIzinHakki = dec;
+                            else
+                                kalanIzinHakki = Convert.ToDecimal(result); // son çare
+                        }
+                        else
+                        {
+                            kalanIzinHakki = 0m;
+                        }
+                    }
+
+                    // 4. Personel bilgileri
+                    string personelQuery = @"
+                SELECT
+                    p.per_adi,
+                    p.per_soyadi,
+                    p.per_kim_gorev,
+                    d.pdp_adi as DepartmanAdi,
+                    p.Per_TcKimlikNo,
+                    p.per_giris_tar,
+                    p.per_IdariAmirKodu,
+                    p.per_raporlama_yapacagi_per_kod
+                FROM PERSONELLER p
+                LEFT JOIN DEPARTMANLAR d ON p.per_dept_kod = d.pdp_kodu
+                WHERE p.per_kod = @personelKodu";
 
                     using (SqlCommand command = new SqlCommand(personelQuery, connection))
                     {
@@ -783,67 +661,56 @@ FROM KullanilanIzinler";
                         {
                             if (await reader.ReadAsync())
                             {
-                                personelAdi = reader["per_adi"].ToString();
-                                personelSoyadi = reader["per_soyadi"].ToString();
+                                personelAdi = reader["per_adi"]?.ToString() ?? "";
+                                personelSoyadi = reader["per_soyadi"]?.ToString() ?? "";
                                 personelGorev = reader["per_kim_gorev"]?.ToString() ?? "";
                                 personelBirim = reader["DepartmanAdi"]?.ToString() ?? "";
                                 personelTcNo = reader["Per_TcKimlikNo"]?.ToString() ?? "";
-                                personelIseGirisTarihi = Convert.ToDateTime(reader["per_giris_tar"]);
-                                kalanIzinHakki = Convert.ToDecimal(reader["KalanIzinBakiyesi"]);
-
-                                idariAmirKodu = reader["per_IdariAmirKodu"]?.ToString();
-                                ikKodu = reader["per_raporlama_yapacagi_per_kod"]?.ToString();
+                                personelIseGirisTarihi = reader.GetDateTime(reader.GetOrdinal("per_giris_tar"));
+                                idariAmirKodu = reader["per_IdariAmirKodu"]?.ToString() ?? "";
+                                ikKodu = reader["per_raporlama_yapacagi_per_kod"]?.ToString() ?? "";
                             }
                         }
                     }
 
-                    // İdari amir bilgilerini ayrı bir sorguda al
+                    // 5. İdari amir bilgileri
                     if (!string.IsNullOrEmpty(idariAmirKodu))
                     {
-                        string amirSorgusu = @"
-                    SELECT per_adi, per_soyadi
-                    FROM PERSONELLER
-                    WHERE per_kod = @amirKodu";
-
+                        string amirSorgusu = "SELECT per_adi, per_soyadi FROM PERSONELLER WHERE per_kod = @amirKodu";
                         using (SqlCommand amirCommand = new SqlCommand(amirSorgusu, connection))
                         {
                             amirCommand.Parameters.AddWithValue("@amirKodu", idariAmirKodu);
-
                             using (SqlDataReader amirReader = await amirCommand.ExecuteReaderAsync())
                             {
                                 if (await amirReader.ReadAsync())
                                 {
-                                    idariAmirAdi = amirReader["per_adi"].ToString();
-                                    idariAmirSoyadi = amirReader["per_soyadi"].ToString();
+                                    idariAmirAdi = amirReader["per_adi"]?.ToString() ?? "";
+                                    idariAmirSoyadi = amirReader["per_soyadi"]?.ToString() ?? "";
                                 }
                             }
                         }
                     }
 
+                    // 6. İnsan Kaynakları bilgileri
                     if (!string.IsNullOrEmpty(ikKodu))
                     {
-                        string ikSorgusu = @"
-                    SELECT per_adi, per_soyadi
-                    FROM PERSONELLER
-                    WHERE per_kod = @ikKodu";
-
-                        using (SqlCommand amirCommand = new SqlCommand(ikSorgusu, connection))
+                        string ikSorgusu = "SELECT per_adi, per_soyadi FROM PERSONELLER WHERE per_kod = @ikKodu";
+                        using (SqlCommand ikCommand = new SqlCommand(ikSorgusu, connection))
                         {
-                            amirCommand.Parameters.AddWithValue("@ikKodu", ikKodu);
-
-                            using (SqlDataReader amirReader = await amirCommand.ExecuteReaderAsync())
+                            ikCommand.Parameters.AddWithValue("@ikKodu", ikKodu);
+                            using (SqlDataReader ikReader = await ikCommand.ExecuteReaderAsync())
                             {
-                                if (await amirReader.ReadAsync())
+                                if (await ikReader.ReadAsync())
                                 {
-                                    ikAdi = amirReader["per_adi"].ToString();
-                                    ikSoyadi = amirReader["per_soyadi"].ToString();
+                                    ikAdi = ikReader["per_adi"]?.ToString() ?? "";
+                                    ikSoyadi = ikReader["per_soyadi"]?.ToString() ?? "";
                                 }
                             }
                         }
                     }
                 }
 
-                // PDF oluştur
+                // PDF OLUŞTURMA - Tam ve eksiksiz
                 using (MemoryStream ms = new MemoryStream())
                 {
                     BaseFont baseFont = BaseFont.CreateFont(BaseFont.HELVETICA, "Cp1254", BaseFont.NOT_EMBEDDED);
@@ -856,7 +723,7 @@ FROM KullanilanIzinler";
                     PdfWriter writer = PdfWriter.GetInstance(document, ms);
                     document.Open();
 
-                    // Logo ekle
+                    // Logo
                     string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "logo.png");
                     if (System.IO.File.Exists(imagePath))
                     {
@@ -870,7 +737,6 @@ FROM KullanilanIzinler";
                     PdfPTable headerTable = new PdfPTable(1);
                     headerTable.WidthPercentage = 100;
                     headerTable.DefaultCell.Border = Rectangle.NO_BORDER;
-
                     PdfPCell titleCell = new PdfPCell(new Phrase("PERSONEL İZİN\nİSTEK FORMU", titleFont));
                     titleCell.HorizontalAlignment = Element.ALIGN_CENTER;
                     titleCell.VerticalAlignment = Element.ALIGN_MIDDLE;
@@ -884,28 +750,24 @@ FROM KullanilanIzinler";
                     companyInfoTable.WidthPercentage = 100;
                     companyInfoTable.DefaultCell.Border = Rectangle.NO_BORDER;
                     companyInfoTable.DefaultCell.HorizontalAlignment = Element.ALIGN_RIGHT;
-
                     PdfPCell infoCell = new PdfPCell();
                     infoCell.Border = Rectangle.NO_BORDER;
                     infoCell.HorizontalAlignment = Element.ALIGN_RIGHT;
-
                     Paragraph infoPara = new Paragraph();
                     infoPara.Add(new Chunk("Dioki Petrokimya", boldFont));
                     infoPara.Add(new Chunk(" Serbest Bölgesi, Adana-Yumurtalık, 01920 Adana\n", smallFont));
                     infoPara.Add(new Chunk("T : +(0322) 634 20 15\n", smallFont));
-
                     infoCell.AddElement(infoPara);
                     companyInfoTable.AddCell(infoCell);
                     document.Add(companyInfoTable);
 
-                    document.Add(new Paragraph(" ")); // Boşluk
+                    document.Add(new Paragraph(" "));
 
-                    // Personel Bilgileri Tablosu - Genişletilmiş
-                    PdfPTable personelTable = new PdfPTable(6); // 5'ten 6'ya çıkarıldı
+                    // Personel bilgileri tablosu
+                    PdfPTable personelTable = new PdfPTable(6);
                     personelTable.WidthPercentage = 100;
-                    personelTable.SetWidths(new float[] { 16f, 16f, 16f, 16f, 18f, 18f }); // Yeni sütun genişlikleri
+                    personelTable.SetWidths(new float[] { 16f, 16f, 16f, 16f, 18f, 18f });
 
-                    // Başlık satırı
                     PdfPCell personelHeaderCell = new PdfPCell(new Phrase("PERSONELİN", boldFont));
                     personelHeaderCell.BackgroundColor = new BaseColor(230, 230, 230);
                     personelHeaderCell.Rowspan = 2;
@@ -913,14 +775,12 @@ FROM KullanilanIzinler";
                     personelHeaderCell.VerticalAlignment = Element.ALIGN_MIDDLE;
                     personelTable.AddCell(personelHeaderCell);
 
-                    // Başlık hücreleri
                     AddHeaderCell(personelTable, "ADI SOYADI", boldFont);
                     AddHeaderCell(personelTable, "GÖREVİ", boldFont);
                     AddHeaderCell(personelTable, "BİRİMİ", boldFont);
                     AddHeaderCell(personelTable, "İŞE GİRİŞ TARİHİ", boldFont);
                     AddHeaderCell(personelTable, "KALAN İZİN HAKKI", boldFont);
 
-                    // İçerik satırı
                     PdfPCell adSoyadCell = new PdfPCell(new Phrase(personelAdi + " " + personelSoyadi, normalFont));
                     adSoyadCell.HorizontalAlignment = Element.ALIGN_CENTER;
                     adSoyadCell.VerticalAlignment = Element.ALIGN_MIDDLE;
@@ -947,9 +807,9 @@ FROM KullanilanIzinler";
                     personelTable.AddCell(kalanIzinCell);
 
                     document.Add(personelTable);
-                    document.Add(new Paragraph(" ")); // Boşluk
+                    document.Add(new Paragraph(" "));
 
-                    // İzin Türü Tablosu (aynı kalıyor)
+                    // İzin türü tablosu
                     PdfPTable izinTuruTable = new PdfPTable(8);
                     izinTuruTable.WidthPercentage = 100;
                     izinTuruTable.SetWidths(new float[] { 20f, 10f, 10f, 10f, 10f, 10f, 10f, 10f });
@@ -969,31 +829,27 @@ FROM KullanilanIzinler";
                     AddHeaderCell(izinTuruTable, "ÜCRETSİZ", boldFont);
                     AddHeaderCell(izinTuruTable, "DİĞER", boldFont);
 
-                    // İzin türü checkbox'ları
-                    bool isYillikIzin = izinTipi == 0;
-                    bool isDogumIzin = izinTipi == 11 || izinTipi == 12 || izinTipi == 13;
-                    bool isOlumIzin = izinTipi == 14;
-                    bool isMazeretIzin = izinTipi == 4;
-                    bool isevlilikIzin = izinTipi == 10;
-                    bool isUcretsizIzin = izinTipi == 8;
-                    bool isDigerIzin = izinTipi == 2 || izinTipi == 3 || izinTipi == 5 || izinTipi == 6 ||
-                                       izinTipi == 7 || izinTipi == 9 || izinTipi == 15;
+                    bool isYillik = izinTipi == 0;
+                    bool isDogum = izinTipi == 11 || izinTipi == 12 || izinTipi == 13;
+                    bool isOlum = izinTipi == 14;
+                    bool isMazeret = izinTipi == 4;
+                    bool isEvlilik = izinTipi == 10;
+                    bool isUcretsiz = izinTipi == 8;
+                    bool isDiger = !isYillik && !isDogum && !isOlum && !isMazeret && !isEvlilik && !isUcretsiz;
 
-                    Font izinBilgiFont = new Font(baseFont, 12, Font.BOLD);
-
-                    // Checkbox hücreleri ekle
-                    AddCheckboxCellWithInfo(izinTuruTable, isYillikIzin, gunSayisi, izinSaati, izinBilgiFont);
-                    AddCheckboxCellWithInfo(izinTuruTable, isDogumIzin, gunSayisi, izinSaati, izinBilgiFont);
-                    AddCheckboxCellWithInfo(izinTuruTable, isOlumIzin, gunSayisi, izinSaati, izinBilgiFont);
-                    AddCheckboxCellWithInfo(izinTuruTable, isMazeretIzin, gunSayisi, izinSaati, izinBilgiFont);
-                    AddCheckboxCellWithInfo(izinTuruTable, isevlilikIzin, gunSayisi, izinSaati, izinBilgiFont);
-                    AddCheckboxCellWithInfo(izinTuruTable, isUcretsizIzin, gunSayisi, izinSaati, izinBilgiFont);
-                    AddCheckboxCellWithInfo(izinTuruTable, isDigerIzin, gunSayisi, izinSaati, izinBilgiFont);
+                    Font infoFont = new Font(baseFont, 12, Font.BOLD);
+                    AddCheckboxCellWithInfo(izinTuruTable, isYillik, gunSayisi, izinSaati, infoFont);
+                    AddCheckboxCellWithInfo(izinTuruTable, isDogum, gunSayisi, izinSaati, infoFont);
+                    AddCheckboxCellWithInfo(izinTuruTable, isOlum, gunSayisi, izinSaati, infoFont);
+                    AddCheckboxCellWithInfo(izinTuruTable, isMazeret, gunSayisi, izinSaati, infoFont);
+                    AddCheckboxCellWithInfo(izinTuruTable, isEvlilik, gunSayisi, izinSaati, infoFont);
+                    AddCheckboxCellWithInfo(izinTuruTable, isUcretsiz, gunSayisi, izinSaati, infoFont);
+                    AddCheckboxCellWithInfo(izinTuruTable, isDiger, gunSayisi, izinSaati, infoFont);
 
                     document.Add(izinTuruTable);
                     document.Add(new Paragraph(" "));
 
-                    // İzin Tarihleri Tablosu
+                    // Kullanılacak izin tarihleri
                     PdfPTable tarihTable = new PdfPTable(3);
                     tarihTable.WidthPercentage = 100;
                     tarihTable.SetWidths(new float[] { 20f, 40f, 40f });
@@ -1021,10 +877,9 @@ FROM KullanilanIzinler";
                     document.Add(tarihTable);
                     document.Add(new Paragraph(" "));
 
-                    // Not bölümü
+                    // Not
                     PdfPTable noteTable = new PdfPTable(1);
                     noteTable.WidthPercentage = 100;
-
                     PdfPCell noteCell = new PdfPCell(new Phrase("NOT : 1) İdari, Teknik, Destek Personeli ve işçilerin yıllık iznini 4857 Sayılı İş Kanunu ile Şirketimiz \"İzin Kullanma Esasları\"na göre, ait olduğu yıl içinde bir seferde kullanır.", normalFont));
                     noteCell.BackgroundColor = new BaseColor(240, 240, 240);
                     noteCell.Border = Rectangle.BOX;
@@ -1033,7 +888,6 @@ FROM KullanilanIzinler";
                     noteCell.PaddingLeft = 5;
                     noteCell.PaddingRight = 5;
                     noteTable.AddCell(noteCell);
-
                     document.Add(noteTable);
                     document.Add(new Paragraph(" "));
 
@@ -1041,20 +895,18 @@ FROM KullanilanIzinler";
                     document.Add(new Paragraph("İzin Açıklaması:", boldFont));
                     PdfPTable adresTable = new PdfPTable(1);
                     adresTable.WidthPercentage = 100;
-
                     PdfPCell adresCell = new PdfPCell(new Phrase(izinAmaci, normalFont));
                     adresCell.MinimumHeight = 70;
                     adresCell.VerticalAlignment = Element.ALIGN_TOP;
                     adresTable.AddCell(adresCell);
-
                     document.Add(adresTable);
                     document.Add(new Paragraph(" "));
 
-                    // İmza alanları
+                    // İmza alanı
                     PdfPTable signatureTable = new PdfPTable(3);
                     signatureTable.WidthPercentage = 100;
 
-                    // Personel imza alanı
+                    // Personel imzası
                     PdfPCell personelSignatureCell = new PdfPCell();
                     personelSignatureCell.BorderWidthTop = 1f;
                     personelSignatureCell.BorderWidthBottom = 0f;
@@ -1062,18 +914,16 @@ FROM KullanilanIzinler";
                     personelSignatureCell.BorderWidthRight = 0f;
                     personelSignatureCell.PaddingTop = 10;
                     personelSignatureCell.HorizontalAlignment = Element.ALIGN_CENTER;
-
-                    Paragraph personelSignatureText = new Paragraph();
-                    personelSignatureText.Alignment = Element.ALIGN_CENTER;
-                    personelSignatureText.Add(new Chunk("PERSONELİN\n", boldFont));
-                    personelSignatureText.Add(new Chunk("ADI SOYADI: " + personelAdi + " " + personelSoyadi + "\n\n", normalFont));
-                    personelSignatureText.Add(new Chunk("İMZASI:\n\n", normalFont));
-                    personelSignatureText.Add(new Chunk("......./......./20......", normalFont));
-
-                    personelSignatureCell.AddElement(personelSignatureText);
+                    Paragraph personelSigText = new Paragraph();
+                    personelSigText.Alignment = Element.ALIGN_CENTER;
+                    personelSigText.Add(new Chunk("PERSONELİN\n", boldFont));
+                    personelSigText.Add(new Chunk("ADI SOYADI: " + personelAdi + " " + personelSoyadi + "\n\n", normalFont));
+                    personelSigText.Add(new Chunk("İMZASI:\n\n", normalFont));
+                    personelSigText.Add(new Chunk("......./......./20......", normalFont));
+                    personelSignatureCell.AddElement(personelSigText);
                     signatureTable.AddCell(personelSignatureCell);
 
-                    // Birim amiri imza alanı
+                    // Amir imzası
                     PdfPCell amirSignatureCell = new PdfPCell();
                     amirSignatureCell.BorderWidthTop = 1f;
                     amirSignatureCell.BorderWidthBottom = 0f;
@@ -1081,27 +931,16 @@ FROM KullanilanIzinler";
                     amirSignatureCell.BorderWidthRight = 0f;
                     amirSignatureCell.PaddingTop = 10;
                     amirSignatureCell.HorizontalAlignment = Element.ALIGN_CENTER;
-
-                    Paragraph amirSignatureText = new Paragraph();
-                    amirSignatureText.Alignment = Element.ALIGN_CENTER;
-                    amirSignatureText.Add(new Chunk("BİRİM AMİRİNİN\n", boldFont));
-
-                    if (!string.IsNullOrEmpty(idariAmirAdi) && !string.IsNullOrEmpty(idariAmirSoyadi))
-                    {
-                        amirSignatureText.Add(new Chunk("ADI SOYADI: " + idariAmirAdi + " " + idariAmirSoyadi + "\n\n", normalFont));
-                    }
-                    else
-                    {
-                        amirSignatureText.Add(new Chunk("ADI SOYADI:\n\n", normalFont));
-                    }
-
-                    amirSignatureText.Add(new Chunk("İMZASI:\n\n", normalFont));
-                    amirSignatureText.Add(new Chunk("......./......./20......", normalFont));
-
-                    amirSignatureCell.AddElement(amirSignatureText);
+                    Paragraph amirSigText = new Paragraph();
+                    amirSigText.Alignment = Element.ALIGN_CENTER;
+                    amirSigText.Add(new Chunk("BİRİM AMİRİNİN\n", boldFont));
+                    amirSigText.Add(new Chunk("ADI SOYADI: " + idariAmirAdi + " " + idariAmirSoyadi + "\n\n", normalFont));
+                    amirSigText.Add(new Chunk("İMZASI:\n\n", normalFont));
+                    amirSigText.Add(new Chunk("......./......./20......", normalFont));
+                    amirSignatureCell.AddElement(amirSigText);
                     signatureTable.AddCell(amirSignatureCell);
 
-                    // İK Personeli imza alanı
+                    // İK imzası
                     PdfPCell ikSignatureCell = new PdfPCell();
                     ikSignatureCell.BorderWidthTop = 1f;
                     ikSignatureCell.BorderWidthBottom = 0f;
@@ -1109,38 +948,26 @@ FROM KullanilanIzinler";
                     ikSignatureCell.BorderWidthRight = 0f;
                     ikSignatureCell.PaddingTop = 10;
                     ikSignatureCell.HorizontalAlignment = Element.ALIGN_CENTER;
-
-                    Paragraph ikSignatureText = new Paragraph();
-                    ikSignatureText.Alignment = Element.ALIGN_CENTER;
-                    ikSignatureText.Add(new Chunk("İNSAN KAYNAKLARI\n", boldFont));
-
-                    if (!string.IsNullOrEmpty(ikAdi) && !string.IsNullOrEmpty(ikSoyadi))
-                    {
-                        ikSignatureText.Add(new Chunk("ADI SOYADI: " + ikAdi + " " + ikSoyadi + "\n\n", normalFont));
-                    }
-                    else
-                    {
-                        ikSignatureText.Add(new Chunk("ADI SOYADI:\n\n", normalFont));
-                    }
-
-                    ikSignatureText.Add(new Chunk("İMZASI:\n\n", normalFont));
-                    ikSignatureText.Add(new Chunk("......./......./20......", normalFont));
-
-                    ikSignatureCell.AddElement(ikSignatureText);
+                    Paragraph ikSigText = new Paragraph();
+                    ikSigText.Alignment = Element.ALIGN_CENTER;
+                    ikSigText.Add(new Chunk("İNSAN KAYNAKLARI\n", boldFont));
+                    ikSigText.Add(new Chunk("ADI SOYADI: " + ikAdi + " " + ikSoyadi + "\n\n", normalFont));
+                    ikSigText.Add(new Chunk("İMZASI:\n\n", normalFont));
+                    ikSigText.Add(new Chunk("......./......./20......", normalFont));
+                    ikSignatureCell.AddElement(ikSigText);
                     signatureTable.AddCell(ikSignatureCell);
 
                     document.Add(signatureTable);
 
-                    // Form referans numarası
+                    // Form referansı
                     Paragraph formRef = new Paragraph("F/M/TARD/EV001", new Font(baseFont, 6));
                     formRef.Alignment = Element.ALIGN_RIGHT;
                     document.Add(formRef);
 
                     document.Close();
 
-                    // PDF'i döndür
                     byte[] pdfBytes = ms.ToArray();
-                    string personelAdSoyad = personelAdi + "_" + personelSoyadi;
+                    string personelAdSoyad = $"{personelAdi}_{personelSoyadi}".Replace(" ", "_");
                     return File(pdfBytes, "application/pdf", $"IzinTalep_{personelAdSoyad}.pdf");
                 }
             }
@@ -1149,15 +976,12 @@ FROM KullanilanIzinler";
                 return RedirectToAction("Izinlerim", new { error = "PDF oluşturulurken bir hata oluştu: " + ex.Message });
             }
         }
-
-        // Yardımcı metot - checkbox ile bilgi gösteren hücre
         private void AddCheckboxCellWithInfo(PdfPTable table, bool isChecked, byte gunSayisi, float izinSaati, Font izinBilgiFont)
         {
             PdfPCell cell = new PdfPCell();
             cell.HorizontalAlignment = Element.ALIGN_CENTER;
             cell.VerticalAlignment = Element.ALIGN_MIDDLE;
             cell.MinimumHeight = 30f;
-
             Paragraph para = new Paragraph();
             if (isChecked)
             {
@@ -1173,37 +997,12 @@ FROM KullanilanIzinler";
             table.AddCell(cell);
         }
 
-        // Yardımcı metotlar - bunları değiştirmeye gerek yok
         private void AddHeaderCell(PdfPTable table, string text, Font font)
         {
             PdfPCell cell = new PdfPCell(new Phrase(text, font));
             cell.HorizontalAlignment = Element.ALIGN_CENTER;
             cell.VerticalAlignment = Element.ALIGN_MIDDLE;
             cell.BackgroundColor = new BaseColor(230, 230, 230);
-            table.AddCell(cell);
-        }
-
-        // Yardımcı metotlar
-
-
-        private void AddCheckboxCell(PdfPTable table, bool isChecked)
-        {
-            PdfPCell cell = new PdfPCell();
-            cell.HorizontalAlignment = Element.ALIGN_CENTER;
-            cell.VerticalAlignment = Element.ALIGN_MIDDLE;
-            cell.MinimumHeight = 20f;
-
-            Paragraph p = new Paragraph();
-            if (isChecked)
-            {
-                p.Add(new Chunk("☑", new Font(Font.FontFamily.ZAPFDINGBATS, 12)));
-            }
-            else
-            {
-                p.Add(new Chunk("☐", new Font(Font.FontFamily.ZAPFDINGBATS, 12)));
-            }
-
-            cell.AddElement(p);
             table.AddCell(cell);
         }
 
@@ -1836,6 +1635,8 @@ ORDER BY t.pit_baslangictarih DESC", erpConnection);
             }
         }
 
+        // IzinTalepleri metodu - Sadece İdari Amir ve Teknik Amir kontrolü
+        // IzinTalepleri metodu - İdari Amir, Teknik Amir ve Raporlama Yapacağı Personel kontrolü
         public async Task<IActionResult> IzinTalepleri()
         {
             try
@@ -1871,7 +1672,6 @@ ORDER BY t.pit_baslangictarih DESC", erpConnection);
                 {
                     await erpConnection.OpenAsync();
 
-                    // Personel kodunu al
                     string personelKodu;
                     using (SqlCommand personelCommand = new SqlCommand("SELECT per_kod FROM PERSONELLER WHERE per_UserNo = @userNo AND per_cikis_tar = '1899-12-31 00:00:00.000'", erpConnection))
                     {
@@ -1887,31 +1687,34 @@ ORDER BY t.pit_baslangictarih DESC", erpConnection);
                         return View(new List<IzinTalepModel>());
                     }
 
-                    // Ana sorgu - Kalan izin hakkı hesaplaması da dahil
                     using SqlCommand command = new SqlCommand(@"
 DECLARE @Yil INT = YEAR(GETDATE());
 
 WITH PersonelHiyerarsi AS (
-    -- Direct administrative subordinates
+    -- İdari Amir, Teknik Amir ve Raporlama Yapacağı Personel ilişkileri
     SELECT 
         p1.per_kod as AltPersonelKod, 
         p2.per_kod as UstPersonelKod,
         1 as Seviye
     FROM PERSONELLER p1
     INNER JOIN PERSONELLER p2 ON 
-        (p1.per_IdariAmirKodu = p2.per_kod OR p1.per_raporlama_yapacagi_per_kod = p2.per_kod)
+        (p1.per_IdariAmirKodu = p2.per_kod 
+         OR p1.per_TeknikAmirKodu = p2.per_kod 
+         OR p1.per_raporlama_yapacagi_per_kod = p2.per_kod)
     WHERE p2.per_kod = @personelKodu
 
     UNION ALL
 
-    -- Recursive hierarchy lookup for deeper levels
+    -- Alt seviyeler için recursive lookup
     SELECT 
         p1.per_kod,
         p2.per_kod,
         ph.Seviye + 1
     FROM PERSONELLER p1
     INNER JOIN PERSONELLER p2 ON 
-        (p1.per_IdariAmirKodu = p2.per_kod OR p1.per_raporlama_yapacagi_per_kod = p2.per_kod)
+        (p1.per_IdariAmirKodu = p2.per_kod 
+         OR p1.per_TeknikAmirKodu = p2.per_kod 
+         OR p1.per_raporlama_yapacagi_per_kod = p2.per_kod)
     INNER JOIN PersonelHiyerarsi ph ON p2.per_kod = ph.AltPersonelKod
     WHERE ph.Seviye < 5
 ),
@@ -1919,14 +1722,23 @@ IzinHakedisleri AS (
     SELECT 
         ph.AltPersonelKod,
         p.per_giris_tar,
-        -- Çalışma süresi hesaplama
+        p.per_nuf_dogum_tarih,
+        CASE
+            WHEN p.per_nuf_dogum_tarih IS NULL OR CAST(p.per_nuf_dogum_tarih AS DATE) = '1899-12-31' THEN 0
+            ELSE DATEDIFF(YEAR, p.per_nuf_dogum_tarih, GETDATE()) - 
+                CASE 
+                    WHEN MONTH(p.per_nuf_dogum_tarih) > MONTH(GETDATE()) OR 
+                         (MONTH(p.per_nuf_dogum_tarih) = MONTH(GETDATE()) AND DAY(p.per_nuf_dogum_tarih) > DAY(GETDATE()))
+                    THEN 1 
+                    ELSE 0 
+                END
+        END AS Yas,
         CASE
             WHEN DATEFROMPARTS(@Yil, MONTH(p.per_giris_tar), DAY(p.per_giris_tar)) <= GETDATE() THEN 
                 DATEDIFF(YEAR, p.per_giris_tar, GETDATE())
             ELSE 
                 DATEDIFF(YEAR, p.per_giris_tar, GETDATE()) - 1
         END AS CalismaSuresiYil,
-        -- Yıldönümü geçti mi kontrolü
         CASE
             WHEN DATEFROMPARTS(@Yil, MONTH(p.per_giris_tar), DAY(p.per_giris_tar)) <= GETDATE() THEN 1
             ELSE 0
@@ -1939,8 +1751,10 @@ YillikIzinHaklari AS (
         AltPersonelKod,
         CalismaSuresiYil,
         YildonumuGectiMi,
+        Yas,
         CASE 
-            WHEN YildonumuGectiMi = 0 THEN 0 -- Yıldönümü geçmediyse yeni izin yok
+            WHEN YildonumuGectiMi = 0 THEN 0
+            WHEN Yas >= 50 AND Yas > 0 AND CalismaSuresiYil >= 1 THEN 20
             WHEN CalismaSuresiYil >= 15 THEN 26
             WHEN CalismaSuresiYil > 5 THEN 20
             WHEN CalismaSuresiYil >= 1 THEN 14
@@ -1982,7 +1796,7 @@ KullanilanIzinler AS (
             FROM PERSONEL_IZINLERI WITH (NOLOCK) 
             WHERE pz_pers_kod = di.AltPersonelKod 
             AND pz_izin_yil = @Yil
-AND pz_izin_tipi = 0  -- Only annual leave
+            AND pz_izin_tipi = 0
         ), 0) AS KullanilanIzinGun
     FROM DevirIzinler di
 ),
@@ -2002,11 +1816,11 @@ KalanIzinler AS (
 SELECT DISTINCT 
     t.pit_guid,
     t.pit_pers_kod,
-    p.per_adi + ' ' + p.per_soyadi as PersonelAdSoyad,
+    p.per_adi + ' ' + p.per_soyadi AS PersonelAdSoyad,
     p.per_IdariAmirKodu,
     (SELECT per_adi + ' ' + per_soyadi 
      FROM PERSONELLER 
-     WHERE per_kod = p.per_IdariAmirKodu) as IdariAmirAdi,
+     WHERE per_kod = p.per_IdariAmirKodu) AS IdariAmirAdi,
     t.pit_talep_tarihi,
     t.pit_izin_tipi,
     t.pit_gun_sayisi,
@@ -2017,15 +1831,17 @@ SELECT DISTINCT
     t.pit_izin_durum,
     t.pit_create_date,
     t.pit_onaylayan_kullanici,
-    CAST(ISNULL(ki.KalanIzinBakiyesi, 0) AS DECIMAL(10,2)) as KalanIzinHakki
+    ki.KalanIzinBakiyesi AS KalanIzinHakki
 FROM PERSONEL_IZIN_TALEPLERI t
 INNER JOIN PERSONELLER p ON t.pit_pers_kod = p.per_kod
 LEFT JOIN KalanIzinler ki ON t.pit_pers_kod = ki.AltPersonelKod
-WHERE t.pit_izin_durum = 0 AND t.pit_pers_kod IN (
-    SELECT AltPersonelKod 
-    FROM PersonelHiyerarsi 
-)
-ORDER BY t.pit_baslangictarih DESC", erpConnection);
+WHERE t.pit_izin_durum = 0 
+  AND t.pit_pers_kod IN (
+        SELECT AltPersonelKod 
+        FROM PersonelHiyerarsi
+  )
+ORDER BY t.pit_baslangictarih DESC;
+", erpConnection);
 
                     command.Parameters.AddWithValue("@personelKodu", personelKodu);
                     System.Diagnostics.Debug.WriteLine("Ana sorgu çalıştırılıyor...");
@@ -2070,27 +1886,21 @@ ORDER BY t.pit_baslangictarih DESC", erpConnection);
                 return View(new List<IzinTalepModel>());
             }
         }
-        [HttpPost]
-        [AllowAnonymous]
         private async Task<string> GetPersonelEmailAsync(string personelKodu, SqlConnection connection)
         {
             string emailQuery = "SELECT Per_PersMailAddress FROM PERSONELLER WHERE per_kod = @personelKodu";
-
             using (SqlCommand emailCommand = new SqlCommand(emailQuery, connection))
             {
                 emailCommand.Parameters.AddWithValue("@personelKodu", personelKodu);
                 var emailResult = await emailCommand.ExecuteScalarAsync();
-
                 return emailResult?.ToString();
             }
         }
-        [HttpPost]
-        [AllowAnonymous]
-        // İzin talebi detaylarını alma metodu
+
         private async Task<IzinTalepModel> GetIzinTalebiDetaylariAsync(Guid guid, SqlConnection connection)
         {
             string query = @"
-SELECT 
+SELECT
     t.pit_guid,
     t.pit_pers_kod,
     p.per_adi + ' ' + p.per_soyadi as PersonelAdSoyad,
@@ -2099,7 +1909,7 @@ SELECT
     t.pit_gun_sayisi,
     t.pit_BaslamaSaati AS BitisTarihi,
     t.pit_baslangictarih,
-    t.pit_saat, -- İzin saati
+    t.pit_saat,
     t.pit_amac,
     t.pit_aciklama1 as ReddetmeNedeni
 FROM PERSONEL_IZIN_TALEPLERI t
@@ -2109,12 +1919,11 @@ WHERE t.pit_guid = @guid";
             using (SqlCommand command = new SqlCommand(query, connection))
             {
                 command.Parameters.AddWithValue("@guid", guid);
-
                 using (SqlDataReader reader = await command.ExecuteReaderAsync())
                 {
                     if (await reader.ReadAsync())
                     {
-                        var izinTalep = new IzinTalepModel
+                        return new IzinTalepModel
                         {
                             Guid = reader.GetGuid(reader.GetOrdinal("pit_guid")),
                             PersonelKodu = reader.GetString(reader.GetOrdinal("pit_pers_kod")),
@@ -2124,27 +1933,14 @@ WHERE t.pit_guid = @guid";
                             GunSayisi = reader.GetByte(reader.GetOrdinal("pit_gun_sayisi")),
                             BaslangicTarihi = reader.GetDateTime(reader.GetOrdinal("pit_baslangictarih")),
                             BitisTarihi = reader.GetDateTime(reader.GetOrdinal("BitisTarihi")),
-                            IzinSaat = !reader.IsDBNull(reader.GetOrdinal("pit_saat"))
-                                ? Convert.ToSingle(reader.GetDouble(reader.GetOrdinal("pit_saat")))
-                                : 0.0f,
-                            Amac = !reader.IsDBNull(reader.GetOrdinal("pit_amac"))
-                                ? reader.GetString(reader.GetOrdinal("pit_amac"))
-                                : null,
-                            ReddetmeNedeni = !reader.IsDBNull(reader.GetOrdinal("ReddetmeNedeni"))
-                                ? reader.GetString(reader.GetOrdinal("ReddetmeNedeni"))
-                                : null
+                            IzinSaat = !reader.IsDBNull(reader.GetOrdinal("pit_saat")) ? Convert.ToSingle(reader.GetDouble(reader.GetOrdinal("pit_saat"))) : 0.0f,
+                            Amac = !reader.IsDBNull(reader.GetOrdinal("pit_amac")) ? reader.GetString(reader.GetOrdinal("pit_amac")) : null,
+                            ReddetmeNedeni = !reader.IsDBNull(reader.GetOrdinal("ReddetmeNedeni")) ? reader.GetString(reader.GetOrdinal("ReddetmeNedeni")) : null
                         };
-
-                        // Önemli: IzinSaat değerinin 0 olmaması için kontrol ekliyoruz
-                        System.Diagnostics.Debug.WriteLine($"İzin Talebi Detayları: Personel={izinTalep.PersonelAdSoyad}, " +
-                            $"Talep Tarihi={izinTalep.TalepTarihi:dd.MM.yyyy}, İzin Saati={izinTalep.IzinSaat}");
-
-                        return izinTalep;
                     }
-
-                    return null;
                 }
             }
+            return null;
         }
         [HttpPost]
         [AllowAnonymous]
@@ -2637,26 +2433,29 @@ INSERT INTO PERSONEL_IZINLERI (
                     // IzinliPersonel metodundan alınan sorguyu, izin_durum = 2 olacak şekilde ve pit_aciklama1 ekleyerek düzenliyoruz
                     using SqlCommand command = new SqlCommand(@"
 WITH PersonelHiyerarsi AS (
-    -- Direct administrative or reporting subordinates
+    -- İdari Amir, Teknik Amir ve Raporlama Yapacağı Personel ilişkileri
     SELECT 
         p1.per_kod as AltPersonelKod, 
         p2.per_kod as UstPersonelKod,
         1 as Seviye
     FROM PERSONELLER p1
     INNER JOIN PERSONELLER p2 ON 
-        (p1.per_IdariAmirKodu = p2.per_kod OR p1.per_raporlama_yapacagi_per_kod = p2.per_kod)
+        (p1.per_IdariAmirKodu = p2.per_kod 
+         OR p1.per_TeknikAmirKodu = p2.per_kod 
+         OR p1.per_raporlama_yapacagi_per_kod = p2.per_kod)
     WHERE p2.per_kod = @personelKodu
 
     UNION ALL
 
-    -- Recursive hierarchy lookup for deeper levels
     SELECT 
         p1.per_kod,
         p2.per_kod,
         ph.Seviye + 1
     FROM PERSONELLER p1
     INNER JOIN PERSONELLER p2 ON 
-        (p1.per_IdariAmirKodu = p2.per_kod OR p1.per_raporlama_yapacagi_per_kod = p2.per_kod)
+        (p1.per_IdariAmirKodu = p2.per_kod 
+         OR p1.per_TeknikAmirKodu = p2.per_kod 
+         OR p1.per_raporlama_yapacagi_per_kod = p2.per_kod)
     INNER JOIN PersonelHiyerarsi ph ON p2.per_kod = ph.AltPersonelKod
     WHERE ph.Seviye < 5
 )
@@ -2876,166 +2675,139 @@ ORDER BY t.pit_baslangictarih DESC", erpConnection);
             try
             {
                 string username = HttpContext.Session.GetString("Username");
-                string version = HttpContext.Session.GetString("SelectedVersion");
-
                 if (string.IsNullOrEmpty(username))
                 {
                     return RedirectToAction("Index", "Login");
                 }
 
-                string mikroDbConnectionString = version == "V16"
+                string mikroDbConnectionString = HttpContext.Session.GetString("SelectedVersion") == "V16"
                     ? _configuration.GetConnectionString("MikroDB_V16")
                     : _configuration.GetConnectionString("MikroDesktop");
 
                 int userNo;
-                string currentPersonelKodu;
-                using (SqlConnection mikroConnection = new SqlConnection(mikroDbConnectionString))
+                using (SqlConnection mikroConn = new SqlConnection(mikroDbConnectionString))
                 {
-                    await mikroConnection.OpenAsync();
-
-                    // Get user number
-                    using (SqlCommand userCommand = new SqlCommand("SELECT User_no FROM KULLANICILAR WHERE User_name = @username", mikroConnection))
+                    await mikroConn.OpenAsync();
+                    using (SqlCommand cmd = new SqlCommand("SELECT User_no FROM KULLANICILAR WHERE User_name = @username", mikroConn))
                     {
-                        userCommand.Parameters.AddWithValue("@username", username);
-                        var result = await userCommand.ExecuteScalarAsync();
-                        userNo = Convert.ToInt32(result);
+                        cmd.Parameters.AddWithValue("@username", username);
+                        userNo = Convert.ToInt32(await cmd.ExecuteScalarAsync());
                     }
                 }
 
-                List<LeaveEntitlementReportModel> hakedisRaporu = new List<LeaveEntitlementReportModel>();
+                string currentPersonelKodu;
                 string erpConnectionString = _dbSelectorService.GetConnectionString();
-
-                using (SqlConnection erpConnection = new SqlConnection(erpConnectionString))
+                using (SqlConnection erpConn = new SqlConnection(erpConnectionString))
                 {
-                    await erpConnection.OpenAsync();
-
-                    // Get current user's personnel code
-                    string currentPersonelQuery = "SELECT per_kod FROM PERSONELLER WHERE per_UserNo = @userNo AND per_cikis_tar = '1899-12-31 00:00:00.000'";
-                    using (SqlCommand personelCommand = new SqlCommand(currentPersonelQuery, erpConnection))
+                    await erpConn.OpenAsync();
+                    using (SqlCommand cmd = new SqlCommand("SELECT per_kod FROM PERSONELLER WHERE per_UserNo = @userNo AND per_cikis_tar = '1899-12-31 00:00:00.000'", erpConn))
                     {
-                        personelCommand.Parameters.AddWithValue("@userNo", userNo);
-                        var result = await personelCommand.ExecuteScalarAsync();
-                        currentPersonelKodu = result?.ToString();
+                        cmd.Parameters.AddWithValue("@userNo", userNo);
+                        currentPersonelKodu = (await cmd.ExecuteScalarAsync())?.ToString();
                     }
+                }
 
-                    if (string.IsNullOrEmpty(currentPersonelKodu))
-                    {
-                        return View(new List<LeaveEntitlementReportModel>());
-                    }
+                if (string.IsNullOrEmpty(currentPersonelKodu))
+                {
+                    return View(new List<LeaveEntitlementReportModel>());
+                }
 
-                    // Tamamen GetLeaveEntitlementInfo metoduyla aynı hesaplama mantığına sahip sorgu
-                    string query = @"
+                List<LeaveEntitlementReportModel> rapor = new List<LeaveEntitlementReportModel>();
+
+                string query = @"
 DECLARE @Yil INT = YEAR(GETDATE());
 
 WITH PersonelHiyerarsi AS (
-    -- Alt personelleri ve raporlama yapılan personelleri bul
-    SELECT DISTINCT 
+    SELECT DISTINCT
         p.per_kod as PersonelKod,
         p.per_adi as PersonelAdi,
         p.per_soyadi as PersonelSoyadi,
         p.per_giris_tar as IseGirisTarihi,
+        p.per_nuf_dogum_tarih as DogumTarihi,
         p.per_dept_kod as DepartmanKodu,
         p.per_kim_gorev as Gorev,
-        CASE
-            WHEN DATEFROMPARTS(@Yil, MONTH(p.per_giris_tar), DAY(p.per_giris_tar)) <= GETDATE() THEN 
-                DATEDIFF(YEAR, p.per_giris_tar, GETDATE())
-            ELSE 
-                DATEDIFF(YEAR, p.per_giris_tar, GETDATE()) - 1
+        CASE WHEN p.per_nuf_dogum_tarih IS NULL OR CAST(p.per_nuf_dogum_tarih AS DATE) = '1899-12-31' THEN 0
+             ELSE DATEDIFF(YEAR, p.per_nuf_dogum_tarih, GETDATE()) -
+                  CASE WHEN MONTH(p.per_nuf_dogum_tarih) > MONTH(GETDATE()) OR
+                       (MONTH(p.per_nuf_dogum_tarih) = MONTH(GETDATE()) AND DAY(p.per_nuf_dogum_tarih) > DAY(GETDATE()))
+                       THEN 1 ELSE 0 END
+        END AS Yas,
+        CASE WHEN DATEFROMPARTS(@Yil, MONTH(p.per_giris_tar), DAY(p.per_giris_tar)) <= GETDATE()
+             THEN DATEDIFF(YEAR, p.per_giris_tar, GETDATE())
+             ELSE DATEDIFF(YEAR, p.per_giris_tar, GETDATE()) - 1
         END AS CalismaSuresiYil,
-        CASE
-            WHEN DATEFROMPARTS(@Yil, MONTH(p.per_giris_tar), DAY(p.per_giris_tar)) <= GETDATE() THEN 1
-            ELSE 0
-        END AS YildonumuGectiMi
+        CASE WHEN DATEFROMPARTS(@Yil, MONTH(p.per_giris_tar), DAY(p.per_giris_tar)) <= GETDATE() THEN 1 ELSE 0 END AS YildonumuGectiMi
     FROM PERSONELLER p
-    WHERE 
-        p.per_IdariAmirKodu = @currentPersonelKodu OR 
-        p.per_raporlama_yapacagi_per_kod = @currentPersonelKodu
+    WHERE p.per_IdariAmirKodu = @currentPersonelKodu OR p.per_TeknikAmirKodu = @currentPersonelKodu OR p.per_raporlama_yapacagi_per_kod = @currentPersonelKodu
 ),
 DepartmanBilgileri AS (
-    SELECT 
-        ph.PersonelKod,
-        ph.PersonelAdi,
-        ph.PersonelSoyadi,
-        ph.IseGirisTarihi,
-        ph.CalismaSuresiYil,
-        ph.YildonumuGectiMi,
-        ph.Gorev,
+    SELECT
+        ph.PersonelKod, ph.PersonelAdi, ph.PersonelSoyadi, ph.IseGirisTarihi, ph.DogumTarihi,
+        ph.Yas, ph.CalismaSuresiYil, ph.YildonumuGectiMi, ph.Gorev,
         d.pdp_adi as DepartmanAdi
     FROM PersonelHiyerarsi ph
     LEFT JOIN DEPARTMANLAR d ON ph.DepartmanKodu = d.pdp_kodu
 ),
-IzinHaklari AS (
+GecenYilHaklari AS (
+    SELECT
+        PersonelKod, Yas, IseGirisTarihi,
+        CASE WHEN DATEFROMPARTS(@Yil - 1, MONTH(IseGirisTarihi), DAY(IseGirisTarihi)) <= DATEFROMPARTS(@Yil - 1, 12, 31)
+             THEN DATEDIFF(YEAR, IseGirisTarihi, DATEFROMPARTS(@Yil - 1, 12, 31))
+             ELSE DATEDIFF(YEAR, IseGirisTarihi, DATEFROMPARTS(@Yil - 1, 12, 31)) - 1
+        END AS GecenYilCalismaSuresi,
+        CASE WHEN DATEFROMPARTS(@Yil - 1, MONTH(IseGirisTarihi), DAY(IseGirisTarihi)) <= DATEFROMPARTS(@Yil - 1, 12, 31) THEN 1 ELSE 0 END AS GecenYilYildonumuGectiMi
+    FROM DepartmanBilgileri
+),
+GecenYilHakEdis AS (
     SELECT
         PersonelKod,
-        PersonelAdi,
-        PersonelSoyadi,
-        IseGirisTarihi,
-        CalismaSuresiYil,
-        YildonumuGectiMi,
-        Gorev,
-        DepartmanAdi,
-        CASE 
-            WHEN YildonumuGectiMi = 0 THEN 0 -- Yıldönümü geçmediyse yeni izin yok
-            WHEN CalismaSuresiYil >= 15 THEN 26
-            WHEN CalismaSuresiYil > 5 THEN 20
-            WHEN CalismaSuresiYil >= 1 THEN 14
-            ELSE 0
+        CASE WHEN GecenYilYildonumuGectiMi = 0 THEN 0
+             WHEN Yas >= 50 AND Yas > 0 AND GecenYilCalismaSuresi >= 1 THEN 20
+             WHEN GecenYilCalismaSuresi >= 15 THEN 26
+             WHEN GecenYilCalismaSuresi > 5 THEN 20
+             WHEN GecenYilCalismaSuresi >= 1 THEN 14
+             ELSE 0
+        END AS GecenYilHakEdilenIzin
+    FROM GecenYilHaklari
+),
+GecenYilKullanim AS (
+    SELECT
+        GyH.PersonelKod,
+        GyH.GecenYilHakEdilenIzin,
+        ISNULL((SELECT SUM(CASE WHEN pz_saat > 0 THEN CASE WHEN pz_saat <= 4 THEN 0.5 + pz_gun_sayisi ELSE 1.0 + pz_gun_sayisi END ELSE pz_gun_sayisi END)
+                FROM PERSONEL_IZINLERI WITH (NOLOCK) WHERE pz_pers_kod = GyH.PersonelKod AND pz_izin_yil = @Yil - 1 AND pz_izin_tipi = 0), 0) AS GecenYilKullanilanIzin,
+        ISNULL((SELECT SUM(pro_gecyil_devir_izin) FROM dbo.PERSONEL_TAHAKKUK_OZETLERI WITH (NOLOCK) WHERE pro_kodozet = GyH.PersonelKod AND pro_ozetyili = @Yil - 1), 0) AS Gecen2024Devir,
+        ISNULL((SELECT SUM(pro_gecyil_devir_saatlikizin) FROM dbo.PERSONEL_TAHAKKUK_OZETLERI WITH (NOLOCK) WHERE pro_kodozet = GyH.PersonelKod AND pro_ozetyili = @Yil - 1), 0) AS Gecen2024DevirSaat
+    FROM GecenYilHakEdis GyH
+),
+IzinHaklari AS (
+    SELECT
+        PersonelKod, PersonelAdi, PersonelSoyadi, IseGirisTarihi, DogumTarihi, Yas, CalismaSuresiYil, YildonumuGectiMi, Gorev, DepartmanAdi,
+        CASE WHEN YildonumuGectiMi = 0 THEN 0
+             WHEN Yas >= 50 AND Yas > 0 AND CalismaSuresiYil >= 1 THEN 20
+             WHEN CalismaSuresiYil >= 15 THEN 26
+             WHEN CalismaSuresiYil > 5 THEN 20
+             WHEN CalismaSuresiYil >= 1 THEN 14
+             ELSE 0
         END AS HakEdilenYillikIzin
     FROM DepartmanBilgileri
 ),
 GecenYilDevredilen AS (
     SELECT
-        IH.PersonelKod,
-        IH.PersonelAdi,
-        IH.PersonelSoyadi,
-        IH.IseGirisTarihi,
-        IH.CalismaSuresiYil,
-        IH.YildonumuGectiMi,
-        IH.Gorev,
-        IH.DepartmanAdi,
-        IH.HakEdilenYillikIzin,
-        ISNULL((SELECT SUM(pro_gecyil_devir_izin) 
-                FROM dbo.PERSONEL_TAHAKKUK_OZETLERI WITH (NOLOCK) 
-                WHERE pro_kodozet = IH.PersonelKod 
-                AND pro_ozetyili = @Yil), 0) AS GecenYilDevirIzinGun,
-        ISNULL((SELECT SUM(pro_gecyil_devir_saatlikizin) 
-                FROM dbo.PERSONEL_TAHAKKUK_OZETLERI WITH (NOLOCK) 
-                WHERE pro_kodozet = IH.PersonelKod 
-                AND pro_ozetyili = @Yil), 0) AS GecenYilDevirIzinSaat
+        IH.PersonelKod, IH.PersonelAdi, IH.PersonelSoyadi, IH.IseGirisTarihi, IH.DogumTarihi, IH.Yas,
+        IH.CalismaSuresiYil, IH.YildonumuGectiMi, IH.Gorev, IH.DepartmanAdi, IH.HakEdilenYillikIzin,
+        COALESCE((SELECT SUM(pro_gecyil_devir_izin) FROM dbo.PERSONEL_TAHAKKUK_OZETLERI WITH (NOLOCK) WHERE pro_kodozet = IH.PersonelKod AND pro_ozetyili = @Yil),
+                 (GyK.Gecen2024Devir + GyK.GecenYilHakEdilenIzin - GyK.GecenYilKullanilanIzin), 0) AS GecenYilDevirIzinGun,
+        COALESCE((SELECT SUM(pro_gecyil_devir_saatlikizin) FROM dbo.PERSONEL_TAHAKKUK_OZETLERI WITH (NOLOCK) WHERE pro_kodozet = IH.PersonelKod AND pro_ozetyili = @Yil),
+                 GyK.Gecen2024DevirSaat, 0) AS GecenYilDevirIzinSaat
     FROM IzinHaklari IH
+    LEFT JOIN GecenYilKullanim GyK ON GyK.PersonelKod = IH.PersonelKod
 ),
 KullanilanIzinler AS (
     SELECT
-        GYD.PersonelKod,
-        GYD.PersonelAdi,
-        GYD.PersonelSoyadi,
-        GYD.IseGirisTarihi,
-        GYD.CalismaSuresiYil,
-        GYD.YildonumuGectiMi,
-        GYD.Gorev,
-        GYD.DepartmanAdi,
-        GYD.HakEdilenYillikIzin,
-        GYD.GecenYilDevirIzinGun,
-        GYD.GecenYilDevirIzinSaat,
-        -- GetLeaveEntitlementInfo ile aynı hesaplama mantığı
-        ISNULL((
-            SELECT SUM(
-                CASE
-                    -- Saat kaydı varsa, saate göre hesapla (VE GÜN SAYISINA EKLE)
-                    WHEN pz_saat IS NOT NULL AND pz_saat > 0 THEN
-                        CASE 
-                            WHEN pz_saat <= 4 THEN 0.5 + pz_gun_sayisi  -- 4 saat ve altı: yarım gün + gün sayısı
-                            ELSE 1.0 + pz_gun_sayisi                   -- 4 saat üstü: tam gün + gün sayısı
-                        END
-                    -- Saat kaydı yoksa normal gün sayısını kullan
-                    ELSE pz_gun_sayisi
-                END
-            )
-            FROM PERSONEL_IZINLERI WITH (NOLOCK) 
-            WHERE pz_pers_kod = GYD.PersonelKod 
-            AND pz_izin_yil = @Yil
-AND pz_izin_tipi = 0  -- Only annual leave
-        ), 0) AS KullanilanIzinGun
+        GYD.*,
+        ISNULL((SELECT SUM(CASE WHEN pz_saat > 0 THEN CASE WHEN pz_saat <= 4 THEN 0.5 + pz_gun_sayisi ELSE 1.0 + pz_gun_sayisi END ELSE pz_gun_sayisi END)
+                FROM PERSONEL_IZINLERI WITH (NOLOCK) WHERE pz_pers_kod = GYD.PersonelKod AND pz_izin_yil = @Yil AND pz_izin_tipi = 0), 0) AS KullanilanIzinGun
     FROM GecenYilDevredilen GYD
 )
 SELECT
@@ -3043,6 +2815,8 @@ SELECT
     PersonelAdi,
     PersonelSoyadi,
     IseGirisTarihi,
+    DogumTarihi,
+    Yas,
     Gorev,
     DepartmanAdi as Departman,
     CalismaSuresiYil,
@@ -3051,29 +2825,24 @@ SELECT
     GecenYilDevirIzinGun as GecenYilDevirGun,
     GecenYilDevirIzinSaat as GecenYilDevirSaat,
     KullanilanIzinGun as KullanilanIzinGun,
-    -- GetLeaveEntitlementInfo ile birebir aynı hesaplama
-    CASE
-        -- Saat kaydı varsa, saate göre hesapla
-        WHEN GecenYilDevirIzinSaat IS NOT NULL AND GecenYilDevirIzinSaat > 0 THEN
-            CASE 
-                WHEN GecenYilDevirIzinSaat <= 4 THEN 0.5 + (GecenYilDevirIzinGun + HakEdilenYillikIzin - KullanilanIzinGun)  -- 4 saat ve altı: yarım gün
-                ELSE 1.0 + (GecenYilDevirIzinGun + HakEdilenYillikIzin - KullanilanIzinGun)                   -- 4 saat üstü: tam gün
-            END
-        -- Saat kaydı yoksa normal gün sayısını kullan
-        ELSE (GecenYilDevirIzinGun + HakEdilenYillikIzin - KullanilanIzinGun)
+    CASE WHEN GecenYilDevirIzinSaat > 0
+         THEN CASE WHEN GecenYilDevirIzinSaat <= 4 THEN 0.5 ELSE 1.0 END + (GecenYilDevirIzinGun + HakEdilenYillikIzin - KullanilanIzinGun)
+         ELSE (GecenYilDevirIzinGun + HakEdilenYillikIzin - KullanilanIzinGun)
     END as KalanIzinBakiyesi
 FROM KullanilanIzinler
 ORDER BY CalismaSuresiYil DESC, PersonelAdi";
 
-                    using (SqlCommand command = new SqlCommand(query, erpConnection))
+                using (SqlConnection conn = new SqlConnection(erpConnectionString))
+                {
+                    await conn.OpenAsync();
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        command.Parameters.AddWithValue("@currentPersonelKodu", currentPersonelKodu);
-
-                        using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                        cmd.Parameters.AddWithValue("@currentPersonelKodu", currentPersonelKodu);
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                         {
                             while (await reader.ReadAsync())
                             {
-                                hakedisRaporu.Add(new LeaveEntitlementReportModel
+                                rapor.Add(new LeaveEntitlementReportModel
                                 {
                                     PersonelKodu = reader["PersonelKodu"].ToString(),
                                     PersonelAdi = reader["PersonelAdi"].ToString(),
@@ -3085,20 +2854,19 @@ ORDER BY CalismaSuresiYil DESC, PersonelAdi";
                                     GecenYilDevirSaat = Convert.ToDecimal(reader["GecenYilDevirSaat"]),
                                     KullanilanIzinGun = Convert.ToDecimal(reader["KullanilanIzinGun"]),
                                     KalanIzinBakiyesi = Convert.ToDecimal(reader["KalanIzinBakiyesi"]),
-                                    Gorev = reader["Gorev"].ToString(),
-                                    Departman = reader["Departman"].ToString()
+                                    Gorev = reader["Gorev"]?.ToString() ?? "",
+                                    Departman = reader["Departman"]?.ToString() ?? ""
                                 });
                             }
                         }
                     }
                 }
 
-                return View(hakedisRaporu);
+                return View(rapor);
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"HATA: {ex.Message}");
-                System.Diagnostics.Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
+                System.Diagnostics.Debug.WriteLine($"HAKEDİŞ RAPORU HATA: {ex.Message}");
                 return View(new List<LeaveEntitlementReportModel>());
             }
         }
@@ -3109,164 +2877,133 @@ ORDER BY CalismaSuresiYil DESC, PersonelAdi";
             try
             {
                 if (string.IsNullOrEmpty(personnelCode))
-                {
                     return Json(new { success = false, message = "Personel kodu boş olamaz" });
-                }
 
                 string erpConnectionString = _dbSelectorService.GetConnectionString();
-                using (SqlConnection erpConnection = new SqlConnection(erpConnectionString))
-                {
-                    await erpConnection.OpenAsync();
 
-                    // Comprehensive leave entitlement calculation query
-                    string query = @"
-           DECLARE @Yil INT = @year;
+                string query = @"
+DECLARE @Yil INT = @year;
 
-WITH PersonelBilgileri AS (
-    SELECT 
-        per_kod,
-        per_adi,
-        per_soyadi,
-        per_giris_tar,
-        CASE
-            WHEN DATEFROMPARTS(@Yil, MONTH(per_giris_tar), DAY(per_giris_tar)) <= GETDATE() THEN 
-                DATEDIFF(YEAR, per_giris_tar, GETDATE())
-            ELSE 
-                DATEDIFF(YEAR, per_giris_tar, GETDATE()) - 1
-        END AS CalismaSuresiYil,
-        CASE
-            WHEN DATEFROMPARTS(@Yil, MONTH(per_giris_tar), DAY(per_giris_tar)) <= GETDATE() THEN 1
-            ELSE 0
-        END AS YildonumuGectiMi
-    FROM PERSONELLER WITH (NOLOCK)
-    WHERE per_kod = @personnelCode
+WITH Base AS (
+    SELECT
+        p.per_giris_tar,
+        p.per_nuf_dogum_tarih,
+        CASE WHEN p.per_nuf_dogum_tarih IS NULL OR CAST(p.per_nuf_dogum_tarih AS DATE) = '1899-12-31' THEN 0
+             ELSE DATEDIFF(YEAR, p.per_nuf_dogum_tarih, GETDATE()) -
+                  CASE WHEN MONTH(p.per_nuf_dogum_tarih) > MONTH(GETDATE()) OR
+                       (MONTH(p.per_nuf_dogum_tarih) = MONTH(GETDATE()) AND DAY(p.per_nuf_dogum_tarih) > DAY(GETDATE()))
+                       THEN 1 ELSE 0 END
+        END AS Yas,
+        CASE WHEN DATEFROMPARTS(@Yil, MONTH(p.per_giris_tar), DAY(p.per_giris_tar)) <= GETDATE()
+             THEN DATEDIFF(YEAR, p.per_giris_tar, GETDATE())
+             ELSE DATEDIFF(YEAR, p.per_giris_tar, GETDATE()) - 1
+        END AS CalismaYili,
+        CASE WHEN DATEFROMPARTS(@Yil, MONTH(p.per_giris_tar), DAY(p.per_giris_tar)) <= GETDATE() THEN 1 ELSE 0 END AS YildonumuGectiMi
+    FROM PERSONELLER p
+    WHERE p.per_kod = @personnelCode
+),
+GecenYilHaklari AS (
+    SELECT
+        CASE WHEN DATEFROMPARTS(@Yil - 1, MONTH(per_giris_tar), DAY(per_giris_tar)) <= DATEFROMPARTS(@Yil - 1, 12, 31)
+             THEN DATEDIFF(YEAR, per_giris_tar, DATEFROMPARTS(@Yil - 1, 12, 31))
+             ELSE DATEDIFF(YEAR, per_giris_tar, DATEFROMPARTS(@Yil - 1, 12, 31)) - 1
+        END AS GecenYilCalismaSuresi,
+        CASE WHEN DATEFROMPARTS(@Yil - 1, MONTH(per_giris_tar), DAY(per_giris_tar)) <= DATEFROMPARTS(@Yil - 1, 12, 31) THEN 1 ELSE 0 END AS GecenYilYildonumuGectiMi,
+        Yas
+    FROM Base
+),
+GecenYilHakEdis AS (
+    SELECT
+        CASE WHEN GecenYilYildonumuGectiMi = 0 THEN 0
+             WHEN Yas >= 50 AND Yas > 0 AND GecenYilCalismaSuresi >= 1 THEN 20
+             WHEN GecenYilCalismaSuresi >= 15 THEN 26
+             WHEN GecenYilCalismaSuresi > 5 THEN 20
+             WHEN GecenYilCalismaSuresi >= 1 THEN 14
+             ELSE 0
+        END AS GecenYilHakEdilenIzin
+    FROM GecenYilHaklari
+),
+GecenYilKullanim AS (
+    SELECT
+        GecenYilHakEdilenIzin,
+        ISNULL((SELECT SUM(CASE WHEN pz_saat > 0 THEN CASE WHEN pz_saat <= 4 THEN 0.5 + pz_gun_sayisi ELSE 1.0 + pz_gun_sayisi END ELSE pz_gun_sayisi END)
+                FROM PERSONEL_IZINLERI WHERE pz_pers_kod = @personnelCode AND pz_izin_yil = @Yil - 1 AND pz_izin_tipi = 0), 0) AS GecenYilKullanilanIzin,
+        ISNULL((SELECT SUM(pro_gecyil_devir_izin) FROM PERSONEL_TAHAKKUK_OZETLERI WHERE pro_kodozet = @personnelCode AND pro_ozetyili = @Yil - 1), 0) AS Gecen2024Devir,
+        ISNULL((SELECT SUM(pro_gecyil_devir_saatlikizin) FROM PERSONEL_TAHAKKUK_OZETLERI WHERE pro_kodozet = @personnelCode AND pro_ozetyili = @Yil - 1), 0) AS Gecen2024DevirSaat
+    FROM GecenYilHakEdis
 ),
 IzinHaklari AS (
     SELECT
-        per_kod,
-        per_adi,
-        per_soyadi,
-        per_giris_tar,
-        CalismaSuresiYil,
-        YildonumuGectiMi,
-        CASE 
-            WHEN YildonumuGectiMi = 0 THEN 0 -- Yıldönümü geçmediyse yeni izin yok
-            WHEN CalismaSuresiYil >= 15 THEN 26
-            WHEN CalismaSuresiYil > 5 THEN 20
-            WHEN CalismaSuresiYil >= 1 THEN 14
-            ELSE 0
+        CASE WHEN YildonumuGectiMi = 0 THEN 0
+             WHEN Yas >= 50 AND Yas > 0 AND CalismaYili >= 1 THEN 20
+             WHEN CalismaYili >= 15 THEN 26
+             WHEN CalismaYili > 5 THEN 20
+             WHEN CalismaYili >= 1 THEN 14
+             ELSE 0
         END AS HakEdilenYillikIzin
-    FROM PersonelBilgileri
+    FROM Base
 ),
 GecenYilDevredilen AS (
     SELECT
-        IH.per_kod,
-        IH.per_adi,
-        IH.per_soyadi,
-        IH.CalismaSuresiYil,
-        IH.YildonumuGectiMi,
-        IH.HakEdilenYillikIzin,
-        ISNULL((SELECT SUM(pro_gecyil_devir_izin) 
-                FROM dbo.PERSONEL_TAHAKKUK_OZETLERI WITH (NOLOCK) 
-                WHERE pro_kodozet = IH.per_kod 
-                AND pro_ozetyili = @Yil), 0) AS GecenYilDevirIzinGun,
-        ISNULL((SELECT SUM(pro_gecyil_devir_saatlikizin) 
-                FROM dbo.PERSONEL_TAHAKKUK_OZETLERI WITH (NOLOCK) 
-                WHERE pro_kodozet = IH.per_kod 
-                AND pro_ozetyili = @Yil), 0) AS GecenYilDevirIzinSaat
-    FROM IzinHaklari IH
+        ih.HakEdilenYillikIzin,
+        COALESCE((SELECT SUM(pro_gecyil_devir_izin) FROM PERSONEL_TAHAKKUK_OZETLERI WHERE pro_kodozet = @personnelCode AND pro_ozetyili = @Yil),
+                 (gy.Gecen2024Devir + gy.GecenYilHakEdilenIzin - gy.GecenYilKullanilanIzin), 0) AS GecenYilDevirIzinGun,
+        COALESCE((SELECT SUM(pro_gecyil_devir_saatlikizin) FROM PERSONEL_TAHAKKUK_OZETLERI WHERE pro_kodozet = @personnelCode AND pro_ozetyili = @Yil),
+                 gy.Gecen2024DevirSaat, 0) AS GecenYilDevirIzinSaat
+    FROM IzinHaklari ih
+    CROSS JOIN GecenYilKullanim gy
 ),
 KullanilanIzinler AS (
     SELECT
-        GYD.per_kod,
-        GYD.per_adi,
-        GYD.per_soyadi,
-        GYD.CalismaSuresiYil,
-        GYD.YildonumuGectiMi,
-        GYD.HakEdilenYillikIzin,
-        GYD.GecenYilDevirIzinGun,
-        GYD.GecenYilDevirIzinSaat,
-        -- Kullanılan izin günleri (izin saatine göre ayarlanmış)
-        ISNULL((
-            SELECT SUM(
-                CASE
-                    -- Saat kaydı varsa, saate göre hesapla
-                    WHEN pz_saat IS NOT NULL AND pz_saat > 0 THEN
-                        CASE 
-                            WHEN pz_saat <= 4 THEN 0.5 + pz_gun_sayisi  -- 4 saat ve altı: yarım gün
-                            ELSE 1.0 + pz_gun_sayisi                    -- 4 saat üstü: tam gün
-                        END
-                    -- Saat kaydı yoksa normal gün sayısını kullan
-                    ELSE pz_gun_sayisi
-                END
-            )
-            FROM PERSONEL_IZINLERI WITH (NOLOCK) 
-            WHERE pz_pers_kod = GYD.per_kod 
-            AND pz_izin_yil = @Yil
-AND pz_izin_tipi = 0  -- Only annual leave
-
-        ), 0) AS KullanilanIzinGun
+        GYD.*,
+        ISNULL((SELECT SUM(CASE WHEN pz_saat > 0 THEN CASE WHEN pz_saat <= 4 THEN 0.5 + pz_gun_sayisi ELSE 1.0 + pz_gun_sayisi END ELSE pz_gun_sayisi END)
+                FROM PERSONEL_IZINLERI WHERE pz_pers_kod = @personnelCode AND pz_izin_yil = @Yil AND pz_izin_tipi = 0), 0) AS KullanilanIzinGun
     FROM GecenYilDevredilen GYD
 )
 SELECT
-    CalismaSuresiYil AS CalismaSuresi,
-    YildonumuGectiMi AS YildonumuGectiMi,
-    HakEdilenYillikIzin AS YillikIzinHakki,
-    GecenYilDevirIzinGun AS GecenYilDevirGun,
-    GecenYilDevirIzinSaat AS GecenYilDevirSaat,
-    KullanilanIzinGun AS KullanilanIzinGun,
-    -- Kalan izin bakiyesi hesaplama
-    CASE
-        -- Saat kaydı varsa, saate göre hesapla
-        WHEN GecenYilDevirIzinSaat IS NOT NULL AND GecenYilDevirIzinSaat > 0 THEN
-            CASE 
-                WHEN GecenYilDevirIzinSaat <= 4 THEN 0.5 + (GecenYilDevirIzinGun + HakEdilenYillikIzin - KullanilanIzinGun)  -- 4 saat ve altı: yarım gün
-                ELSE 1.0 + (GecenYilDevirIzinGun + HakEdilenYillikIzin - KullanilanIzinGun)                   -- 4 saat üstü: tam gün
-            END
-        -- Saat kaydı yoksa normal gün sayısını kullan
-        ELSE (GecenYilDevirIzinGun + HakEdilenYillikIzin - KullanilanIzinGun)
-    END AS KalanIzinBakiyesi
+    ISNULL(HakEdilenYillikIzin, 0) AS YillikIzinHakki,
+    CAST(ISNULL(GecenYilDevirIzinGun, 0) AS DECIMAL(10,2)) AS GecenYilDevirGun,
+    CAST(ISNULL(GecenYilDevirIzinSaat, 0) AS DECIMAL(10,2)) AS GecenYilDevirSaat,
+    CAST(ISNULL(KullanilanIzinGun, 0) AS DECIMAL(10,2)) AS KullanilanIzinGun,
+    CAST(CASE WHEN ISNULL(GecenYilDevirIzinSaat, 0) > 0
+         THEN CASE WHEN ISNULL(GecenYilDevirIzinSaat, 0) <= 4 THEN 0.5 ELSE 1.0 END + 
+              (ISNULL(GecenYilDevirIzinGun, 0) + ISNULL(HakEdilenYillikIzin, 0) - ISNULL(KullanilanIzinGun, 0))
+         ELSE (ISNULL(GecenYilDevirIzinGun, 0) + ISNULL(HakEdilenYillikIzin, 0) - ISNULL(KullanilanIzinGun, 0))
+    END AS DECIMAL(10,2)) AS KalanIzinBakiyesi
 FROM KullanilanIzinler";
 
-                    using (SqlCommand command = new SqlCommand(query, erpConnection))
+                using (SqlConnection conn = new SqlConnection(erpConnectionString))
+                {
+                    await conn.OpenAsync();
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        command.Parameters.AddWithValue("@personnelCode", personnelCode);
-                        command.Parameters.AddWithValue("@year", year);
+                        cmd.Parameters.AddWithValue("@personnelCode", personnelCode);
+                        cmd.Parameters.AddWithValue("@year", year);
 
-                        using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                         {
                             if (await reader.ReadAsync())
                             {
-                                double kullanilanIzinGun = Convert.ToDouble(reader["KullanilanIzinGun"]);
-                                double gecenYilDevirGun = Convert.ToDouble(reader["GecenYilDevirGun"]);
-                                double gecenYilDevirSaat = Convert.ToDouble(reader["GecenYilDevirSaat"]);
-                                int yillikIzinHakki = Convert.ToInt32(reader["YillikIzinHakki"]);
-                                double kalanIzinBakiyesi = Convert.ToDouble(reader["KalanIzinBakiyesi"]);
+                                // DEĞİŞİKLİK: GetDecimal() kullan
+                                int yillikHak = reader.GetInt32(reader.GetOrdinal("YillikIzinHakki"));
+                                decimal devirGun = reader.GetDecimal(reader.GetOrdinal("GecenYilDevirGun"));
+                                decimal devirSaat = reader.GetDecimal(reader.GetOrdinal("GecenYilDevirSaat"));
+                                decimal kullanilan = reader.GetDecimal(reader.GetOrdinal("KullanilanIzinGun"));
+                                decimal kalan = reader.GetDecimal(reader.GetOrdinal("KalanIzinBakiyesi"));
 
-                                // Detaylı izin bilgilerini JSON ile dön
                                 return Json(new
                                 {
                                     success = true,
-                                    seniorityYears = Convert.ToInt32(reader["CalismaSuresi"]),
-                                    previousYearDays = gecenYilDevirGun,
-                                    previousYearHours = gecenYilDevirSaat,
-                                    yearlyEntitlement = yillikIzinHakki,
-                                    usedDays = kullanilanIzinGun,
-                                    remainingDays = kalanIzinBakiyesi,
-                                    detailedBreakdown = new
-                                    {
-                                        carriedOverDays = gecenYilDevirGun,
-                                        carriedOverHours = gecenYilDevirSaat,
-                                        currentYearEntitlement = yillikIzinHakki,
-                                        totalAvailableDays = gecenYilDevirGun + yillikIzinHakki,
-                                        totalUsedDays = kullanilanIzinGun,
-                                        totalRemainingDays = kalanIzinBakiyesi
-                                    }
+                                    yearlyEntitlement = yillikHak,
+                                    previousYearDays = devirGun,
+                                    previousYearHours = devirSaat,
+                                    usedDays = kullanilan,
+                                    remainingDays = kalan
                                 });
                             }
                             else
                             {
-                                return Json(new { success = false, message = "Personel bilgisi bulunamadı" });
+                                return Json(new { success = false, message = "Bu personel kodu için kayıt bulunamadı." });
                             }
                         }
                     }
@@ -3274,17 +3011,10 @@ FROM KullanilanIzinler";
             }
             catch (Exception ex)
             {
-
-                return Json(new
-                {
-                    success = false,
-                    message = "İzin bilgileri alınırken bir hata oluştu",
-                    errorDetails = ex.Message
-                });
+                System.Diagnostics.Debug.WriteLine($"GetLeaveEntitlementInfo Hata: {ex.Message}\n{ex.StackTrace}");
+                return Json(new { success = false, message = "İzin bilgileri alınırken bir hata oluştu: " + ex.Message });
             }
         }
-
-        /// <summary>
         /// İşe giriş tarihine göre yıllık izin hakkını hesaplar
         /// (1-5 yıl arası 14 gün, 5+ yıl 21 gün)
         /// </summary>

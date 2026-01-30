@@ -36,6 +36,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWt0YXJpbVxQYXJhbWV0cmVBeWFybGEuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Api/ApiAyarlari.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXBpXEFwaUF5YXJsYXJpLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Bahcepinar/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmFoY2VwaW5hclxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -186,6 +190,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/DENEME.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXERFTkVNRS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/EksikPaletPartiler.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmF0dXJhXEVrc2lrUGFsZXRQYXJ0aWxlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Fatura/EnCokSatilan.cshtml]
@@ -390,6 +398,26 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/Profil/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZmlsXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/SarfCikis/Onay.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2FyZkNpa2lzXE9uYXkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/SarfCikis/Talep.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2FyZkNpa2lzXFRhbGVwLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/SarfCikis/TalepListesi.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2FyZkNpa2lzXFRhbGVwTGlzdGVzaS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/SarfCikis/Tamamla.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2FyZkNpa2lzXFRhbWFtbGEuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/SarfIslemleri/SarfCikisTanimla.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2FyZklzbGVtbGVyaVxTYXJmQ2lraXNUYW5pbWxhLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Lenovo/source/repos/dbtcomtr/DbtErpAsp/Deneme_proje/Views/ServisHareketleri/AllIsEmri.cshtml]

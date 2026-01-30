@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "OYxDdxYcUjjr9pZuag+mio66eO6CJMySQINNo514+sc=",
+  "Hash": "nFES5gIRVsJjPthSSlJPJTai2J++9pzVTjb6HhghunI=",
   "Source": "Deneme_proje",
   "BasePath": "_content/Deneme_proje",
   "Mode": "Default",
@@ -78,6 +78,27 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\1.pdf"
+    },
+    {
+      "Identity": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\2dlogosiyah.png",
+      "SourceId": "Deneme_proje",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\",
+      "BasePath": "_content/Deneme_proje",
+      "RelativePath": "2dlogosiyah#[.{fingerprint}]?.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "3o81nsz8zj",
+      "Integrity": "I3l4xCy3ef459lwF8TINTz5cN5nplTXuUP53mITputo=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\2dlogosiyah.png"
     },
     {
       "Identity": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\BahceLogo.png",
@@ -12925,8 +12946,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "hebq6kd91n",
-      "Integrity": "x53NRMI/IMy5OdrOEYbLpT++Qmxn+XSes2m7vcZ/QQA=",
+      "Fingerprint": "e0z1goekgi",
+      "Integrity": "frcCV1k9oG9oKj3dpUqdJg1PxRT2RSN/XKdLCPjaYaY=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\Content\\assets1\\js\\pages\\dashboard.init.js"
@@ -30929,6 +30950,69 @@
       "OriginalItemSpec": "wwwroot\\Content\\DataTables\\turkish.json"
     },
     {
+      "Identity": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\Diokilogoyeni.png",
+      "SourceId": "Deneme_proje",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\",
+      "BasePath": "_content/Deneme_proje",
+      "RelativePath": "Diokilogoyeni#[.{fingerprint}]?.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "ygvk9p76fe",
+      "Integrity": "Unl1WMyLzIJ6PXei54qCygs1EkVMfAXnLTpWAxMusOQ=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Diokilogoyeni.png"
+    },
+    {
+      "Identity": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\FSSC.jpeg",
+      "SourceId": "Deneme_proje",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\",
+      "BasePath": "_content/Deneme_proje",
+      "RelativePath": "FSSC#[.{fingerprint}]?.jpeg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "2vxjvmb5c5",
+      "Integrity": "Lrk/OdxyUTZMrQfP7z6x5d2+rEh9AeY2bxKzuq+Hv9A=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\FSSC.jpeg"
+    },
+    {
+      "Identity": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\ISO.jpeg",
+      "SourceId": "Deneme_proje",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\",
+      "BasePath": "_content/Deneme_proje",
+      "RelativePath": "ISO#[.{fingerprint}]?.jpeg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "39f6mugs7x",
+      "Integrity": "SV+9MiVWbNr5DR9g8Hvouhudvr6R54ephCF9kpdYj7I=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\ISO.jpeg"
+    },
+    {
       "Identity": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css",
       "SourceId": "Deneme_proje",
       "SourceType": "Discovered",
@@ -32269,6 +32353,88 @@
         {
           "Name": "integrity",
           "Value": "sha256-05KlA0ESnXdL+OL5ZH2OQPwCXprPiJgWlMgO9V0yQxI="
+        }
+      ]
+    },
+    {
+      "Route": "2dlogosiyah.3o81nsz8zj.png",
+      "AssetFile": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\2dlogosiyah.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "150595"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"I3l4xCy3ef459lwF8TINTz5cN5nplTXuUP53mITputo=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 19 Nov 2025 08:14:33 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "3o81nsz8zj"
+        },
+        {
+          "Name": "label",
+          "Value": "2dlogosiyah.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-I3l4xCy3ef459lwF8TINTz5cN5nplTXuUP53mITputo="
+        }
+      ]
+    },
+    {
+      "Route": "2dlogosiyah.png",
+      "AssetFile": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\2dlogosiyah.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "150595"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"I3l4xCy3ef459lwF8TINTz5cN5nplTXuUP53mITputo=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 19 Nov 2025 08:14:33 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-I3l4xCy3ef459lwF8TINTz5cN5nplTXuUP53mITputo="
         }
       ]
     },
@@ -82375,7 +82541,7 @@
       ]
     },
     {
-      "Route": "Content/assets1/js/pages/dashboard.init.hebq6kd91n.js",
+      "Route": "Content/assets1/js/pages/dashboard.init.e0z1goekgi.js",
       "AssetFile": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\Content\\assets1\\js\\pages\\dashboard.init.js",
       "Selectors": [],
       "ResponseHeaders": [
@@ -82385,7 +82551,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "3808"
+          "Value": "2"
         },
         {
           "Name": "Content-Type",
@@ -82393,11 +82559,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"x53NRMI/IMy5OdrOEYbLpT++Qmxn+XSes2m7vcZ/QQA=\""
+          "Value": "\"frcCV1k9oG9oKj3dpUqdJg1PxRT2RSN/XKdLCPjaYaY=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 04 Nov 2024 14:30:09 GMT"
+          "Value": "Tue, 18 Nov 2025 13:27:34 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -82407,7 +82573,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "hebq6kd91n"
+          "Value": "e0z1goekgi"
         },
         {
           "Name": "label",
@@ -82415,7 +82581,7 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-x53NRMI/IMy5OdrOEYbLpT++Qmxn+XSes2m7vcZ/QQA="
+          "Value": "sha256-frcCV1k9oG9oKj3dpUqdJg1PxRT2RSN/XKdLCPjaYaY="
         }
       ]
     },
@@ -82430,7 +82596,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "3808"
+          "Value": "2"
         },
         {
           "Name": "Content-Type",
@@ -82438,11 +82604,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"x53NRMI/IMy5OdrOEYbLpT++Qmxn+XSes2m7vcZ/QQA=\""
+          "Value": "\"frcCV1k9oG9oKj3dpUqdJg1PxRT2RSN/XKdLCPjaYaY=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 04 Nov 2024 14:30:09 GMT"
+          "Value": "Tue, 18 Nov 2025 13:27:34 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -82452,7 +82618,7 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-x53NRMI/IMy5OdrOEYbLpT++Qmxn+XSes2m7vcZ/QQA="
+          "Value": "sha256-frcCV1k9oG9oKj3dpUqdJg1PxRT2RSN/XKdLCPjaYaY="
         }
       ]
     },
@@ -152891,6 +153057,252 @@
         {
           "Name": "integrity",
           "Value": "sha256-QgQ9QuUxEdcp37ElF57Y2IUA7kxgpnUYehUeVQm1ido="
+        }
+      ]
+    },
+    {
+      "Route": "Diokilogoyeni.png",
+      "AssetFile": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\Diokilogoyeni.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "13241"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"Unl1WMyLzIJ6PXei54qCygs1EkVMfAXnLTpWAxMusOQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 09 Dec 2025 07:47:40 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-Unl1WMyLzIJ6PXei54qCygs1EkVMfAXnLTpWAxMusOQ="
+        }
+      ]
+    },
+    {
+      "Route": "Diokilogoyeni.ygvk9p76fe.png",
+      "AssetFile": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\Diokilogoyeni.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "13241"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"Unl1WMyLzIJ6PXei54qCygs1EkVMfAXnLTpWAxMusOQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 09 Dec 2025 07:47:40 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "ygvk9p76fe"
+        },
+        {
+          "Name": "label",
+          "Value": "Diokilogoyeni.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-Unl1WMyLzIJ6PXei54qCygs1EkVMfAXnLTpWAxMusOQ="
+        }
+      ]
+    },
+    {
+      "Route": "FSSC.2vxjvmb5c5.jpeg",
+      "AssetFile": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\FSSC.jpeg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "3768"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"Lrk/OdxyUTZMrQfP7z6x5d2+rEh9AeY2bxKzuq+Hv9A=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 19 Nov 2025 08:22:01 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "2vxjvmb5c5"
+        },
+        {
+          "Name": "label",
+          "Value": "FSSC.jpeg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-Lrk/OdxyUTZMrQfP7z6x5d2+rEh9AeY2bxKzuq+Hv9A="
+        }
+      ]
+    },
+    {
+      "Route": "FSSC.jpeg",
+      "AssetFile": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\FSSC.jpeg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "3768"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"Lrk/OdxyUTZMrQfP7z6x5d2+rEh9AeY2bxKzuq+Hv9A=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 19 Nov 2025 08:22:01 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-Lrk/OdxyUTZMrQfP7z6x5d2+rEh9AeY2bxKzuq+Hv9A="
+        }
+      ]
+    },
+    {
+      "Route": "ISO.39f6mugs7x.jpeg",
+      "AssetFile": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\ISO.jpeg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "5042"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"SV+9MiVWbNr5DR9g8Hvouhudvr6R54ephCF9kpdYj7I=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 19 Nov 2025 08:21:52 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "39f6mugs7x"
+        },
+        {
+          "Name": "label",
+          "Value": "ISO.jpeg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-SV+9MiVWbNr5DR9g8Hvouhudvr6R54ephCF9kpdYj7I="
+        }
+      ]
+    },
+    {
+      "Route": "ISO.jpeg",
+      "AssetFile": "C:\\Users\\Lenovo\\source\\repos\\dbtcomtr\\DbtErpAsp\\Deneme_proje\\wwwroot\\ISO.jpeg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "5042"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"SV+9MiVWbNr5DR9g8Hvouhudvr6R54ephCF9kpdYj7I=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 19 Nov 2025 08:21:52 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-SV+9MiVWbNr5DR9g8Hvouhudvr6R54ephCF9kpdYj7I="
         }
       ]
     },

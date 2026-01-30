@@ -1,0 +1,627 @@
+﻿@model dynamic
+@{
+    ViewData["Title"] = "Sarf Çıkış Talep Tamamlama (Departman Bazlı)";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/content/assets/css/bahcepinar.css" rel="stylesheet" />
+
+<div class="main-content mt-5">
+    <div class="px-lg-5 px-3">
+        <div class="row">
+            <div class="col-sm-12 p-0">
+                <div class="main-header">
+                    <ol class="breadcrumb breadcrumb-title breadcrumb-arrow">
+                        <li class="breadcrumb-item">
+                            <a href="/Home/Index">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">Sarf İşlemleri</li>
+                        <li class="breadcrumb-item active">Talep Tamamlama</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evrak Bilgileri Card -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">
+                            <i class="icofont icofont-file-document"></i> Evrak Bilgileri
+                        </h5>
+                    </div>
+
+                    <div class="card-body" style="padding: 20px;">
+                        <div class="row">
+                            <!-- Sol Taraf - Evrak Bilgileri -->
+                            <div class="col-lg-6 col-md-12">
+                                <div class="evrak-bilgileri-section">
+                                    <h6 class="section-title">
+                                        <i class="icofont icofont-info-circle"></i> Evrak Detayları
+                                    </h6>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Seri No</label>
+                                            <input type="text" class="form-control" id="seriNo" readonly />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Sıra No</label>
+                                            <input type="text" class="form-control" id="siraNo" value="0" readonly />
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label class="form-label">Belge No</label>
+                                            <input type="text" class="form-control" id="belgeNo" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label class="form-label">Tarih</label>
+                                            <input type="date" class="form-control" id="tarih" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Masraf Merkezi</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="masrafMerkezi" />
+                                                <button class="btn btn-outline-secondary" type="button">
+                                                    <i class="icofont icofont-search"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Alt Masraf Merkezi</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="altMasrafMerkezi" />
+                                                <button class="btn btn-outline-secondary" type="button">
+                                                    <i class="icofont icofont-search"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label class="form-label">
+                                                <i class="icofont icofont-ui-note"></i> Birim
+                                            </label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="birim" />
+                                                <button class="btn btn-success" type="button">
+                                                    <i class="icofont icofont-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sağ Taraf - Stok Bilgileri -->
+                            <div class="col-lg-6 col-md-12">
+                                <div class="stok-bilgileri-section">
+                                    <h6 class="section-title">
+                                        <i class="icofont icofont-package"></i> Stok Bilgileri
+                                    </h6>
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label class="form-label">Stok Adı</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="stokAdi" />
+                                                <button class="btn btn-outline-secondary" type="button">
+                                                    <i class="icofont icofont-barcode"></i>
+                                                </button>
+                                                <button class="btn btn-outline-secondary" type="button">
+                                                    <i class="icofont icofont-search"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Miktar</label>
+                                            <input type="number" class="form-control" id="miktar" value="0" step="0.01" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Eldeki Miktar</label>
+                                            <input type="number" class="form-control" id="eldekiMiktar" value="0" readonly />
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label class="form-label">Birim</label>
+                                            <select class="form-control" id="birimSelect">
+                                                <option value="">Birim Seçiniz</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label class="form-label">Birim Fiyat</label>
+                                            <input type="number" class="form-control" id="birimFiyat" value="0" step="0.01" readonly />
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <button type="button" class="btn btn-warning btn-block" style="width: 100%;">
+                                                <i class="icofont icofont-refresh"></i> TEMİZLE
+                                            </button>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <button type="button" class="btn btn-primary btn-block" style="width: 100%;">
+                                                <i class="icofont icofont-plus"></i> EKLE
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Depo Bilgileri -->
+                        <div class="row mt-3">
+                            <div class="col-lg-6 col-md-12">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Çıkış Depo</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="cikisDepo" />
+                                            <button class="btn btn-outline-secondary" type="button">
+                                                <i class="icofont icofont-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Teslim Alan</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="teslimAlan" />
+                                            <button class="btn btn-outline-secondary" type="button">
+                                                <i class="icofont icofont-close text-danger"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="card-footer" style="background-color: #f8f9fa; padding: 15px 20px;">
+                        <div class="row">
+                            <div class="col-md-12 text-right">
+                                <button type="button" class="btn btn-success btn-action">
+                                    <i class="icofont icofont-arrow-right"></i> GETİR
+                                </button>
+                                <button type="button" class="btn btn-primary btn-action">
+                                    <i class="icofont icofont-save"></i> KAYDET
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evrak Filtre ve Tarih Seçimi -->
+        <div class="row mt-4">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">
+                            <i class="icofont icofont-filter"></i> Evrak Bilgileri
+                        </h5>
+                        <button class="btn btn-sm btn-light float-right" type="button" data-toggle="collapse" data-target="#evrakBilgileriCollapse">
+                            <i class="icofont icofont-rounded-down"></i>
+                        </button>
+                    </div>
+
+                    <div class="collapse show" id="evrakBilgileriCollapse">
+                        <div class="card-body" style="padding: 20px;">
+                            <div class="row align-items-end">
+                                <div class="col-md-4">
+                                    <label class="form-label">Başlangıç Tarihi</label>
+                                    <input type="date" class="form-control" id="baslangicTarihi" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Bitiş Tarihi</label>
+                                    <input type="date" class="form-control" id="bitisTarihi" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Giriş Depo</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="girisDepo" />
+                                        <button class="btn btn-outline-secondary" type="button">
+                                            <i class="icofont icofont-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Teslim Alan</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="teslimAlanFilter" />
+                                        <button class="btn btn-outline-secondary" type="button">
+                                            <i class="icofont icofont-close text-danger"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evrak Listesi Tablosu -->
+        <div class="row mt-4">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">
+                            <i class="icofont icofont-list"></i> Evrak Listesi
+                        </h5>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-hover mb-0" id="evrakListesiTable">
+                                <thead>
+                                    <tr>
+                                        <th>Bekleyen</th>
+                                        <th>Onaylanan</th>
+                                        <th>Kısmi Tamamlanan</th>
+                                        <th>Tamamlanan</th>
+                                        <th>Red Edilen</th>
+                                        <th>Kapatılan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-4">
+                                            <i class="icofont icofont-search-document" style="font-size: 48px; opacity: 0.3;"></i>
+                                            <p class="mb-0 mt-2">Evrak bulunamadı. Lütfen filtre kriterlerini kontrol ediniz.</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alt Tablo - Evrak Detay -->
+        <div class="row mt-4">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header" style="background: radial-gradient(circle, rgba(0, 118, 168, 1) 0%, rgba(22, 46, 84, 1) 63%); padding: 10px 20px;">
+                        <h5 class="card-header-text text-white">
+                            <i class="icofont icofont-document-folder"></i> Evrak Detayları
+                        </h5>
+                        <div class="float-right">
+                            <button class="btn btn-sm btn-light mr-2">
+                                <i class="icofont icofont-file-excel"></i> EXCEL
+                            </button>
+                            <button class="btn btn-sm btn-light">
+                                <i class="icofont icofont-print"></i> YAZDIR
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <!-- Arama Kutusu -->
+                        <div class="p-3 border-bottom">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-right-0">
+                                    <i class="icofont icofont-search"></i>
+                                </span>
+                                <input type="text" class="form-control border-left-0" placeholder="ara" id="searchInput" />
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-hover mb-0" id="evrakDetayTable">
+                                <thead>
+                                    <tr>
+                                        <th>Evrak No Seri</th>
+                                        <th>Evrak No Sıra <i class="icofont icofont-arrow-down"></i></th>
+                                        <th>Masraf Merkezi İsmi</th>
+                                        <th>Masraf Merkezi Alt Başlık İsmi</th>
+                                        <th>Birim İsmi</th>
+                                        <th>Talep Eden İsim</th>
+                                        <th>Talep Tarihi</th>
+                                        <th>Gereken Onay Sayısı</th>
+                                        <th>Kapatma Nedeni</th>
+                                        <th>Durum</th>
+                                        <th>Onay</th>
+                                        <th>Kapat</th>
+                                        <th>Detay</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="13" class="text-center text-muted py-4">
+                                            <i class="icofont icofont-document-folder" style="font-size: 48px; opacity: 0.3;"></i>
+                                            <p class="mb-0 mt-2">Henüz evrak detayı bulunmamaktadır.</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Genel Card Stilleri */
+    .card {
+        border: none;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+        margin-bottom: 20px;
+    }
+
+        .card:hover {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+    /* Form Kontrolleri */
+    .form-label {
+        font-weight: 600;
+        color: #1D3A67;
+        margin-bottom: 5px;
+        font-size: 13px;
+    }
+
+    .form-control {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 8px 12px;
+        font-size: 13px;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus {
+            border-color: #0076a8;
+            box-shadow: 0 0 0 0.2rem rgba(0, 118, 168, 0.25);
+        }
+
+        .form-control:read-only {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+    /* Section Başlıkları */
+    .section-title {
+        color: #1D3A67;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #0076a8;
+    }
+
+    /* Input Group Butonları */
+    .input-group .btn {
+        border-color: #ddd;
+        background-color: white;
+        color: #666;
+    }
+
+        .input-group .btn:hover {
+            background-color: #f5f5f5;
+            border-color: #0076a8;
+            color: #0076a8;
+        }
+
+    /* Action Butonları */
+    .btn-action {
+        padding: 10px 30px;
+        font-weight: 600;
+        font-size: 13px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+        margin-left: 10px;
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        border: none;
+    }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
+            transform: translateY(-1px);
+        }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #0076a8 0%, #162e54 100%);
+        border: none;
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #005a7d 0%, #0f1f3a 100%);
+            transform: translateY(-1px);
+        }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        border: none;
+        color: white;
+    }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            transform: translateY(-1px);
+        }
+
+    /* Tablo Stilleri */
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 0;
+    }
+
+        .table th {
+            background-color: #1D3A67;
+            color: white;
+            font-weight: 600;
+            font-size: 11px;
+            padding: 12px 10px;
+            text-align: center;
+            border: 1px solid #162e54;
+            white-space: nowrap;
+        }
+
+        .table td {
+            font-size: 12px;
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #e5e5e5;
+        }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #f9f9f9;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f1f1;
+        cursor: pointer;
+    }
+
+    /* Sections */
+    .evrak-bilgileri-section,
+    .stok-bilgileri-section {
+        padding: 15px;
+        background-color: #fafafa;
+        border-radius: 8px;
+        border: 1px solid #e5e5e5;
+    }
+
+    /* Collapse Button */
+    .card-header .btn-light {
+        background-color: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+    }
+
+        .card-header .btn-light:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+    /* Search Input */
+    .input-group-text {
+        background-color: white;
+        border: 1px solid #ddd;
+    }
+
+    /* Badge Stilleri */
+    .badge {
+        padding: 5px 10px;
+        font-size: 11px;
+        border-radius: 3px;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .btn-action
+
+    {
+        margin-top: 10px;
+        width: 100%;
+    }
+
+    .table th,
+    .table td {
+        font-size: 10px;
+        padding: 8px 5px;
+    }
+
+    .card-body {
+        padding: 15px !important;
+    }
+
+    .section-title {
+        font-size: 13px;
+    }
+
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0;
+        margin-bottom: 20px;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: #6c757d;
+    }
+
+    .breadcrumb-item a {
+        color: #0076a8;
+        text-decoration: none;
+    }
+
+        .breadcrumb-item a:hover {
+            color: #005a7d;
+            text-decoration: underline;
+        }
+
+    .breadcrumb-item.active {
+        color: #6c757d;
+    }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Sayfa yüklendiğinde varsayılan değerleri ayarla
+        initializePage();
+
+        // Arama fonksiyonu
+        $('#searchInput').on('keyup', function () {
+            var value = $(this).val().toLowerCase();
+            $('#evrakDetayTable tbody tr').filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        });
+    });
+
+    function initializePage() {
+        // Bugünün tarihini ayarla
+        var today = new Date().toISOString().split('T')[0];
+        $('#tarih, #baslangicTarihi, #bitisTarihi').val(today);
+
+        console.log('Sayfa yüklendi');
+    }
+
+    // Temizle butonu
+    function temizleForm() {
+        $('#stokAdi, #miktar, #birimSelect').val('');
+        $('#eldekiMiktar, #birimFiyat').val('0');
+    }
+
+    // Excel export
+    function exportToExcel() {
+        alert('Excel\'e aktarma özelliği yakında eklenecek');
+    }
+
+    // Print
+    function printTable() {
+        window.print();
+    }
+</script>
