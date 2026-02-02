@@ -17656,13 +17656,13 @@
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\Deneme_proje.aqt3rkk51n.bundle.scp.css'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
       <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"aqt3rkk51n"},{"Name":"integrity","Value":"sha256-QgQ9QuUxEdcp37ElF57Y2IUA7kxgpnUYehUeVQm1ido="},{"Name":"label","Value":"_content/Deneme_proje/Deneme_proje.bundle.scp.css"}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"1130"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022QgQ9QuUxEdcp37ElF57Y2IUA7kxgpnUYehUeVQm1ido=\u0022"},{"Name":"Last-Modified","Value":"Thu, 06 Mar 2025 07:33:14 GMT"}]]]></ResponseHeaders>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"1130"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022QgQ9QuUxEdcp37ElF57Y2IUA7kxgpnUYehUeVQm1ido=\u0022"},{"Name":"Last-Modified","Value":"Mon, 02 Feb 2026 11:56:07 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/Deneme_proje/Deneme_proje.bundle.scp.css">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\Deneme_proje.aqt3rkk51n.bundle.scp.css'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
       <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-QgQ9QuUxEdcp37ElF57Y2IUA7kxgpnUYehUeVQm1ido="}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"1130"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022QgQ9QuUxEdcp37ElF57Y2IUA7kxgpnUYehUeVQm1ido=\u0022"},{"Name":"Last-Modified","Value":"Thu, 06 Mar 2025 07:33:14 GMT"}]]]></ResponseHeaders>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"1130"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022QgQ9QuUxEdcp37ElF57Y2IUA7kxgpnUYehUeVQm1ido=\u0022"},{"Name":"Last-Modified","Value":"Mon, 02 Feb 2026 11:56:07 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/Deneme_proje/Diokilogoyeni.png">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\Diokilogoyeni.png'))</AssetFile>

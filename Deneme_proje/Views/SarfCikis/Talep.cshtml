@@ -8,218 +8,202 @@
     <div class="px-lg-5 py-3">
         <div class="row">
             <div class="col-12">
-                <div class="card">
+                <div class="card shadow">
                     <div class="card-header bg-primary text-white">
                         <h4 class="mb-0"><i class="fas fa-boxes"></i> Sarf Çıkış Talebi Oluştur</h4>
                     </div>
                     <div class="card-body">
 
                         <!-- EVRAK BİLGİLERİ -->
-                        <div class="row mb-3">
-                            <div class="col-md-12"><h5 class="border-bottom pb-2">Evrak Bilgileri</h5></div>
+                        <div class="row mb-4">
+                            <div class="col-12"><h5 class="border-bottom pb-2 mb-3">Evrak Bilgileri</h5></div>
                         </div>
-                        <div class="row mb-3">
+                        <div class="row mb-4 g-3">
                             <div class="col-md-3">
                                 <label class="form-label">Evrak Seri No</label>
                                 <input type="text" class="form-control" id="evrakSeri" value="SÇ" />
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Evrak Sıra No</label>
-                                <input type="text" class="form-control" id="evrakSira" value="1" readonly />
+                                <input type="text" class="form-control bg-light" id="evrakSira" readonly />
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Talep Tarihi</label>
-                                <input type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly />
+                                <input type="date" class="form-control bg-light" value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly />
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Talep Eden</label>
-                                <input type="text" class="form-control" value="@ViewBag.UserName" readonly />
+                                <input type="text" class="form-control bg-light" value="@ViewBag.UserName" readonly />
                             </div>
                         </div>
 
-                        <!-- MASRAF MERKEZİ VE DEPO -->
-                        <div class="row mb-3">
-                            <div class="col-md-12"><h5 class="border-bottom pb-2">Masraf Merkezi ve Depo</h5></div>
+                        <!-- MASRAF MERKEZİ + DEPO -->
+                        <div class="row mb-4">
+                            <div class="col-12"><h5 class="border-bottom pb-2 mb-3">Masraf Merkezi ve Depo</h5></div>
                         </div>
-                        <div class="row mb-3">
+                        <div class="row g-3 mb-4">
                             <div class="col-md-6">
-                                <label class="form-label">Masraf Merkezi <span class="text-danger">*</span></label>
-                                <select class="form-select" id="masrafMerkezi">
+                                <label class="form-label">Ana Masraf Merkezi <span class="text-danger">*</span></label>
+                                <select class="form-select" id="anaMasraf">
                                     <option value="">Seçiniz...</option>
-                                    @if (Model.MasrafMerkezleri != null)
+                                    @if (Model.AnaMasrafGruplari != null)
                                     {
-                                        @foreach (var masraf in Model.MasrafMerkezleri)
+                                        foreach (var ana in Model.AnaMasrafGruplari)
                                         {
-                                            <option value="@masraf.his_kod" data-isim="@masraf.his_isim">@masraf.his_isim</option>
+                                            <option value="@ana.AnaKod">@ana.AnaKod - @ana.AnaIsim</option>
                                         }
                                     }
                                 </select>
                             </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Alt Masraf Merkezi <span class="text-danger">*</span></label>
+                                <select class="form-select" id="masrafMerkezi" disabled>
+                                    <option value="">Önce ana masraf merkezi seçiniz</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
                             <div class="col-md-6">
                                 <label class="form-label">Çıkış Deposu <span class="text-danger">*</span></label>
                                 <select class="form-select" id="cikisDepo">
                                     <option value="">Seçiniz...</option>
                                     @if (Model.Depolar != null)
                                     {
-                                        @foreach (var depo in Model.Depolar)
+                                        foreach (var depo in Model.Depolar)
                                         {
                                             <option value="@depo.dep_no">@depo.dep_adi</option>
                                         }
                                     }
                                 </select>
                             </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-md-12">
-                                <label class="form-label">Birim Adı</label>
-                                <input type="text" class="form-control" id="birimAdi" placeholder="Örn: Üretim, Paketleme..." />
+                            <div class="col-md-6">
+                                <label class="form-label">Birim Adı / Departman</label>
+                                <input type="text" class="form-control" id="birimAdi" placeholder="Örn: Üretim, Paketleme, Montaj..." />
                             </div>
                         </div>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Sorumluluk Merkezi <span class="text-danger">*</span></label>
+                                <select class="form-select" id="sorumlulukMerkezi" required>
+                                    <option value="">Seçiniz...</option>
+                                    @if (Model.SorumlulukMerkezleri != null)
+                                    {
+                                        foreach (var sm in Model.SorumlulukMerkezleri)
+                                        {
+                                            <option value="@sm.Kod">@sm.Kod - @sm.Isim</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
 
-                        <!-- STOK EKLEME -->
-                        <div class="row mb-3">
-                            <div class="col-md-12"><h5 class="border-bottom pb-2">Stok Ekleme</h5></div>
+                            <!-- İsterseniz buraya başka bir alan daha koyabilirsiniz -->
+                            <div class="col-md-6">
+                                <!-- boş bırakabilir veya başka bilgi eklenebilir -->
+                            </div>
+                        </div>
+                        <!-- STOK EKLEME BÖLÜMÜ -->
+                        <div class="row mb-4">
+                            <div class="col-12"><h5 class="border-bottom pb-2 mb-3">Stok Ekleme</h5></div>
                         </div>
 
-                        <!-- ✅ YENİ STOK ARAMA YAPISI -->
-                        <div class="row mb-3">
-                            <div class="col-md-12">
-                                <div class="card bg-light">
-                                    <div class="card-body">
-                                        <div class="row align-items-end">
-                                            <!-- STOK ARAMA -->
-                                            <div class="col-md-4">
-                                                <label class="form-label fw-bold">Stok Arama <span class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <input type="text"
-                                                           class="form-control"
-                                                           id="stokArama"
-                                                           placeholder="En az 2 karakter yazın..."
-                                                           autocomplete="off" />
-                                                    <button class="btn btn-outline-secondary" type="button" id="stokTemizleBtn">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
-                                                <small class="text-muted">Stok kodu veya adı yazın</small>
-                                            </div>
-
-                                            <!-- MİKTAR -->
-                                            <div class="col-md-2">
-                                                <label class="form-label fw-bold">Miktar <span class="text-danger">*</span></label>
-                                                <input type="number" class="form-control" id="miktar" min="0" step="0.01" value="0" />
-                                            </div>
-
-                                            <!-- BİRİM -->
-                                            <div class="col-md-2">
-                                                <label class="form-label fw-bold">Birim <span class="text-danger">*</span></label>
-                                                <select class="form-select" id="birim" disabled>
-                                                    <option value="">Önce stok seçin</option>
-                                                </select>
-                                            </div>
-
-                                            <!-- BİRİM FİYAT -->
-                                            <div class="col-md-2">
-                                                <label class="form-label fw-bold">Birim Fiyat</label>
-                                                <input type="number" class="form-control" id="birimFiyat" min="0" step="0.01" value="0" />
-                                            </div>
-
-                                            <!-- EKLE BUTONU -->
-                                            <div class="col-md-2">
-                                                <button type="button" class="btn btn-success w-100" id="stokEkleBtn">
-                                                    <i class="fas fa-plus"></i> Ekle
-                                                </button>
-                                            </div>
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold">Stok Arama</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="stokArama" placeholder="Stok kodu veya adı..." autocomplete="off" />
+                                            <button class="btn btn-outline-secondary" type="button" id="stokTemizleBtn"><i class="fas fa-times"></i></button>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- ✅ STOK SONUÇLARI (DROPDOWN) -->
-                        <div class="row mb-3" id="stokSonucAlani" style="display:none;">
-                            <div class="col-md-12">
-                                <div class="card border-primary">
-                                    <div class="card-header bg-primary text-white d-flex justify-content-between">
-                                        <span><i class="fas fa-search"></i> Arama Sonuçları</span>
-                                        <button type="button" class="btn btn-sm btn-light" id="sonuclariKapatBtn">
-                                            <i class="fas fa-times"></i>
+                                    <div class="col-md-2">
+                                        <label class="form-label fw-bold">Miktar</label>
+                                        <input type="number" class="form-control" id="miktar" min="0.001" step="0.001" value="0" />
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label fw-bold">Birim</label>
+                                        <select class="form-select" id="birim" disabled>
+                                            <option value="">Stok seçiniz</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label fw-bold">Birim Fiyat (TL)</label>
+                                        <input type="number" class="form-control" id="birimFiyat" step="0.01" value="0" />
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="button" class="btn btn-success w-100 mt-4" id="stokEkleBtn">
+                                            <i class="fas fa-plus"></i> Ekle
                                         </button>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Arama sonuçları alanı -->
+                        <div class="row mb-4" id="stokSonucAlani" style="display:none;">
+                            <div class="col-12">
+                                <div class="card border-primary">
+                                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                        <span><i class="fas fa-search"></i> Arama Sonuçları</span>
+                                        <button type="button" class="btn btn-sm btn-light" id="sonuclariKapatBtn"><i class="fas fa-times"></i></button>
+                                    </div>
                                     <div class="card-body p-0">
-                                        <div class="list-group list-group-flush" id="stokListesi" style="max-height: 300px; overflow-y: auto;">
-                                            <!-- Buraya stoklar gelecek -->
-                                        </div>
+                                        <div class="list-group list-group-flush" id="stokListesi" style="max-height:320px; overflow-y:auto;"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- ✅ LOADING VE UYARILAR -->
-                        <div class="row mb-3">
-                            <div class="col-md-12">
-                                <!-- Loading -->
-                                <div id="stokYukleniyor" class="alert alert-info" style="display:none;">
-                                    <div class="spinner-border spinner-border-sm me-2"></div>
-                                    <span>Stoklar aranıyor...</span>
-                                </div>
-
-                                <!-- Stok Miktar Uyarısı -->
-                                <div id="stokMiktarUyari"></div>
-
-                                <!-- Seçili Stok Bilgisi -->
-                                <div id="seciliStokBilgi" class="alert alert-success" style="display:none;">
-                                    <strong><i class="fas fa-check-circle"></i> Seçili Stok:</strong>
-                                    <span id="seciliStokText"></span>
-                                </div>
-                            </div>
+                        <!-- Uyarı ve bilgi alanları -->
+                        <div id="stokYukleniyor" class="alert alert-info d-none">
+                            <div class="spinner-border spinner-border-sm me-2"></div> Stoklar aranıyor...
+                        </div>
+                        <div id="stokMiktarUyari" class="mb-3"></div>
+                        <div id="seciliStokBilgi" class="alert alert-success d-none">
+                            <strong>Seçili stok:</strong> <span id="seciliStokText"></span>
                         </div>
 
-                        <!-- STOK TABLOSU -->
-                        <div class="row mb-3">
-                            <div class="col-md-12">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-hover" id="stokTablosu">
-                                        <thead class="table-dark">
-                                            <tr>
-                                                <th style="width: 5%;">#</th>
-                                                <th style="width: 15%;">Stok Kodu</th>
-                                                <th style="width: 30%;">Stok Adı</th>
-                                                <th style="width: 10%;">Miktar</th>
-                                                <th style="width: 10%;">Birim</th>
-                                                <th style="width: 12%;">Birim Fiyat</th>
-                                                <th style="width: 12%;">Toplam</th>
-                                                <th style="width: 6%;">İşlem</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr id="bos-satir">
-                                                <td colspan="8" class="text-center text-muted py-4">
-                                                    <i class="fas fa-info-circle fa-2x mb-2"></i>
-                                                    <p class="mb-0">Henüz stok eklenmedi</p>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                        <tfoot class="table-light">
-                                            <tr>
-                                                <td colspan="6" class="text-end fw-bold">GENEL TOPLAM:</td>
-                                                <td colspan="2" class="fw-bold"><span id="genelToplam">0.00</span> TL</td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-                                </div>
-                            </div>
+                        <!-- Stok tablosu -->
+                        <div class="table-responsive mb-4">
+                            <table class="table table-bordered table-hover" id="stokTablosu">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Stok Kodu</th>
+                                        <th>Stok Adı</th>
+                                        <th class="text-end">Miktar</th>
+                                        <th>Birim</th>
+                                        <th class="text-end">Birim Fiyat</th>
+                                        <th class="text-end">Toplam</th>
+                                        <th class="text-center">İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="bos-satir">
+                                        <td colspan="8" class="text-center text-muted py-5">
+                                            <i class="fas fa-box-open fa-2x mb-3 d-block"></i>
+                                            Henüz stok eklenmedi
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot class="table-light">
+                                    <tr>
+                                        <td colspan="6" class="text-end fw-bold">TOPLAM:</td>
+                                        <td colspan="2" class="fw-bold text-end" id="genelToplam">0,00 TL</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
                         </div>
 
-                        <!-- BUTONLAR -->
-                        <div class="row">
-                            <div class="col-md-12 text-end">
-                                <button type="button" class="btn btn-secondary btn-lg me-2" onclick="window.history.back()">
-                                    <i class="fas fa-times"></i> İptal
-                                </button>
-                                <button type="button" class="btn btn-primary btn-lg" id="kaydetBtn">
-                                    <i class="fas fa-save"></i> Talebi Kaydet
-                                </button>
-                            </div>
+                        <!-- Kaydet / İptal -->
+                        <div class="text-end">
+                            <button type="button" class="btn btn-lg btn-outline-secondary me-3" onclick="history.back()">
+                                <i class="fas fa-arrow-left"></i> Vazgeç
+                            </button>
+                            <button type="button" class="btn btn-lg btn-primary" id="kaydetBtn">
+                                <i class="fas fa-save"></i> Talebi Kaydet
+                            </button>
                         </div>
 
                     </div>
@@ -228,364 +212,287 @@
         </div>
     </div>
 </div>
+
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        console.log('✅ Sayfa yüklendi');
+        $(function () {
 
-        $(document).ready(function () {
-            console.log('✅ jQuery hazır');
-
-            // ==================== DEĞİŞKENLER ====================
             let stoklar = [];
             let satirNo = 1;
-            let secilenDepo = null;
             let secilenStok = null;
-            let aramaTimeout = null;
-            let sonArama = '';
+            let secilenDepo = null;
 
-            // ==================== DEPO SEÇİMİ ====================
-            $('#cikisDepo').on('change', function () {
+            // ─── Evrak sıra numarasını backend'den çek ───
+            function yukleSonSira() {
+                let seri = $('#evrakSeri').val().trim() || 'SÇ';
+                $.getJSON('@Url.Action("GetSonEvrakNo", "SarfCikis")', { seriNo: seri }, function (res) {
+                    if (res.success) {
+                        $('#evrakSira').val(res.siraNo);
+                    } else {
+                        $('#evrakSira').val(1);
+                    }
+                });
+            }
+            yukleSonSira();
+            $('#evrakSeri').on('change', yukleSonSira);
+
+            // Depo seçimi
+            $('#cikisDepo').change(function () {
                 secilenDepo = $(this).val();
-                console.log('📦 Depo seçildi:', secilenDepo);
-
-                if (secilenStok) {
+                if (secilenStok && secilenDepo) {
                     stokMiktarKontrol(secilenStok.sto_kod, secilenDepo);
                 }
             });
 
-            // ==================== STOK ARAMA ====================
+            // ─── Stok arama ───
+            let aramaTimer;
             $('#stokArama').on('input', function () {
-                clearTimeout(aramaTimeout);
-                let arama = $(this).val().trim();
+                clearTimeout(aramaTimer);
+                let val = $(this).val().trim();
 
-                console.log('🔍 Arama:', arama);
-
-                if (arama.length < 2) {
-                    $('#stokSonucAlani').hide();
-                    $('#stokYukleniyor').hide();
-                    $('#stokListesi').html('');
+                if (val.length < 2) {
+                    $('#stokSonucAlani, #stokYukleniyor').hide();
                     return;
                 }
 
-                if (arama === sonArama) return;
-                sonArama = arama;
-
-                // Loading göster
-                $('#stokYukleniyor').show();
-                $('#stokSonucAlani').hide();
-
-                aramaTimeout = setTimeout(function () {
-                    console.log('📡 AJAX isteği gönderiliyor...');
-
-                    $.ajax({
-                        url: '@Url.Action("StokAra", "SarfCikis")',
-                        type: 'GET',
-                        data: { arama: arama },
-                        success: function (res) {
-                            console.log('✅ Sonuç:', res);
-
-                            $('#stokYukleniyor').hide();
-
-                            if (res.success && res.data && res.data.length > 0) {
-                                let html = '';
-                                res.data.forEach(function (stok, index) {
-                                    html += `
-                                        <a href="#" class="list-group-item list-group-item-action stok-item"
-                                           data-kod="${stok.sto_kod}"
-                                           data-isim="${stok.sto_isim}"
-                                           data-birim1="${stok.sto_birim1_ad}"
-                                           data-birim2="${stok.sto_birim2_ad}"
-                                           data-birim3="${stok.sto_birim3_ad}"
-                                           data-birim4="${stok.sto_birim4_ad}">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <strong class="text-primary">${stok.sto_kod}</strong>
-                                                    <br>
-                                                    <small class="text-muted">${stok.sto_isim}</small>
-                                                </div>
-                                                <span class="badge bg-info">${stok.sto_birim1_ad || 'Birim Yok'}</span>
-                                            </div>
-                                        </a>
-                                    `;
-                                });
-
-                                $('#stokListesi').html(html);
-                                $('#stokSonucAlani').show();
-                                console.log(`✅ ${res.data.length} stok listelendi`);
-                            } else {
-                                $('#stokListesi').html(`
-                                    <div class="list-group-item text-center text-muted">
-                                        <i class="fas fa-exclamation-circle"></i> Sonuç bulunamadı
-                                    </div>
-                                `);
-                                $('#stokSonucAlani').show();
-                                console.log('⚠️ Stok bulunamadı');
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            console.error('❌ AJAX Hatası:', error);
-                            $('#stokYukleniyor').hide();
-                            alert('Stok arama hatası! Console\'u kontrol edin.');
+                aramaTimer = setTimeout(() => {
+                    $('#stokYukleniyor').removeClass('d-none').show();
+                    $.getJSON('@Url.Action("StokAra", "SarfCikis")', { arama: val }, function (res) {
+                        $('#stokYukleniyor').hide();
+                        let html = '';
+                        if (res.success && res.data?.length) {
+                            res.data.forEach(s => {
+                                html += `
+                                <a href="#" class="list-group-item list-group-item-action stok-item px-3 py-2"
+                                   data-kod="${s.sto_kod}"
+                                   data-isim="${s.sto_isim?.replace(/"/g,'&quot;')}"
+                                   data-birim1="${s.sto_birim1_ad||''}"
+                                   data-birim2="${s.sto_birim2_ad||''}"
+                                   data-birim3="${s.sto_birim3_ad||''}"
+                                   data-birim4="${s.sto_birim4_ad||''}">
+                                    <strong>${s.sto_kod}</strong><br>
+                                    <small class="text-muted">${s.sto_isim}</small>
+                                    <span class="badge bg-info float-end">${s.sto_birim1_ad || '-'}</span>
+                                </a>`;
+                            });
+                        } else {
+                            html = '<div class="list-group-item text-center py-4 text-muted">Sonuç bulunamadı</div>';
                         }
+                        $('#stokListesi').html(html);
+                        $('#stokSonucAlani').show();
                     });
-                }, 500);
+                }, 400);
             });
 
-            // ==================== STOK SEÇİMİ ====================
+            // Stok seçildi
             $(document).on('click', '.stok-item', function (e) {
                 e.preventDefault();
-
-                let $this = $(this);
+                let $el = $(this);
                 secilenStok = {
-                    sto_kod: $this.data('kod'),
-                    sto_isim: $this.data('isim'),
-                    sto_birim1_ad: $this.data('birim1') || '',
-                    sto_birim2_ad: $this.data('birim2') || '',
-                    sto_birim3_ad: $this.data('birim3') || '',
-                    sto_birim4_ad: $this.data('birim4') || ''
+                    sto_kod: $el.data('kod'),
+                    sto_isim: $el.data('isim'),
+                    birim1: $el.data('birim1'),
+                    birim2: $el.data('birim2'),
+                    birim3: $el.data('birim3'),
+                    birim4: $el.data('birim4')
                 };
 
-                console.log('✅ Stok seçildi:', secilenStok);
-
-                // Arama kutusuna yaz
                 $('#stokArama').val(secilenStok.sto_kod + ' - ' + secilenStok.sto_isim);
-
-                // Sonuçları gizle
                 $('#stokSonucAlani').hide();
+                $('#seciliStokText').text(secilenStok.sto_kod + ' – ' + secilenStok.sto_isim);
+                $('#seciliStokBilgi').removeClass('d-none').show();
 
-                // Seçili stok bilgisini göster
-                $('#seciliStokText').text(secilenStok.sto_kod + ' - ' + secilenStok.sto_isim);
-                $('#seciliStokBilgi').show();
+                // Birim seçenekleri
+                let opts = '<option value="">Seçiniz</option>';
+                if (secilenStok.birim1) opts += `<option value="1">${secilenStok.birim1}</option>`;
+                if (secilenStok.birim2) opts += `<option value="2">${secilenStok.birim2}</option>`;
+                if (secilenStok.birim3) opts += `<option value="3">${secilenStok.birim3}</option>`;
+                if (secilenStok.birim4) opts += `<option value="4">${secilenStok.birim4}</option>`;
+                $('#birim').html(opts).prop('disabled', false);
 
-                // Birimleri doldur
-                let html = '<option value="">Seçiniz...</option>';
-                if (secilenStok.sto_birim1_ad) html += `<option value="1">${secilenStok.sto_birim1_ad}</option>`;
-                if (secilenStok.sto_birim2_ad) html += `<option value="2">${secilenStok.sto_birim2_ad}</option>`;
-                if (secilenStok.sto_birim3_ad) html += `<option value="3">${secilenStok.sto_birim3_ad}</option>`;
-                if (secilenStok.sto_birim4_ad) html += `<option value="4">${secilenStok.sto_birim4_ad}</option>`;
-
-                $('#birim').html(html).prop('disabled', false);
-
-                // Miktar kontrolü
-                if (secilenDepo) {
-                    stokMiktarKontrol(secilenStok.sto_kod, secilenDepo);
-                } else {
-                    $('#stokMiktarUyari').html(`
-                        <div class="alert alert-warning">
-                            <i class="fas fa-exclamation-triangle"></i> Önce çıkış deposu seçiniz!
-                        </div>
-                    `);
-                }
-
-                // Miktar alanına focus
+                if (secilenDepo) stokMiktarKontrol(secilenStok.sto_kod, secilenDepo);
                 $('#miktar').focus().select();
             });
 
-            // ==================== TEMİZLE BUTONLARI ====================
-            $('#stokTemizleBtn').click(function () {
-                $('#stokArama').val('');
-                $('#stokSonucAlani').hide();
-                $('#seciliStokBilgi').hide();
-                $('#stokMiktarUyari').html('');
-                secilenStok = null;
-                $('#birim').html('<option value="">Önce stok seçin</option>').prop('disabled', true);
-            });
-
-            $('#sonuclariKapatBtn').click(function () {
-                $('#stokSonucAlani').hide();
-            });
-
-            // ==================== MİKTAR KONTROL ====================
-            function stokMiktarKontrol(stokKod, depoNo) {
-                $.get('@Url.Action("GetStokMiktar", "SarfCikis")', { stokKod: stokKod, depoNo: depoNo }, function (res) {
+            // Stok miktar kontrol
+            function stokMiktarKontrol(kod, depo) {
+                if (!kod || !depo) return;
+                $.getJSON('@Url.Action("GetStokMiktar", "SarfCikis")', { stokKod: kod, depoNo: depo }, res => {
                     if (res.success) {
-                        let miktar = parseFloat(res.miktar) || 0;
-                        let renk = miktar > 0 ? 'success' : 'danger';
-                        let icon = miktar > 0 ? 'fa-check-circle' : 'fa-exclamation-circle';
-
+                        let m = parseFloat(res.miktar) || 0;
+                        let cls = m > 0 ? 'success' : 'danger';
+                        let ico = m > 0 ? 'check-circle' : 'exclamation-triangle';
                         $('#stokMiktarUyari').html(`
-                            <div class="alert alert-${renk}">
-                                <i class="fas ${icon}"></i>
-                                <strong>Depoda Mevcut:</strong> ${miktar.toFixed(2)}
-                            </div>
-                        `);
+                            <div class="alert alert-${cls}">
+                                <i class="fas fa-${ico}"></i> Depoda mevcut: <strong>${m.toFixed(3)}</strong>
+                            </div>`);
                     }
                 });
             }
 
-            // ==================== STOK EKLE ====================
-            $('#stokEkleBtn').click(function () {
-                if (!secilenDepo) {
-                    Swal.fire('Uyarı', 'Önce çıkış deposu seçiniz!', 'warning');
-                    return;
-                }
+            // Temizle butonları
+            $('#stokTemizleBtn, #sonuclariKapatBtn').click(() => {
+                $('#stokArama').val('');
+                $('#stokSonucAlani').hide();
+                $('#seciliStokBilgi').addClass('d-none');
+                $('#stokMiktarUyari').empty();
+                secilenStok = null;
+                $('#birim').html('<option value="">Stok seçiniz</option>').prop('disabled', true);
+            });
 
-                if (!secilenStok) {
-                    Swal.fire('Uyarı', 'Lütfen stok seçiniz!', 'warning');
-                    return;
-                }
+            // Stok ekle
+            $('#stokEkleBtn').click(function () {
+                if (!secilenDepo) return Swal.fire('Uyarı', 'Önce çıkış deposu seçmelisiniz.', 'warning');
+                if (!secilenStok) return Swal.fire('Uyarı', 'Stok seçmelisiniz.', 'warning');
 
                 let miktar = parseFloat($('#miktar').val()) || 0;
-                if (miktar <= 0) {
-                    Swal.fire('Uyarı', 'Geçerli miktar giriniz!', 'warning');
-                    return;
-                }
+                if (miktar <= 0) return Swal.fire('Uyarı', 'Geçerli miktar giriniz.', 'warning');
 
-                let birimPntr = $('#birim').val();
-                if (!birimPntr) {
-                    Swal.fire('Uyarı', 'Birim seçiniz!', 'warning');
-                    return;
-                }
+                let birimPtr = $('#birim').val();
+                if (!birimPtr) return Swal.fire('Uyarı', 'Birim seçmelisiniz.', 'warning');
 
-                let birimAdi = $('#birim option:selected').text();
-                let birimFiyat = parseFloat($('#birimFiyat').val()) || 0;
-                let toplam = miktar * birimFiyat;
+                let birimAd = $('#birim option:selected').text();
+                let fiyat = parseFloat($('#birimFiyat').val()) || 0;
+                let toplam = miktar * fiyat;
 
-                // Tabloya ekle
                 stoklar.push({
                     sth_stok_kod: secilenStok.sto_kod,
                     sth_stok_adi: secilenStok.sto_isim,
                     sth_miktar: miktar,
-                    sth_birim_pntr: parseInt(birimPntr),
-                    sth_tutar: birimFiyat,
+                    sth_birim_pntr: parseInt(birimPtr),
+                    sth_tutar: fiyat,
                     planlanan_adet: miktar,
-                    birim_adi: birimAdi
+                    birim_adi: birimAd
                 });
 
                 $('#bos-satir').remove();
                 $('#stokTablosu tbody').append(`
-                    <tr data-index="${stoklar.length - 1}">
+                    <tr data-idx="${stoklar.length-1}">
                         <td>${satirNo++}</td>
                         <td>${secilenStok.sto_kod}</td>
                         <td>${secilenStok.sto_isim}</td>
-                        <td class="text-end">${miktar.toFixed(2)}</td>
-                        <td>${birimAdi}</td>
-                        <td class="text-end">${birimFiyat.toFixed(2)} TL</td>
-                        <td class="text-end">${toplam.toFixed(2)} TL</td>
+                        <td class="text-end">${miktar.toFixed(3)}</td>
+                        <td>${birimAd}</td>
+                        <td class="text-end">${fiyat.toFixed(2)}</td>
+                        <td class="text-end">${toplam.toFixed(2)}</td>
                         <td class="text-center">
-                            <button class="btn btn-sm btn-danger stok-sil">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                            <button class="btn btn-sm btn-danger stok-sil"><i class="fas fa-trash"></i></button>
                         </td>
-                    </tr>
-                `);
+                    </tr>`);
 
-                // Temizle
-                $('#stokArama').val('');
-                $('#miktar').val('0');
-                $('#birim').html('<option value="">Önce stok seçin</option>').prop('disabled', true);
-                $('#birimFiyat').val('0');
-                $('#seciliStokBilgi').hide();
-                $('#stokMiktarUyari').html('');
+                // temizle
+                $('#stokArama,#miktar,#birimFiyat').val('');
+                $('#birim').prop('disabled', true).html('<option value="">Stok seçiniz</option>');
+                $('#seciliStokBilgi').addClass('d-none');
+                $('#stokMiktarUyari').empty();
                 secilenStok = null;
-
-                toplamHesapla();
-                Swal.fire({ icon: 'success', title: 'Eklendi!', timer: 1000, showConfirmButton: false });
+                hesaplaToplam();
+                Swal.fire({icon:'success', title:'Eklendi', timer:900, showConfirmButton:false});
             });
 
-            // ==================== SİL ====================
+            // Silme
             $(document).on('click', '.stok-sil', function () {
-                let row = $(this).closest('tr');
-                let idx = row.data('index');
-
+                let $row = $(this).closest('tr');
+                let idx = $row.data('idx');
                 stoklar.splice(idx, 1);
-                row.remove();
+                $row.remove();
 
-                // Sıra numaralarını yeniden düzenle
-                $('#stokTablosu tbody tr').each(function (i) {
-                    $(this).data('index', i).find('td:first').text(i + 1);
+                $('#stokTablosu tbody tr').each((i, el) => {
+                    $(el).data('idx', i).find('td:first').text(i+1);
                 });
 
-                if (stoklar.length === 0) {
+                if (!stoklar.length) {
                     $('#stokTablosu tbody').html(`
                         <tr id="bos-satir">
-                            <td colspan="8" class="text-center text-muted py-4">
-                                <i class="fas fa-info-circle fa-2x mb-2"></i>
-                                <p class="mb-0">Henüz stok eklenmedi</p>
+                            <td colspan="8" class="text-center text-muted py-5">
+                                <i class="fas fa-box-open fa-2x mb-3 d-block"></i>
+                                Henüz stok eklenmedi
                             </td>
-                        </tr>
-                    `);
+                        </tr>`);
                     satirNo = 1;
                 }
-
-                toplamHesapla();
+                hesaplaToplam();
             });
 
-            // ==================== TOPLAM HESAPLA ====================
-            function toplamHesapla() {
-                let toplam = stoklar.reduce((sum, s) => sum + (s.sth_miktar * s.sth_tutar), 0);
-                $('#genelToplam').text(toplam.toFixed(2));
+            function hesaplaToplam() {
+                let t = stoklar.reduce((a, b) => a + (b.sth_miktar * b.sth_tutar), 0);
+                $('#genelToplam').text(t.toFixed(2) + ' TL');
             }
 
-            // ==================== KAYDET ====================
+            // Kaydet
             $('#kaydetBtn').click(function () {
+                let anaMasraf = $('#anaMasraf').val();
                 let masrafKod = $('#masrafMerkezi').val();
-                let masrafIsim = $('#masrafMerkezi option:selected').data('isim');
-                let depoNo = $('#cikisDepo').val();
+                let masrafIsim = $('#masrafMerkezi option:selected').text().trim();
+                let depo = $('#cikisDepo').val();
                 let birimAdi = $('#birimAdi').val().trim();
 
-                if (!masrafKod) {
-                    Swal.fire('Uyarı', 'Masraf merkezi seçiniz!', 'warning');
-                    return;
-                }
+                if (!anaMasraf) return Swal.fire('Eksik', 'Ana masraf merkezi seçmelisiniz.', 'warning');
+                if (!masrafKod) return Swal.fire('Eksik', 'Alt masraf merkezi seçmelisiniz.', 'warning');
+                if (!depo) return Swal.fire('Eksik', 'Çıkış deposu seçmelisiniz.', 'warning');
+                if (!stoklar.length) return Swal.fire('Eksik', 'En az bir stok eklemelisiniz.', 'warning');
 
-                if (!depoNo) {
-                    Swal.fire('Uyarı', 'Çıkış deposu seçiniz!', 'warning');
-                    return;
-                }
+                let payload = {
+        SarfCikis: {
+            sth_evrakno_seri: $('#evrakSeri').val().trim(),
+            sth_evrakno_sira: parseInt($('#evrakSira').val()) || 1,
+            masraf_merkezi_kodu: masrafKod,
+            masraf_merkezi_ismi: masrafIsim,
+            birim_adi: birimAdi,
+            sth_cikis_depo_no: parseInt(depo),
 
-                if (stoklar.length === 0) {
-                    Swal.fire('Uyarı', 'En az bir stok ekleyiniz!', 'warning');
-                    return;
-                }
+            // ─── YENİ ───
+            sorumluluk_merkezi_kodu: $('#sorumlulukMerkezi').val()?.trim() || "",
+            // sorumluluk_merkezi_ismi: $('#sorumlulukMerkezi option:selected').text().trim() || ""   // isterseniz
+        },
+        Stoklar: stoklar
+    };
 
-                let data = {
-                    SarfCikis: {
-                        sth_evrakno_seri: $('#evrakSeri').val().trim(),
-                        sth_evrakno_sira: parseInt($('#evrakSira').val()) || 1,
-                        masraf_merkezi_kodu: masrafKod,
-                        masraf_merkezi_ismi: masrafIsim,
-                        birim_adi: birimAdi,
-                        sth_cikis_depo_no: parseInt(depoNo)
-                    },
-                    Stoklar: stoklar
-                };
-
-                console.log('💾 Kaydediliyor:', data);
-
-                Swal.fire({
-                    title: 'Kaydediliyor...',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
+                Swal.fire({title:'Kaydediliyor...', allowOutsideClick:false, didOpen:()=>Swal.showLoading()});
 
                 $.ajax({
                     url: '@Url.Action("TalepKaydet", "SarfCikis")',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify(data),
-                    success: function (res) {
-                        console.log('✅ Kayıt sonucu:', res);
-
-                        if (res.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Başarılı!',
-                                text: res.message
-                            }).then(() => {
-                                window.location.href = '@Url.Action("TalepListesi", "SarfCikis")';
-                            });
+                    data: JSON.stringify(payload),
+                    success(r) {
+                        if (r.success) {
+                            Swal.fire('Başarılı', r.message || 'Talep kaydedildi', 'success')
+                                .then(() => location.href = '@Url.Action("Tamamla", "SarfCikis")');
                         } else {
-                            Swal.fire('Hata', res.message, 'error');
+                            Swal.fire('Hata', r.message || 'Kayıt yapılamadı', 'error');
                         }
                     },
-                    error: function (xhr, status, error) {
-                        console.error('❌ Kayıt hatası:', error);
-                        Swal.fire('Hata', 'Sunucu hatası!', 'error');
+                    error() {
+                        Swal.fire('Hata', 'Sunucu ile iletişim kurulamadı', 'error');
                     }
                 });
             });
 
-            console.log('✅ Tüm event listener\'lar hazır');
+            // Ana masraf → alt masraf yükleme
+            $('#anaMasraf').change(function () {
+                let prefix = $(this).val();
+                let $alt = $('#masrafMerkezi').prop('disabled', true);
+
+                if (!prefix) {
+                    $alt.html('<option value="">Önce ana grup seçin</option>');
+                    return;
+                }
+
+                $alt.html('<option value="">Yükleniyor...</option>');
+
+                $.getJSON('@Url.Action("GetAltMasrafMerkezleri", "SarfCikis")', { anaPrefix: prefix }, function (res) {
+                    if (res.success && res.data?.length) {
+                        let html = '<option value="">Seçiniz...</option>';
+                        res.data.forEach(item => {
+                            html += `<option value="${item.Kod}">${item.Kod} - ${item.Isim}</option>`;
+                        });
+                        $alt.html(html).prop('disabled', false);
+                    } else {
+                        $alt.html('<option value="">Alt grup bulunamadı</option>');
+                    }
+                });
+            });
         });
     </script>
